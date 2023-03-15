@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIB4_MACROTIME_EVAL_H
-# define LIB4_MACROTIME_EVAL_H
+#ifndef LIBANDRIA4_MACROTIME_EVAL_H
+# define LIBANDRIA4_MACROTIME_EVAL_H
 	
 	#include "math.h"
 	
@@ -35,33 +35,33 @@ SOFTWARE.
 		/*  The *_FORSET macro system uses it, but you might occassionally */
 		/*  need to add a few layers of eval if you give forset too much to */
 		/*  do... */
-	#define LIB4_EVAL0( ... ) __VA_ARGS__
-	#define LIB4_EVAL1( ... ) \
-		LIB4_EVAL0( LIB4_EVAL0( LIB4_EVAL0( __VA_ARGS__ )))
-	#define LIB4_EVAL2( ... ) \
-		LIB4_EVAL1( LIB4_EVAL1( LIB4_EVAL1( __VA_ARGS__ )))
-	#define LIB4_EVAL3( ... ) \
-		LIB4_EVAL2( LIB4_EVAL2( LIB4_EVAL2( __VA_ARGS__ )))
-	#define LIB4_EVAL4( ... ) \
-		LIB4_EVAL3( LIB4_EVAL3( LIB4_EVAL3( __VA_ARGS__ )))
-	#define LIB4_EVAL5( ... ) \
-		LIB4_EVAL4( LIB4_EVAL4( LIB4_EVAL4( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL0( ... ) __VA_ARGS__
+	#define LIBANDRIA4_EVAL1( ... ) \
+		LIBANDRIA4_EVAL0( LIBANDRIA4_EVAL0( LIBANDRIA4_EVAL0( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL2( ... ) \
+		LIBANDRIA4_EVAL1( LIBANDRIA4_EVAL1( LIBANDRIA4_EVAL1( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL3( ... ) \
+		LIBANDRIA4_EVAL2( LIBANDRIA4_EVAL2( LIBANDRIA4_EVAL2( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL4( ... ) \
+		LIBANDRIA4_EVAL3( LIBANDRIA4_EVAL3( LIBANDRIA4_EVAL3( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL5( ... ) \
+		LIBANDRIA4_EVAL4( LIBANDRIA4_EVAL4( LIBANDRIA4_EVAL4( __VA_ARGS__ )))
 	
-	#define LIB4_EVAL6( ... ) \
-		LIB4_EVAL5( LIB4_EVAL5( LIB4_EVAL5( __VA_ARGS__ )))
-	#define LIB4_EVAL7( ... ) \
-		LIB4_EVAL6( LIB4_EVAL6( LIB4_EVAL6( __VA_ARGS__ )))
-	#define LIB4_EVAL8( ... ) \
-		LIB4_EVAL7( LIB4_EVAL7( LIB4_EVAL7( __VA_ARGS__ )))
-	#define LIB4_EVAL9( ... ) \
-		LIB4_EVAL8( LIB4_EVAL8( LIB4_EVAL8( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL6( ... ) \
+		LIBANDRIA4_EVAL5( LIBANDRIA4_EVAL5( LIBANDRIA4_EVAL5( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL7( ... ) \
+		LIBANDRIA4_EVAL6( LIBANDRIA4_EVAL6( LIBANDRIA4_EVAL6( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL8( ... ) \
+		LIBANDRIA4_EVAL7( LIBANDRIA4_EVAL7( LIBANDRIA4_EVAL7( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL9( ... ) \
+		LIBANDRIA4_EVAL8( LIBANDRIA4_EVAL8( LIBANDRIA4_EVAL8( __VA_ARGS__ )))
 	
-	#define LIB4_EVAL( ... )  \
-		LIB4_EVAL3( LIB4_EVAL3( LIB4_EVAL3( __VA_ARGS__ )))
+	#define LIBANDRIA4_EVAL( ... )  \
+		LIBANDRIA4_EVAL3( LIBANDRIA4_EVAL3( LIBANDRIA4_EVAL3( __VA_ARGS__ )))
 	
 	
 	
-	#define LIB4_DELAY( func, ... ) LIB4_DELAYLOOP( 60, func, __VA_ARGS__ )
+	#define LIBANDRIA4_DELAY( func, ... ) LIBANDRIA4_DELAYLOOP( 60, func, __VA_ARGS__ )
 			/* Note: if you get weird results on high delay values, then */
 			/*  it's possibly because LIB4_SUMMATIONNUMS_* doesn't go up */
 			/*  high enough. As of when this is being written, it only goes */
@@ -83,14 +83,14 @@ SOFTWARE.
 			/* A delay of 1 is the equivalent to LIB4_EVAL3()'s 21 for */
 			/*  LIB4_EVAL0(), but there is no equivalent to 19, as -1 just */
 			/*  results in a compiler error. */
-		#define LIB4_DELAYINDIR( ... ) \
-			LIB4_DELAYLOOP LIB4_IGNORETHIS ( __VA_ARGS__ )
-		#define LIB4_DELAYDONE( delay, func, ... ) \
-			func LIB4_IGNORETHIS ( __VA_ARGS__ )
-		#define LIB4_DELAYLOOP( delay, func, ... ) \
-			LIB4_IIF( LIB4_BOOL( delay ) ) \
-				( LIB4_DELAYINDIR, LIB4_DELAYDONE ) \
-			LIB4_IGNORETHIS ( LIB4_SUB( delay, 1 ), func, __VA_ARGS__ )
+		#define LIBANDRIA4_DELAYINDIR( ... ) \
+			LIBANDRIA4_DELAYLOOP LIBANDRIA4_IGNORETHIS ( __VA_ARGS__ )
+		#define LIBANDRIA4_DELAYDONE( delay, func, ... ) \
+			func LIBANDRIA4_IGNORETHIS ( __VA_ARGS__ )
+		#define LIBANDRIA4_DELAYLOOP( delay, func, ... ) \
+			LIBANDRIA4_IIF( LIBANDRIA4_BOOL( delay ) ) \
+				( LIBANDRIA4_DELAYINDIR, LIBANDRIA4_DELAYDONE ) \
+			LIBANDRIA4_IGNORETHIS ( LIBANDRIA4_SUB( delay, 1 ), func, __VA_ARGS__ )
 	
 #endif
-/* End lib4 macrotime eval.h */
+/* End libabdria4 basic eval.h */

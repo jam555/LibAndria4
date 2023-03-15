@@ -31,62 +31,62 @@ SOFTWARE.
 
 
 #include "stdmem.h"
-#include "macrotime/simpleops.h"
+#include "simpleops.h"
 
 
-lib4_ptrresult lib4_mallocwrapper( void *ign, size_t size )
+libandria4_ptrresult libandria4_mallocwrapper( void *ign, size_t size )
 {
 	int errmem = errno;
 	errno = 0;
 	
 	void *mem = malloc( size );
-	lib4_result e = lib4_errno_2result();
+	libandria4_result e = libandria4_errno_2result();
 	
-	lib4_ptrresult ret;
-#define lib4_mallocwrapper_SUCCESS( val ) \
-		ret = LIB4_PTRRESULT_BUILDSUCCESS( mem );
-#define lib4_mallocwrapper_FAILURE( val ) \
-		ret = LIB4_PTRRESULT_BUILDFAILURE( val );
-	LIB4_RESULT_BODYMATCH(
+	libandria4_ptrresult ret;
+#define libandria4_mallocwrapper_SUCCESS( val ) \
+		ret = LIBANDRIA4_PTRRESULT_BUILDSUCCESS( mem );
+#define libandria4_mallocwrapper_FAILURE( val ) \
+		ret = LIBANDRIA4_PTRRESULT_BUILDFAILURE( val );
+	LIBANDRIA4_RESULT_BODYMATCH(
 		e,
 		
-		lib4_mallocwrapper_SUCCESS,
-		lib4_mallocwrapper_FAILURE
+		libandria4_mallocwrapper_SUCCESS,
+		libandria4_mallocwrapper_FAILURE
 	);
 	
 	errno = errmem;
 	return( ret );
 }
-lib4_ptrresult lib4_reallocwrapper( void *ign,  void *cur, size_t size )
+libandria4_ptrresult libandria4_reallocwrapper( void *ign,  void *cur, size_t size )
 {
 	int errmem = errno;
 	errno = 0;
 	
 	void *mem = realloc( cur, size );
-	lib4_result e = lib4_errno_2result();
+	libandria4_result e = libandria4_errno_2result();
 	
-	lib4_ptrresult ret;
-#define lib4_reallocwrapper_SUCCESS( val ) \
-		ret = LIB4_PTRRESULT_BUILDSUCCESS( mem );
-#define lib4_reallocwrapper_FAILURE( val ) \
-		ret = LIB4_PTRRESULT_BUILDFAILURE( val );
-	LIB4_RESULT_BODYMATCH(
+	libandria4_ptrresult ret;
+#define libandria4_reallocwrapper_SUCCESS( val ) \
+		ret = LIBANDRIA4_PTRRESULT_BUILDSUCCESS( mem );
+#define libandria4_reallocwrapper_FAILURE( val ) \
+		ret = LIBANDRIA4_PTRRESULT_BUILDFAILURE( val );
+	LIBANDRIA4_RESULT_BODYMATCH(
 		e,
 		
-		lib4_reallocwrapper_SUCCESS,
-		lib4_reallocwrapper_FAILURE
+		libandria4_reallocwrapper_SUCCESS,
+		libandria4_reallocwrapper_FAILURE
 	);
 	
 	errno = errmem;
 	return( ret );
 }
-lib4_result lib4_deallocwrapper( void *ign, void *mem )
+libandria4_result libandria4_deallocwrapper( void *ign, void *mem )
 {
 	int errmem = errno;
 	errno = 0;
 	
 	free( mem );
-	lib4_result ret = lib4_errno_2result()
+	libandria4_result ret = libandria4_errno_2result()
 	
 	errno = errmem;
 	
@@ -95,14 +95,14 @@ lib4_result lib4_deallocwrapper( void *ign, void *mem )
 
 
 
-lib4_memfuncs_t lib4_stdmemfuncs =
+libandria4_memfuncs_t libandria4_stdmemfuncs =
 #if 1
 	{
 		(void*)0,
 		
-		&lib4_mallocwrapper,
-		&lib4_reallocwrapper,
-		&lib4_deallocwrapper
+		&libandria4_mallocwrapper,
+		&libandria4_reallocwrapper,
+		&libandria4_deallocwrapper
 	};
 #else
 	#error "stdmem.c : invalid stdmemfuncs override."

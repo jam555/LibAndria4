@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIB4_MONADS_H
-# define LIB4_MONADS_H
+#ifndef LIBANDRIA4_MONADS_H
+# define LIBANDRIA4_MONADS_H
 	
 	/* This is some untested monadic C code. Monads are used for several */
 	/*  things, but in particularly are the latest fad for errors in */
@@ -47,40 +47,40 @@ SOFTWARE.
 	/*  "nothing" value to a static & just use that if you want to. */
 	
 		/* This should be specialized for packing purposes. */
-	#define LIB4_MONAD_MAYBE_BUILDTYPE_DEFINITION( name, type ) \
+	#define LIBANDRIA4_MONAD_MAYBE_BUILDTYPE_DEFINITION( name, type ) \
 		struct name { type val; unsigned char is_valid; }
-	#define LIB4_MONAD_MAYBE_BUILDTYPE( name, type ) \
+	#define LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( name, type ) \
 		typedef struct name name; \
-		LIB4_MONAD_MAYBE_BUILDTYPE_DEFINITION( name, type )
+		LIBANDRIA4_MONAD_MAYBE_BUILDTYPE_DEFINITION( name, type )
 	
 		/* These produce the actual values. */
-	#define LIB4_MONAD_MAYBE_BUILDJUST( name, type, val ) \
+	#define LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name, type, val ) \
 		( (name){ (type)( val ), 0 } )
-	#define LIB4_MONAD_MAYBE_BUILDNOTHING( name, type ) \
+	#define LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name, type ) \
 		( (name){ (type){ 0 }, 1 } ) \
 		/* C allows compound-literals for scalar types too, so this is fine. */
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
-	#define LIB4_MONAD_MAYBE_BODYMATCH( var, match, otherwise ) \
+	#define LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, match, otherwise ) \
 		if( ( var ).is_valid ) { match( ( var ).val ); } else { otherwise(); }
-	#define LIB4_MONAD_MAYBE_EXPRMATCH( var, match, otherwise ) \
+	#define LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( var, match, otherwise ) \
 		( ( ( var ).is_valid ) ? ( match( ( var ).val ) ) : ( otherwise() ) )
 	
 		/* Like the *MATCH() stuff above, but intended for chaining. I */
 		/*  honestly don't know if the re-ordering does anything useful, but */
 		/*  the change in result type could be useful. */
-	#define LIB4_MONAD_MAYBE_EXPRCHAIN( name, type, var, match ) \
+	#define LIBANDRIA4_MONAD_MAYBE_EXPRCHAIN( name, type, var, match ) \
 		( ( !( ( var ).is_valid ) ) \
-			? ( LIB4_MONAD_MAYBE_BUILDNOTHING( name, type ) ) \
+			? ( LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name, type ) ) \
 			: ( match )( ( var ).val ) )
 	
 		/* Convenience wrappers. See the *_EITHER_* versions for the */
 		/*  involved concept. Remember that the "type" is in both cases the */
 		/*  SAME type. */
-	#define LIB4_MONAD_MAYBE_RETURNLEFT( name, type, val ) \
-		return( LIB4_MONAD_MAYBE_BUILDJUST( name, type, ( (type)( val ) ) ) );
-	#define LIB4_MONAD_MAYBE_RETURNRIGHT( name, type ) \
-		return( LIB4_MONAD_MAYBE_BUILDNOTHING( name, type ) );
+	#define LIBANDRIA4_MONAD_MAYBE_RETURNLEFT( name, type, val ) \
+		return( LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name, type, ( (type)( val ) ) ) );
+	#define LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( name, type ) \
+		return( LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name, type ) );
 	
 	
 	
@@ -88,27 +88,27 @@ SOFTWARE.
 	/*  type with different meanings as well. */
 	
 		/* This should ALSO be specialized for packing purposes. */
-	#define LIB4_MONAD_EITHER_BUILDTYPE_DEFINITION( name, typea, typeb ) \
+	#define LIBANDRIA4_MONAD_EITHER_BUILDTYPE_DEFINITION( name, typea, typeb ) \
 		struct name \
 			{ union{ typea a; typeb b; } val; \
 				unsigned char is_b; }
-	#define LIB4_MONAD_EITHER_BUILDTYPE( name, typea, typeb ) \
+	#define LIBANDRIA4_MONAD_EITHER_BUILDTYPE( name, typea, typeb ) \
 		typedef struct name name; \
-		LIB4_MONAD_EITHER_BUILDTYPE_DEFINITION( name, typea, typeb )
+		LIBANDRIA4_MONAD_EITHER_BUILDTYPE_DEFINITION( name, typea, typeb )
 	
 		/* These produce the actual values. */
-	#define LIB4_MONAD_EITHER_BUILDLEFT( name, typea, val ) \
+	#define LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name, typea, val ) \
 		( (name){ { .a: (typea)( val ) }, 0 } )
-	#define LIB4_MONAD_EITHER_BUILDRIGHT( name, typeb, val ) \
+	#define LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( name, typeb, val ) \
 		( (name){ { .b: (typeb)( val ) }, 1 } )
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
-	#define LIB4_MONAD_EITHER_BODYMATCH( var, matcha, matchb ) \
+	#define LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, matcha, matchb ) \
 		if( !( (var).is_b ) ) { \
 			matcha( (var).val.a ); \
 		} else { \
 			matchb( (var).val.b ); }
-	#define LIB4_MONAD_EITHER_EXPRMATCH( var, matcha, matchb ) \
+	#define LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, matcha, matchb ) \
 		( ( !( (var).is_b ) ) \
 			? ( matcha( (var).val.a ) ) \
 			: ( matchb( (var).val.b ) ) )
@@ -119,12 +119,12 @@ SOFTWARE.
 		/*  *_EITHER_* wrappers, when the return of one function returning */
 		/*  an either-type can be DIRECTLY derived from an either-type */
 		/*  returned by one of it's own internal calls. */
-	#define LIB4_MONAD_EITHER_RETURNLEFT( name, typea, val ) \
-		return( LIB4_MONAD_EITHER_BUILDLEFT( \
+	#define LIBANDRIA4_MONAD_EITHER_RETURNLEFT( name, typea, val ) \
+		return( LIBANDRIA4_MONAD_EITHER_BUILDLEFT( \
 			name, typea, ( (typea)( val ) ) ) );
-	#define LIB4_MONAD_EITHER_RETURNRIGHT( name, typeb, val ) \
-		return( LIB4_MONAD_EITHER_BUILDRIGHT( \
+	#define LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( name, typeb, val ) \
+		return( LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( \
 			name, typeb, ( (typeb)( val ) ) ) );
 	
 #endif
-/* End lib4 monads.h */
+/* End libandria4 basic monads.h */

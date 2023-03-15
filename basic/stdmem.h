@@ -26,40 +26,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIB4_STDMEM_H
-# define LIB4_STDMEM_H
+#ifndef LIBANDRIA4_STDMEM_H
+# define LIBANDRIA4_STDMEM_H
 	
 	#include <stdint.h>
 	
 	#include "stdmonads.h"
 	
-	lib4_ptrresult lib4_mallocwrapper( void *ign, size_t size );
-	lib4_ptrresult lib4_reallocwrapper( void *ign,  void *cur, size_t size );
-	lib4_result lib4_deallocwrapper( void *ign, void *mem );
+	libandria4_ptrresult libandria4_mallocwrapper( void *ign, size_t size );
+	libandria4_ptrresult libandria4_reallocwrapper( void *ign,  void *cur, size_t size );
+	libandria4_result libandria4_deallocwrapper( void *ign, void *mem );
 	
 	typedef struct lib4_memfuncs_t
 	{
 		void *data;
 		
-		lib4_ptrresult (*alloc)( void*, size_t );
-		lib4_ptrresult (*realloc)( void*,  void* /*mem*/, size_t );
-		lib4_result (*dealloc)( void*, void* /*mem*/ );
+		libandria4_ptrresult (*alloc)( void*, size_t );
+		libandria4_ptrresult (*realloc)( void*,  void* /*mem*/, size_t );
+		libandria4_result (*dealloc)( void*, void* /*mem*/ );
 		
-	} lib4_memfuncs_t;
-	extern lib4_memfuncs_t lib4_stdmemfuncs;
+	} libandria4_memfuncs_t;
+	extern libandria4_memfuncs_t libandria4_stdmemfuncs;
 	
 	
-	#define LIB4_MEMFUNCS_MEMMANARGS \
+	#define LIBANDRIA4_MEMFUNCS_MEMMANARGS \
 		void *data, \
-		lib4_ptrresult (*alloc)( void*, size_t ), \
-		lib4_ptrresult (*realloc_)( void*,  void*, size_t ), \
-		lib4_result (*dealloc)( void*, void* )
+		libandria4_ptrresult (*alloc)( void*, size_t ), \
+		libandria4_ptrresult (*realloc_)( void*,  void*, size_t ), \
+		libandria4_result (*dealloc)( void*, void* )
 	
-	#define LIB4_MEMFUNCS_T_UNPACK( var ) \
+	#define LIBANDRIA4_MEMFUNCS_T_UNPACK( var ) \
 		( var ).data, ( var ).alloc, ( var ).realloc, ( var ).dealloc
 	
-	#define LIB4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf_ptr ) \
-		if( !( mf_ptr ) ) { ( mf_ptr ) = &lib4_stdmemfuncs; }
+	#define LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf_ptr ) \
+		if( !( mf_ptr ) ) { ( mf_ptr ) = &libandria4_stdmemfuncs; }
 	
 #endif
-/* End lib4 stdmem.h */
+/* End libandria4 stdmem.h */

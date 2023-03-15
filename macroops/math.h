@@ -26,145 +26,145 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIB4_MACROTIME_MATH_H
-# define LIB4_MACROTIME_MATH_H
+#ifndef LIBANDRIA4_MACROTIME_MATH_H
+# define LIBANDRIA4_MACROTIME_MATH_H
 	
 	#include "simpleops.h"
 	
-	/* NOTE! : LIB4_SUB( x, y ) has now been actually tested, but add, mul, */
+	/* NOTE! : LIBANDRIA4_SUB( x, y ) has now been actually tested, but add, mul, */
 	/*  etc., have not, and probably don't work (because of expansion */
-	/*  problems). Also, LIB4_INCREMENT( x ) can probably be used to */
+	/*  problems). Also, LIBANDRIA4_INCREMENT( x ) can probably be used to */
 	/*  compress down the *_SUB(), etc., functions to just a single pair */
-	/*  each, via eliminating the hard-wired LIB4_RETURN_*() call in the */
+	/*  each, via eliminating the hard-wired LIBANDRIA4_RETURN_*() call in the */
 	/*  inner macros. */
 	/* Use http://coliru.stacked-crooked.com/ to develop further. */
 	
-	#define LIB4_DECREMENT( x ) \
-		LIB4_APPLY( LIB4_RETURN_1ST, \
-			LIB4_PRIMITIVE_CAT( LIB4_ADJACENTNUMS_, x ), () )
-	#define LIB4_INCREMENT( x ) \
-		LIB4_APPLY( LIB4_RETURN_2ND, \
-			LIB4_PRIMITIVE_CAT( LIB4_ADJACENTNUMS_, x ), () )
+	#define LIBANDRIA4_DECREMENT( x ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_1ST, \
+			LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_ADJACENTNUMS_, x ), () )
+	#define LIBANDRIA4_INCREMENT( x ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_2ND, \
+			LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_ADJACENTNUMS_, x ), () )
 	
 	
 		/* Equivalent to x + y. */
-	#define LIB4_ADD( x, y ) \
-		LIB4_PRIMITIVE_CAT( LIB4_ADD_, y ) ( \
-			LIB4_APPLY( LIB4_RETURN_1ST, \
-				LIB4_PRIMITIVE_CAT( LIB4_SUMMATIONNUMS_, x ) ) \
+	#define LIBANDRIA4_ADD( x, y ) \
+		LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_ADD_, y ) ( \
+			LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_1ST, \
+				LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_SUMMATIONNUMS_, x ) ) \
 		)
 	
-	#define LIB4_ADD_0( array ) \
-		LIB4_APPLY( LIB4_RETURN_1, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_0( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_1, LIBANDRIA4_STRIPPARENS( array ) )
 	
-	#define LIB4_ADD_1( array ) \
-		LIB4_APPLY( LIB4_RETURN_2, LIB4_STRIPPARENS( array ) )
-	#define LIB4_ADD_2( array ) \
-		LIB4_APPLY( LIB4_RETURN_3, LIB4_STRIPPARENS( array ) )
-	#define LIB4_ADD_3( array ) \
-		LIB4_APPLY( LIB4_RETURN_4, LIB4_STRIPPARENS( array ) )
-	#define LIB4_ADD_4( array ) \
-		LIB4_APPLY( LIB4_RETURN_5, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_1( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_2, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_2( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_3, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_3( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_4, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_4( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_5, LIBANDRIA4_STRIPPARENS( array ) )
 	
-	#define LIB4_ADD_5( array ) \
-		LIB4_APPLY( LIB4_RETURN_6, LIB4_STRIPPARENS( array ) )
-	#define LIB4_ADD_6( array ) \
-		LIB4_APPLY( LIB4_RETURN_7, LIB4_STRIPPARENS( array ) )
-	#define LIB4_ADD_7( array ) \
-		LIB4_APPLY( LIB4_RETURN_8, LIB4_STRIPPARENS( array ) )
-	#define LIB4_ADD_8( array ) \
-		LIB4_APPLY( LIB4_RETURN_9, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_5( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_6, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_6( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_7, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_7( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_8, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_8( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_9, LIBANDRIA4_STRIPPARENS( array ) )
 	
-	#define LIB4_ADD_9( array ) \
-		LIB4_APPLY( LIB4_RETURN_10, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_ADD_9( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_10, LIBANDRIA4_STRIPPARENS( array ) )
 	
 	
 		/* Equivalent to x - y. */
-	#define LIB4_SUB( x, y ) \
-		LIB4_PRIMITIVE_CAT( LIB4_SUB_, y ) ( \
-			LIB4_APPLY( LIB4_RETURN_2ND, \
-				LIB4_PRIMITIVE_CAT( LIB4_SUMMATIONNUMS_, x ) ) \
+	#define LIBANDRIA4_SUB( x, y ) \
+		LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_SUB_, y ) ( \
+			LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_2ND, \
+				LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_SUMMATIONNUMS_, x ) ) \
 		)
 	
-	#define LIB4_SUB_0( array ) \
-		LIB4_APPLY( LIB4_RETURN_1, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_0( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_1, LIBANDRIA4_STRIPPARENS( array ) )
 	
-	#define LIB4_SUB_1( array ) \
-		LIB4_APPLY( LIB4_RETURN_2, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SUB_2( array ) \
-		LIB4_APPLY( LIB4_RETURN_3, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SUB_3( array ) \
-		LIB4_APPLY( LIB4_RETURN_4, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SUB_4( array ) \
-		LIB4_APPLY( LIB4_RETURN_5, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_1( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_2, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_2( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_3, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_3( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_4, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_4( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_5, LIBANDRIA4_STRIPPARENS( array ) )
 	
-	#define LIB4_SUB_5( array ) \
-		LIB4_APPLY( LIB4_RETURN_6, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SUB_6( array ) \
-		LIB4_APPLY( LIB4_RETURN_7, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SUB_7( array ) \
-		LIB4_APPLY( LIB4_RETURN_8, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SUB_8( array ) \
-		LIB4_APPLY( LIB4_RETURN_9, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_5( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_6, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_6( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_7, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_7( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_8, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_8( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_9, LIBANDRIA4_STRIPPARENS( array ) )
 	
-	#define LIB4_SUB_9( array ) \
-		LIB4_APPLY( LIB4_RETURN_10, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SUB_9( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_10, LIBANDRIA4_STRIPPARENS( array ) )
 	
 	
-		/* As LIB4_SUB(), but negative numbers are swapped with parenthese */
+		/* As LIBANDRIA4_SUB(), but negative numbers are swapped with parenthese */
 		/*  pairs. */
-	#define LIB4_SENSESUB( x, y ) \
-		LIB4_PRIMITIVE_CAT( LIB4_SENSESUB_, y ) ( \
-			LIB4_APPLY( LIB4_RETURN_4TH, \
-				LIB4_PRIMITIVE_CAT( LIB4_SUMMATIONNUMS_, x ) ) \
+	#define LIBANDRIA4_SENSESUB( x, y ) \
+		LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_SENSESUB_, y ) ( \
+			LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_4TH, \
+				LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_SUMMATIONNUMS_, x ) ) \
 		)
 	
-	#define LIB4_SENSESUB_0( array ) \
-		LIB4_APPLY( LIB4_RETURN_1, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_0( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_1, LIBANDRIA4_STRIPPARENS( array ) )
 	
-	#define LIB4_SENSESUB_1( array ) \
-		LIB4_APPLY( LIB4_RETURN_2, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SENSESUB_2( array ) \
-		LIB4_APPLY( LIB4_RETURN_3, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SENSESUB_3( array ) \
-		LIB4_APPLY( LIB4_RETURN_4, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SENSESUB_4( array ) \
-		LIB4_APPLY( LIB4_RETURN_5, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_1( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_2, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_2( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_3, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_3( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_4, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_4( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_5, LIBANDRIA4_STRIPPARENS( array ) )
 	
-	#define LIB4_SENSESUB_5( array ) \
-		LIB4_APPLY( LIB4_RETURN_6, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SENSESUB_6( array ) \
-		LIB4_APPLY( LIB4_RETURN_7, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SENSESUB_7( array ) \
-		LIB4_APPLY( LIB4_RETURN_8, LIB4_STRIPPARENS( array ) )
-	#define LIB4_SENSESUB_8( array ) \
-		LIB4_APPLY( LIB4_RETURN_9, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_5( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_6, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_6( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_7, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_7( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_8, LIBANDRIA4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_8( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_9, LIBANDRIA4_STRIPPARENS( array ) )
 	
-	#define LIB4_SENSESUB_9( array ) \
-		LIB4_APPLY( LIB4_RETURN_10, LIB4_STRIPPARENS( array ) )
+	#define LIBANDRIA4_SENSESUB_9( array ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_RETURN_10, LIBANDRIA4_STRIPPARENS( array ) )
 	
 	
 		/* x / y */
-	#define LIB4_DIVIDE( x, y ) \
-		LIB4_DIVIDE_APPLY( \
-			LIB4_RETURN_2, \
-			LIB4_STRIPPARENS( LIB4_PRIMITIVE_CAT( LIB4_DIVIDE_, y ) \
-				( LIB4_PRIMITIVE_CAT( LIB4_DIVISIONNUMS_, x ) ) ) \
+	#define LIBANDRIA4_DIVIDE( x, y ) \
+		LIBANDRIA4_DIVIDE_APPLY( \
+			LIBANDRIA4_RETURN_2, \
+			LIBANDRIA4_STRIPPARENS( LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_DIVIDE_, y ) \
+				( LIBANDRIA4_PRIMITIVE_CAT( LIBANDRIA4_DIVISIONNUMS_, x ) ) ) \
 		)
-	#define LIB4_DIVIDE_APPLY( func, ... ) func( __VA_ARGS__ )
+	#define LIBANDRIA4_DIVIDE_APPLY( func, ... ) func( __VA_ARGS__ )
 	
-	#define LIB4_DIVIDE_1( ... ) \
-		LIB4_DIVIDE_APPLY( LIB4_RETURN_1, __VA_ARGS__ )
-	#define LIB4_DIVIDE_2( ... ) \
-		LIB4_DIVIDE_APPLY( LIB4_RETURN_2, __VA_ARGS__ )
-	#define LIB4_DIVIDE_3( ... ) \
-		LIB4_DIVIDE_APPLY( LIB4_RETURN_3, __VA_ARGS__ )
+	#define LIBANDRIA4_DIVIDE_1( ... ) \
+		LIBANDRIA4_DIVIDE_APPLY( LIBANDRIA4_RETURN_1, __VA_ARGS__ )
+	#define LIBANDRIA4_DIVIDE_2( ... ) \
+		LIBANDRIA4_DIVIDE_APPLY( LIBANDRIA4_RETURN_2, __VA_ARGS__ )
+	#define LIBANDRIA4_DIVIDE_3( ... ) \
+		LIBANDRIA4_DIVIDE_APPLY( LIBANDRIA4_RETURN_3, __VA_ARGS__ )
 	
 	
 	
 		/* Addition, then subtraction. */
 		/* Sumands: 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 */
-	#define LIB4_SUMMATIONNUMS_() \
+	#define LIBANDRIA4_SUMMATIONNUMS_() \
 		( \
 			(), (), (), (), (), \
 			(), (), (), (), () \
@@ -182,7 +182,7 @@ SOFTWARE.
 			(), (), (), (), () \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_0 \
+	#define LIBANDRIA4_SUMMATIONNUMS_0 \
 		( \
 			0, 1, 2, 3, 4, \
 			5, 6, 7, 8, 9 \
@@ -199,7 +199,7 @@ SOFTWARE.
 			0, (), (), (), (), \
 			(), (), (), (), () \
 		)
-	#define LIB4_SUMMATIONNUMS_1 \
+	#define LIBANDRIA4_SUMMATIONNUMS_1 \
 		( \
 			1, 2, 3, 4, 5, \
 			6, 7, 8, 9, 10 \
@@ -216,7 +216,7 @@ SOFTWARE.
 			1, 0, (), (), (), \
 			(), (), (), (), () \
 		)
-	#define LIB4_SUMMATIONNUMS_2 \
+	#define LIBANDRIA4_SUMMATIONNUMS_2 \
 		( \
 			2, 3, 4, 5, 6, \
 			7, 8, 9, 10, 11 \
@@ -233,7 +233,7 @@ SOFTWARE.
 			2, 1, 0, (), (), \
 			(), (), (), (), () \
 		)
-	#define LIB4_SUMMATIONNUMS_3 \
+	#define LIBANDRIA4_SUMMATIONNUMS_3 \
 		( \
 			3, 4, 5, 6, 7, \
 			8, 9, 10, 11, 12 \
@@ -250,7 +250,7 @@ SOFTWARE.
 			3, 2, 1, 0, (), \
 			(), (), (), (), () \
 		)
-	#define LIB4_SUMMATIONNUMS_4 \
+	#define LIBANDRIA4_SUMMATIONNUMS_4 \
 		( \
 			4, 5, 6, 7, 8, \
 			9, 10, 11, 12, 13 \
@@ -267,7 +267,7 @@ SOFTWARE.
 			4, 3, 2, 1, 0, \
 			(), (), (), (), () \
 		)
-	#define LIB4_SUMMATIONNUMS_5 \
+	#define LIBANDRIA4_SUMMATIONNUMS_5 \
 		( \
 			5, 6, 7, 8, 9, \
 			10, 11, 12, 13, 14 \
@@ -284,7 +284,7 @@ SOFTWARE.
 			5, 4, 3, 2, 1, \
 			0, (), (), (), () \
 		)
-	#define LIB4_SUMMATIONNUMS_6 \
+	#define LIBANDRIA4_SUMMATIONNUMS_6 \
 		( \
 			6, 7, 8, 9, 10, \
 			11, 12, 13, 14, 15 \
@@ -301,7 +301,7 @@ SOFTWARE.
 			6, 5, 4, 3, 2, \
 			1, 0, (), (), () \
 		)
-	#define LIB4_SUMMATIONNUMS_7 \
+	#define LIBANDRIA4_SUMMATIONNUMS_7 \
 		( \
 			7, 8, 9, 10, 11, \
 			12, 13, 14, 15, 16 \
@@ -318,7 +318,7 @@ SOFTWARE.
 			7, 6, 5, 4, 3, \
 			2, 1, 0, (), () \
 		)
-	#define LIB4_SUMMATIONNUMS_8 \
+	#define LIBANDRIA4_SUMMATIONNUMS_8 \
 		( \
 			8, 9, 10, 11, 12, \
 			13, 14, 15, 16, 17 \
@@ -335,7 +335,7 @@ SOFTWARE.
 			8, 7, 6, 5, 4, \
 			3, 2, 1, 0, () \
 		)
-	#define LIB4_SUMMATIONNUMS_9 \
+	#define LIBANDRIA4_SUMMATIONNUMS_9 \
 		( \
 			9, 10, 11, 12, 13, \
 			14, 15, 16, 17, 18 \
@@ -353,7 +353,7 @@ SOFTWARE.
 			4, 3, 2, 1, 0 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_10 \
+	#define LIBANDRIA4_SUMMATIONNUMS_10 \
 		( \
 			10, 11, 12, 13, 14, \
 			15, 16, 17, 18, 19 \
@@ -370,7 +370,7 @@ SOFTWARE.
 			10, 9, 8, 7, 6, \
 			5, 4, 3, 2, 1 \
 		)
-	#define LIB4_SUMMATIONNUMS_11 \
+	#define LIBANDRIA4_SUMMATIONNUMS_11 \
 		( \
 			11, 12, 13, 14, 15, \
 			16, 17, 18, 19, 20 \
@@ -387,7 +387,7 @@ SOFTWARE.
 			11, 10, 9, 8, 7, \
 			6, 5, 4, 3, 2 \
 		)
-	#define LIB4_SUMMATIONNUMS_12 \
+	#define LIBANDRIA4_SUMMATIONNUMS_12 \
 		( \
 			12, 13, 14, 15, 16, \
 			17, 18, 19, 20, 21 \
@@ -404,7 +404,7 @@ SOFTWARE.
 			12, 11, 10, 9, 8, \
 			7, 6, 5, 4, 3 \
 		)
-	#define LIB4_SUMMATIONNUMS_13 \
+	#define LIBANDRIA4_SUMMATIONNUMS_13 \
 		( \
 			13, 14, 15, 16, 17, \
 			18, 19, 20, 21, 22 \
@@ -421,7 +421,7 @@ SOFTWARE.
 			13, 12, 11, 10, 9, \
 			8, 7, 6, 5, 4 \
 		)
-	#define LIB4_SUMMATIONNUMS_14 \
+	#define LIBANDRIA4_SUMMATIONNUMS_14 \
 		( \
 			14, 15, 16, 17, 18, \
 			19, 20, 21, 22, 23 \
@@ -438,7 +438,7 @@ SOFTWARE.
 			14, 13, 12, 11, 10, \
 			9, 8, 7, 6, 5 \
 		)
-	#define LIB4_SUMMATIONNUMS_15 \
+	#define LIBANDRIA4_SUMMATIONNUMS_15 \
 		( \
 			15, 16, 17, 18, 19, \
 			20, 21, 22, 23, 24 \
@@ -455,7 +455,7 @@ SOFTWARE.
 			15, 14, 13, 12, 11, \
 			10, 9, 8, 7, 6 \
 		)
-	#define LIB4_SUMMATIONNUMS_16 \
+	#define LIBANDRIA4_SUMMATIONNUMS_16 \
 		( \
 			16, 17, 18, 19, 20, \
 			21, 22, 23, 24, 25 \
@@ -472,7 +472,7 @@ SOFTWARE.
 			16, 15, 14, 13, 12, \
 			11, 10, 9, 8, 7 \
 		)
-	#define LIB4_SUMMATIONNUMS_17 \
+	#define LIBANDRIA4_SUMMATIONNUMS_17 \
 		( \
 			17, 18, 19, 20, 21, \
 			22, 23, 24, 25, 26 \
@@ -489,7 +489,7 @@ SOFTWARE.
 			17, 16, 15, 14, 13, \
 			12, 11, 10, 9, 8 \
 		)
-	#define LIB4_SUMMATIONNUMS_18 \
+	#define LIBANDRIA4_SUMMATIONNUMS_18 \
 		( \
 			18, 19, 20, 21, 22, \
 			23, 24, 25, 26, 27 \
@@ -506,7 +506,7 @@ SOFTWARE.
 			18, 17, 16, 15, 14, \
 			13, 12, 11, 10, 9 \
 		)
-	#define LIB4_SUMMATIONNUMS_19 \
+	#define LIBANDRIA4_SUMMATIONNUMS_19 \
 		( \
 			19, 20, 21, 22, 23, \
 			24, 25, 26, 27, 28 \
@@ -524,7 +524,7 @@ SOFTWARE.
 			14, 13, 12, 11, 10 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_20 \
+	#define LIBANDRIA4_SUMMATIONNUMS_20 \
 		( \
 			20, 21, 22, 23, 24, \
 			25, 26, 27, 28, 29 \
@@ -541,7 +541,7 @@ SOFTWARE.
 			20, 19, 18, 17, 16, \
 			15, 14, 13, 12, 11 \
 		)
-	#define LIB4_SUMMATIONNUMS_21 \
+	#define LIBANDRIA4_SUMMATIONNUMS_21 \
 		( \
 			21, 22, 23, 24, 25, \
 			26, 27, 28, 29, 30 \
@@ -558,7 +558,7 @@ SOFTWARE.
 			21, 20, 19, 18, 17, \
 			16, 15, 14, 13, 12 \
 		)
-	#define LIB4_SUMMATIONNUMS_22 \
+	#define LIBANDRIA4_SUMMATIONNUMS_22 \
 		( \
 			22, 23, 24, 25, 26, \
 			27, 28, 29, 30, 31 \
@@ -575,7 +575,7 @@ SOFTWARE.
 			22, 21, 20, 19, 18, \
 			17, 16, 15, 14, 13 \
 		)
-	#define LIB4_SUMMATIONNUMS_23 \
+	#define LIBANDRIA4_SUMMATIONNUMS_23 \
 		( \
 			23, 24, 25, 26, 27, \
 			28, 29, 30, 31, 32 \
@@ -592,7 +592,7 @@ SOFTWARE.
 			23, 22, 21, 20, 19, \
 			18, 17, 16, 15, 14 \
 		)
-	#define LIB4_SUMMATIONNUMS_24 \
+	#define LIBANDRIA4_SUMMATIONNUMS_24 \
 		( \
 			24, 25, 26, 27, 28, \
 			29, 30, 31, 32, 33 \
@@ -609,7 +609,7 @@ SOFTWARE.
 			24, 23, 22, 21, 20, \
 			19, 18, 17, 16, 15 \
 		)
-	#define LIB4_SUMMATIONNUMS_25 \
+	#define LIBANDRIA4_SUMMATIONNUMS_25 \
 		( \
 			25, 26, 27, 28, 29, \
 			30, 31, 32, 33, 34 \
@@ -626,7 +626,7 @@ SOFTWARE.
 			25, 24, 23, 22, 21, \
 			20, 19, 18, 17, 16 \
 		)
-	#define LIB4_SUMMATIONNUMS_26 \
+	#define LIBANDRIA4_SUMMATIONNUMS_26 \
 		( \
 			26, 27, 28, 29, 30, \
 			31, 32, 33, 34, 35 \
@@ -643,7 +643,7 @@ SOFTWARE.
 			26, 25, 24, 23, 22, \
 			21, 20, 19, 18, 17 \
 		)
-	#define LIB4_SUMMATIONNUMS_27 \
+	#define LIBANDRIA4_SUMMATIONNUMS_27 \
 		( \
 			27, 28, 29, 30, 31, \
 			32, 33, 34, 35, 36 \
@@ -660,7 +660,7 @@ SOFTWARE.
 			27, 26, 25, 24, 23, \
 			22, 21, 20, 19, 18 \
 		)
-	#define LIB4_SUMMATIONNUMS_28 \
+	#define LIBANDRIA4_SUMMATIONNUMS_28 \
 		( \
 			28, 29, 30, 31, 32, \
 			33, 34, 35, 36, 37 \
@@ -677,7 +677,7 @@ SOFTWARE.
 			28, 27, 26, 25, 24, \
 			23, 22, 21, 20, 19 \
 		)
-	#define LIB4_SUMMATIONNUMS_29 \
+	#define LIBANDRIA4_SUMMATIONNUMS_29 \
 		( \
 			29, 30, 31, 32, 33, \
 			34, 35, 36, 37, 38 \
@@ -695,7 +695,7 @@ SOFTWARE.
 			24, 23, 22, 21, 20 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_30 \
+	#define LIBANDRIA4_SUMMATIONNUMS_30 \
 		( \
 			30, 31, 32, 33, 34, \
 			35, 36, 37, 38, 39 \
@@ -712,7 +712,7 @@ SOFTWARE.
 			30, 29, 28, 27, 26, \
 			25, 24, 23, 22, 21 \
 		)
-	#define LIB4_SUMMATIONNUMS_31 \
+	#define LIBANDRIA4_SUMMATIONNUMS_31 \
 		( \
 			31, 32, 33, 34, 35, \
 			36, 37, 38, 39, 40 \
@@ -729,7 +729,7 @@ SOFTWARE.
 			31, 30, 29, 28, 27, \
 			26, 25, 24, 23, 22 \
 		)
-	#define LIB4_SUMMATIONNUMS_32 \
+	#define LIBANDRIA4_SUMMATIONNUMS_32 \
 		( \
 			32, 33, 34, 35, 36, \
 			37, 38, 39, 40, 41 \
@@ -746,7 +746,7 @@ SOFTWARE.
 			32, 31, 30, 29, 28, \
 			27, 26, 25, 24, 23 \
 		)
-	#define LIB4_SUMMATIONNUMS_33 \
+	#define LIBANDRIA4_SUMMATIONNUMS_33 \
 		( \
 			33, 34, 35, 36, 37, \
 			38, 39, 40, 41, 42 \
@@ -763,7 +763,7 @@ SOFTWARE.
 			33, 32, 31, 30, 29, \
 			28, 27, 26, 25, 24 \
 		)
-	#define LIB4_SUMMATIONNUMS_34 \
+	#define LIBANDRIA4_SUMMATIONNUMS_34 \
 		( \
 			34, 35, 36, 37, 38, \
 			39, 40, 41, 42, 43 \
@@ -780,7 +780,7 @@ SOFTWARE.
 			34, 33, 32, 31, 30, \
 			29, 28, 27, 26, 25 \
 		)
-	#define LIB4_SUMMATIONNUMS_35 \
+	#define LIBANDRIA4_SUMMATIONNUMS_35 \
 		( \
 			35, 36, 37, 38, 39, \
 			40, 41, 42, 43, 44 \
@@ -797,7 +797,7 @@ SOFTWARE.
 			35, 34, 33, 32, 31, \
 			30, 29, 28, 27, 26 \
 		)
-	#define LIB4_SUMMATIONNUMS_36 \
+	#define LIBANDRIA4_SUMMATIONNUMS_36 \
 		( \
 			36, 37, 38, 39, 40, \
 			41, 42, 43, 44, 45 \
@@ -814,7 +814,7 @@ SOFTWARE.
 			36, 35, 34, 33, 32, \
 			31, 30, 29, 28, 27 \
 		)
-	#define LIB4_SUMMATIONNUMS_37 \
+	#define LIBANDRIA4_SUMMATIONNUMS_37 \
 		( \
 			37, 38, 39, 40, 41, \
 			42, 43, 44, 45, 46 \
@@ -831,7 +831,7 @@ SOFTWARE.
 			37, 36, 35, 34, 33, \
 			32, 31, 30, 29, 28 \
 		)
-	#define LIB4_SUMMATIONNUMS_38 \
+	#define LIBANDRIA4_SUMMATIONNUMS_38 \
 		( \
 			38, 39, 40, 41, 42, \
 			43, 44, 45, 46, 47 \
@@ -848,7 +848,7 @@ SOFTWARE.
 			38, 37, 36, 35, 34, \
 			33, 32, 31, 30, 29 \
 		)
-	#define LIB4_SUMMATIONNUMS_39 \
+	#define LIBANDRIA4_SUMMATIONNUMS_39 \
 		( \
 			39, 40, 41, 42, 43, \
 			44, 45, 46, 47, 48 \
@@ -866,7 +866,7 @@ SOFTWARE.
 			34, 33, 32, 31, 30 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_40 \
+	#define LIBANDRIA4_SUMMATIONNUMS_40 \
 		( \
 			40, 41, 42, 43, 44, \
 			45, 46, 47, 48, 49 \
@@ -883,7 +883,7 @@ SOFTWARE.
 			40, 39, 38, 37, 36, \
 			35, 34, 33, 32, 31 \
 		)
-	#define LIB4_SUMMATIONNUMS_41 \
+	#define LIBANDRIA4_SUMMATIONNUMS_41 \
 		( \
 			41, 42, 43, 44, 45, \
 			46, 47, 48, 49, 50 \
@@ -900,7 +900,7 @@ SOFTWARE.
 			41, 40, 39, 38, 37, \
 			36, 35, 34, 33, 32 \
 		)
-	#define LIB4_SUMMATIONNUMS_42 \
+	#define LIBANDRIA4_SUMMATIONNUMS_42 \
 		( \
 			42, 43, 44, 45, 46, \
 			47, 48, 49, 50, 51 \
@@ -917,7 +917,7 @@ SOFTWARE.
 			42, 41, 40, 39, 38, \
 			37, 36, 35, 34, 33 \
 		)
-	#define LIB4_SUMMATIONNUMS_43 \
+	#define LIBANDRIA4_SUMMATIONNUMS_43 \
 		( \
 			43, 44, 45, 46, 47, \
 			48, 49, 50, 51, 52 \
@@ -934,7 +934,7 @@ SOFTWARE.
 			43, 42, 41, 40, 39, \
 			38, 37, 36, 35, 34 \
 		)
-	#define LIB4_SUMMATIONNUMS_44 \
+	#define LIBANDRIA4_SUMMATIONNUMS_44 \
 		( \
 			44, 45, 46, 47, 48, \
 			49, 50, 51, 52, 53 \
@@ -951,7 +951,7 @@ SOFTWARE.
 			44, 43, 42, 41, 40, \
 			39, 38, 37, 36, 35 \
 		)
-	#define LIB4_SUMMATIONNUMS_45 \
+	#define LIBANDRIA4_SUMMATIONNUMS_45 \
 		( \
 			45, 46, 47, 48, 49, \
 			50, 51, 52, 53, 54 \
@@ -968,7 +968,7 @@ SOFTWARE.
 			45, 44, 43, 42, 41, \
 			40, 39, 38, 37, 36 \
 		)
-	#define LIB4_SUMMATIONNUMS_46 \
+	#define LIBANDRIA4_SUMMATIONNUMS_46 \
 		( \
 			46, 47, 48, 49, 50, \
 			51, 52, 53, 54, 55 \
@@ -985,7 +985,7 @@ SOFTWARE.
 			46, 45, 44, 43, 42, \
 			41, 40, 39, 38, 37 \
 		)
-	#define LIB4_SUMMATIONNUMS_47 \
+	#define LIBANDRIA4_SUMMATIONNUMS_47 \
 		( \
 			47, 48, 49, 50, 51, \
 			52, 53, 54, 55, 56 \
@@ -1002,7 +1002,7 @@ SOFTWARE.
 			47, 46, 45, 44, 43, \
 			42, 41, 40, 39, 38 \
 		)
-	#define LIB4_SUMMATIONNUMS_48 \
+	#define LIBANDRIA4_SUMMATIONNUMS_48 \
 		( \
 			48, 49, 50, 51, 52, \
 			53, 54, 55, 56, 57 \
@@ -1019,7 +1019,7 @@ SOFTWARE.
 			48, 47, 46, 45, 44, \
 			43, 42, 41, 40, 39 \
 		)
-	#define LIB4_SUMMATIONNUMS_49 \
+	#define LIBANDRIA4_SUMMATIONNUMS_49 \
 		( \
 			49, 50, 51, 52, 53, \
 			54, 55, 56, 57, 58 \
@@ -1037,7 +1037,7 @@ SOFTWARE.
 			44, 43, 42, 41, 40 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_50 \
+	#define LIBANDRIA4_SUMMATIONNUMS_50 \
 		( \
 			50, 51, 52, 53, 54, \
 			55, 56, 57, 58, 59 \
@@ -1054,7 +1054,7 @@ SOFTWARE.
 			50, 49, 48, 47, 46, \
 			45, 44, 43, 42, 41 \
 		)
-	#define LIB4_SUMMATIONNUMS_51 \
+	#define LIBANDRIA4_SUMMATIONNUMS_51 \
 		( \
 			51, 52, 53, 54, 55, \
 			56, 57, 58, 59, 60 \
@@ -1071,7 +1071,7 @@ SOFTWARE.
 			51, 50, 49, 48, 47, \
 			46, 45, 44, 43, 42 \
 		)
-	#define LIB4_SUMMATIONNUMS_52 \
+	#define LIBANDRIA4_SUMMATIONNUMS_52 \
 		( \
 			52, 53, 54, 55, 56, \
 			57, 58, 59, 60, 61 \
@@ -1088,7 +1088,7 @@ SOFTWARE.
 			52, 51, 50, 49, 48, \
 			47, 46, 45, 44, 43 \
 		)
-	#define LIB4_SUMMATIONNUMS_53 \
+	#define LIBANDRIA4_SUMMATIONNUMS_53 \
 		( \
 			53, 54, 55, 56, 57, \
 			58, 59, 60, 61, 62 \
@@ -1105,7 +1105,7 @@ SOFTWARE.
 			53, 52, 51, 50, 49, \
 			48, 47, 46, 45, 44 \
 		)
-	#define LIB4_SUMMATIONNUMS_54 \
+	#define LIBANDRIA4_SUMMATIONNUMS_54 \
 		( \
 			54, 55, 56, 57, 58, \
 			59, 60, 61, 62, 63 \
@@ -1122,7 +1122,7 @@ SOFTWARE.
 			54, 53, 52, 51, 50, \
 			49, 48, 47, 46, 45 \
 		)
-	#define LIB4_SUMMATIONNUMS_55 \
+	#define LIBANDRIA4_SUMMATIONNUMS_55 \
 		( \
 			55, 56, 57, 58, 59, \
 			60, 61, 62, 63, 64 \
@@ -1139,7 +1139,7 @@ SOFTWARE.
 			55, 54, 53, 52, 51, \
 			50, 49, 48, 47, 46 \
 		)
-	#define LIB4_SUMMATIONNUMS_56 \
+	#define LIBANDRIA4_SUMMATIONNUMS_56 \
 		( \
 			56, 57, 58, 59, 60, \
 			61, 62, 63, 64, 65 \
@@ -1156,7 +1156,7 @@ SOFTWARE.
 			56, 55, 54, 53, 52, \
 			51, 50, 49, 48, 47 \
 		)
-	#define LIB4_SUMMATIONNUMS_57 \
+	#define LIBANDRIA4_SUMMATIONNUMS_57 \
 		( \
 			57, 58, 59, 60, 61, \
 			62, 63, 64, 65, 66 \
@@ -1173,7 +1173,7 @@ SOFTWARE.
 			57, 56, 55, 54, 53, \
 			52, 51, 50, 49, 48 \
 		)
-	#define LIB4_SUMMATIONNUMS_58 \
+	#define LIBANDRIA4_SUMMATIONNUMS_58 \
 		( \
 			58, 59, 60, 61, 62, \
 			63, 64, 65, 66, 67 \
@@ -1190,7 +1190,7 @@ SOFTWARE.
 			58, 57, 56, 55, 54, \
 			53, 52, 51, 50, 49 \
 		)
-	#define LIB4_SUMMATIONNUMS_59 \
+	#define LIBANDRIA4_SUMMATIONNUMS_59 \
 		( \
 			59, 60, 61, 62, 63, \
 			64, 65, 66, 67, 68 \
@@ -1208,7 +1208,7 @@ SOFTWARE.
 			54, 53, 52, 51, 50 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_60 \
+	#define LIBANDRIA4_SUMMATIONNUMS_60 \
 		( \
 			60, 61, 62, 63, 64, \
 			65, 66, 67, 68, 69 \
@@ -1225,7 +1225,7 @@ SOFTWARE.
 			60, 59, 58, 57, 56, \
 			55, 54, 53, 52, 51 \
 		)
-	#define LIB4_SUMMATIONNUMS_61 \
+	#define LIBANDRIA4_SUMMATIONNUMS_61 \
 		( \
 			61, 62, 63, 64, 65, \
 			66, 67, 68, 69, 70 \
@@ -1242,7 +1242,7 @@ SOFTWARE.
 			61, 60, 59, 58, 57, \
 			56, 55, 54, 53, 52 \
 		)
-	#define LIB4_SUMMATIONNUMS_62 \
+	#define LIBANDRIA4_SUMMATIONNUMS_62 \
 		( \
 			62, 63, 64, 65, 66, \
 			67, 68, 69, 70, 71 \
@@ -1259,7 +1259,7 @@ SOFTWARE.
 			62, 61, 60, 59, 58, \
 			57, 56, 55, 54, 53 \
 		)
-	#define LIB4_SUMMATIONNUMS_63 \
+	#define LIBANDRIA4_SUMMATIONNUMS_63 \
 		( \
 			63, 64, 65, 66, 67, \
 			68, 69, 70, 71, 72 \
@@ -1276,7 +1276,7 @@ SOFTWARE.
 			63, 62, 61, 60, 59, \
 			58, 57, 56, 55, 54 \
 		)
-	#define LIB4_SUMMATIONNUMS_64 \
+	#define LIBANDRIA4_SUMMATIONNUMS_64 \
 		( \
 			64, 65, 66, 67, 68, \
 			69, 70, 71, 72, 73 \
@@ -1293,7 +1293,7 @@ SOFTWARE.
 			64, 63, 62, 61, 60, \
 			59, 58, 57, 56, 55 \
 		)
-	#define LIB4_SUMMATIONNUMS_65 \
+	#define LIBANDRIA4_SUMMATIONNUMS_65 \
 		( \
 			65, 66, 67, 68, 69, \
 			70, 71, 72, 73, 74 \
@@ -1310,7 +1310,7 @@ SOFTWARE.
 			65, 64, 63, 62, 61, \
 			60, 59, 58, 57, 56 \
 		)
-	#define LIB4_SUMMATIONNUMS_66 \
+	#define LIBANDRIA4_SUMMATIONNUMS_66 \
 		( \
 			66, 67, 68, 69, 70, \
 			71, 72, 73, 74, 75 \
@@ -1327,7 +1327,7 @@ SOFTWARE.
 			66, 65, 64, 63, 62, \
 			61, 60, 59, 58, 57 \
 		)
-	#define LIB4_SUMMATIONNUMS_67 \
+	#define LIBANDRIA4_SUMMATIONNUMS_67 \
 		( \
 			67, 68, 69, 70, 71, \
 			72, 73, 74, 75, 76 \
@@ -1344,7 +1344,7 @@ SOFTWARE.
 			67, 66, 65, 64, 63, \
 			62, 61, 60, 59, 58 \
 		)
-	#define LIB4_SUMMATIONNUMS_68 \
+	#define LIBANDRIA4_SUMMATIONNUMS_68 \
 		( \
 			68, 69, 70, 71, 72, \
 			73, 74, 75, 76, 77 \
@@ -1361,7 +1361,7 @@ SOFTWARE.
 			68, 67, 66, 65, 64, \
 			63, 62, 61, 60, 59 \
 		)
-	#define LIB4_SUMMATIONNUMS_69 \
+	#define LIBANDRIA4_SUMMATIONNUMS_69 \
 		( \
 			69, 70, 71, 72, 73, \
 			74, 75, 76, 77, 78 \
@@ -1379,7 +1379,7 @@ SOFTWARE.
 			64, 63, 62, 61, 60 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_70 \
+	#define LIBANDRIA4_SUMMATIONNUMS_70 \
 		( \
 			70, 71, 72, 73, 74, \
 			75, 76, 77, 78, 79 \
@@ -1396,7 +1396,7 @@ SOFTWARE.
 			70, 69, 68, 67, 66, \
 			65, 64, 63, 62, 61 \
 		)
-	#define LIB4_SUMMATIONNUMS_71 \
+	#define LIBANDRIA4_SUMMATIONNUMS_71 \
 		( \
 			71, 72, 73, 74, 75, \
 			76, 77, 78, 79, 80 \
@@ -1413,7 +1413,7 @@ SOFTWARE.
 			71, 70, 69, 68, 67, \
 			66, 65, 64, 63, 62 \
 		)
-	#define LIB4_SUMMATIONNUMS_72 \
+	#define LIBANDRIA4_SUMMATIONNUMS_72 \
 		( \
 			72, 73, 74, 75, 76, \
 			77, 78, 79, 80, 81 \
@@ -1430,7 +1430,7 @@ SOFTWARE.
 			72, 71, 70, 69, 68, \
 			67, 66, 65, 64, 63 \
 		)
-	#define LIB4_SUMMATIONNUMS_73 \
+	#define LIBANDRIA4_SUMMATIONNUMS_73 \
 		( \
 			73, 74, 75, 76, 77, \
 			78, 79, 80, 81, 82 \
@@ -1447,7 +1447,7 @@ SOFTWARE.
 			73, 72, 71, 70, 69, \
 			68, 67, 66, 65, 64 \
 		)
-	#define LIB4_SUMMATIONNUMS_74 \
+	#define LIBANDRIA4_SUMMATIONNUMS_74 \
 		( \
 			74, 75, 76, 77, 78, \
 			79, 80, 81, 82, 83 \
@@ -1464,7 +1464,7 @@ SOFTWARE.
 			74, 73, 72, 71, 70, \
 			69, 68, 67, 66, 65 \
 		)
-	#define LIB4_SUMMATIONNUMS_75 \
+	#define LIBANDRIA4_SUMMATIONNUMS_75 \
 		( \
 			75, 76, 77, 78, 79, \
 			80, 81, 82, 83, 84 \
@@ -1481,7 +1481,7 @@ SOFTWARE.
 			75, 74, 73, 72, 71, \
 			70, 69, 68, 67, 66 \
 		)
-	#define LIB4_SUMMATIONNUMS_76 \
+	#define LIBANDRIA4_SUMMATIONNUMS_76 \
 		( \
 			76, 77, 78, 79, 80, \
 			81, 82, 83, 84, 85 \
@@ -1498,7 +1498,7 @@ SOFTWARE.
 			76, 75, 74, 73, 72, \
 			71, 70, 69, 68, 67 \
 		)
-	#define LIB4_SUMMATIONNUMS_77 \
+	#define LIBANDRIA4_SUMMATIONNUMS_77 \
 		( \
 			77, 78, 79, 80, 81, \
 			82, 83, 84, 85, 86 \
@@ -1515,7 +1515,7 @@ SOFTWARE.
 			77, 76, 75, 74, 73, \
 			72, 71, 70, 69, 68 \
 		)
-	#define LIB4_SUMMATIONNUMS_78 \
+	#define LIBANDRIA4_SUMMATIONNUMS_78 \
 		( \
 			78, 79, 80, 81, 82, \
 			83, 84, 85, 86, 87 \
@@ -1532,7 +1532,7 @@ SOFTWARE.
 			78, 77, 76, 75, 74, \
 			73, 72, 71, 70, 69 \
 		)
-	#define LIB4_SUMMATIONNUMS_79 \
+	#define LIBANDRIA4_SUMMATIONNUMS_79 \
 		( \
 			79, 80, 81, 82, 83, \
 			84, 85, 86, 87, 88 \
@@ -1550,7 +1550,7 @@ SOFTWARE.
 			74, 73, 72, 71, 70 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_80 \
+	#define LIBANDRIA4_SUMMATIONNUMS_80 \
 		( \
 			80, 81, 82, 83, 84, \
 			85, 86, 87, 88, 89 \
@@ -1567,7 +1567,7 @@ SOFTWARE.
 			80, 79, 78, 77, 76, \
 			75, 74, 73, 72, 71 \
 		)
-	#define LIB4_SUMMATIONNUMS_81 \
+	#define LIBANDRIA4_SUMMATIONNUMS_81 \
 		( \
 			81, 82, 83, 84, 85, \
 			86, 87, 88, 89, 90 \
@@ -1584,7 +1584,7 @@ SOFTWARE.
 			81, 80, 79, 78, 77, \
 			76, 75, 74, 73, 72 \
 		)
-	#define LIB4_SUMMATIONNUMS_82 \
+	#define LIBANDRIA4_SUMMATIONNUMS_82 \
 		( \
 			82, 83, 84, 85, 86, \
 			87, 88, 89, 90, 91 \
@@ -1601,7 +1601,7 @@ SOFTWARE.
 			82, 81, 80, 79, 78, \
 			77, 76, 75, 74, 73 \
 		)
-	#define LIB4_SUMMATIONNUMS_83 \
+	#define LIBANDRIA4_SUMMATIONNUMS_83 \
 		( \
 			83, 84, 85, 86, 87, \
 			88, 89, 90, 91, 92 \
@@ -1618,7 +1618,7 @@ SOFTWARE.
 			83, 82, 81, 80, 79, \
 			78, 77, 76, 75, 74 \
 		)
-	#define LIB4_SUMMATIONNUMS_84 \
+	#define LIBANDRIA4_SUMMATIONNUMS_84 \
 		( \
 			84, 85, 86, 87, 88, \
 			89, 90, 91, 92, 93 \
@@ -1635,7 +1635,7 @@ SOFTWARE.
 			84, 83, 82, 81, 80, \
 			79, 78, 77, 76, 75 \
 		)
-	#define LIB4_SUMMATIONNUMS_85 \
+	#define LIBANDRIA4_SUMMATIONNUMS_85 \
 		( \
 			85, 86, 87, 88, 89, \
 			90, 91, 92, 93, 94 \
@@ -1652,7 +1652,7 @@ SOFTWARE.
 			85, 84, 83, 82, 81, \
 			80, 79, 78, 77, 76 \
 		)
-	#define LIB4_SUMMATIONNUMS_86 \
+	#define LIBANDRIA4_SUMMATIONNUMS_86 \
 		( \
 			86, 87, 88, 89, 90, \
 			91, 92, 93, 94, 95 \
@@ -1669,7 +1669,7 @@ SOFTWARE.
 			86, 85, 84, 83, 82, \
 			81, 80, 79, 78, 77 \
 		)
-	#define LIB4_SUMMATIONNUMS_87 \
+	#define LIBANDRIA4_SUMMATIONNUMS_87 \
 		( \
 			87, 88, 89, 90, 91, \
 			92, 93, 94, 95, 96 \
@@ -1686,7 +1686,7 @@ SOFTWARE.
 			87, 86, 85, 84, 83, \
 			82, 81, 80, 79, 78 \
 		)
-	#define LIB4_SUMMATIONNUMS_88 \
+	#define LIBANDRIA4_SUMMATIONNUMS_88 \
 		( \
 			88, 89, 90, 91, 92, \
 			93, 94, 95, 96, 97 \
@@ -1703,7 +1703,7 @@ SOFTWARE.
 			88, 87, 86, 85, 84, \
 			83, 82, 81, 80, 79 \
 		)
-	#define LIB4_SUMMATIONNUMS_89 \
+	#define LIBANDRIA4_SUMMATIONNUMS_89 \
 		( \
 			89, 90, 91, 92, 93, \
 			94, 95, 96, 97, 98 \
@@ -1721,7 +1721,7 @@ SOFTWARE.
 			84, 83, 82, 81, 80 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_90 \
+	#define LIBANDRIA4_SUMMATIONNUMS_90 \
 		( \
 			90, 91, 92, 93, 94, \
 			95, 96, 97, 98, 99 \
@@ -1738,7 +1738,7 @@ SOFTWARE.
 			90, 89, 88, 87, 86, \
 			85, 84, 83, 82, 81 \
 		)
-	#define LIB4_SUMMATIONNUMS_91 \
+	#define LIBANDRIA4_SUMMATIONNUMS_91 \
 		( \
 			91, 92, 93, 94, 95, \
 			96, 97, 98, 99, 100 \
@@ -1755,7 +1755,7 @@ SOFTWARE.
 			91, 90, 89, 88, 87, \
 			86, 85, 84, 83, 82 \
 		)
-	#define LIB4_SUMMATIONNUMS_92 \
+	#define LIBANDRIA4_SUMMATIONNUMS_92 \
 		( \
 			92, 93, 94, 95, 96, \
 			97, 98, 99, 100, 101 \
@@ -1772,7 +1772,7 @@ SOFTWARE.
 			92, 91, 90, 89, 88, \
 			87, 86, 85, 84, 83 \
 		)
-	#define LIB4_SUMMATIONNUMS_93 \
+	#define LIBANDRIA4_SUMMATIONNUMS_93 \
 		( \
 			93, 94, 95, 96, 97, \
 			98, 99, 100, 101, 102 \
@@ -1789,7 +1789,7 @@ SOFTWARE.
 			93, 92, 91, 90, 89, \
 			88, 87, 86, 85, 84 \
 		)
-	#define LIB4_SUMMATIONNUMS_94 \
+	#define LIBANDRIA4_SUMMATIONNUMS_94 \
 		( \
 			94, 95, 96, 97, 98, \
 			99, 100, 101, 102, 103 \
@@ -1806,7 +1806,7 @@ SOFTWARE.
 			94, 93, 92, 91, 90, \
 			89, 88, 87, 86, 85 \
 		)
-	#define LIB4_SUMMATIONNUMS_95 \
+	#define LIBANDRIA4_SUMMATIONNUMS_95 \
 		( \
 			95, 96, 97, 98, 99, \
 			100, 101, 102, 103, 104 \
@@ -1823,7 +1823,7 @@ SOFTWARE.
 			95, 94, 93, 92, 91, \
 			90, 89, 88, 87, 86 \
 		)
-	#define LIB4_SUMMATIONNUMS_96 \
+	#define LIBANDRIA4_SUMMATIONNUMS_96 \
 		( \
 			96, 97, 98, 99, 100, \
 			101, 102, 103, 104, 105 \
@@ -1840,7 +1840,7 @@ SOFTWARE.
 			96, 95, 94, 93, 92, \
 			91, 90, 89, 88, 87 \
 		)
-	#define LIB4_SUMMATIONNUMS_97 \
+	#define LIBANDRIA4_SUMMATIONNUMS_97 \
 		( \
 			97, 98, 99, 100, 101, \
 			102, 103, 104, 105, 106 \
@@ -1857,7 +1857,7 @@ SOFTWARE.
 			97, 96, 95, 94, 93, \
 			92, 91, 90, 89, 88 \
 		)
-	#define LIB4_SUMMATIONNUMS_98 \
+	#define LIBANDRIA4_SUMMATIONNUMS_98 \
 		( \
 			98, 99, 100, 101, 102, \
 			103, 104, 105, 106, 107 \
@@ -1874,7 +1874,7 @@ SOFTWARE.
 			98, 97, 96, 95, 94, \
 			93, 92, 91, 90, 89 \
 		)
-	#define LIB4_SUMMATIONNUMS_99 \
+	#define LIBANDRIA4_SUMMATIONNUMS_99 \
 		( \
 			99, 100, 101, 102, 103, \
 			104, 105, 106, 107, 108 \
@@ -1892,7 +1892,7 @@ SOFTWARE.
 			94, 93, 92, 91, 90 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_100 \
+	#define LIBANDRIA4_SUMMATIONNUMS_100 \
 		( \
 			100, 101, 102, 103, 104, \
 			105, 106, 107, 108, 109 \
@@ -1909,7 +1909,7 @@ SOFTWARE.
 			100, 99, 98, 97, 96, \
 			95, 94, 93, 92, 91 \
 		)
-	#define LIB4_SUMMATIONNUMS_101 \
+	#define LIBANDRIA4_SUMMATIONNUMS_101 \
 		( \
 			101, 102, 103, 104, 105, \
 			106, 107, 108, 109, 110 \
@@ -1926,7 +1926,7 @@ SOFTWARE.
 			101, 100, 99, 98, 97, \
 			96, 95, 94, 93, 92 \
 		)
-	#define LIB4_SUMMATIONNUMS_102 \
+	#define LIBANDRIA4_SUMMATIONNUMS_102 \
 		( \
 			102, 103, 104, 105, 106, \
 			107, 108, 109, 110, 111 \
@@ -1943,7 +1943,7 @@ SOFTWARE.
 			102, 101, 100, 99, 98, \
 			97, 96, 95, 94, 93 \
 		)
-	#define LIB4_SUMMATIONNUMS_103 \
+	#define LIBANDRIA4_SUMMATIONNUMS_103 \
 		( \
 			103, 104, 105, 106, 107, \
 			108, 109, 110, 111, 112 \
@@ -1960,7 +1960,7 @@ SOFTWARE.
 			103, 102, 101, 100, 99, \
 			98, 97, 96, 95, 94 \
 		)
-	#define LIB4_SUMMATIONNUMS_104 \
+	#define LIBANDRIA4_SUMMATIONNUMS_104 \
 		( \
 			104, 105, 106, 107, 108, \
 			109, 110, 111, 112, 113 \
@@ -1977,7 +1977,7 @@ SOFTWARE.
 			104, 103, 102, 101, 100, \
 			99, 98, 97, 96, 95 \
 		)
-	#define LIB4_SUMMATIONNUMS_105 \
+	#define LIBANDRIA4_SUMMATIONNUMS_105 \
 		( \
 			105, 106, 107, 108, 109, \
 			110, 111, 112, 113, 114 \
@@ -1994,7 +1994,7 @@ SOFTWARE.
 			105, 104, 103, 102, 101, \
 			100, 99, 98, 97, 96 \
 		)
-	#define LIB4_SUMMATIONNUMS_106 \
+	#define LIBANDRIA4_SUMMATIONNUMS_106 \
 		( \
 			106, 107, 108, 109, 110, \
 			111, 112, 113, 114, 115 \
@@ -2011,7 +2011,7 @@ SOFTWARE.
 			106, 105, 104, 103, 102, \
 			101, 100, 99, 98, 97 \
 		)
-	#define LIB4_SUMMATIONNUMS_107 \
+	#define LIBANDRIA4_SUMMATIONNUMS_107 \
 		( \
 			107, 108, 109, 110, 111, \
 			112, 113, 114, 115, 116 \
@@ -2028,7 +2028,7 @@ SOFTWARE.
 			107, 106, 105, 104, 103, \
 			102, 101, 100, 99, 98 \
 		)
-	#define LIB4_SUMMATIONNUMS_108 \
+	#define LIBANDRIA4_SUMMATIONNUMS_108 \
 		( \
 			108, 109, 110, 111, 112, \
 			113, 114, 115, 116, 117 \
@@ -2045,7 +2045,7 @@ SOFTWARE.
 			108, 107, 106, 105, 104, \
 			103, 102, 101, 100, 99 \
 		)
-	#define LIB4_SUMMATIONNUMS_109 \
+	#define LIBANDRIA4_SUMMATIONNUMS_109 \
 		( \
 			109, 110, 111, 112, 113, \
 			114, 115, 116, 117, 118 \
@@ -2063,7 +2063,7 @@ SOFTWARE.
 			104, 103, 102, 101, 100 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_110 \
+	#define LIBANDRIA4_SUMMATIONNUMS_110 \
 		( \
 			110, 111, 112, 113, 114, \
 			115, 116, 117, 118, 119 \
@@ -2080,7 +2080,7 @@ SOFTWARE.
 			110, 109, 108, 107, 106, \
 			105, 104, 103, 102, 101 \
 		)
-	#define LIB4_SUMMATIONNUMS_111 \
+	#define LIBANDRIA4_SUMMATIONNUMS_111 \
 		( \
 			111, 112, 113, 114, 115, \
 			116, 117, 118, 119, 120 \
@@ -2097,7 +2097,7 @@ SOFTWARE.
 			111, 110, 109, 108, 107, \
 			106, 105, 104, 103, 102 \
 		)
-	#define LIB4_SUMMATIONNUMS_112 \
+	#define LIBANDRIA4_SUMMATIONNUMS_112 \
 		( \
 			112, 113, 114, 115, 116, \
 			117, 118, 119, 120, 121 \
@@ -2114,7 +2114,7 @@ SOFTWARE.
 			112, 111, 110, 109, 108, \
 			107, 106, 105, 104, 103 \
 		)
-	#define LIB4_SUMMATIONNUMS_113 \
+	#define LIBANDRIA4_SUMMATIONNUMS_113 \
 		( \
 			113, 114, 115, 116, 117, \
 			118, 119, 120, 121, 122 \
@@ -2131,7 +2131,7 @@ SOFTWARE.
 			113, 112, 111, 110, 109, \
 			108, 107, 106, 105, 104 \
 		)
-	#define LIB4_SUMMATIONNUMS_114 \
+	#define LIBANDRIA4_SUMMATIONNUMS_114 \
 		( \
 			114, 115, 116, 117, 118, \
 			119, 120, 121, 122, 123 \
@@ -2148,7 +2148,7 @@ SOFTWARE.
 			114, 113, 112, 111, 110, \
 			109, 108, 107, 106, 105 \
 		)
-	#define LIB4_SUMMATIONNUMS_115 \
+	#define LIBANDRIA4_SUMMATIONNUMS_115 \
 		( \
 			115, 116, 117, 118, 119, \
 			120, 121, 122, 123, 124 \
@@ -2165,7 +2165,7 @@ SOFTWARE.
 			115, 114, 113, 112, 111, \
 			110, 109, 108, 107, 106 \
 		)
-	#define LIB4_SUMMATIONNUMS_116 \
+	#define LIBANDRIA4_SUMMATIONNUMS_116 \
 		( \
 			116, 117, 118, 119, 120, \
 			121, 122, 123, 124, 125 \
@@ -2182,7 +2182,7 @@ SOFTWARE.
 			116, 115, 114, 113, 112, \
 			111, 110, 109, 108, 107 \
 		)
-	#define LIB4_SUMMATIONNUMS_117 \
+	#define LIBANDRIA4_SUMMATIONNUMS_117 \
 		( \
 			117, 118, 119, 120, 121, \
 			122, 123, 124, 125, 126 \
@@ -2199,7 +2199,7 @@ SOFTWARE.
 			117, 116, 115, 114, 113, \
 			112, 111, 110, 109, 108 \
 		)
-	#define LIB4_SUMMATIONNUMS_118 \
+	#define LIBANDRIA4_SUMMATIONNUMS_118 \
 		( \
 			118, 119, 120, 121, 122, \
 			123, 124, 125, 126, 127 \
@@ -2216,7 +2216,7 @@ SOFTWARE.
 			118, 117, 116, 115, 114, \
 			113, 112, 111, 110, 109 \
 		)
-	#define LIB4_SUMMATIONNUMS_119 \
+	#define LIBANDRIA4_SUMMATIONNUMS_119 \
 		( \
 			119, 120, 121, 122, 123, \
 			124, 125, 126, 127, 128 \
@@ -2234,7 +2234,7 @@ SOFTWARE.
 			114, 113, 112, 111, 110 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_120 \
+	#define LIBANDRIA4_SUMMATIONNUMS_120 \
 		( \
 			120, 121, 122, 123, 124, \
 			125, 126, 127, 128, 129 \
@@ -2251,7 +2251,7 @@ SOFTWARE.
 			120, 119, 118, 117, 116, \
 			115, 114, 113, 112, 111 \
 		)
-	#define LIB4_SUMMATIONNUMS_121 \
+	#define LIBANDRIA4_SUMMATIONNUMS_121 \
 		( \
 			121, 122, 123, 124, 125, \
 			126, 127, 128, 129, 130 \
@@ -2268,7 +2268,7 @@ SOFTWARE.
 			121, 120, 119, 118, 117, \
 			116, 115, 114, 113, 112 \
 		)
-	#define LIB4_SUMMATIONNUMS_122 \
+	#define LIBANDRIA4_SUMMATIONNUMS_122 \
 		( \
 			122, 123, 124, 125, 126, \
 			127, 128, 129, 130, 131 \
@@ -2285,7 +2285,7 @@ SOFTWARE.
 			122, 121, 120, 119, 118, \
 			117, 116, 115, 114, 113 \
 		)
-	#define LIB4_SUMMATIONNUMS_123 \
+	#define LIBANDRIA4_SUMMATIONNUMS_123 \
 		( \
 			123, 124, 125, 126, 127, \
 			128, 129, 130, 131, 132 \
@@ -2302,7 +2302,7 @@ SOFTWARE.
 			123, 122, 121, 120, 119, \
 			118, 117, 116, 115, 114 \
 		)
-	#define LIB4_SUMMATIONNUMS_124 \
+	#define LIBANDRIA4_SUMMATIONNUMS_124 \
 		( \
 			124, 125, 126, 127, 128, \
 			129, 130, 131, 132, 133 \
@@ -2319,7 +2319,7 @@ SOFTWARE.
 			124, 123, 122, 121, 120, \
 			119, 118, 117, 116, 115 \
 		)
-	#define LIB4_SUMMATIONNUMS_125 \
+	#define LIBANDRIA4_SUMMATIONNUMS_125 \
 		( \
 			125, 126, 127, 128, 129, \
 			130, 131, 132, 133, 134 \
@@ -2336,7 +2336,7 @@ SOFTWARE.
 			125, 124, 123, 122, 121, \
 			120, 119, 118, 117, 116 \
 		)
-	#define LIB4_SUMMATIONNUMS_126 \
+	#define LIBANDRIA4_SUMMATIONNUMS_126 \
 		( \
 			126, 127, 128, 129, 130, \
 			131, 132, 133, 134, 135 \
@@ -2353,7 +2353,7 @@ SOFTWARE.
 			126, 125, 124, 123, 122, \
 			121, 120, 119, 118, 117 \
 		)
-	#define LIB4_SUMMATIONNUMS_127 \
+	#define LIBANDRIA4_SUMMATIONNUMS_127 \
 		( \
 			127, 128, 129, 130, 131, \
 			132, 133, 134, 135, 136 \
@@ -2370,7 +2370,7 @@ SOFTWARE.
 			127, 126, 125, 124, 123, \
 			122, 121, 120, 119, 118 \
 		)
-	#define LIB4_SUMMATIONNUMS_128 \
+	#define LIBANDRIA4_SUMMATIONNUMS_128 \
 		( \
 			128, 129, 130, 131, 132, \
 			133, 134, 135, 136, 137 \
@@ -2387,7 +2387,7 @@ SOFTWARE.
 			128, 127, 126, 125, 124, \
 			123, 122, 121, 120, 119 \
 		)
-	#define LIB4_SUMMATIONNUMS_129 \
+	#define LIBANDRIA4_SUMMATIONNUMS_129 \
 		( \
 			129, 130, 131, 132, 133, \
 			134, 135, 136, 137, 138 \
@@ -2405,7 +2405,7 @@ SOFTWARE.
 			124, 123, 122, 121, 120 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_130 \
+	#define LIBANDRIA4_SUMMATIONNUMS_130 \
 		( \
 			130, 131, 132, 133, 134, \
 			135, 136, 137, 138, 139 \
@@ -2422,7 +2422,7 @@ SOFTWARE.
 			130, 129, 128, 127, 126, \
 			125, 124, 123, 122, 121 \
 		)
-	#define LIB4_SUMMATIONNUMS_131 \
+	#define LIBANDRIA4_SUMMATIONNUMS_131 \
 		( \
 			131, 132, 133, 134, 135, \
 			136, 137, 138, 139, 140 \
@@ -2439,7 +2439,7 @@ SOFTWARE.
 			131, 130, 129, 128, 127, \
 			126, 125, 124, 123, 122 \
 		)
-	#define LIB4_SUMMATIONNUMS_132 \
+	#define LIBANDRIA4_SUMMATIONNUMS_132 \
 		( \
 			132, 133, 134, 135, 136, \
 			137, 138, 139, 140, 141 \
@@ -2456,7 +2456,7 @@ SOFTWARE.
 			132, 131, 130, 129, 128, \
 			127, 126, 125, 124, 123 \
 		)
-	#define LIB4_SUMMATIONNUMS_133 \
+	#define LIBANDRIA4_SUMMATIONNUMS_133 \
 		( \
 			133, 134, 135, 136, 137, \
 			138, 139, 140, 141, 142 \
@@ -2473,7 +2473,7 @@ SOFTWARE.
 			133, 132, 131, 130, 129, \
 			128, 127, 126, 125, 124 \
 		)
-	#define LIB4_SUMMATIONNUMS_134 \
+	#define LIBANDRIA4_SUMMATIONNUMS_134 \
 		( \
 			134, 135, 136, 137, 138, \
 			139, 140, 141, 142, 143 \
@@ -2490,7 +2490,7 @@ SOFTWARE.
 			134, 133, 132, 131, 130, \
 			129, 128, 127, 126, 125 \
 		)
-	#define LIB4_SUMMATIONNUMS_135 \
+	#define LIBANDRIA4_SUMMATIONNUMS_135 \
 		( \
 			135, 136, 137, 138, 139, \
 			140, 141, 142, 143, 144 \
@@ -2507,7 +2507,7 @@ SOFTWARE.
 			135, 134, 133, 132, 131, \
 			130, 129, 128, 127, 126 \
 		)
-	#define LIB4_SUMMATIONNUMS_136 \
+	#define LIBANDRIA4_SUMMATIONNUMS_136 \
 		( \
 			136, 137, 138, 139, 140, \
 			141, 142, 143, 144, 145 \
@@ -2524,7 +2524,7 @@ SOFTWARE.
 			136, 135, 134, 133, 132, \
 			131, 130, 129, 128, 127 \
 		)
-	#define LIB4_SUMMATIONNUMS_137 \
+	#define LIBANDRIA4_SUMMATIONNUMS_137 \
 		( \
 			137, 138, 139, 140, 141, \
 			142, 143, 144, 145, 146 \
@@ -2541,7 +2541,7 @@ SOFTWARE.
 			137, 136, 135, 134, 133, \
 			132, 131, 130, 129, 128 \
 		)
-	#define LIB4_SUMMATIONNUMS_138 \
+	#define LIBANDRIA4_SUMMATIONNUMS_138 \
 		( \
 			138, 139, 140, 141, 142, \
 			143, 144, 145, 146, 147 \
@@ -2558,7 +2558,7 @@ SOFTWARE.
 			138, 137, 136, 135, 134, \
 			133, 132, 131, 130, 129 \
 		)
-	#define LIB4_SUMMATIONNUMS_139 \
+	#define LIBANDRIA4_SUMMATIONNUMS_139 \
 		( \
 			139, 140, 141, 142, 143, \
 			144, 145, 146, 147, 148 \
@@ -2576,7 +2576,7 @@ SOFTWARE.
 			134, 133, 132, 131, 130 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_140 \
+	#define LIBANDRIA4_SUMMATIONNUMS_140 \
 		( \
 			140, 141, 142, 143, 144, \
 			145, 146, 147, 148, 149 \
@@ -2593,7 +2593,7 @@ SOFTWARE.
 			140, 139, 138, 137, 136, \
 			135, 134, 133, 132, 131 \
 		)
-	#define LIB4_SUMMATIONNUMS_141 \
+	#define LIBANDRIA4_SUMMATIONNUMS_141 \
 		( \
 			141, 142, 143, 144, 145, \
 			146, 147, 148, 149, 150 \
@@ -2610,7 +2610,7 @@ SOFTWARE.
 			141, 140, 139, 138, 137, \
 			136, 135, 134, 133, 132 \
 		)
-	#define LIB4_SUMMATIONNUMS_142 \
+	#define LIBANDRIA4_SUMMATIONNUMS_142 \
 		( \
 			142, 143, 144, 145, 146, \
 			147, 148, 149, 150, 151 \
@@ -2627,7 +2627,7 @@ SOFTWARE.
 			142, 141, 140, 139, 138, \
 			137, 136, 135, 134, 133 \
 		)
-	#define LIB4_SUMMATIONNUMS_143 \
+	#define LIBANDRIA4_SUMMATIONNUMS_143 \
 		( \
 			143, 144, 145, 146, 147, \
 			148, 149, 150, 151, 152 \
@@ -2644,7 +2644,7 @@ SOFTWARE.
 			143, 142, 141, 140, 139, \
 			138, 137, 136, 135, 134 \
 		)
-	#define LIB4_SUMMATIONNUMS_144 \
+	#define LIBANDRIA4_SUMMATIONNUMS_144 \
 		( \
 			144, 145, 146, 147, 148, \
 			149, 150, 151, 152, 153 \
@@ -2661,7 +2661,7 @@ SOFTWARE.
 			144, 143, 142, 141, 140, \
 			139, 138, 137, 136, 135 \
 		)
-	#define LIB4_SUMMATIONNUMS_145 \
+	#define LIBANDRIA4_SUMMATIONNUMS_145 \
 		( \
 			145, 146, 147, 148, 149, \
 			150, 151, 152, 153, 154 \
@@ -2678,7 +2678,7 @@ SOFTWARE.
 			145, 144, 143, 142, 141, \
 			140, 139, 138, 137, 136 \
 		)
-	#define LIB4_SUMMATIONNUMS_146 \
+	#define LIBANDRIA4_SUMMATIONNUMS_146 \
 		( \
 			146, 147, 148, 149, 150, \
 			151, 152, 153, 154, 155 \
@@ -2695,7 +2695,7 @@ SOFTWARE.
 			146, 145, 144, 143, 142, \
 			141, 140, 139, 138, 137 \
 		)
-	#define LIB4_SUMMATIONNUMS_147 \
+	#define LIBANDRIA4_SUMMATIONNUMS_147 \
 		( \
 			147, 148, 149, 150, 151, \
 			152, 153, 154, 155, 156 \
@@ -2712,7 +2712,7 @@ SOFTWARE.
 			147, 146, 145, 144, 143, \
 			142, 141, 140, 139, 138 \
 		)
-	#define LIB4_SUMMATIONNUMS_148 \
+	#define LIBANDRIA4_SUMMATIONNUMS_148 \
 		( \
 			148, 149, 150, 151, 152, \
 			153, 154, 155, 156, 157 \
@@ -2729,7 +2729,7 @@ SOFTWARE.
 			148, 147, 146, 145, 144, \
 			143, 142, 141, 140, 139 \
 		)
-	#define LIB4_SUMMATIONNUMS_149 \
+	#define LIBANDRIA4_SUMMATIONNUMS_149 \
 		( \
 			149, 150, 151, 152, 153, \
 			154, 155, 156, 157, 158 \
@@ -2747,7 +2747,7 @@ SOFTWARE.
 			144, 143, 142, 141, 140 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_150 \
+	#define LIBANDRIA4_SUMMATIONNUMS_150 \
 		( \
 			150, 151, 152, 153, 154, \
 			155, 156, 157, 158, 159 \
@@ -2764,7 +2764,7 @@ SOFTWARE.
 			150, 149, 148, 147, 146, \
 			145, 144, 143, 142, 141 \
 		)
-	#define LIB4_SUMMATIONNUMS_151 \
+	#define LIBANDRIA4_SUMMATIONNUMS_151 \
 		( \
 			151, 152, 153, 154, 155, \
 			156, 157, 158, 159, 160 \
@@ -2781,7 +2781,7 @@ SOFTWARE.
 			151, 150, 149, 148, 147, \
 			146, 145, 144, 143, 142 \
 		)
-	#define LIB4_SUMMATIONNUMS_152 \
+	#define LIBANDRIA4_SUMMATIONNUMS_152 \
 		( \
 			152, 153, 154, 155, 156, \
 			157, 158, 159, 160, 161 \
@@ -2798,7 +2798,7 @@ SOFTWARE.
 			152, 151, 150, 149, 148, \
 			147, 146, 145, 144, 143 \
 		)
-	#define LIB4_SUMMATIONNUMS_153 \
+	#define LIBANDRIA4_SUMMATIONNUMS_153 \
 		( \
 			153, 154, 155, 156, 157, \
 			158, 159, 160, 161, 162 \
@@ -2815,7 +2815,7 @@ SOFTWARE.
 			153, 152, 151, 150, 149, \
 			148, 147, 146, 145, 144 \
 		)
-	#define LIB4_SUMMATIONNUMS_154 \
+	#define LIBANDRIA4_SUMMATIONNUMS_154 \
 		( \
 			154, 155, 156, 157, 158, \
 			159, 160, 161, 162, 163 \
@@ -2832,7 +2832,7 @@ SOFTWARE.
 			154, 153, 152, 151, 150, \
 			149, 148, 147, 146, 145 \
 		)
-	#define LIB4_SUMMATIONNUMS_155 \
+	#define LIBANDRIA4_SUMMATIONNUMS_155 \
 		( \
 			155, 156, 157, 158, 159, \
 			160, 161, 162, 163, 164 \
@@ -2849,7 +2849,7 @@ SOFTWARE.
 			155, 154, 153, 152, 151, \
 			150, 149, 148, 147, 146 \
 		)
-	#define LIB4_SUMMATIONNUMS_156 \
+	#define LIBANDRIA4_SUMMATIONNUMS_156 \
 		( \
 			156, 157, 158, 159, 160, \
 			161, 162, 163, 164, 165 \
@@ -2866,7 +2866,7 @@ SOFTWARE.
 			156, 155, 154, 153, 152, \
 			151, 150, 149, 148, 147 \
 		)
-	#define LIB4_SUMMATIONNUMS_157 \
+	#define LIBANDRIA4_SUMMATIONNUMS_157 \
 		( \
 			157, 158, 159, 160, 161, \
 			162, 163, 164, 165, 166 \
@@ -2883,7 +2883,7 @@ SOFTWARE.
 			157, 156, 155, 154, 153, \
 			152, 151, 150, 149, 148 \
 		)
-	#define LIB4_SUMMATIONNUMS_158 \
+	#define LIBANDRIA4_SUMMATIONNUMS_158 \
 		( \
 			158, 159, 160, 161, 162, \
 			163, 164, 165, 166, 167 \
@@ -2900,7 +2900,7 @@ SOFTWARE.
 			158, 157, 156, 155, 154, \
 			153, 152, 151, 150, 149 \
 		)
-	#define LIB4_SUMMATIONNUMS_159 \
+	#define LIBANDRIA4_SUMMATIONNUMS_159 \
 		( \
 			159, 160, 161, 162, 163, \
 			164, 165, 166, 167, 168 \
@@ -2918,7 +2918,7 @@ SOFTWARE.
 			154, 153, 152, 151, 150 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_160 \
+	#define LIBANDRIA4_SUMMATIONNUMS_160 \
 		( \
 			160, 161, 162, 163, 164, \
 			165, 166, 167, 168, 169 \
@@ -2935,7 +2935,7 @@ SOFTWARE.
 			160, 159, 158, 157, 156, \
 			155, 154, 153, 152, 151 \
 		)
-	#define LIB4_SUMMATIONNUMS_161 \
+	#define LIBANDRIA4_SUMMATIONNUMS_161 \
 		( \
 			161, 162, 163, 164, 165, \
 			166, 167, 168, 169, 170 \
@@ -2952,7 +2952,7 @@ SOFTWARE.
 			161, 160, 159, 158, 157, \
 			156, 155, 154, 153, 152 \
 		)
-	#define LIB4_SUMMATIONNUMS_162 \
+	#define LIBANDRIA4_SUMMATIONNUMS_162 \
 		( \
 			162, 163, 164, 165, 166, \
 			167, 168, 169, 170, 171 \
@@ -2969,7 +2969,7 @@ SOFTWARE.
 			162, 161, 160, 159, 158, \
 			157, 156, 155, 154, 153 \
 		)
-	#define LIB4_SUMMATIONNUMS_163 \
+	#define LIBANDRIA4_SUMMATIONNUMS_163 \
 		( \
 			163, 164, 165, 166, 167, \
 			168, 169, 170, 171, 172 \
@@ -2986,7 +2986,7 @@ SOFTWARE.
 			163, 162, 161, 160, 159, \
 			158, 157, 156, 155, 154 \
 		)
-	#define LIB4_SUMMATIONNUMS_164 \
+	#define LIBANDRIA4_SUMMATIONNUMS_164 \
 		( \
 			164, 165, 166, 167, 168, \
 			169, 170, 171, 172, 173 \
@@ -3003,7 +3003,7 @@ SOFTWARE.
 			164, 163, 162, 161, 160, \
 			159, 158, 157, 156, 155 \
 		)
-	#define LIB4_SUMMATIONNUMS_165 \
+	#define LIBANDRIA4_SUMMATIONNUMS_165 \
 		( \
 			165, 166, 167, 168, 169, \
 			170, 171, 172, 173, 174 \
@@ -3020,7 +3020,7 @@ SOFTWARE.
 			165, 164, 163, 162, 161, \
 			160, 159, 158, 157, 156 \
 		)
-	#define LIB4_SUMMATIONNUMS_166 \
+	#define LIBANDRIA4_SUMMATIONNUMS_166 \
 		( \
 			166, 167, 168, 169, 170, \
 			171, 172, 173, 174, 175 \
@@ -3037,7 +3037,7 @@ SOFTWARE.
 			166, 165, 164, 163, 162, \
 			161, 160, 159, 158, 157 \
 		)
-	#define LIB4_SUMMATIONNUMS_167 \
+	#define LIBANDRIA4_SUMMATIONNUMS_167 \
 		( \
 			167, 168, 169, 170, 171, \
 			172, 173, 174, 175, 176 \
@@ -3054,7 +3054,7 @@ SOFTWARE.
 			167, 166, 165, 164, 163, \
 			162, 161, 160, 159, 158 \
 		)
-	#define LIB4_SUMMATIONNUMS_168 \
+	#define LIBANDRIA4_SUMMATIONNUMS_168 \
 		( \
 			168, 169, 170, 171, 172, \
 			173, 174, 175, 176, 177 \
@@ -3071,7 +3071,7 @@ SOFTWARE.
 			168, 167, 166, 165, 164, \
 			163, 162, 161, 160, 159 \
 		)
-	#define LIB4_SUMMATIONNUMS_169 \
+	#define LIBANDRIA4_SUMMATIONNUMS_169 \
 		( \
 			169, 170, 171, 172, 173, \
 			174, 175, 176, 177, 178 \
@@ -3089,7 +3089,7 @@ SOFTWARE.
 			164, 163, 162, 161, 160 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_170 \
+	#define LIBANDRIA4_SUMMATIONNUMS_170 \
 		( \
 			170, 171, 172, 173, 174, \
 			175, 176, 177, 178, 179 \
@@ -3106,7 +3106,7 @@ SOFTWARE.
 			170, 169, 168, 167, 166, \
 			165, 164, 163, 162, 161 \
 		)
-	#define LIB4_SUMMATIONNUMS_171 \
+	#define LIBANDRIA4_SUMMATIONNUMS_171 \
 		( \
 			171, 172, 173, 174, 175, \
 			176, 177, 178, 179, 180 \
@@ -3123,7 +3123,7 @@ SOFTWARE.
 			171, 170, 169, 168, 167, \
 			166, 165, 164, 163, 162 \
 		)
-	#define LIB4_SUMMATIONNUMS_172 \
+	#define LIBANDRIA4_SUMMATIONNUMS_172 \
 		( \
 			172, 173, 174, 175, 176, \
 			177, 178, 179, 180, 181 \
@@ -3140,7 +3140,7 @@ SOFTWARE.
 			172, 171, 170, 169, 168, \
 			167, 166, 165, 164, 163 \
 		)
-	#define LIB4_SUMMATIONNUMS_173 \
+	#define LIBANDRIA4_SUMMATIONNUMS_173 \
 		( \
 			173, 174, 175, 176, 177, \
 			178, 179, 180, 181, 182 \
@@ -3157,7 +3157,7 @@ SOFTWARE.
 			173, 172, 171, 170, 169, \
 			168, 167, 166, 165, 164 \
 		)
-	#define LIB4_SUMMATIONNUMS_174 \
+	#define LIBANDRIA4_SUMMATIONNUMS_174 \
 		( \
 			174, 175, 176, 177, 178, \
 			179, 180, 181, 182, 183 \
@@ -3174,7 +3174,7 @@ SOFTWARE.
 			174, 173, 172, 171, 170, \
 			169, 168, 167, 166, 165 \
 		)
-	#define LIB4_SUMMATIONNUMS_175 \
+	#define LIBANDRIA4_SUMMATIONNUMS_175 \
 		( \
 			175, 176, 177, 178, 179, \
 			180, 181, 182, 183, 184 \
@@ -3191,7 +3191,7 @@ SOFTWARE.
 			175, 174, 173, 172, 171, \
 			170, 169, 168, 167, 166 \
 		)
-	#define LIB4_SUMMATIONNUMS_176 \
+	#define LIBANDRIA4_SUMMATIONNUMS_176 \
 		( \
 			176, 177, 178, 179, 180, \
 			181, 182, 183, 184, 185 \
@@ -3208,7 +3208,7 @@ SOFTWARE.
 			176, 175, 174, 173, 172, \
 			171, 170, 169, 168, 167 \
 		)
-	#define LIB4_SUMMATIONNUMS_177 \
+	#define LIBANDRIA4_SUMMATIONNUMS_177 \
 		( \
 			177, 178, 179, 180, 181, \
 			182, 183, 184, 185, 186 \
@@ -3225,7 +3225,7 @@ SOFTWARE.
 			177, 176, 175, 174, 173, \
 			172, 171, 170, 169, 168 \
 		)
-	#define LIB4_SUMMATIONNUMS_178 \
+	#define LIBANDRIA4_SUMMATIONNUMS_178 \
 		( \
 			178, 179, 180, 181, 182, \
 			183, 184, 185, 186, 187 \
@@ -3242,7 +3242,7 @@ SOFTWARE.
 			178, 177, 176, 175, 174, \
 			173, 172, 171, 170, 169 \
 		)
-	#define LIB4_SUMMATIONNUMS_179 \
+	#define LIBANDRIA4_SUMMATIONNUMS_179 \
 		( \
 			179, 180, 181, 182, 183, \
 			184, 185, 186, 187, 188 \
@@ -3260,7 +3260,7 @@ SOFTWARE.
 			174, 173, 172, 171, 170 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_180 \
+	#define LIBANDRIA4_SUMMATIONNUMS_180 \
 		( \
 			180, 181, 182, 183, 184, \
 			185, 186, 187, 188, 189 \
@@ -3277,7 +3277,7 @@ SOFTWARE.
 			180, 179, 178, 177, 176, \
 			175, 174, 173, 172, 171 \
 		)
-	#define LIB4_SUMMATIONNUMS_181 \
+	#define LIBANDRIA4_SUMMATIONNUMS_181 \
 		( \
 			181, 182, 183, 184, 185, \
 			186, 187, 188, 189, 190 \
@@ -3294,7 +3294,7 @@ SOFTWARE.
 			181, 180, 179, 178, 177, \
 			176, 175, 174, 173, 172 \
 		)
-	#define LIB4_SUMMATIONNUMS_182 \
+	#define LIBANDRIA4_SUMMATIONNUMS_182 \
 		( \
 			182, 183, 184, 185, 186, \
 			187, 188, 189, 190, 191 \
@@ -3311,7 +3311,7 @@ SOFTWARE.
 			182, 181, 180, 179, 178, \
 			177, 176, 175, 174, 173 \
 		)
-	#define LIB4_SUMMATIONNUMS_183 \
+	#define LIBANDRIA4_SUMMATIONNUMS_183 \
 		( \
 			183, 184, 185, 186, 187, \
 			188, 189, 190, 191, 192 \
@@ -3328,7 +3328,7 @@ SOFTWARE.
 			183, 182, 181, 180, 179, \
 			178, 177, 176, 175, 174 \
 		)
-	#define LIB4_SUMMATIONNUMS_184 \
+	#define LIBANDRIA4_SUMMATIONNUMS_184 \
 		( \
 			184, 185, 186, 187, 188, \
 			189, 190, 191, 192, 193 \
@@ -3345,7 +3345,7 @@ SOFTWARE.
 			184, 183, 182, 181, 180, \
 			179, 178, 177, 176, 175 \
 		)
-	#define LIB4_SUMMATIONNUMS_185 \
+	#define LIBANDRIA4_SUMMATIONNUMS_185 \
 		( \
 			185, 186, 187, 188, 189, \
 			190, 191, 192, 193, 194 \
@@ -3362,7 +3362,7 @@ SOFTWARE.
 			185, 184, 183, 182, 181, \
 			180, 179, 178, 177, 176 \
 		)
-	#define LIB4_SUMMATIONNUMS_186 \
+	#define LIBANDRIA4_SUMMATIONNUMS_186 \
 		( \
 			186, 187, 188, 189, 190, \
 			191, 192, 193, 194, 195 \
@@ -3379,7 +3379,7 @@ SOFTWARE.
 			186, 185, 184, 183, 182, \
 			181, 180, 179, 178, 177 \
 		)
-	#define LIB4_SUMMATIONNUMS_187 \
+	#define LIBANDRIA4_SUMMATIONNUMS_187 \
 		( \
 			187, 188, 189, 190, 191, \
 			192, 193, 194, 195, 196 \
@@ -3396,7 +3396,7 @@ SOFTWARE.
 			187, 186, 185, 184, 183, \
 			182, 181, 180, 179, 178 \
 		)
-	#define LIB4_SUMMATIONNUMS_188 \
+	#define LIBANDRIA4_SUMMATIONNUMS_188 \
 		( \
 			188, 189, 190, 191, 192, \
 			193, 194, 195, 196, 197 \
@@ -3413,7 +3413,7 @@ SOFTWARE.
 			188, 187, 186, 185, 184, \
 			183, 182, 181, 180, 179 \
 		)
-	#define LIB4_SUMMATIONNUMS_189 \
+	#define LIBANDRIA4_SUMMATIONNUMS_189 \
 		( \
 			189, 190, 191, 192, 193, \
 			194, 195, 196, 197, 198 \
@@ -3431,7 +3431,7 @@ SOFTWARE.
 			184, 183, 182, 181, 180 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_190 \
+	#define LIBANDRIA4_SUMMATIONNUMS_190 \
 		( \
 			190, 191, 192, 193, 194, \
 			195, 196, 197, 198, 199 \
@@ -3448,7 +3448,7 @@ SOFTWARE.
 			190, 189, 188, 187, 186, \
 			185, 184, 183, 182, 181 \
 		)
-	#define LIB4_SUMMATIONNUMS_191 \
+	#define LIBANDRIA4_SUMMATIONNUMS_191 \
 		( \
 			191, 192, 193, 194, 195, \
 			196, 197, 198, 199, 200 \
@@ -3465,7 +3465,7 @@ SOFTWARE.
 			191, 190, 189, 188, 187, \
 			186, 185, 184, 183, 182 \
 		)
-	#define LIB4_SUMMATIONNUMS_192 \
+	#define LIBANDRIA4_SUMMATIONNUMS_192 \
 		( \
 			192, 193, 194, 195, 196, \
 			197, 198, 199, 200, 201 \
@@ -3482,7 +3482,7 @@ SOFTWARE.
 			192, 191, 190, 189, 188, \
 			187, 186, 185, 184, 183 \
 		)
-	#define LIB4_SUMMATIONNUMS_193 \
+	#define LIBANDRIA4_SUMMATIONNUMS_193 \
 		( \
 			193, 194, 195, 196, 197, \
 			198, 199, 200, 201, 202 \
@@ -3499,7 +3499,7 @@ SOFTWARE.
 			193, 192, 191, 190, 189, \
 			188, 187, 186, 185, 184 \
 		)
-	#define LIB4_SUMMATIONNUMS_194 \
+	#define LIBANDRIA4_SUMMATIONNUMS_194 \
 		( \
 			194, 195, 196, 197, 198, \
 			199, 200, 201, 202, 203 \
@@ -3516,7 +3516,7 @@ SOFTWARE.
 			194, 193, 192, 191, 190, \
 			189, 188, 187, 186, 185 \
 		)
-	#define LIB4_SUMMATIONNUMS_195 \
+	#define LIBANDRIA4_SUMMATIONNUMS_195 \
 		( \
 			195, 196, 197, 198, 199, \
 			200, 201, 202, 203, 204 \
@@ -3533,7 +3533,7 @@ SOFTWARE.
 			195, 194, 193, 192, 191, \
 			190, 189, 188, 187, 186 \
 		)
-	#define LIB4_SUMMATIONNUMS_196 \
+	#define LIBANDRIA4_SUMMATIONNUMS_196 \
 		( \
 			196, 197, 198, 199, 200, \
 			201, 202, 203, 204, 205 \
@@ -3550,7 +3550,7 @@ SOFTWARE.
 			196, 195, 194, 193, 192, \
 			191, 190, 189, 188, 187 \
 		)
-	#define LIB4_SUMMATIONNUMS_197 \
+	#define LIBANDRIA4_SUMMATIONNUMS_197 \
 		( \
 			197, 198, 199, 200, 201, \
 			202, 203, 204, 205, 206 \
@@ -3567,7 +3567,7 @@ SOFTWARE.
 			197, 196, 195, 194, 193, \
 			192, 191, 190, 189, 188 \
 		)
-	#define LIB4_SUMMATIONNUMS_198 \
+	#define LIBANDRIA4_SUMMATIONNUMS_198 \
 		( \
 			198, 199, 200, 201, 202, \
 			203, 204, 205, 206, 207 \
@@ -3584,7 +3584,7 @@ SOFTWARE.
 			198, 197, 196, 195, 194, \
 			193, 192, 191, 190, 189 \
 		)
-	#define LIB4_SUMMATIONNUMS_199 \
+	#define LIBANDRIA4_SUMMATIONNUMS_199 \
 		( \
 			199, 200, 201, 202, 203, \
 			204, 205, 206, 207, 208 \
@@ -3602,7 +3602,7 @@ SOFTWARE.
 			194, 193, 192, 191, 190 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_200 \
+	#define LIBANDRIA4_SUMMATIONNUMS_200 \
 		( \
 			200, 201, 202, 203, 204, \
 			205, 206, 207, 208, 209 \
@@ -3619,7 +3619,7 @@ SOFTWARE.
 			200, 199, 198, 197, 196, \
 			195, 194, 193, 192, 191 \
 		)
-	#define LIB4_SUMMATIONNUMS_201 \
+	#define LIBANDRIA4_SUMMATIONNUMS_201 \
 		( \
 			201, 202, 203, 204, 205, \
 			206, 207, 208, 209, 210 \
@@ -3636,7 +3636,7 @@ SOFTWARE.
 			201, 200, 199, 198, 197, \
 			196, 195, 194, 193, 192 \
 		)
-	#define LIB4_SUMMATIONNUMS_202 \
+	#define LIBANDRIA4_SUMMATIONNUMS_202 \
 		( \
 			202, 203, 204, 205, 206, \
 			207, 208, 209, 210, 211 \
@@ -3653,7 +3653,7 @@ SOFTWARE.
 			202, 201, 200, 199, 198, \
 			197, 196, 195, 194, 193 \
 		)
-	#define LIB4_SUMMATIONNUMS_203 \
+	#define LIBANDRIA4_SUMMATIONNUMS_203 \
 		( \
 			203, 204, 205, 206, 207, \
 			208, 209, 210, 211, 212 \
@@ -3670,7 +3670,7 @@ SOFTWARE.
 			203, 202, 201, 200, 199, \
 			198, 197, 196, 195, 194 \
 		)
-	#define LIB4_SUMMATIONNUMS_204 \
+	#define LIBANDRIA4_SUMMATIONNUMS_204 \
 		( \
 			204, 205, 206, 207, 208, \
 			209, 210, 211, 212, 213 \
@@ -3687,7 +3687,7 @@ SOFTWARE.
 			204, 203, 202, 201, 200, \
 			199, 198, 197, 196, 195 \
 		)
-	#define LIB4_SUMMATIONNUMS_205 \
+	#define LIBANDRIA4_SUMMATIONNUMS_205 \
 		( \
 			205, 206, 207, 208, 209, \
 			210, 211, 212, 213, 214 \
@@ -3704,7 +3704,7 @@ SOFTWARE.
 			205, 204, 203, 202, 201, \
 			200, 199, 198, 197, 196 \
 		)
-	#define LIB4_SUMMATIONNUMS_206 \
+	#define LIBANDRIA4_SUMMATIONNUMS_206 \
 		( \
 			206, 207, 208, 209, 210, \
 			211, 212, 213, 214, 215 \
@@ -3721,7 +3721,7 @@ SOFTWARE.
 			206, 205, 204, 203, 202, \
 			201, 200, 199, 198, 197 \
 		)
-	#define LIB4_SUMMATIONNUMS_207 \
+	#define LIBANDRIA4_SUMMATIONNUMS_207 \
 		( \
 			207, 208, 209, 210, 211, \
 			212, 213, 214, 215, 216 \
@@ -3738,7 +3738,7 @@ SOFTWARE.
 			207, 206, 205, 204, 203, \
 			202, 201, 200, 199, 198 \
 		)
-	#define LIB4_SUMMATIONNUMS_208 \
+	#define LIBANDRIA4_SUMMATIONNUMS_208 \
 		( \
 			208, 209, 210, 211, 212, \
 			213, 214, 215, 216, 217 \
@@ -3755,7 +3755,7 @@ SOFTWARE.
 			208, 207, 206, 205, 204, \
 			203, 202, 201, 200, 199 \
 		)
-	#define LIB4_SUMMATIONNUMS_209 \
+	#define LIBANDRIA4_SUMMATIONNUMS_209 \
 		( \
 			209, 210, 211, 212, 213, \
 			214, 215, 216, 217, 218 \
@@ -3773,7 +3773,7 @@ SOFTWARE.
 			204, 203, 202, 201, 200 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_210 \
+	#define LIBANDRIA4_SUMMATIONNUMS_210 \
 		( \
 			210, 211, 212, 213, 214, \
 			215, 216, 217, 218, 219 \
@@ -3790,7 +3790,7 @@ SOFTWARE.
 			210, 209, 208, 207, 206, \
 			205, 204, 203, 202, 201 \
 		)
-	#define LIB4_SUMMATIONNUMS_211 \
+	#define LIBANDRIA4_SUMMATIONNUMS_211 \
 		( \
 			211, 212, 213, 214, 215, \
 			216, 217, 218, 219, 220 \
@@ -3807,7 +3807,7 @@ SOFTWARE.
 			211, 210, 209, 208, 207, \
 			206, 205, 204, 203, 202 \
 		)
-	#define LIB4_SUMMATIONNUMS_212 \
+	#define LIBANDRIA4_SUMMATIONNUMS_212 \
 		( \
 			212, 213, 214, 215, 216, \
 			217, 218, 219, 220, 221 \
@@ -3824,7 +3824,7 @@ SOFTWARE.
 			212, 211, 210, 209, 208, \
 			207, 206, 205, 204, 203 \
 		)
-	#define LIB4_SUMMATIONNUMS_213 \
+	#define LIBANDRIA4_SUMMATIONNUMS_213 \
 		( \
 			213, 214, 215, 216, 217, \
 			218, 219, 220, 221, 222 \
@@ -3841,7 +3841,7 @@ SOFTWARE.
 			213, 212, 211, 210, 209, \
 			208, 207, 206, 205, 204 \
 		)
-	#define LIB4_SUMMATIONNUMS_214 \
+	#define LIBANDRIA4_SUMMATIONNUMS_214 \
 		( \
 			214, 215, 216, 217, 218, \
 			219, 220, 221, 222, 223 \
@@ -3858,7 +3858,7 @@ SOFTWARE.
 			214, 213, 212, 211, 210, \
 			209, 208, 207, 206, 205 \
 		)
-	#define LIB4_SUMMATIONNUMS_215 \
+	#define LIBANDRIA4_SUMMATIONNUMS_215 \
 		( \
 			215, 216, 217, 218, 219, \
 			220, 221, 222, 223, 224 \
@@ -3875,7 +3875,7 @@ SOFTWARE.
 			215, 214, 213, 212, 211, \
 			210, 209, 208, 207, 206 \
 		)
-	#define LIB4_SUMMATIONNUMS_216 \
+	#define LIBANDRIA4_SUMMATIONNUMS_216 \
 		( \
 			216, 217, 218, 219, 220, \
 			221, 222, 223, 224, 225 \
@@ -3892,7 +3892,7 @@ SOFTWARE.
 			216, 215, 214, 213, 212, \
 			211, 210, 209, 208, 207 \
 		)
-	#define LIB4_SUMMATIONNUMS_217 \
+	#define LIBANDRIA4_SUMMATIONNUMS_217 \
 		( \
 			217, 218, 219, 220, 221, \
 			222, 223, 224, 225, 226 \
@@ -3909,7 +3909,7 @@ SOFTWARE.
 			217, 216, 215, 214, 213, \
 			212, 211, 210, 209, 208 \
 		)
-	#define LIB4_SUMMATIONNUMS_218 \
+	#define LIBANDRIA4_SUMMATIONNUMS_218 \
 		( \
 			218, 219, 220, 221, 222, \
 			223, 224, 225, 226, 227 \
@@ -3926,7 +3926,7 @@ SOFTWARE.
 			218, 217, 216, 215, 214, \
 			213, 212, 211, 210, 209 \
 		)
-	#define LIB4_SUMMATIONNUMS_219 \
+	#define LIBANDRIA4_SUMMATIONNUMS_219 \
 		( \
 			219, 220, 221, 222, 223, \
 			224, 225, 226, 227, 228 \
@@ -3944,7 +3944,7 @@ SOFTWARE.
 			214, 213, 212, 211, 210 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_220 \
+	#define LIBANDRIA4_SUMMATIONNUMS_220 \
 		( \
 			220, 221, 222, 223, 224, \
 			225, 226, 227, 228, 229 \
@@ -3961,7 +3961,7 @@ SOFTWARE.
 			220, 219, 218, 217, 216, \
 			215, 214, 213, 212, 211 \
 		)
-	#define LIB4_SUMMATIONNUMS_221 \
+	#define LIBANDRIA4_SUMMATIONNUMS_221 \
 		( \
 			221, 222, 223, 224, 225, \
 			226, 227, 228, 229, 230 \
@@ -3978,7 +3978,7 @@ SOFTWARE.
 			221, 220, 219, 218, 217, \
 			216, 215, 214, 213, 212 \
 		)
-	#define LIB4_SUMMATIONNUMS_222 \
+	#define LIBANDRIA4_SUMMATIONNUMS_222 \
 		( \
 			222, 223, 224, 225, 226, \
 			227, 228, 229, 230, 231 \
@@ -3995,7 +3995,7 @@ SOFTWARE.
 			222, 221, 220, 219, 218, \
 			217, 216, 215, 214, 213 \
 		)
-	#define LIB4_SUMMATIONNUMS_223 \
+	#define LIBANDRIA4_SUMMATIONNUMS_223 \
 		( \
 			223, 224, 225, 226, 227, \
 			228, 229, 230, 231, 232 \
@@ -4012,7 +4012,7 @@ SOFTWARE.
 			223, 222, 221, 220, 219, \
 			218, 217, 216, 215, 214 \
 		)
-	#define LIB4_SUMMATIONNUMS_224 \
+	#define LIBANDRIA4_SUMMATIONNUMS_224 \
 		( \
 			224, 225, 226, 227, 228, \
 			229, 230, 231, 232, 233 \
@@ -4029,7 +4029,7 @@ SOFTWARE.
 			224, 223, 222, 221, 220, \
 			219, 218, 217, 216, 215 \
 		)
-	#define LIB4_SUMMATIONNUMS_225 \
+	#define LIBANDRIA4_SUMMATIONNUMS_225 \
 		( \
 			225, 226, 227, 228, 229, \
 			230, 231, 232, 233, 234 \
@@ -4046,7 +4046,7 @@ SOFTWARE.
 			225, 224, 223, 222, 221, \
 			220, 219, 218, 217, 216 \
 		)
-	#define LIB4_SUMMATIONNUMS_226 \
+	#define LIBANDRIA4_SUMMATIONNUMS_226 \
 		( \
 			226, 227, 228, 229, 230, \
 			231, 232, 233, 234, 235 \
@@ -4063,7 +4063,7 @@ SOFTWARE.
 			226, 225, 224, 223, 222, \
 			221, 220, 219, 218, 217 \
 		)
-	#define LIB4_SUMMATIONNUMS_227 \
+	#define LIBANDRIA4_SUMMATIONNUMS_227 \
 		( \
 			227, 228, 229, 230, 231, \
 			232, 233, 234, 235, 236 \
@@ -4080,7 +4080,7 @@ SOFTWARE.
 			227, 226, 225, 224, 223, \
 			222, 221, 220, 219, 218 \
 		)
-	#define LIB4_SUMMATIONNUMS_228 \
+	#define LIBANDRIA4_SUMMATIONNUMS_228 \
 		( \
 			228, 229, 230, 231, 232, \
 			233, 234, 235, 236, 237 \
@@ -4097,7 +4097,7 @@ SOFTWARE.
 			228, 227, 226, 225, 224, \
 			223, 222, 221, 220, 219 \
 		)
-	#define LIB4_SUMMATIONNUMS_229 \
+	#define LIBANDRIA4_SUMMATIONNUMS_229 \
 		( \
 			229, 230, 231, 232, 233, \
 			234, 235, 236, 237, 238 \
@@ -4115,7 +4115,7 @@ SOFTWARE.
 			224, 223, 222, 221, 220 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_230 \
+	#define LIBANDRIA4_SUMMATIONNUMS_230 \
 		( \
 			230, 231, 232, 233, 234, \
 			235, 236, 237, 238, 239 \
@@ -4132,7 +4132,7 @@ SOFTWARE.
 			230, 229, 228, 227, 226, \
 			225, 224, 223, 222, 221 \
 		)
-	#define LIB4_SUMMATIONNUMS_231 \
+	#define LIBANDRIA4_SUMMATIONNUMS_231 \
 		( \
 			231, 232, 233, 234, 235, \
 			236, 237, 238, 239, 240 \
@@ -4149,7 +4149,7 @@ SOFTWARE.
 			231, 230, 229, 228, 227, \
 			226, 225, 224, 223, 222 \
 		)
-	#define LIB4_SUMMATIONNUMS_232 \
+	#define LIBANDRIA4_SUMMATIONNUMS_232 \
 		( \
 			232, 233, 234, 235, 236, \
 			237, 238, 239, 240, 241 \
@@ -4166,7 +4166,7 @@ SOFTWARE.
 			232, 231, 230, 229, 228, \
 			227, 226, 225, 224, 223 \
 		)
-	#define LIB4_SUMMATIONNUMS_233 \
+	#define LIBANDRIA4_SUMMATIONNUMS_233 \
 		( \
 			233, 234, 235, 236, 237, \
 			238, 239, 240, 241, 242 \
@@ -4183,7 +4183,7 @@ SOFTWARE.
 			233, 232, 231, 230, 229, \
 			228, 227, 226, 225, 224 \
 		)
-	#define LIB4_SUMMATIONNUMS_234 \
+	#define LIBANDRIA4_SUMMATIONNUMS_234 \
 		( \
 			234, 235, 236, 237, 238, \
 			239, 240, 241, 242, 243 \
@@ -4200,7 +4200,7 @@ SOFTWARE.
 			234, 233, 232, 231, 230, \
 			229, 228, 227, 226, 225 \
 		)
-	#define LIB4_SUMMATIONNUMS_235 \
+	#define LIBANDRIA4_SUMMATIONNUMS_235 \
 		( \
 			235, 236, 237, 238, 239, \
 			240, 241, 242, 243, 244 \
@@ -4217,7 +4217,7 @@ SOFTWARE.
 			235, 234, 233, 232, 231, \
 			230, 229, 228, 227, 226 \
 		)
-	#define LIB4_SUMMATIONNUMS_236 \
+	#define LIBANDRIA4_SUMMATIONNUMS_236 \
 		( \
 			236, 237, 238, 239, 240, \
 			241, 242, 243, 244, 245 \
@@ -4234,7 +4234,7 @@ SOFTWARE.
 			236, 235, 234, 233, 232, \
 			231, 230, 229, 228, 227 \
 		)
-	#define LIB4_SUMMATIONNUMS_237 \
+	#define LIBANDRIA4_SUMMATIONNUMS_237 \
 		( \
 			237, 238, 239, 240, 241, \
 			242, 243, 244, 245, 246 \
@@ -4251,7 +4251,7 @@ SOFTWARE.
 			237, 236, 235, 234, 233, \
 			232, 231, 230, 229, 228 \
 		)
-	#define LIB4_SUMMATIONNUMS_238 \
+	#define LIBANDRIA4_SUMMATIONNUMS_238 \
 		( \
 			238, 239, 240, 241, 242, \
 			243, 244, 245, 246, 247 \
@@ -4268,7 +4268,7 @@ SOFTWARE.
 			238, 237, 236, 235, 234, \
 			233, 232, 231, 230, 229 \
 		)
-	#define LIB4_SUMMATIONNUMS_239 \
+	#define LIBANDRIA4_SUMMATIONNUMS_239 \
 		( \
 			239, 240, 241, 242, 243, \
 			244, 245, 246, 247, 248 \
@@ -4286,7 +4286,7 @@ SOFTWARE.
 			234, 233, 232, 231, 230 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_240 \
+	#define LIBANDRIA4_SUMMATIONNUMS_240 \
 		( \
 			240, 241, 242, 243, 244, \
 			245, 246, 247, 248, 249 \
@@ -4303,7 +4303,7 @@ SOFTWARE.
 			240, 239, 238, 237, 236, \
 			235, 234, 233, 232, 231 \
 		)
-	#define LIB4_SUMMATIONNUMS_241 \
+	#define LIBANDRIA4_SUMMATIONNUMS_241 \
 		( \
 			241, 242, 243, 244, 245, \
 			246, 247, 248, 249, 250 \
@@ -4320,7 +4320,7 @@ SOFTWARE.
 			241, 240, 239, 238, 237, \
 			236, 235, 234, 233, 232 \
 		)
-	#define LIB4_SUMMATIONNUMS_242 \
+	#define LIBANDRIA4_SUMMATIONNUMS_242 \
 		( \
 			242, 243, 244, 245, 246, \
 			247, 248, 249, 250, 251 \
@@ -4337,7 +4337,7 @@ SOFTWARE.
 			242, 241, 240, 239, 238, \
 			237, 236, 235, 234, 233 \
 		)
-	#define LIB4_SUMMATIONNUMS_243 \
+	#define LIBANDRIA4_SUMMATIONNUMS_243 \
 		( \
 			243, 244, 245, 246, 247, \
 			248, 249, 250, 251, 252 \
@@ -4354,7 +4354,7 @@ SOFTWARE.
 			243, 242, 241, 240, 239, \
 			238, 237, 236, 235, 234 \
 		)
-	#define LIB4_SUMMATIONNUMS_244 \
+	#define LIBANDRIA4_SUMMATIONNUMS_244 \
 		( \
 			244, 245, 246, 247, 248, \
 			249, 250, 251, 252, 253 \
@@ -4371,7 +4371,7 @@ SOFTWARE.
 			244, 243, 242, 241, 240, \
 			239, 238, 237, 236, 235 \
 		)
-	#define LIB4_SUMMATIONNUMS_245 \
+	#define LIBANDRIA4_SUMMATIONNUMS_245 \
 		( \
 			245, 246, 247, 248, 249, \
 			250, 251, 252, 253, 254 \
@@ -4388,7 +4388,7 @@ SOFTWARE.
 			245, 244, 243, 242, 241, \
 			240, 239, 238, 237, 236 \
 		)
-	#define LIB4_SUMMATIONNUMS_246 \
+	#define LIBANDRIA4_SUMMATIONNUMS_246 \
 		( \
 			246, 247, 248, 249, 250, \
 			251, 252, 253, 254, 255 \
@@ -4405,7 +4405,7 @@ SOFTWARE.
 			246, 245, 244, 243, 242, \
 			241, 240, 239, 238, 237 \
 		)
-	#define LIB4_SUMMATIONNUMS_247 \
+	#define LIBANDRIA4_SUMMATIONNUMS_247 \
 		( \
 			247, 248, 249, 250, 251, \
 			252, 253, 254, 255, 256 \
@@ -4422,7 +4422,7 @@ SOFTWARE.
 			247, 246, 245, 244, 243, \
 			242, 241, 240, 239, 238 \
 		)
-	#define LIB4_SUMMATIONNUMS_248 \
+	#define LIBANDRIA4_SUMMATIONNUMS_248 \
 		( \
 			248, 249, 250, 251, 252, \
 			253, 254, 255, 256, 257 \
@@ -4439,7 +4439,7 @@ SOFTWARE.
 			248, 247, 246, 245, 244, \
 			243, 242, 241, 240, 239 \
 		)
-	#define LIB4_SUMMATIONNUMS_249 \
+	#define LIBANDRIA4_SUMMATIONNUMS_249 \
 		( \
 			249, 250, 251, 252, 253, \
 			254, 255, 256, 257, 258 \
@@ -4457,7 +4457,7 @@ SOFTWARE.
 			244, 243, 242, 241, 240 \
 		)
 	
-	#define LIB4_SUMMATIONNUMS_250 \
+	#define LIBANDRIA4_SUMMATIONNUMS_250 \
 		( \
 			250, 251, 252, 253, 254, \
 			255, 256, 257, 258, 259 \
@@ -4474,7 +4474,7 @@ SOFTWARE.
 			250, 249, 248, 247, 246, \
 			245, 244, 243, 242, 241 \
 		)
-	#define LIB4_SUMMATIONNUMS_251 \
+	#define LIBANDRIA4_SUMMATIONNUMS_251 \
 		( \
 			251, 252, 253, 254, 255, \
 			256, 257, 258, 259, 260 \
@@ -4491,7 +4491,7 @@ SOFTWARE.
 			251, 250, 249, 248, 247, \
 			246, 245, 244, 243, 242 \
 		)
-	#define LIB4_SUMMATIONNUMS_252 \
+	#define LIBANDRIA4_SUMMATIONNUMS_252 \
 		( \
 			252, 253, 254, 255, 256, \
 			257, 258, 259, 260, 261 \
@@ -4508,7 +4508,7 @@ SOFTWARE.
 			252, 251, 250, 249, 248, \
 			247, 246, 245, 244, 243 \
 		)
-	#define LIB4_SUMMATIONNUMS_253 \
+	#define LIBANDRIA4_SUMMATIONNUMS_253 \
 		( \
 			253, 254, 255, 256, 257, \
 			258, 259, 260, 261, 262 \
@@ -4525,7 +4525,7 @@ SOFTWARE.
 			253, 252, 251, 250, 249, \
 			248, 247, 246, 245, 244 \
 		)
-	#define LIB4_SUMMATIONNUMS_254 \
+	#define LIBANDRIA4_SUMMATIONNUMS_254 \
 		( \
 			254, 255, 256, 257, 258, \
 			259, 260, 261, 262, 263 \
@@ -4542,7 +4542,7 @@ SOFTWARE.
 			254, 253, 252, 251, 250, \
 			249, 248, 247, 246, 245 \
 		)
-	#define LIB4_SUMMATIONNUMS_255 \
+	#define LIBANDRIA4_SUMMATIONNUMS_255 \
 		( \
 			255, 256, 257, 258, 259, \
 			260, 261, 262, 263, 264 \
@@ -4559,7 +4559,7 @@ SOFTWARE.
 			255, 254, 253, 252, 251, \
 			250, 249, 248, 247, 246 \
 		)
-	#define LIB4_SUMMATIONNUMS_256 \
+	#define LIBANDRIA4_SUMMATIONNUMS_256 \
 		( \
 			256, 257, 258, 259, 260, \
 			261, 262, 263, 264, 265 \
@@ -4576,7 +4576,7 @@ SOFTWARE.
 			256, 255, 254, 253, 252, \
 			251, 250, 249, 248, 247 \
 		)
-	#define LIB4_SUMMATIONNUMS_257 \
+	#define LIBANDRIA4_SUMMATIONNUMS_257 \
 		( \
 			257, 258, 259, 260, 261, \
 			262, 263, 264, 265, 266 \
@@ -4593,7 +4593,7 @@ SOFTWARE.
 			257, 256, 255, 254, 253, \
 			252, 251, 250, 249, 248 \
 		)
-	#define LIB4_SUMMATIONNUMS_258 \
+	#define LIBANDRIA4_SUMMATIONNUMS_258 \
 		( \
 			258, 259, 260, 261, 262, \
 			263, 264, 265, 266, 267 \
@@ -4610,7 +4610,7 @@ SOFTWARE.
 			258, 257, 256, 255, 254, \
 			253, 252, 251, 250, 249 \
 		)
-	#define LIB4_SUMMATIONNUMS_259 \
+	#define LIBANDRIA4_SUMMATIONNUMS_259 \
 		( \
 			259, 260, 261, 262, 263, \
 			264, 265, 266, 267, 268 \
@@ -4631,83 +4631,83 @@ SOFTWARE.
 	
 		/* Entry format: ( round-down, round-norm, round-up, fractional ) */
 		/* Divisors: 1, 2, 3 */
-	#define LIB4_DIVISIONNUMS_() \
+	#define LIBANDRIA4_DIVISIONNUMS_() \
 		( (), (), (), () ), \
 		( (), (), (), () ), \
 		( (), (), (), () )
 	
-	#define LIB4_DIVISIONNUMS_0 \
+	#define LIBANDRIA4_DIVISIONNUMS_0 \
 		( 0, 0, 0, 0 ), \
 		( 0, 0, 0, 0 ), \
 		( 0, 0, 0, 0 )
 	
-	#define LIB4_DIVISIONNUMS_1 \
+	#define LIBANDRIA4_DIVISIONNUMS_1 \
 		( 1, 1, 1, 1 ), \
 		( 0, 1, 1, 0.5 ), \
 		( 0, 0, 1, 1.0/3 )
-	#define LIB4_DIVISIONNUMS_2 \
+	#define LIBANDRIA4_DIVISIONNUMS_2 \
 		( 2, 2, 2, 2 ), \
 		( 1, 1, 1, 1 ), \
 		( 0, 1, 1, 2.0/3 )
-	#define LIB4_DIVISIONNUMS_3 \
+	#define LIBANDRIA4_DIVISIONNUMS_3 \
 		( 3, 3, 3, 3 ), \
 		( 1, 2, 2, 1.5 ), \
 		( 1, 1, 1, 1 )
-	#define LIB4_DIVISIONNUMS_4 \
+	#define LIBANDRIA4_DIVISIONNUMS_4 \
 		( 4, 4, 4, 4 ), \
 		( 2, 2, 2, 2 ), \
 		( 1, 1, 2, 4.0/3 )
 	
-	#define LIB4_DIVISIONNUMS_5 \
+	#define LIBANDRIA4_DIVISIONNUMS_5 \
 		( 5, 5, 5, 5 ), \
 		( 2, 3, 3, 2.5 ), \
 		( 1, 2, 2, 5.0/3 )
-	#define LIB4_DIVISIONNUMS_6 \
+	#define LIBANDRIA4_DIVISIONNUMS_6 \
 		( 6, 6, 6, 6 ), \
 		( 3, 3, 3, 3 ), \
 		( 2, 2, 2, 2 )
-	#define LIB4_DIVISIONNUMS_7 \
+	#define LIBANDRIA4_DIVISIONNUMS_7 \
 		( 7, 7, 7, 7 ), \
 		( 3, 4, 4, 3.5 ), \
 		( 2, 2, 3, 7.0/3 )
-	#define LIB4_DIVISIONNUMS_8 \
+	#define LIBANDRIA4_DIVISIONNUMS_8 \
 		( 8, 8, 8, 8 ), \
 		( 4, 4, 4, 4 ), \
 		( 2, 3, 3, 8.0/3 )
 	
-	#define LIB4_DIVISIONNUMS_9 \
+	#define LIBANDRIA4_DIVISIONNUMS_9 \
 		( 9, 9, 9, 9 ), \
 		( 4, 5, 5, 4.5 ), \
 		( 3, 3, 3, 3 )
-	#define LIB4_DIVISIONNUMS_10 \
+	#define LIBANDRIA4_DIVISIONNUMS_10 \
 		( 10, 10, 10, 10 ), \
 		( 5, 5, 5, 5 ), \
 		( 3, 3, 4, 10.0/3 )
-	#define LIB4_DIVISIONNUMS_11 \
+	#define LIBANDRIA4_DIVISIONNUMS_11 \
 		( 11, 11, 11, 11 ), \
 		( 5, 6, 6, 5.5 ), \
 		( 3, 4, 4, 11.0/3 )
-	#define LIB4_DIVISIONNUMS_12 \
+	#define LIBANDRIA4_DIVISIONNUMS_12 \
 		( 12, 12, 12, 12 ), \
 		( 6, 6, 6, 6 ), \
 		( 4, 4, 4, 4 )
 	
-	#define LIB4_DIVISIONNUMS_13 \
+	#define LIBANDRIA4_DIVISIONNUMS_13 \
 		( 13, 13, 13, 13 ), \
 		( 6, 7, 7, 6.5 ), \
 		( 4, 4, 5, 13.0/3 )
-	#define LIB4_DIVISIONNUMS_14 \
+	#define LIBANDRIA4_DIVISIONNUMS_14 \
 		( 14, 14, 14, 14 ), \
 		( 7, 7, 7, 7 ), \
 		( 4, 5, 5, 14.0/3 )
-	#define LIB4_DIVISIONNUMS_15 \
+	#define LIBANDRIA4_DIVISIONNUMS_15 \
 		( 15, 15, 15, 15 ), \
 		( 7, 8, 8, 7.5 ), \
 		( 5, 5, 5, 5 )
-	#define LIB4_DIVISIONNUMS_16 \
+	#define LIBANDRIA4_DIVISIONNUMS_16 \
 		( 16, 16, 16, 16 ), \
 		( 8, 8, 8, 8 ), \
 		( 5, 5, 6, 16.0/3 )
 	
 #endif
-/* End lib4 macrotime math.h */
+/* End libandria4 macroops math.h */
