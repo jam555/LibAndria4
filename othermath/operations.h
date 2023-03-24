@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIB4_OPERATIONS_H
-# define LIB4_OPERATIONS_H
+#ifndef LIBANDRIA4_OPERATIONS_H
+# define LIBANDRIA4_OPERATIONS_H
 	
 		/* The math macros that were here have been moved to macwrap_operations.h */
 	#include "macwrap_operations.h"
@@ -50,7 +50,7 @@ SOFTWARE.
 		/*  dates back to Gary Tarolli for the SGI Indigo, or Greg Walsh & */
 		/*  Cleve Moler for Ardent Computer, or William Kahan & K. C. Ng at */
 		/*  Berkley. */
-	float lib4_sketchyLog2( float num )
+	float libandria4_sketchyLog2( float num )
 	{
 		/* Note: requires num & i to be 32 bits. */
 		int32_t i = *( (int32_t*)( &num ) );
@@ -65,4 +65,4 @@ SOFTWARE.
 	}
 	
 #endif
-/* End lib4 operations.h */
+/* End libandria4 othermath operations.h */

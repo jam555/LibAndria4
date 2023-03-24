@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIB4_MACROTIME_NORMCHAR_H
-# define LIB4_MACROTIME_NORMCHAR_H
+#ifndef LIBANDRIA4_MACROTIME_NORMCHAR_H
+# define LIBANDRIA4_MACROTIME_NORMCHAR_H
 	
 	#include "simpleops.h"
 	
@@ -36,32 +36,32 @@ SOFTWARE.
 	/*  parentheses will be replaced with the default value, which is the */
 	/*  character-null, since these are in fact characters. */
 	
-	#define LIB4_NORMALIZECHAR_1( a ) \
-		( LIB4_DEFAULTABLE_VALUE( a, '\0' ), ) ( a )
-	#define LIB4_NORMALIZECHAR_2( a, b ) \
+	#define LIBANDRIA4_NORMALIZECHAR_1( a ) \
+		( LIBANDRIA4_DEFAULTABLE_VALUE( a, '\0' ), ) ( a )
+	#define LIBANDRIA4_NORMALIZECHAR_2( a, b ) \
 		( \
-			LIB4_DEFAULTABLE_VALUE( a, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( b, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( a, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( b, '\0' ), \
 		) ( b )
-	#define LIB4_NORMALIZECHAR_4( a, b, c, d ) \
+	#define LIBANDRIA4_NORMALIZECHAR_4( a, b, c, d ) \
 		( \
-			LIB4_DEFAULTABLE_VALUE( a, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( b, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( c, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( d, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( a, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( b, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( c, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( d, '\0' ), \
 		) ( d )
-	#define LIB4_NORMALIZECHAR_8( a, b, c, d,  e, f, g, h ) \
+	#define LIBANDRIA4_NORMALIZECHAR_8( a, b, c, d,  e, f, g, h ) \
 		( \
-			LIB4_DEFAULTABLE_VALUE( a, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( b, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( c, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( d, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( a, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( b, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( c, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( d, '\0' ), \
 			\
-			LIB4_DEFAULTABLE_VALUE( e, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( f, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( g, '\0' ), \
-			LIB4_DEFAULTABLE_VALUE( h, '\0' ) \
+			LIBANDRIA4_DEFAULTABLE_VALUE( e, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( f, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( g, '\0' ), \
+			LIBANDRIA4_DEFAULTABLE_VALUE( h, '\0' ) \
 		) ( h )
 	
 #endif
-/* End lib4 macrotime normchar.h */
+/* End libandria4 text normchar.h */

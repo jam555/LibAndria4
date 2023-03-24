@@ -33,7 +33,7 @@ SOFTWARE.
 
 
 	/* This currently expects ASCII! */
-int lib4_char_##parr_decincr( lib4_char_##parr *parr )
+int libandria4_char_##parr_decincr( libandria4_char_##parr *parr )
 {
 	if( parr )
 	{
@@ -81,48 +81,48 @@ int lib4_char_##parr_decincr( lib4_char_##parr *parr )
 	return( -1 );
 }
 
-lib4_char_##parrres lib4_char_##parr_strbuild
+libandria4_char_##parrres libandria4_char_##parr_strbuild
 (
-	lib4_memfuncs_t *mf,
+	libandria4_memfuncs_t *mf,
 	
 	char *str
 )
 {
-	lib4_char_##parrres ret;
+	libandria4_char_##parrres ret;
 	
 	if( str )
 	{
 		size_t len = strlen( str );
 		
 			/* Note: allocates an extra entry for the end-marking null. */
-		ret = lib4_char_##pascalarray_build( mf, len + 1 );
+		ret = libandria4_char_##pascalarray_build( mf, len + 1 );
 		
-		#define lib4_char_parr_strbuild_BUILD_SUCC( var ) \
-			lib4_char_##parr *res = ( var ); \
+		#define libandria4_char_parr_strbuild_BUILD_SUCC( var ) \
+			libandria4_char_##parr *res = ( var ); \
 			res->body[ len ] = '\0'; \
 			while( len ) { \
 				res->body[ res->len - ( len + 1 ) ] = *str; \
 				--len; ++str; }
 		
-		LIB4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
+		LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
 			ret,
 			
-			lib4_char_parr_strbuild_BUILD_SUCC,
-			LIB4_NULL_MACRO
+			libandria4_char_parr_strbuild_BUILD_SUCC,
+			LIBANDRIA4_NULL_MACRO
 		)
 	}
 	
 	return( ret );
 }
-lib4_char_##parrres lib4_char_##parr_strbuildmerge
+libandria4_char_##parrres libandria4_char_##parr_strbuildmerge
 (
-	lib4_memfuncs_t *mf,
+	libandria4_memfuncs_t *mf,
 	
 	char *a,
 	char *b
 )
 {
-	lib4_char_##parrres ret;
+	libandria4_char_##parrres ret;
 	
 	if( a && b )
 	{
@@ -131,10 +131,10 @@ lib4_char_##parrres lib4_char_##parr_strbuildmerge
 			b_len = strlen( b );
 		
 			/* Note: allocates an extra entry for the end-marking null. */
-		ret = lib4_char_##pascalarray_build( mf, a->len + b->len + 1 );
+		ret = libandria4_char_##pascalarray_build( mf, a->len + b->len + 1 );
 		
-		#define lib4_char_parr_strbuildmerge_BUILD_SUCC( var ) \
-			lib4_char_##parr *res = ( var ); \
+		#define libandria4_char_parr_strbuildmerge_BUILD_SUCC( var ) \
+			libandria4_char_##parr *res = ( var ); \
 			size_t len = 0, targ = 0; \
 			while( len < a_len ) { \
 				res->body[ targ ] = a[ len ]; \
@@ -145,33 +145,33 @@ lib4_char_##parrres lib4_char_##parr_strbuildmerge
 				++len; ++targ; } \
 			res->body[ targ ] = '\0';
 		
-		LIB4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
+		LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
 			ret,
 			
-			lib4_char_parr_strbuildmerge_BUILD_SUCC,
-			LIB4_NULL_MACRO
+			libandria4_char_parr_strbuildmerge_BUILD_SUCC,
+			LIBANDRIA4_NULL_MACRO
 		)
 	}
 	
 	return( ret );
 }
 
-lib4_char_##parrres lib4_char_##parr_merge
+libandria4_char_##parrres libandria4_char_##parr_merge
 (
-	lib4_memfuncs_t *mf,
+	libandria4_memfuncs_t *mf,
 	
-	lib4_char_##parr *a,
-	lib4_char_##parr *b
+	libandria4_char_##parr *a,
+	libandria4_char_##parr *b
 )
 {
-	lib4_char_parr *ret = (lib4_char_parr*)0;
+	libandria4_char_parr *ret = (libandria4_char_parr*)0;
 	
 	if( a && b )
 	{
-		ret = lib4_char_##pascalarray_build( mf, a->len + b->len - 1 );
+		ret = libandria4_char_##pascalarray_build( mf, a->len + b->len - 1 );
 		
-		#define lib4_char_parr_merge_BUILD_SUCC( var ) \
-			lib4_char_##parr *res = ( var ); \
+		#define libandria4_char_parr_merge_BUILD_SUCC( var ) \
+			libandria4_char_##parr *res = ( var ); \
 			size_t len = 0, targ = 0; \
 			while( len + 1 < a->len ) { \
 				res->body[ targ ] = a->body[ len ]; \
@@ -182,18 +182,18 @@ lib4_char_##parrres lib4_char_##parr_merge
 				++len; ++targ; } \
 			res->body[ targ ] = '\0';
 		
-		LIB4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
+		LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
 			ret,
 			
-			lib4_char_parr_merge_BUILD_SUCC,
-			LIB4_NULL_MACRO
+			libandria4_char_parr_merge_BUILD_SUCC,
+			LIBANDRIA4_NULL_MACRO
 		)
 	}
 	
 	return( ret );
 }
 
-int lib4_ascii_isnewline( char c )
+int libandria4_ascii_isnewline( char c )
 {
 		/* Detects form-feed, vertical-tab, true new-line, and */
 		/*  carriage-return. */
