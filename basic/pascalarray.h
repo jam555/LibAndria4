@@ -191,4 +191,4 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type,  &libandria4_stdmemfuncs )
 	
 #endif
-/* End lib4 pascalarray.h */
+/* End lib4 basic pascalarray.h */

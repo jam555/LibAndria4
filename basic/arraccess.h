@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIBANDRIA4_MACROTIME_ARRTOOLS_H
-# define LIBANDRIA4_MACROTIME_ARRTOOLS_H
+#ifndef LIBANDRIA4_BASIC_ARRTOOLS_H
+# define LIBANDRIA4_BASIC_ARRTOOLS_H
 	
 	/* ... Perhaps you were looking for strsnarrs.h instead? Or perhaps for */
 	/*  forset.h is more to your interest? These tools only work on things */
