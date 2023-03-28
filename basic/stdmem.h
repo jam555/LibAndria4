@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIBANDRIA4_STDMEM_H
-# define LIBANDRIA4_STDMEM_H
+#ifndef LIBANDRIA4_BASIC_STDMEM_H
+# define LIBANDRIA4_BASIC_STDMEM_H
 	
 	#include <stdint.h>
 	
@@ -62,4 +62,4 @@ SOFTWARE.
 		if( !( mf_ptr ) ) { ( mf_ptr ) = &libandria4_stdmemfuncs; }
 	
 #endif
-/* End libandria4 stdmem.h */
+/* End libandria4 basic stdmem.h */
