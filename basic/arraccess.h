@@ -133,7 +133,7 @@ SOFTWARE.
 	
 	
 	#include "simpleops.h"
-	#include "math.h"
+	#include "../math/math.h"
 	
 		/* Result: ( left ), ( right ), left_size */
 	#define LIBANDRIA4_SPLIT_2( ... ) \

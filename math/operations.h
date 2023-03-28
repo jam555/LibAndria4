@@ -30,7 +30,7 @@ SOFTWARE.
 # define LIBANDRIA4_MATH_OPERATIONS_H
 	
 		/* The math macros that were here have been moved to macwrap_operations.h */
-	#include "macwrap_operations.h"
+	#include "expressions.h"
 	
 	
 	/* Note: should convert sketchyLog2 to a macro version. */

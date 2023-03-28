@@ -29,7 +29,7 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_EVAL_H
 # define LIBANDRIA4_BASIC_EVAL_H
 	
-	#include "math.h"
+	#include "../math/math.h"
 	
 		/* This EVAL system is effectively a processor-instruction iterator. */
 		/*  The *_FORSET macro system uses it, but you might occassionally */

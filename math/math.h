@@ -29,7 +29,7 @@ SOFTWARE.
 #ifndef LIBANDRIA4_MATH_MATH_H
 # define LIBANDRIA4_MATH_MATH_H
 	
-	#include "simpleops.h"
+	#include "../basic/simpleops.h"
 	
 	/* NOTE! : LIBANDRIA4_SUB( x, y ) has now been actually tested, but add, mul, */
 	/*  etc., have not, and probably don't work (because of expansion */

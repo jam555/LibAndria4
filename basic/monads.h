@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIBANDRIA4_MONADS_H
-# define LIBANDRIA4_MONADS_H
+#ifndef LIBANDRIA4_BASIC_MONADS_H
+# define LIBANDRIA4_BASIC_MONADS_H
 	
 	/* This is some untested monadic C code. Monads are used for several */
 	/*  things, but in particularly are the latest fad for errors in */

@@ -37,8 +37,8 @@ SOFTWARE.
 	
 	
 	
-	#include "stdmem.h"
-	#include "pascalarray.h"
+	#include "../basic/stdmem.h"
+	#include "../basic/pascalarray.h"
 	
 	
 	LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( libandria4_char_, char )
