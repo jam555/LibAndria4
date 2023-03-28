@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIBANDRIA4_MACROTIME_MATH_H
-# define LIBANDRIA4_MACROTIME_MATH_H
+#ifndef LIBANDRIA4_MATH_MATH_H
+# define LIBANDRIA4_MATH_MATH_H
 	
 	#include "simpleops.h"
 	
@@ -4710,4 +4710,4 @@ SOFTWARE.
 		( 5, 5, 6, 16.0/3 )
 	
 #endif
-/* End libandria4 macroops math.h */
+/* End libandria4 math math.h */

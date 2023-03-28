@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIBANDRIA4_OTHERMATH_LOGIC_H
-# define LIBANDRIA4_OTHERMATH_LOGIC_H
+#ifndef LIBANDRIA4_MATH_LOGIC_H
+# define LIBANDRIA4_MATH_LOGIC_H
 	
 	
 	
@@ -174,4 +174,4 @@ SOFTWARE.
 	#define LIBANDRIA4_WHEN3( flag ) LIBANDRIA4_WHENx( 3, flag )
 	
 #endif
-/* End libsndria4 othermath logic.h */
+/* End libsndria4 math logic.h */

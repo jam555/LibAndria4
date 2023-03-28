@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIBANDRIA4_OPERATIONS_H
-# define LIBANDRIA4_OPERATIONS_H
+#ifndef LIBANDRIA4_MATH_OPERATIONS_H
+# define LIBANDRIA4_MATH_OPERATIONS_H
 	
 		/* The math macros that were here have been moved to macwrap_operations.h */
 	#include "macwrap_operations.h"
@@ -65,4 +65,4 @@ SOFTWARE.
 	}
 	
 #endif
-/* End libandria4 othermath operations.h */
+/* End libandria4 math operations.h */

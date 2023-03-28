@@ -26,8 +26,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIBANDRIA4_MONALIKEMATH_H
-# define LIBANDRIA4_MONALIKEMATH_H
+#ifndef LIBANDRIA4_MATH_MONALIKEMATH_H
+# define LIBANDRIA4_MATH_MONALIKEMATH_H
 	
 	/* Monadic math - monalike_math.h */
 	/* This file implements some monad-based math functions. The intent is */
@@ -151,4 +151,4 @@ SOFTWARE.
 	LIBANDRIA4_MONADOUBLE_BUILDBINARYOP( lor, LIBANDRIA4_MONADOUBLE_LOR )
 	
 #endif
-/* End libandria4 macroops monalike_math.h */
+/* End libandria4 math monalike_math.h */
