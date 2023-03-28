@@ -101,7 +101,7 @@ SOFTWARE.
 				if( !( mf->alloc ) ) { \
 					return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
 						LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ) ); } \
-				4_ptrresult ptrres = (mf->alloc)( mf->data, \
+				libandria4_ptrresult ptrres = (mf->alloc)( mf->data, \
 						sizeof( parrtype ) + sizeof( type ) * len ); \
 				LIBANDRIA4_PTRRESULT_BODYMATCH( ptrres, \
 					LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb ) } \

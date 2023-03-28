@@ -29,7 +29,7 @@ SOFTWARE.
 #ifndef LIBANDRIA4_MACROTIME_NORMCHAR_H
 # define LIBANDRIA4_MACROTIME_NORMCHAR_H
 	
-	#include "simpleops.h"
+	#include "../basic/simpleops.h"
 	
 	
 	/* These accept a mixture of character constants and parentheses. All */

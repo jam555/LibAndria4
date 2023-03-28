@@ -29,7 +29,7 @@ SOFTWARE.
 #include <string.h>
 
 #include "text_pascalarray.h"
-#include "macrotime/simpleops.h"
+#include "../basic/simpleops.h"
 
 
 	/* This currently expects ASCII! */

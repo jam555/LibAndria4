@@ -26,10 +26,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIB4_MACROTIME_CHARSETS_ASCII_H
-# define LIB4_MACROTIME_CHARSETS_ASCII_H
+#ifndef LIBANDRIA4_MACROTIME_CHARSETS_ASCII_H
+# define LIBANDRIA4_MACROTIME_CHARSETS_ASCII_H
 	
 	#include "charsets_general.h"
 	
 #endif
-/* End lib4 macrotime charsets_ascii.h */
+/* End libandria4 text charsets_ascii.h */

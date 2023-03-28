@@ -54,8 +54,8 @@ SOFTWARE.
 	#define LIBANDRIA4_DEFINE_CHAR_PASCALARRAY_LITERAL_NNULL( text ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL( libandria4_char_, sizeof( text ) - 1, text )
 	
-	typedef LIBANDRIA4_char_pascalarray libandria4_char_parr;
-	typedef LIBANDRIA4_char_pascalarray_result libandria4_char_parrres;
+	typedef libandria4_char_pascalarray libandria4_char_parr;
+	typedef libandria4_char_pascalarray_result libandria4_char_parrres;
 		/* To get the relevant stuff out of a libandria4_char_parrres, pass a */
 		/*  VARIABLE containing the value to either */
 		/*  LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH() or */
