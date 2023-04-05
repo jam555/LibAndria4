@@ -2,25 +2,25 @@ LibAndria version 4
 TODO:
 
 I only just copied this stuff to my Chromebook, and need to spruce things up:
-	All of the include guards will be wrong, because I've changed directories.
-	Various names need lib4 and similar changed to libandria4 and similar.
 	To match the name change, need to fill in stdabbrevs/metaCabbrevs.h with
 		relevant abbreviations so the identifier lengths are tolerable.
-	Need to reorganize file contents, as some stuff just won't make that much
-		sense.
-	Need to add copyrights to pretty much everything.
 	Need a proper readme to explain stuff.
-	Need to add to a commit tracker and push into the public.
 	Need to add tests & makefiles for those tests.
 	Need to bring in more stuff (e.g. get that rope stuff working, &
 		streams/dirs).
 	Need to bring in/build some version of LCIS.
-	Need to move some stuff (e.g. the error reporter & it's behing the scenes
+	Need to move some stuff (e.g. the error reporter & it's behind the scenes
 		printf()-derivative) from MetaC to here.
 	monalike_math.h needs to have functions rewritten, because e.g. just( 1 )
 		+ nothing() should equal 1, but currently equals 0: this is wrong and
 		should be fixed.
+		Actually, is that even true? Is this a "square root of -1" thing?
 	text_pascalarray.c has a lot of concat operators instead of just sticking
 		the sub-tokens together directly: decide if that should be changed or
 		not.
 	It looks like charsets_EBCDICInvariant.h isn't actually complete.
+	Review all of the include guards to see if any are still wrong.
+	Review to see if there's still anything prefixed "lib4", or not prefixed
+		at all.
+	Need to review organization, to see if there's any sensible improvements.
+	Move most or all concrete type definitions into commontypes.h.

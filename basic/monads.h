@@ -98,9 +98,9 @@ SOFTWARE.
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name, typea, val ) \
-		( (name){ { .a: (typea)( val ) }, 0 } )
+		( (name){ { .a = (typea)( val ) }, 0 } )
 	#define LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( name, typeb, val ) \
-		( (name){ { .b: (typeb)( val ) }, 1 } )
+		( (name){ { .b = (typeb)( val ) }, 1 } )
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 	#define LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, matcha, matchb ) \

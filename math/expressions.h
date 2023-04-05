@@ -34,59 +34,59 @@ SOFTWARE.
 	/*  functions in an abstract fashion. You should never begin with these, but */
 	/*  instead translate to them from something else. */
 	
-	#define EXPR_SET( dest, src ) ( ( dest ) = (src ) )
+	#define LIBANDRIA4_EXPR_SET( dest, src ) ( ( dest ) = (src ) )
 	
-	#define EXPR_MONOPRE( a, op ) \
+	#define LIBANDRIA4_EXPR_MONOPRE( a, op ) \
 		( ( op ) ( a ) )
-	#define EXPR_MONOPOST( a, op ) \
+	#define LIBANDRIA4_EXPR_MONOPOST( a, op ) \
 		( ( a ) ( op ) )
-	#define EXPR_BININF( a, b, op ) \
+	#define LIBANDRIA4_EXPR_BININF( a, b, op ) \
 		( ( a ) ( op ) ( b ) )
-	#define EXPR_TRIINF( a, b, c, opa, opb ) \
+	#define LIBANDRIA4_EXPR_TRIINF( a, b, c, opa, opb ) \
 		( ( a ) (opa) ( b ) (opb) ( c ) )
-	#define EXPR_MONOCONF( a, opa, opb ) \
+	#define LIBANDRIA4_EXPR_MONOCONF( a, opa, opb ) \
 		( (opa) ( a ) (opb) )
 	
-	#define EXPR_NOT( a ) EXPR_MONOPRE( ( a ), ! )
-	#define EXPR_TOGGLETOP( a ) \
-		EXPR_BXOR( \
-			EXPR_ONESCOMPL( a ), \
+	#define LIBANDRIA4_EXPR_NOT( a ) LIBANDRIA4_EXPR_MONOPRE( ( a ), ! )
+	#define LIBANDRIA4_EXPR_TOGGLETOP( a ) \
+		LIBANDRIA4_EXPR_BXOR( \
+			LIBANDRIA4_EXPR_ONESCOMPL( a ), \
 			1 << ( ( sizeof( ( a ) ) * CHAR_BIT ) - 1 ) )
-	#define EXPR_NOOPIDENT( a ) ( a )
-	#define EXPR_POSIDENT( a ) EXPR_MONOPRE( ( a ), + )
-	#define EXPR_NEGATE( a ) EXPR_MONOPRE( ( a ), - )
-	#define EXPR_ONESCOMPL( a ) EXPR_MONOPRE( ( a ), ~ )
-	#define EXPR_TWOSCOMPL( a ) EXPR_ADD( EXPR_ONESCOMPL( a ), 1 )
-	#define EXPR_PREINC( a ) EXPR_MONOPRE( ( a ), ++ )
-	#define EXPR_POSTINCR( a ) EXPR_MONOPOST( ( a ), ++ )
-	#define EXPR_PREDECR( a ) EXPR_MONOPRE( ( a ), -- )
-	#define EXPR_POSTDECR( a ) EXPR_MONOPOST( ( a ), -- )
-	#define EXPR_DEREF( a ) EXPR_MONOPRE( ( a ), * )
-	#define EXPR_REFOF( a ) EXPR_MONOPRE( ( a ), & )
-	#define EXPR_ARRWRAP( a ) EXPR_MONOCONF( ( a ), [, ] )
+	#define LIBANDRIA4_EXPR_NOOPIDENT( a ) ( a )
+	#define LIBANDRIA4_EXPR_POSIDENT( a ) LIBANDRIA4_EXPR_MONOPRE( ( a ), + )
+	#define LIBANDRIA4_EXPR_NEGATE( a ) LIBANDRIA4_EXPR_MONOPRE( ( a ), - )
+	#define LIBANDRIA4_EXPR_ONESCOMPL( a ) LIBANDRIA4_EXPR_MONOPRE( ( a ), ~ )
+	#define LIBANDRIA4_EXPR_TWOSCOMPL( a ) LIBANDRIA4_EXPR_ADD( LIBANDRIA4_EXPR_ONESCOMPL( a ), 1 )
+	#define LIBANDRIA4_EXPR_PREINC( a ) LIBANDRIA4_EXPR_MONOPRE( ( a ), ++ )
+	#define LIBANDRIA4_EXPR_POSTINCR( a ) LIBANDRIA4_EXPR_MONOPOST( ( a ), ++ )
+	#define LIBANDRIA4_EXPR_PREDECR( a ) LIBANDRIA4_EXPR_MONOPRE( ( a ), -- )
+	#define LIBANDRIA4_EXPR_POSTDECR( a ) LIBANDRIA4_EXPR_MONOPOST( ( a ), -- )
+	#define LIBANDRIA4_EXPR_DEREF( a ) LIBANDRIA4_EXPR_MONOPRE( ( a ), * )
+	#define LIBANDRIA4_EXPR_REFOF( a ) LIBANDRIA4_EXPR_MONOPRE( ( a ), & )
+	#define LIBANDRIA4_EXPR_ARRWRAP( a ) LIBANDRIA4_EXPR_MONOCONF( ( a ), [, ] )
 	
-	#define EXPR_CTERNARY( test, succ, fail ) \
-		EXPR_TRIINF( test, succ, fail, ?, : )
+	#define LIBANDRIA4_EXPR_CTERNARY( test, succ, fail ) \
+		LIBANDRIA4_EXPR_TRIINF( test, succ, fail, ?, : )
 	
 		/* The *PY* are Python style logicals: instead of returning true/false, */
 		/*  they return the last computed value. */
-	#define EXPR_PYAND( a, b ) EXPR_CTERNARY( ( a ), ( b ), ( a ) )
-	#define EXPY_PYOR( a, b ) EXPR_CTERNARY( ( a ), ( a ), ( b ) )
-	#define EXPR_LAND( a, b ) EXPR_BININF( ( a ), ( b ), && )
-	#define EXPR_LOR( a, b ) EXPR_BININF( ( a ), ( b ), || )
-	#define EXPR_BAND( a, b ) EXPR_BININF( ( a ), ( b ), & )
-	#define EXPR_BIOR( a, b ) EXPR_BININF( ( a ), ( b ), | )
-	#define EXPR_BXOR( a, b ) EXPR_BININF( ( a ), ( b ), ^ )
-	#define EXPR_ADD( a, b ) EXPR_BININF( ( a ), ( b ), + )
-	#define EXPR_SUB( a, b )  EXPR_BININF( ( a ), ( b ), - )
-	#define EXPR_MUL( a, b )  EXPR_BININF( ( a ), ( b ), * )
-	#define EXPR_DIV( a, b )  EXPR_BININF( ( a ), ( b ), / )
-	#define EXPR_MOD( a, b )  EXPR_BININF( ( a ), ( b ), % )
-	#define EXPR_LSHFT( a, b )  EXPR_BININF( ( a ), ( b ), << )
-	#define EXPR_RSHFT( a, b )  EXPR_BININF( ( a ), ( b ), >> )
-	#define EXPR_ARRACC( a, b ) ( ( a ) EXPR_ARRWRAP( b ) )
-	#define EXPR_NAMEACC( a, b ) EXPR_BININF( ( a ), ( b ), . )
-	#define EXPR_PTRACC( a, b ) EXPR_BININF( ( a ), ( b ), -> )
+	#define LIBANDRIA4_EXPR_PYAND( a, b ) LIBANDRIA4_EXPR_CTERNARY( ( a ), ( b ), ( a ) )
+	#define LIBANDRIA4_EXPY_PYOR( a, b ) LIBANDRIA4_EXPR_CTERNARY( ( a ), ( a ), ( b ) )
+	#define LIBANDRIA4_EXPR_LAND( a, b ) LIBANDRIA4_EXPR_BININF( ( a ), ( b ), && )
+	#define LIBANDRIA4_EXPR_LOR( a, b ) LIBANDRIA4_EXPR_BININF( ( a ), ( b ), || )
+	#define LIBANDRIA4_EXPR_BAND( a, b ) LIBANDRIA4_EXPR_BININF( ( a ), ( b ), & )
+	#define LIBANDRIA4_EXPR_BIOR( a, b ) LIBANDRIA4_EXPR_BININF( ( a ), ( b ), | )
+	#define LIBANDRIA4_EXPR_BXOR( a, b ) LIBANDRIA4_EXPR_BININF( ( a ), ( b ), ^ )
+	#define LIBANDRIA4_EXPR_ADD( a, b ) LIBANDRIA4_EXPR_BININF( ( a ), ( b ), + )
+	#define LIBANDRIA4_EXPR_SUB( a, b )  LIBANDRIA4_EXPR_BININF( ( a ), ( b ), - )
+	#define LIBANDRIA4_EXPR_MUL( a, b )  LIBANDRIA4_EXPR_BININF( ( a ), ( b ), * )
+	#define LIBANDRIA4_EXPR_DIV( a, b )  LIBANDRIA4_EXPR_BININF( ( a ), ( b ), / )
+	#define LIBANDRIA4_EXPR_MOD( a, b )  LIBANDRIA4_EXPR_BININF( ( a ), ( b ), % )
+	#define LIBANDRIA4_EXPR_LSHFT( a, b )  LIBANDRIA4_EXPR_BININF( ( a ), ( b ), << )
+	#define LIBANDRIA4_EXPR_RSHFT( a, b )  LIBANDRIA4_EXPR_BININF( ( a ), ( b ), >> )
+	#define LIBANDRIA4_EXPR_ARRACC( a, b ) ( ( a ) LIBANDRIA4_EXPR_ARRWRAP( b ) )
+	#define LIBANDRIA4_EXPR_NAMEACC( a, b ) LIBANDRIA4_EXPR_BININF( ( a ), ( b ), . )
+	#define LIBANDRIA4_EXPR_PTRACC( a, b ) LIBANDRIA4_EXPR_BININF( ( a ), ( b ), -> )
 	
 #endif
-/* End libsndria4 math expressions.h */
+/* End libandria4 math expressions.h */
