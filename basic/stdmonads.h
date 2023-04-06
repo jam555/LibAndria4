@@ -29,9 +29,10 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_STDMONADS_H
 # define LIBANDRIA4_BASIC_STDMONADS_H
 	
+		/* size_t and ptrdiff_t. */
 	#include <stddef.h>
+		/* intptr_t and uintptr_t. */
 	#include <stdint.h>
-	#include <errno.h>
 	
 	#include "monads.h"
 	#include "commonerrvals.h"
@@ -98,68 +99,8 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_result, libandria4_failure_result, val )
 	
 	
-	libandria4_result libandria4_errno_2result()
-	{
-		int errnum = errno;
-		
-		switch( errnum )
-		{
-			case 0:
-					/* No error. */
-				break;
-				
-			case EDOM:
-				return
-				(
-					LIBANDRIA4_RESULT_BUILDFAILURE(
-						(libandria4_failure_result){
-							LIBANDRIA4_RESULT_FAILURE_DOMAIN } )
-				);
-			case ERANGE:
-				return
-				(
-					LIBANDRIA4_RESULT_BUILDFAILURE(
-						(libandria4_failure_result){
-							LIBANDRIA4_RESULT_FAILURE_RANGE } )
-				);
-			case EILSEQ:
-				return
-				(
-					LIBANDRIA4_RESULT_BUILDFAILURE(
-						(libandria4_failure_result){
-							LIBANDRIA4_RESULT_FAILURE_ILSEQ } )
-				);
-				
-			default:
-					/* Because whatever it is, I added a result number for it. */
-				return
-				(
-					LIBANDRIA4_RESULT_BUILDFAILURE(
-						(libandria4_failure_result){
-							LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED } )
-				);
-		}
-		
-		return
-		(
-			LIBANDRIA4_RESULT_BUILDSUCCESS(
-				(libandria4_success_result){
-					LIBANDRIA4_RESULT_GENERIC } )
-		);
-	}
-	libandria4_result libandria4_errno_popresult( int *errnum )
-	{
-		libandria4_result res = libandria4_errno_2result();
-		
-		if( errnum )
-		{
-			*errnum = errno;
-		}
-		
-		errno = 0;
-		
-		return( res );
-	}
+	libandria4_result libandria4_errno_2result();
+	libandria4_result libandria4_errno_popresult( int *errnum );
 	
 	
 	

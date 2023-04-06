@@ -2,8 +2,7 @@ LibAndria version 4
 TODO:
 
 I only just copied this stuff to my Chromebook, and need to spruce things up:
-	To match the name change, need to fill in stdabbrevs/metaCabbrevs.h with
-		relevant abbreviations so the identifier lengths are tolerable.
+	Add more abbreviations to stdabbrevs/metaCabbrevs.h.
 	Need a proper readme to explain stuff.
 	Need to add tests & makefiles for those tests.
 	Need to bring in more stuff (e.g. get that rope stuff working, &
@@ -11,6 +10,7 @@ I only just copied this stuff to my Chromebook, and need to spruce things up:
 	Need to bring in/build some version of LCIS.
 	Need to move some stuff (e.g. the error reporter & it's behind the scenes
 		printf()-derivative) from MetaC to here.
+		E.g. need to move MetaC's char2num.h/.c to LibAndria4.
 	monalike_math.h needs to have functions rewritten, because e.g. just( 1 )
 		+ nothing() should equal 1, but currently equals 0: this is wrong and
 		should be fixed.
@@ -24,3 +24,5 @@ I only just copied this stuff to my Chromebook, and need to spruce things up:
 		at all.
 	Need to review organization, to see if there's any sensible improvements.
 	Move most or all concrete type definitions into commontypes.h.
+	Compare commontypes.h's platform detection to platformdetect.h to see if
+		it should be e.g. adopted there.
