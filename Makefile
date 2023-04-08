@@ -1,54 +1,71 @@
-# MetaC Preprocessor - A macro processor for preprocessing usage.
-# Copyright (C) 2022 Jared A. Maddox
+# LibAndria version 4
+# A C-based general purpose utility library.
+# Copyright (c) 2019 Jared A. Maddox
 # 
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of version 2 of the GNU General Public License as
-# published by the Free Software Foundation.
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is furnished to do
+# so, subject to the following conditions:
 # 
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-# more details.
+# This grant of rights is subject to two conditions:
 # 
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the:
-#	Free Software Foundation, Inc.,
-#	59 Temple Place, Suite 330,
-#	Boston, MA 02111-1307 USA
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# And:
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 
 # This is the generic root-most makefile.
 
 # Note that includes aren't the same across all makefile styles- in particular,
 #  GNU and Microsoft are COMPLETELY incompatible. So, that stuff MUST be handled
-#  on the command line. The build_tools/*/common.make files provide variables to
+#  on the command line. The buildtools/*/common.make files provide variables to
 #  handle precisely that.
 
 
 
 all: 
-	echo "Alert: The all target isn't currently implemented by Makefile."
+	echo "Alert: The all target isn't currently implemented by LibAndria4."
 
 world: all install
 # This should probably be followed by using the preprocessor and/or compiler to
 #  generate localized support files.
 
 
+$(BUILDDIR)obj: 
+	$(requiredircommand) $@
+$(BUILDDIR)obj/stdmonads.o: $(BUILDDIR)obj basic/stdmonads.c
+	$(compileonlyCcommand) basic/stdmonads.c $@
+	
+
 # There should eventually be a pre-build option, that builds at least the
 #  preprocessor from C source to iterate to the self-compiling versions.
-build:
-	echo "Error: Makefile has not implemented the build target."
+build: 
+	echo "Alert: The build target isn't currently needed by LibAndria4."
 
-build-sourcecheck:
+$(BUILDDIR)test: 
+	$(requiredircommand) $@
+$(BUILDDIR)test/stdmonadstest.o: $(BUILDDIR)test tests/stdmonadstest.c
+	$(compileonlyCcommand) tests/stdmonadstest.c $@
+$(BUILDDIR)test/stdmonadstest.exe: $(BUILDDIR)obj/stdmonads.o $(BUILDDIR)test/stdmonadstest.o
+	$(genericcompileCcommand) $@ $^
 
 
 import:
-	echo "Error: Makefile has not yet properly implemented external dependency import."
-	echo "  User must currently import external dependencies to external_dependencies manually."
-	$(createdircommand) $(IMPORTSDIR)
+	echo "Alert: The import target isn't currently needed by LibAndria4."
 
 install: 
-	echo "Error: Makefile has not implemented the install target."
+	echo "Error: The install target isn't currently implemented by LibAndria4."
 # example-
 # install: default
 #         install gcd INSTALL_BIN
@@ -56,24 +73,24 @@ install:
 
 # Create the directories for installation, but don't fill them
 installdir: 
-	echo "Error: Makefile has not implemented the installdir target."
+	echo "Error: The installdir target isn't currently implemented by LibAndria4."
 
 uninstall: 
-	echo "Error: Makefile has not implemented the uninstall target."
+	echo "Error: The uninstall target isn't currently implemented by LibAndria4."
 
 
 clean: 
-	echo "Error: Makefile has not implemented the clean target."
+	echo "Error: The clean target isn't currently implemented by LibAndria4."
 
 # Clean for distribuition: stricter than just "clean"
 distclean: clean
-	echo "Error: Makefile has not implemented the distclean target."
+	echo "Error: The distclean target isn't currently implemented by LibAndria4."
 # Then do more stuff, like executables.
 
 # Clean up almost everything that can be rebuilt; usually config scripts will be
 #  left alone. Some files may require special tools to reconstruct
 maintainer-clean: distclean
-	echo "Error: Makefile has not implemented the maintainer-clean target."
+	echo "Error: The maintainer-clean target isn't currently implemented by LibAndria4."
 # And even more stuff...
 
 
@@ -83,16 +100,16 @@ maintainer-clean: distclean
 #  target should depend on all relevant targets, to ensure that everything is
 #  "fresh"
 dist: build
-	echo "Error: Makefile has not implemented the dist target."
+	echo "Error: The dist target isn't currently implemented by LibAndria4."
 # So, how do we build?
 
 
 # Test the built project: DO NOT depend on installation
-check: build
-	echo "Error: Makefile has not implemented the check target."
+check: 
+	echo "Alert: The check target isn't currently implemented by LibAndria4."
 # Tests.
 
 # Test the source files; unit testing
-sourcecheck: build-sourcecheck
-	echo "Error: Makefile has not implemented the sourcecheck target."
+sourcecheck: $(BUILDDIR)test/stdmonadstest.exe
+	$^
 # Then run tests.

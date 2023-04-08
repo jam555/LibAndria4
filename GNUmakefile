@@ -1,20 +1,28 @@
-# MetaC Preprocessor - A macro processor for preprocessing usage.
-# Copyright (C) 2022 Jared A. Maddox
+# LibAndria version 4
+# A C-based general purpose utility library.
+# Copyright (c) 2019 Jared A. Maddox
 # 
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of version 2 of the GNU General Public License as
-# published by the Free Software Foundation.
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is furnished to do
+# so, subject to the following conditions:
 # 
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-# more details.
+# This grant of rights is subject to two conditions:
 # 
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the:
-#	Free Software Foundation, Inc.,
-#	59 Temple Place, Suite 330,
-#	Boston, MA 02111-1307 USA
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# And:
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 
 # The GNU make localizer for makefiles.
@@ -27,7 +35,7 @@
 basification_path=.
 basification_extension=
 
-include build_tools/GNU_make/common.make
+include buildtools/GNU_make/common.make
 
 # rootoverride isn't guaranteed to exist, but if it does, then it is intended to
 #  allow overrides of... STUFF in this file.
@@ -36,18 +44,18 @@ include build_tools/GNU_make/common.make
 
 
 all: 
-	./$(make_runfile) Makefile all
+	$(make_runfile) Makefile all
 
 
 build:
+	$(make_runfile) Makefile build
 
 build-sourcecheck:
+	$(make_runfile) Makefile build-sourcecheck
 
-
-import:
-	./$(make_runfile) Makefile import
 
 install: 
+	$(make_runfile) Makefile install
 # example
 # install: default
 #         install gcd INSTALL_BIN
@@ -55,19 +63,23 @@ install:
 
 # Create the directories for installation, but don't fill them
 installdir: 
+	$(make_runfile) Makefile installdir
 
 uninstall: 
+	$(make_runfile) Makefile uninstall
 
 
 clean: 
-	./$(make_runfile) Makefile clean
+	$(make_runfile) Makefile clean
 
 # Clean for distribuition: stricter than just "clean"
 distclean: 
+	$(make_runfile) Makefile distclean
 
 # Clean up almost everything that can be rebuilt; usually config scripts will be
 #  left alone. Some files may require special tools to reconstruct
 maintainer-clean: 
+	$(make_runfile) Makefile maintainer-clean
 
 
 # Create a distribution file (e.g. a tar file, perhaps compressed with gzip);
@@ -76,10 +88,13 @@ maintainer-clean:
 #  target should depend on all relevant targets, to ensure that everything is
 #  "fresh"
 dist: 
+	$(make_runfile) Makefile dist
 
 
 # Test the built project: DO NOT depend on installation
 check: 
+	$(make_runfile) Makefile check
 
 # Test the source files; unit testing
 sourcecheck: 
+	$(make_runfile) Makefile sourcecheck
