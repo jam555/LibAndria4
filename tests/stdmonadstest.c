@@ -76,7 +76,7 @@ int main( int argn, char *argc[] )
 	
 	
 	
-	printf( "LibAndria4 stdmonads.c test program.\n\n" );
+	printf( "\nRunning LibAndria4 stdmonads.c test program.\n" );
 	printf( " Preliminary errno value: %i\n", desired );
 	
 	

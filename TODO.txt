@@ -26,3 +26,6 @@ I only just copied this stuff to my Chromebook, and need to spruce things up:
 	Move most or all concrete type definitions into commontypes.h.
 	Compare commontypes.h's platform detection to platformdetect.h to see if
 		it should be e.g. adopted there.
+	Add documentation explaining that dirs updating at the time of their
+		files updating means that dir builds must be in the root makefiles
+		instead of the "normal" makefile.

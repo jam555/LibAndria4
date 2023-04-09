@@ -38,3 +38,7 @@
 !IF EXIST( overrides/rootoverride.make )
 !INCLUDE overrides/rootoverride.make
 !ENDIF
+
+# There should be an include of buildtools/MS_nmake/common.make here, but that
+#  doesn't yet exist.
+!INCLUDE buildtools/early.make

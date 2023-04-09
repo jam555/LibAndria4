@@ -35,11 +35,12 @@
 basification_path=.
 basification_extension=
 
-include buildtools/GNU_make/common.make
-
 # rootoverride isn't guaranteed to exist, but if it does, then it is intended to
 #  allow overrides of... STUFF in this file.
 -include overrides/rootoverride.make
+
+include buildtools/GNU_make/common.make
+include buildtools/early.make
 
 
 
@@ -47,7 +48,7 @@ all:
 	$(make_runfile) Makefile all
 
 
-build:
+build: $(BUILDDIR)obj
 	$(make_runfile) Makefile build
 
 build-sourcecheck:
@@ -96,5 +97,5 @@ check:
 	$(make_runfile) Makefile check
 
 # Test the source files; unit testing
-sourcecheck: 
+sourcecheck: $(BUILDDIR)test
 	$(make_runfile) Makefile sourcecheck

@@ -42,9 +42,7 @@ world: all install
 #  generate localized support files.
 
 
-$(BUILDDIR)obj: 
-	$(requiredircommand) $@
-$(BUILDDIR)obj/stdmonads.o: $(BUILDDIR)obj basic/stdmonads.c
+$(BUILDDIR)obj/stdmonads.o: basic/stdmonads.c
 	$(compileonlyCcommand) basic/stdmonads.c $@
 	
 
@@ -53,9 +51,7 @@ $(BUILDDIR)obj/stdmonads.o: $(BUILDDIR)obj basic/stdmonads.c
 build: 
 	echo "Alert: The build target isn't currently needed by LibAndria4."
 
-$(BUILDDIR)test: 
-	$(requiredircommand) $@
-$(BUILDDIR)test/stdmonadstest.o: $(BUILDDIR)test tests/stdmonadstest.c
+$(BUILDDIR)test/stdmonadstest.o: tests/stdmonadstest.c
 	$(compileonlyCcommand) tests/stdmonadstest.c $@
 $(BUILDDIR)test/stdmonadstest.exe: $(BUILDDIR)obj/stdmonads.o $(BUILDDIR)test/stdmonadstest.o
 	$(genericcompileCcommand) $@ $^
