@@ -51,5 +51,8 @@ SOFTWARE.
 	#define LIBANDRIA4_COMPILETIME_SIZEOF( ... ) \
 		( sizeof( (int[]){ __VA_ARGS__ } ) / sizeof( int ) )
 	
+	#define LIBANDRIA4_COMPILETIME_ARRAYELEMS( type, name ) \
+		( sizeof( name ) / sizeof( type ) )
+	
 #endif
 /* End libsndria4 basic sizeof_macros.h */
