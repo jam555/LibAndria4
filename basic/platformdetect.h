@@ -29,9 +29,13 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_PLATFORMDETECT_H
 # define LIBANDRIA4_BASIC_PLATFORMDETECT_H
 	
-		/* These are used later. */
-	#include <errno.h>
-	#include "monads.h"
+	/**************************************************************************/
+	/**************************************************************************/
+	/** WARNING! From here until a comment specifying otherwise, there must ***/
+	/**  be NO inclusions of other files, due to the need to specify feature **/
+	/**  enabling macros for GNU Libc. ****************************************/
+	/**************************************************************************/
+	/**************************************************************************/
 	
 	
 	
@@ -66,6 +70,7 @@ SOFTWARE.
 	
 	
 	
+	#define LIBANDRIA4_PLATFORMPREVIEW0 0
 	#define LIBANDRIA4_PLATFORM0 0
 	
 	#define LIBANDRIA4_PLATFORM0_NIX 1
@@ -118,7 +123,7 @@ SOFTWARE.
 	#define LIBANDRIA4_COMPILER_ERA_2000S 4
 	#define LIBANDRIA4_COMPILER_ERA_2010S 5
 	#define LIBANDRIA4_COMPILER_ERA_2020S 6
-	#define LIBANDRIA4_COMPILER_ERA_OVERFLOWED 31
+	#define LIBANDRIA4_COMPILER_ERA_OVERFLOWED LIBANDRIA4_COMPILER_ERAMASK
 		/* This should be set in lock-step with ( LIBANDRIA4_COMPILER & */
 		/*  LIBANDRIA4_COMPILER_ERAMASK ), unless the value is 31 or above. Note */
 		/*  that if value is "0", then it actually just hasn't been set. */
@@ -201,6 +206,132 @@ SOFTWARE.
 	/*  __INTEL_COMPILER or __ICC or __ECC or __ICL : Intel C/C++. */
 	
 	
+	#if defined( __GNUC__ )
+		#if defined( __INTEL_COMPILER ) || defined( __ICC ) || defined( __ECC ) || defined( __ICL )
+			#warning "Warning: Detected Intel C compiler masquerading as GNU C compiler!"
+		#endif
+		
+		
+		#if defined( LIBANDRIA4_COMPILER ) && LIBANDRIA4_COMPILER & ( ~LIBANDRIA4_COMPILER_CODEBASEANTIMASK ) != LIBANDRIA4_COMPILER_CODEBASE_GNU
+			#error "Error: Libandria4 platformdetect.h LIBANDRIA4_COMPILER"
+			#error " already had a non-null value when detecting GNU C compiler."
+		#else
+			#ifdef LIBANDRIA4_COMPILER
+				#undef LIBANDRIA4_COMPILER
+			#endif
+			#define LIBANDRIA4_COMPILER LIBANDRIA4_COMPILER_CODEBASE_GNU
+		#endif
+	#endif
+	
+		/* This might not actually detect the earliest Microsoft C compilers. */
+		/*  Supposedly versions before 3.0 might register as Lattice C */
+		/*  instead, as Microsoft apparently licensed that codebase. */
+	#if defined( _MSC_VER )
+		#if defined( LIBANDRIA4_COMPILER ) && LIBANDRIA4_COMPILER & ( ~LIBANDRIA4_COMPILER_CODEBASEANTIMASK ) != LIBANDRIA4_COMPILER_CODEBASE_MSVC
+			#error "Error: Libandria4 platformdetect.h LIBANDRIA4_COMPILER"
+			#error " already had a non-null value when detecting Microsoft C compiler."
+		#else
+			#ifdef LIBANDRIA4_COMPILER
+				#undef LIBANDRIA4_COMPILER
+			#endif
+			#define LIBANDRIA4_COMPILER LIBANDRIA4_COMPILER_CODEBASE_MSVC
+		#endif
+	#endif
+	
+	
+		/* Define LIBANDRIA4_COMPILER_ERA here. */
+	/* This is a lazy hack, we should really detect language era here. */
+	#undef LIBANDRIA4_COMPILER_ERA
+	#define LIBANDRIA4_COMPILER_ERA LIBANDRIA4_COMPILER_ERA_CURRENT
+	
+	
+		/* The final stage: time to merge era and compiler together. */
+	#if defined( LIBANDRIA4_COMPILER )
+		#if LIBANDRIA4_COMPILER & ( ~LIBANDRIA4_COMPILER_CODEBASEANTIMASK ) != LIBANDRIA4_COMPILER_CODEBASE_GNU
+			#undef LIBANDRIA4_COMPILER
+			#define LIBANDRIA4_COMPILER ( LIBANDRIA4_COMPILER_CODEBASE_GNU | LIBANDRIA4_COMPILER_ERA )
+		#elif LIBANDRIA4_COMPILER & ( ~LIBANDRIA4_COMPILER_CODEBASEANTIMASK ) != LIBANDRIA4_COMPILER_CODEBASE_MSVC
+			#undef LIBANDRIA4_COMPILER
+			#define LIBANDRIA4_COMPILER ( LIBANDRIA4_COMPILER_CODEBASE_MSVC | LIBANDRIA4_COMPILER_ERA )
+		#else
+		#endif
+	#endif
+	
+	
+	
+	/* Initial detection for the platform. This is essentially a preview, */
+	/*  meant to be double-checked and expanded upon with later logic. */
+	
+	#if defined( linux ) || defined( __linux ) || defined( __linux__ )
+		#if defined( LIBANDRIA4_PLATFORMPREVIEW0 ) && LIBANDRIA4_PLATFORMPREVIEW0 != 0 && LIBANDRIA4_PLATFORMPREVIEW0 != LIBANDRIA4_PLATFORM0_NIX
+			#error "Error: Libandria4 platformdetect.h LIBANDRIA4_PLATFORMPREVIEW0"
+			#error " already had a non-null value when detecting Linux."
+		#else
+			#ifdef LIBANDRIA4_PLATFORMPREVIEW0
+				#undef LIBANDRIA4_PLATFORMPREVIEW0
+			#endif
+			#define LIBANDRIA4_PLATFORMPREVIEW0 LIBANDRIA4_PLATFORM0_NIX
+		#endif
+	#endif
+	
+	#if defined( _WIN32 ) || defined( __WIN32__ ) || defined( __TOS_WIN__ ) || defined( __WINDOWS__ )
+		if defined( LIBANDRIA4_PLATFORMPREVIEW0 ) && LIBANDRIA4_PLATFORMPREVIEW0 != 0 && LIBANDRIA4_PLATFORMPREVIEW0 != LIBANDRIA4_PLATFORM0_MSWIN
+			#error "Error: Libandria4 platformdetect.h LIBANDRIA4_PLATFORMPREVIEW0"
+			#error " already had a non-null value when detecting MSWindows."
+		#else
+			#ifdef LIBANDRIA4_PLATFORMPREVIEW0
+				#undef LIBANDRIA4_PLATFORMPREVIEW0
+			#endif
+			#define LIBANDRIA4_PLATFORMPREVIEW0 LIBANDRIA4_PLATFORM0_MSWIN
+		#endif
+	#endif
+	
+	#if defined( _WIN16 ) || defined( MSDOS ) || defined( __MSDOS__ ) || defined( _MSDOS ) || defined( __DOS__ )
+		#if defined( LIBANDRIA4_PLATFORMPREVIEW0 ) && LIBANDRIA4_PLATFORMPREVIEW0 != 0 && LIBANDRIA4_PLATFORMPREVIEW0 != LIBANDRIA4_PLATFORM0_DOS
+			#error "Error: Libandria4 platformdetect.h LIBANDRIA4_PLATFORMPREVIEW0"
+			#error " already had a non-null value when detecting MSDOS / 16bit MSWindows."
+		#else
+			#ifdef LIBANDRIA4_PLATFORMPREVIEW0
+				#undef LIBANDRIA4_PLATFORMPREVIEW0
+			#endif
+			#define LIBANDRIA4_PLATFORMPREVIEW0 LIBANDRIA4_PLATFORM0_DOS
+		#endif
+	#endif
+	
+	
+	
+	/*************************************************************************/
+	/*************************************************************************/
+	/** WARNING! Only override files may be included from here onwards, and **/
+	/**  they MUST NOT contain includes of any system files, lest conflicts **/
+	/**  with e.g. Posix feature-enable macros occur. ************************/
+	/*************************************************************************/
+	/*************************************************************************/
+	
+	
+	
+	/* This is the proper area to perform any override inclusions that might */
+	/*  activate feature-control macros. */
+	
+	#if ( LIBANDRIA4_PLATFORMPREVIEW0 == LIBANDRIA4_PLATFORM0_NIX ) && ( LIBANDRIA4_COMPILER & ( ~LIBANDRIA4_COMPILER_CODEBASEANTIMASK ) != LIBANDRIA4_COMPILER_CODEBASE_GNU )
+			/* This is some weird thing that might be GNU specific, or */
+			/*  might not. You define some mix of _POSIX_VERSION, */
+			/*  _POSIX_C_SOURCE, _XOPEN_SOURCE, etc., to enable extra */
+			/*  features in system headers. Some will cause the others to be */
+			/*  defined as well. */
+		#define _POSIX_C_VERSION 200112L
+		#warning "Warning: Defining POSIX C version macro. This needs to allow an override to be specified."
+	#endif
+	
+	
+	
+	/***********************************************************************/
+	/***********************************************************************/
+	/** ATTENTION! From here forwards, any desired files may be included. **/
+	/***********************************************************************/
+	/***********************************************************************/
+	
+	
 	
 	/* Platform detection. When this is run, it should not only detect the */
 	/*  general operating system & big-file support, but also indicate the */
@@ -208,103 +339,128 @@ SOFTWARE.
 	/*  specify THE VERSION of the operating system. None of which do any of */
 	/*  these currently do. */
 	
-	/* Note: need to keep copying/translating things over from the */
-	/*  "non-localized" equivalent. */
-	
-		/* *Nix-family detect. Rather bare-bones at the moment. */
-	#if defined( __GNUC__ )
-		# undef LIBANDRIA4_PLATFORM0
-		
-		#if defined( _POSIX_C_SOURCE ) || defined( _XOPEN_SOURCE ) || defined( _GNU_SOURCE )
-			# define LIBANDRIA4_PLATFORM0 LIBANDRIA4_PLATFORM_NIX
-			
-			#if defined( _POSIX_C_SOURCE ) && _POSIX_C_SOURCE >= 200112L
-				# undef LIBANDRIA4_BIGFILES_SEEK
-				# define LIBANDRIA4_BIGFILES_SEEK 1
-			#endif
-			
-			#if defined( _XOPEN_SOURCE ) && _XOPEN_SOURCE >= 600
-				# undef LIBANDRIA4_BIGFILES_SEEK
-				# define LIBANDRIA4_BIGFILES_SEEK 1
-			#endif
-			
-			#if defined( _LARGEFILE64_SOURCE ) || defined( _LARGEFILE_SOURCE )
-				# undef LIBANDRIA4_BIGFILES_SEEK
-				# define LIBANDRIA4_BIGFILES_SEEK 1
-			#endif
-			
-			
-			#if LIBANDRIA4_TARGETPLATFORM == 0 && !defined( LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_NIX )
-				# undef LIBANDRIA4_TARGETPLATFORM
-				# define LIBANDRIA4_TARGETPLATFORM LIBANDRIA4_TARGETPLATFORM_NIX
-			#endif
-			
-		#else
-			
-			/* This is BAD, it needs PROPER testing. */
-			
-			# define LIBANDRIA4_PLATFORM LIBANDRIA4_PLATFORM_MSWIN
-			
-			#if LIBANDRIA4_TARGETPLATFORM == 0 && !defined( LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_MSWIN )
-				# undef LIBANDRIA4_TARGETPLATFORM
-				# define LIBANDRIA4_TARGETPLATFORM LIBANDRIA4_TARGETPLATFORM_MSWIN
-			#endif
-			
+	#if LIBANDRIA4_PLATFORMPREVIEW0 == LIBANDRIA4_PLATFORM0_NIX && !defined( LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_NIX )
+		#if defined( unix ) || defined( __unix__ ) || defined( __unix )
+			#include <unistd.h>
 		#endif
 		
-	#elif defined( _POSIX_C_SOURCE ) || defined( _XOPEN_SOURCE ) || defined( _GNU_SOURCE )
-		/* This is BAD, it needs to be replaced. */
-		# undef LIBANDRIA4_PLATFORM0
-	# define LIBANDRIA4_PLATFORM0 LIBANDRIA4_PLATFORM_NIX
-		
-		#if defined( _POSIX_C_SOURCE ) && _POSIX_C_SOURCE >= 200112L
-			# undef LIBANDRIA4_BIGFILES_SEEK
-			# define LIBANDRIA4_BIGFILES_SEEK 1
+			/* The defines in this block are from */
+			/*  https://sourceforge.net/p/predef/wiki/Standards/ : */
+			/*  Need to figure out my own equivalent. */
+		#if defined( _XOPEN_VERSION )
+			#if ( _XOPEN_VERSION >= 3 )
+				/* X/Open Portability Guide 3 (1989) */
+			#endif
+			#if ( _XOPEN_VERSION >= 4 )
+				/* X/Open Portability Guide 4 (1992) */
+			#endif
+			#if ( _XOPEN_VERSION >= 4 ) && defined( _XOPEN_UNIX )
+				/* X/Open Single UNIX Specification (UNIX95) (1995) */
+			#endif
+			#if ( _XOPEN_VERSION >= 500 )
+				/* X/Open Single UNIX Specification, Version 2 (UNIX98) (1998) */
+			#endif
+			#if ( _XOPEN_VERSION >= 600 )
+				/* Open Group Single UNIX Specification, Version 3 (UNIX03) (2003) */
+				#if defined( _XOPEN_SOURCE ) && _XOPEN_SOURCE >= 600
+					# undef LIBANDRIA4_BIGFILES_SEEK
+					# define LIBANDRIA4_BIGFILES_SEEK 1
+				#endif
+			#endif
+			#if ( _XOPEN_VERSION >= 700 )
+				/* Open Group Single UNIX Specification, Version 4 (2008) */
+			#endif
 		#endif
 		
-		#if defined( _XOPEN_SOURCE ) && _XOPEN_SOURCE >= 600
-			# undef LIBANDRIA4_BIGFILES_SEEK
-			# define LIBANDRIA4_BIGFILES_SEEK 1
+		#if defined( _POSIX_VERSION )
+			#if ( _POSIX_VERSION >= 198808L )
+			#endif
+			#if ( _POSIX_VERSION >= 199009L )
+				/* ISO/IEC 9945-1:1990 */
+			#endif
+			#if ( _POSIX_VERSION >= 199309L )
+				/* IEEE 1003.1b-1993 */
+			#endif
+			#if ( _POSIX_VERSION >= 199506L )
+				/* IEEE 1003.1-1996 */
+			#endif
+			#if ( _POSIX_VERSION >= 200112L )
+				/* IEEE 1003.1-2001 */
+				#if defined( _POSIX_C_SOURCE ) && _POSIX_C_SOURCE >= 200112L
+					# undef LIBANDRIA4_BIGFILES_SEEK
+					# define LIBANDRIA4_BIGFILES_SEEK 1
+				#endif
+			#endif
+			#if ( _POSIX_VERSION >= 200809L )
+				/* IEEE 1003.1-2008 */
+			#endif
 		#endif
+		if defined( _POSIX2_C_VERSION )
+			#if ( _POSIX2_C_VERSION == 199209L )
+				/* ISO/IEC 9945-2:1993 */
+			#endif
+		#endif
+		
+		#if defined( __LSB_VERSION__ )
+			/*
+				__LSB_VERSION__ == VR
+				Linux Standards Base,
+					V = Version
+					R = Revision
+			*/
+		#endif
+		
 		
 		#if defined( _LARGEFILE64_SOURCE ) || defined( _LARGEFILE_SOURCE )
-			# undef LIBANDRIA4_BIGFILES_SEEK
-			# define LIBANDRIA4_BIGFILES_SEEK 1
+			#undef LIBANDRIA4_BIGFILES_SEEK
+			#define LIBANDRIA4_BIGFILES_SEEK 1
+		#endif
+		
+		#if LIBANDRIA4_TARGETPLATFORM != 0
+			#error "Error: LibAndria4 platformdetect.h detected Nix, but LIBANDRIA4_TARGETPLATFORM was already set."
+		#else
+			#undef LIBANDRIA4_TARGETPLATFORM
+			#define LIBANDRIA4_TARGETPLATFORM LIBANDRIA4_TARGETPLATFORM_NIX
 		#endif
 		
 		
-		#if LIBANDRIA4_TARGETPLATFORM == 0 && !defined( LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_NIX )
-			# undef LIBANDRIA4_TARGETPLATFORM
-			# define LIBANDRIA4_TARGETPLATFORM LIBANDRIA4_TARGETPLATFORM_NIX
-		#endif
+		#define LIBANDRIA4_PLATFORM0 LIBANDRIA4_PLATFORM_NIX
+		
+	#elif LIBANDRIA4_PLATFORMPREVIEW0 == LIBANDRIA4_PLATFORM0_NIX && defined( LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_NIX )
+		#error "Error: LibAndria4 platformdetect.h detected Nix, but LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_NIX was set."
 		
 	#endif
 	
-		/* MSWindows-family detect. Actually MORE bare-bones than the *nix */
-		/*  stuff.  */
-	#if defined( _MSC_VER )
-		# undef LIBANDRIA4_PLATFORM
-		# define LIBANDRIA4_PLATFORM LIBANDRIA4_PLATFORM_MSWIN
-		
+	
+	
+	#if LIBANDRIA4_PLATFORMPREVIEW0 == LIBANDRIA4_PLATFORM_MSWIN && !defined( LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_MSWIN )
 		#if defined( _WIN32_WCE )
 			/* This is defined for Windows CE devices. We currently don't */
 			/*  distinguish those. */
 		#endif
+		
 		
 		#if defined( _MSC_VER ) && _MSC_VER >= 1000
 			# undef LIBANDRIA4_BIGFILES_SEEK
 			# define LIBANDRIA4_BIGFILES_SEEK 1
 		#endif
 		
-		
-		#if LIBANDRIA4_TARGETPLATFORM == 0 && !defined( LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_MSWIN )
-			# undef LIBANDRIA4_TARGETPLATFORM
-			# define LIBANDRIA4_TARGETPLATFORM LIBANDRIA4_TARGETPLATFORM_MSWIN
+		#if LIBANDRIA4_TARGETPLATFORM != 0
+			#error "Error: LibAndria4 platformdetect.h detected MSWindows, but LIBANDRIA4_TARGETPLATFORM was already set."
+		#else
+			#undef LIBANDRIA4_TARGETPLATFORM
+			#define LIBANDRIA4_TARGETPLATFORM LIBANDRIA4_TARGETPLATFORM_MSWIN
 		#endif
 		
+		
+		#define LIBANDRIA4_PLATFORM0 LIBANDRIA4_PLATFORM_MSWIN
+		
+	#elif LIBANDRIA4_PLATFORMPREVIEW0 == LIBANDRIA4_PLATFORM_MSWIN && defined( LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_MSWIN )
+		#error "Error: LibAndria4 platformdetect.h detected MSWindows, but LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_MSWIN was set."
 	#endif
 	
-		/* Finish handling the target-platform identification. */
+	
+		/* Allow the user to override platform detection. */
 	#if LIBANDRIA4_TARGETPLATFORM == -1
 		# undef LIBANDRIA4_TARGETPLATFORM
 		# define LIBANDRIA4_TARGETPLATFORM LIBANDRIA4_MACROSWITCHES_OVERRIDE_TARGETPLATFORM
@@ -312,7 +468,7 @@ SOFTWARE.
 	
 	
 	
-		/* File size/ file-offset-type size detection. Overrides because */
+		/* File size / file-offset-type size detection. Overrides because */
 		/*  sometimes people care. */
 	#if !defined( LIBANDRIA4_MACROSWITCHES_NO_LARGE_FILES ) && !defined( _FILE_OFFSET_BITS )
 		#if LIBANDRIA4_TARGETPLATFORM == LIBANDRIA4_TARGETPLATFORM_MSWIN && LIBANDRIA4_BIGFILES_SEEK
@@ -328,89 +484,46 @@ SOFTWARE.
 		#define LIBANDRIA4_PLATFORM_FILE_OFFSET_BITS 32
 	#endif
 		/* Note: while LIBANDRIA4_SWITCHES_NO_LARGE_FILES is an argument to the */
-		/*  libandria4 system, _FILE_OFFSET_BITS is actually from Posix. However, */
+		/*  LibAndria4 system, _FILE_OFFSET_BITS is actually from Posix. However, */
 		/*  the idea of it (whatever the exact idea actually is: it's been a */
 		/*  while since I originally wrote the code that I've localized */
 		/*  above) is itself useful enough to fairly directly copied. */
 	
 	
 	
-	/* Compiler detection. */
-	
-	/* This is some of the lazyist code I've ever written, to the point */
-	/*  that MSVC before version 3.0 should actually register as */
-	/*  LIBANDRIA4_COMPILER_CODEBASE_LATTICEC in some sense, because Microsoft */
-	/*  licensed it. However, for place-holder code, I guess it's */
-	/*  survivable. Barely. */
-	
-	#if LIBANDRIA4_TARGETPLATFORM == LIBANDRIA4_TARGETPLATFORM_MSWIN
-		# undef LIBANDRIA4_COMPILER
-		
-		#if defined( _MSC_VER )
-			
-			# define LIBANDRIA4_COMPILER \
-				( LIBANDRIA4_COMPILER_CODEBASE_MSVC | LIBANDRIA4_COMPILER_ERA_CURRENT )
-		#else
-			
-			/* This is BAD, and needs to be replaced. */
-			# define LIBANDRIA4_COMPILER \
-				( LIBANDRIA4_COMPILER_CODEBASE_GNU | LIBANDRIA4_COMPILER_ERA_CURRENT )
-			
-		#endif
-		
-	#endif
 	
 	
 	
-	/* Some function name definitions. These should probably have an inline */
-	/*  wrapper, because there is at least some variation between MSWindows */
-	/*  & Linux. */
+	
+	
+	/* TODO: Create a platformsupport.h, and move the stuff below into it. */
+	
+	#include "monads.h"
+	#include "stdio.h"
 	
 	#if LIBANDRIA4_PLATFORM_FILE_OFFSET_BITS > 32
 		#if LIBANDRIA4_TARGETPLATFORM == LIBANDRIA4_TARGETPLATFORM_MSWIN
 			typedef __int64 libandria4_foff_t;
-			#define LIBANDRIA4_FSEEK_FUNCTION _fseeki64
-			#define LIBANDRIA4_FTELL_FUNCTION _ftelli64
 		#elif LIBANDRIA4_TARGETPLATFORM == LIBANDRIA4_TARGETPLATFORM_NIX
 			typedef off_t libandria4_foff_t;
-			#define LIBANDRIA4_FSEEK_FUNCTION fseeko
-			#define LIBANDRIA4_FTELL_FUNCTION ftello
 		#else
-		# error "Unknown platform: ftello/_ftelli64 equivalent not known."
+			#warning "Unknown platform: ftello/_ftelli64 equivalent not known."
 			typedef long libandria4_foff_t;
-			#define LIBANDRIA4_FSEEK_FUNCTION fseek
-			#define LIBANDRIA4_FTELL_FUNCTION ftell
 		#endif
 	#else
 		typedef long libandria4_foff_t;
-		#define LIBANDRIA4_FSEEK_FUNCTION fseek
-		#define LIBANDRIA4_FTELL_FUNCTION ftell
-	#endif
-	
-	#ifdef LIBANDRIA4_FSEEK_INNER
-		# define LIBANDRIA4_FSEEK( stream, offset, origin ) \
-		LIBANDRIA4_FSEEK_INNER( ( stream ), ( offset ), ( origin ) )
-	#else
-		# define LIBANDRIA4_FSEEK( stream, offset, origin ) \
-		LIBANDRIA4_FSEEK_FUNCTION( ( stream ), ( offset ), ( origin ) )
-	#endif
-	
-	#ifdef LIBANDRIA4_FTELL_INNER
-		# define LIBANDRIA4_FTELL( stream ) LIBANDRIA4_FTELL_INNER( ( stream ) )
-	#else
-		# define LIBANDRIA4_FTELL( stream ) LIBANDRIA4_FTELL_FUNCTION( ( stream ) )
 	#endif
 	
 	LIBANDRIA4_MONAD_EITHER_BUILDTYPE( libandria4_either_fofft_int, libandria4_foff_t, int );
 	typedef libandria4_either_fofft_int libandria4_either_fofft;
-	#define LIBANDRIA4_EITHER_FOFFT_BUILDLEFT( val ) \
+	#define LIBANDRIA4_EITHER_FOFFT_BUILDSUCCESS( val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_either_fofft, libandria4_foff_t, ( val ) )
-	#define LIBANDRIA4_EITHER_FOFFT_BUILDRIGHT( val ) \
+	#define LIBANDRIA4_EITHER_FOFFT_BUILDERROR( val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_either_fofft, int, ( val ) )
-	#define LIBANDRIA4_EITHER_FOFFT_BODYMATCH( var, matcha, matchb ) \
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, matcha, matchb )
-	#define LIBANDRIA4_EITHER_FOFFT_EXPRMATCH( var, matcha, matchb ) \
-		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, matcha, matchb )
+	#define LIBANDRIA4_EITHER_FOFFT_BODYMATCH( var, succmatch, errmatch ) \
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, succmatch, errmatch )
+	#define LIBANDRIA4_EITHER_FOFFT_EXPRMATCH( var, succmatch, errmatch ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, succmatch, errmatch )
 	
 	typedef struct libandria4_int_errint
 	{
@@ -418,53 +531,9 @@ SOFTWARE.
 		
 	} libandria4_int_errint;
 	
-	inline libandria4_int_errint libandria4_fseek( FILE *stream, libandria4_either_fofft offset, int origin )
-	{
-			/* Used internally. */
-		#define libandria4_fseek_MATCHA( val ) \
-			res = LIBANDRIA4_FSEEK( stream, val, origin )
-		#define libandria4_fseek_MATCHB( val ) \
-			ret = (libandria4_int_errint){ -2, val }; errno = err; return( ret )
-		
-		int res, err = errno;
-		errno = 0;
-		libandria4_int_errint ret;
-		
-		LIBANDRIA4_EITHER_FOFFT_BODYMATCH(
-			offset,
-			
-			libandria4_fseek_MATCHA,
-			libandria4_fseek_MATCHB
-		)
-		
-		ret = (libandria4_int_errint){ res, errno };
-		
-		errno = err;
-		
-		return( ret );
-	}
-	inline libandria4_either_fofft libandria4_ftell( FILE *stream )
-	{
-		libandria4_either_fofft ret;
-		libandria4_foff_t res;
-		int err = errno;
-		errno = 0;
-		
-		res = LIBANDRIA4_FTELL( stream );
-		
-		if( res >= 0 )
-		{
-			ret = LIBANDRIA4_EITHER_FOFFT_BUILDLEFT( res );
-			
-		} else {
-			
-			ret = LIBANDRIA4_EITHER_FOFFT_BUILDRIGHT( errno );
-		}
-		
-		errno = err;
-		
-		return( ret );
-	}
+		/* origin expects the standard SEEK_SET, SEEK_CUR, and SEEK_END macros from C. */
+	inline libandria4_int_errint libandria4_fseek( FILE *stream, libandria4_either_fofft offset, int origin );
+	inline libandria4_either_fofft libandria4_ftell( FILE *stream );
 	
 #endif
 /* End libandria4 basic platformdetect.h */
