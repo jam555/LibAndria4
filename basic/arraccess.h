@@ -155,7 +155,7 @@ SOFTWARE.
 			( ( (type) )a << ( ( shiftstep ) * 0 ) ) | \
 			( ( (type) )b << ( ( shiftstep ) * 1 ) ) \
 		)
-	#define LIBANDRIA4_PACKELEM_4( type, shiftstep,  a, b, c,  ... ) \
+	#define LIBANDRIA4_PACKELEM_3( type, shiftstep,  a, b, c,  ... ) \
 		( (type) )( \
 			( ( (type) )a << ( ( shiftstep ) * 0 ) ) | \
 			( ( (type) )b << ( ( shiftstep ) * 1 ) ) | \

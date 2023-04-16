@@ -33,9 +33,9 @@ SOFTWARE.
 		/* For LIBANDRIA4_RETURN_* macros. */
 	#include "arraccess.h"
 		/* Mostly for true/false defines. */
-	#include "../othermath/numerics.h"
-	#include "../othermath/logic.h"
-	#include "sizeof_macros.h"
+	#include "../math/numerics.h"
+	#include "../math/logic.h"
+	#include "sizeofmacros.h"
 	#include "nulls.h"
 	
 	
