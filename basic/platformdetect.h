@@ -275,7 +275,7 @@ SOFTWARE.
 	#endif
 	
 	#if defined( _WIN32 ) || defined( __WIN32__ ) || defined( __TOS_WIN__ ) || defined( __WINDOWS__ )
-		if defined( LIBANDRIA4_PLATFORMPREVIEW0 ) && LIBANDRIA4_PLATFORMPREVIEW0 != 0 && LIBANDRIA4_PLATFORMPREVIEW0 != LIBANDRIA4_PLATFORM0_MSWIN
+		#if defined( LIBANDRIA4_PLATFORMPREVIEW0 ) && LIBANDRIA4_PLATFORMPREVIEW0 != 0 && LIBANDRIA4_PLATFORMPREVIEW0 != LIBANDRIA4_PLATFORM0_MSWIN
 			#error "Error: Libandria4 platformdetect.h LIBANDRIA4_PLATFORMPREVIEW0"
 			#error " already had a non-null value when detecting MSWindows."
 		#else
@@ -363,8 +363,8 @@ SOFTWARE.
 			#if ( _XOPEN_VERSION >= 600 )
 				/* Open Group Single UNIX Specification, Version 3 (UNIX03) (2003) */
 				#if defined( _XOPEN_SOURCE ) && _XOPEN_SOURCE >= 600
-					# undef LIBANDRIA4_BIGFILES_SEEK
-					# define LIBANDRIA4_BIGFILES_SEEK 1
+					#undef LIBANDRIA4_BIGFILES_SEEK
+					#define LIBANDRIA4_BIGFILES_SEEK 1
 				#endif
 			#endif
 			#if ( _XOPEN_VERSION >= 700 )
@@ -387,15 +387,15 @@ SOFTWARE.
 			#if ( _POSIX_VERSION >= 200112L )
 				/* IEEE 1003.1-2001 */
 				#if defined( _POSIX_C_SOURCE ) && _POSIX_C_SOURCE >= 200112L
-					# undef LIBANDRIA4_BIGFILES_SEEK
-					# define LIBANDRIA4_BIGFILES_SEEK 1
+					#undef LIBANDRIA4_BIGFILES_SEEK
+					#define LIBANDRIA4_BIGFILES_SEEK 1
 				#endif
 			#endif
 			#if ( _POSIX_VERSION >= 200809L )
 				/* IEEE 1003.1-2008 */
 			#endif
 		#endif
-		if defined( _POSIX2_C_VERSION )
+		#if defined( _POSIX2_C_VERSION )
 			#if ( _POSIX2_C_VERSION == 199209L )
 				/* ISO/IEC 9945-2:1993 */
 			#endif
@@ -424,6 +424,7 @@ SOFTWARE.
 		#endif
 		
 		
+		#undef LIBANDRIA4_PLATFORM0
 		#define LIBANDRIA4_PLATFORM0 LIBANDRIA4_PLATFORM_NIX
 		
 	#elif LIBANDRIA4_PLATFORMPREVIEW0 == LIBANDRIA4_PLATFORM0_NIX && defined( LIBANDRIA4_MACROSWITCHES_NO_PLATFORM_NIX )
@@ -462,8 +463,8 @@ SOFTWARE.
 	
 		/* Allow the user to override platform detection. */
 	#if LIBANDRIA4_TARGETPLATFORM == -1
-		# undef LIBANDRIA4_TARGETPLATFORM
-		# define LIBANDRIA4_TARGETPLATFORM LIBANDRIA4_MACROSWITCHES_OVERRIDE_TARGETPLATFORM
+		#undef LIBANDRIA4_TARGETPLATFORM
+		#define LIBANDRIA4_TARGETPLATFORM LIBANDRIA4_MACROSWITCHES_OVERRIDE_TARGETPLATFORM
 	#endif
 	
 	
@@ -532,8 +533,8 @@ SOFTWARE.
 	} libandria4_int_errint;
 	
 		/* origin expects the standard SEEK_SET, SEEK_CUR, and SEEK_END macros from C. */
-	inline libandria4_int_errint libandria4_fseek( FILE *stream, libandria4_either_fofft offset, int origin );
-	inline libandria4_either_fofft libandria4_ftell( FILE *stream );
+	libandria4_int_errint libandria4_fseek( FILE *stream, libandria4_either_fofft offset, int origin );
+	libandria4_either_fofft libandria4_ftell( FILE *stream );
 	
 #endif
 /* End libandria4 basic platformdetect.h */

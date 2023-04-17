@@ -53,7 +53,10 @@ SOFTWARE.
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL( head, len, text ) \
 		(head##pascalarray){ ( len ), ( text ) }
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL2( head, type, ... ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL( head, sizeof( (type[]){ __VA_ARGS__ } ), (type[]){ __VA_ARGS__ } )
+		LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL( \
+			head, \
+			( sizeof( (type[]){ __VA_ARGS__ } ) ), \
+			( (type[]){ __VA_ARGS__ } ) )
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDSUCCESS( head, val ) \
@@ -165,7 +168,7 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type )
 	
 	
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr )
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_INIT( head, head##pascalarray ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BUILD( libandria4_definer_##head, \

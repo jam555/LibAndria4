@@ -53,12 +53,12 @@ SOFTWARE.
 	#define LIB4_DEFINE_PASCALARRAY_LITERAL2 \
 		LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL2
 	#define LIB4_DEFINE_PASCALARRAY_STDDEFINE( head, type ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( ( head ), ( type ) )
+		LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( head, type )
 	
 	
 		/* From monads.h */
 	#define LIB4_MONAD_EITHER_BODYMATCH( var, matcha, matchb ) \
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( ( var ), matcha, matchb )
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, matcha, matchb )
 	
 	
 		/* Sourced from stdmonads.h */
@@ -84,7 +84,7 @@ SOFTWARE.
 		LIBANDRIA4_INTRESULT_RETURNFAILURE( (libandria4_failure_uipresult){ fail } )
 	
 	#define LIB4_INTRESULT_BODYMATCH( var, matchsucc, matchfail ) \
-		LIBANDRIA4_INTRESULT_BODYMATCH( ( var ), matchsucc, matchfail )
+		LIBANDRIA4_INTRESULT_BODYMATCH( var, matchsucc, matchfail )
 	
 	
 		/* Sourced from commonerrvals.h, often via stdmonads.h */
