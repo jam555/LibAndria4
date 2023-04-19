@@ -29,6 +29,8 @@ SOFTWARE.
 #ifndef LIBANDRIA4_STDABBREVS_METACABBREVS_H
 # define LIBANDRIA4_STDABBREVS_METACABBREVS_H
 	
+	#include "../basic/simpleops.h"
+	
 	/* Developer note: When writing a *_BODYMATCH() or *_EXPRMATCH() (or */
 	/*  anything similar), you MUST NOT wrap the "functional" arguments in */
 	/*  parentheses when handing themn to the wrapped macro, because they */
@@ -50,13 +52,15 @@ SOFTWARE.
 	
 	
 		/* From pascalarray.h */
-	#define LIB4_DEFINE_PASCALARRAY_LITERAL2 \
-		LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL2
+	#define LIB4_DEFINE_PASCALARRAY_LITERAL2( head, type, ... ) \
+		LIBANDRIA4_APPLY( LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL2, head, type, __VA_ARGS__ )
 	#define LIB4_DEFINE_PASCALARRAY_STDDEFINE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( head, type )
 	
 	
 		/* From monads.h */
+	#define LIB4_MONAD_EITHER_BUILDTYPE_DEFINITION( name, typea, typeb ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDTYPE_DEFINITION( name, typea, typeb )
 	#define LIB4_MONAD_EITHER_BODYMATCH( var, matcha, matchb ) \
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, matcha, matchb )
 	

@@ -48,10 +48,10 @@ SOFTWARE.
 	
 		/* This should be specialized for packing purposes. */
 	#define LIBANDRIA4_MONAD_MAYBE_BUILDTYPE_DEFINITION( name, type ) \
-		struct name { type val; unsigned char is_valid; }
+		struct name { type val; unsigned char is_valid; };
 	#define LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( name, type ) \
 		typedef struct name name; \
-		LIBANDRIA4_MONAD_MAYBE_BUILDTYPE_DEFINITION( name, type )
+		LIBANDRIA4_MONAD_MAYBE_BUILDTYPE_DEFINITION( name, type );
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name, type, val ) \
@@ -88,13 +88,14 @@ SOFTWARE.
 	/*  type with different meanings as well. */
 	
 		/* This should ALSO be specialized for packing purposes. */
+		/* This should probably do the "struct type type;" thing directly... */
 	#define LIBANDRIA4_MONAD_EITHER_BUILDTYPE_DEFINITION( name, typea, typeb ) \
 		struct name \
 			{ union{ typea a; typeb b; } val; \
-				unsigned char is_b; }
+				unsigned char is_b; };
 	#define LIBANDRIA4_MONAD_EITHER_BUILDTYPE( name, typea, typeb ) \
 		typedef struct name name; \
-		LIBANDRIA4_MONAD_EITHER_BUILDTYPE_DEFINITION( name, typea, typeb )
+		LIBANDRIA4_MONAD_EITHER_BUILDTYPE_DEFINITION( name, typea, typeb );
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name, typea, val ) \

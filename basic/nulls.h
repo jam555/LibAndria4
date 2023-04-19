@@ -29,6 +29,9 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_NULLS_H
 # define LIBANDRIA4_BASIC_NULLS_H
 	
+		/* Required for LIBANDRIA4_NULL_SIZEDMACRO() \ LIBANDRIA4_PRIMITIVE_CAT(). */
+	#include "simpleops.h"
+	
 		/* These exist for the sake of doing nothing, when you would */
 		/*  otherwise do something. */
 	#define LIBANDRIA4_NOACTION() 

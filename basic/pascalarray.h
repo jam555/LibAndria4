@@ -31,6 +31,9 @@ SOFTWARE.
 	
 	#include "stdmem.h"
 	#include "stdmonads.h"
+	#ifndef LIBANDRIA4_RESULT_BUILDFAILURE
+		#error "Error: pascalarray.h requires LIBANDRIA4_RESULT_BUILDFAILURE() from stdmonads.h, but it wasn't found."
+	#endif
 	#include "simpleops.h"
 	
 	
@@ -45,7 +48,7 @@ SOFTWARE.
 		typedef struct head##pascalarray { \
 			size_t len; type body[]; \
 		} head##pascalarray; \
-		LIBANDRIA4_MONAD_EITHER_BUILDTYPE_DEFINITION( \
+		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( \
 			head##pascalarray_result, \
 			head##pascalarray*, libandria4_failure_uipresult \
 		)
@@ -59,13 +62,17 @@ SOFTWARE.
 			( (type[]){ __VA_ARGS__ } ) )
 	
 	
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDSUCCESS( head, val ) \
+	/* These both need to be changed to take the p-array type instead of */
+	/*  the head name, for compatibility with the WRAPPED macro. */
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDSUCCESS( parrtype, val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( \
-			head##pascalarray_result, head##pascalarray*, (val) \
+			parrtype##_result, parrtype*, (val) \
 		)
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( head, val ) \
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( parrtype, val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( \
-			head##pascalarray_result, libandria4_failure_uipresult, (val) \
+			parrtype##_result, \
+			libandria4_failure_uipresult, \
+			(libandria4_failure_uipresult){ (val) } \
 		)
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
@@ -95,67 +102,69 @@ SOFTWARE.
 		/*  it as an index directly, then it will point you past the legal */
 		/*  end of the array. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_BUILD( head, parrtype, type ) \
-		head##pascalarray_result head##pascalarray_build \
+		parrtype##_result head##pascalarray_build \
 		( libandria4_memfuncs_t *mf,  size_t len ) \
 		{ void *a = (void*)0; \
-			libandria4_failure_uipresult b = LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED; \
-			LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf ) \
+			libandria4_failure_uipresult b; \
+			b.val = LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED; \
+			LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf ); \
 			if( len ) { \
 				if( !( mf->alloc ) ) { \
 					return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
-						LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ) ); } \
+						parrtype, LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ) ); } \
 				libandria4_ptrresult ptrres = (mf->alloc)( mf->data, \
 						sizeof( parrtype ) + sizeof( type ) * len ); \
 				LIBANDRIA4_PTRRESULT_BODYMATCH( ptrres, \
 					LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb ) } \
 			if( a ) { \
-				if( head##pascalarray_init( (head##pascalarray*)a, len ) \
+				if( head##pascalarray_init( (parrtype*)a, len ) \
 					< 0 ) \
-				{ dealloc( data, a ); \
+				{ (mf->dealloc)( mf->data, a ); \
 					return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
-						head, LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) ); } \
+						parrtype, LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) ); } \
 				else { \
 					return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDSUCCESS( \
-						head, (head##pascalarray*)a ) ); } } \
+						parrtype, (parrtype*)a ) ); } } \
 			else { return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
-				head, b ) ); } }
+				parrtype, b.val ) ); } }
 		/* This also stores newlen directly into the array. */
 		/* Responds to a newlen of 0 with LIB4_RESULT_FAILURE_DOMAIN. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_REBUILD( head, parrtype, type ) \
-		head##pascalarray_result head##pascalarray_rebuild \
+		parrtype##_result head##pascalarray_rebuild \
 		( libandria4_memfuncs_t *mf,  parrtype *parr, size_t newlen ) \
 		{ \
 			void *a = (void*)0; \
-			libandria4_failure_uipresult b = LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED; \
-			LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf ) \
+			libandria4_failure_uipresult b; \
+			b.val = LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED; \
+			LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf ); \
 			if( newlen ) { \
 				if( !( parr && mf->realloc ) ) { \
 					return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
-						LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ) ); } \
+						parrtype, LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ) ); } \
 				libandria4_ptrresult ptrres = (mf->realloc)( mf->data, parr, \
 						sizeof( parrtype ) + sizeof( type ) * newlen ); \
 				LIBANDRIA4_PTRRESULT_BODYMATCH( ptrres, \
 					LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb ) } \
 			else { return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
-				head, LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+				parrtype, LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
 			if( a ) { \
-				a->len = newlen; \
+				( (parrtype*)a )->len = newlen; \
 				return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDSUCCESS( \
-					head, (head##pascalarray*)a ) ); } \
+					parrtype, (parrtype*)a ) ); } \
 			else { return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
-				head, b ) ); } }
+				parrtype, b.val ) ); } }
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_DESTROY( head, parrtype, type ) \
 		libandria4_result head##pascalarray_destroy( \
 			libandria4_memfuncs_t *mf, parrtype *parr ) \
-		{ if( mf->dealloc ) { return( ( mf->dealloc )( mf->data, parr ) ); } \
-			return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
-				LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ) ); }
+		{ if( mf->dealloc ) { return( (mf->dealloc)( mf->data, parr ) ); } \
+			return( LIBANDRIA4_RESULT_BUILDFAILURE( \
+				(libandria4_failure_result){ LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS } ) ); }
 	
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, parrtype, type ) \
 		void head##pascalarray_visit( parrtype *parr,  \
 			void *data, void (*visitor)( void*, type* ) ) \
 			{ size_t l = 0; if( parr && visitor ) { while( l < parr->len ) \
-				{ visitor( data, parr->body[ l++ ] ); } } }
+				{ visitor( data, &( parr->body[ l++ ] ) ); } } }
 	
 	
 	
@@ -170,7 +179,7 @@ SOFTWARE.
 	
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( head, type ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_INIT( head, head##pascalarray ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_INIT( libandria4_definer_##head, head##pascalarray ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BUILD( libandria4_definer_##head, \
 			head##pascalarray, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_REBUILD( libandria4_definer_##head, \
@@ -178,6 +187,9 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALARRAY_DESTROY( libandria4_definer_##head, \
 			head##pascalarray, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type ) \
+		int head##pascalarray_init( head##pascalarray *parr, size_t len ) \
+			{ return( libandria4_definer_##head##pascalarray_init( \
+				parr, len ) ); } \
 		head##pascalarray_result head##pascalarray_build( size_t len ) \
 			{ return( libandria4_definer_##head##pascalarray_build( \
 				( memfuncs_ptr ),  len ) ); } \

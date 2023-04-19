@@ -84,6 +84,9 @@ SOFTWARE.
 		/* File & directory stuff. */
 	#define LIBANDRIA4_RESULT_FAILURE_EOF ( 14 )
 	
+		/* EFAULT: Note that this indicates a segfault. */
+	#define LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ( 15 )
+	
 	
 	#if 0
 		/* These are apparently POSIX values that were added to C++11. */
@@ -118,8 +121,6 @@ SOFTWARE.
 		#define LIBANDRIA4_RESULT_FAILURE_SYMLINKSTOODEEP ( 17 )
 			/* EOVERFLOW */
 		#define LIBANDRIA4_RESULT_FAILURE_OVERFLOW ( 18 )
-			/* EFAULT: Note that this indicates a segfault. */
-		#define LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ( 19 )
 			/* ENOMEM, there's not enough memory available. */
 		#define LIBANDRIA4_RESULT_FAILURE_MEMORYFULL ( 20 )
 		
