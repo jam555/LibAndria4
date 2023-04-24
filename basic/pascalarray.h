@@ -29,15 +29,21 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_PASCALARRAY_H
 # define LIBANDRIA4_BASIC_PASCALARRAY_H
 	
+	#include <stddef.h>
+	
 	#include "stdmem.h"
-	#include "stdmonads.h"
-	#ifndef LIBANDRIA4_RESULT_BUILDFAILURE
-		#error "Error: pascalarray.h requires LIBANDRIA4_RESULT_BUILDFAILURE() from stdmonads.h, but it wasn't found."
-	#endif
 	#include "simpleops.h"
+	#include "stdmonads.h"
+	#include "commonerrvals.h"
 	
 	
 	#define LIBANDRIA4_PASCALARRAY_MEMMANARGS LIBANDRIA4_MEMFUNCS_MEMMANARGS
+	
+	#if 1
+		#define LIBANDRIA4_FLEXARRAY_FILLERLENGTH 
+	#else
+		#error "LibAndria4 pascal arrays only support the C99 default, for e.g. C++ support, improve the header."
+	#endif
 	
 	
 	
@@ -46,20 +52,23 @@ SOFTWARE.
 		/*  "shit" assumes that the struct always provides 1 char... */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( head, type ) \
 		typedef struct head##pascalarray { \
-			size_t len; type body[]; \
+			size_t len; type body[ LIBANDRIA4_FLEXARRAY_FILLERLENGTH ]; \
 		} head##pascalarray; \
 		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( \
 			head##pascalarray_result, \
 			head##pascalarray*, libandria4_failure_uipresult \
 		)
 	
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL( head, len, text ) \
-		(head##pascalarray){ ( len ), ( text ) }
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL2( head, type, ... ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL( \
-			head, \
-			( sizeof( (type[]){ __VA_ARGS__ } ) ), \
-			( (type[]){ __VA_ARGS__ } ) )
+	/* Both LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL() and */
+	/*  LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL2() used to be here. They */
+	/*  attempted to initialize a "flexible array member" as part of the */
+	/*  containing struct, which even for gloabals/statics and even at */
+	/*  compile-time is illegal. Thus, they've been deleted. */
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_STATICBUILD( outername, name, head, type, ... ) \
+		static struct { head##pascalarray name; type libandria4_pascalarray_arrmember[ \
+			sizeof( (type[]){ __VA_ARGS__ } ) / sizeof( type ) ]; } outername = \
+			{ (head##pascalarray){ sizeof( (type[]){ __VA_ARGS__ } ) / sizeof( type ) }, \
+				(type[]){ __VA_ARGS__ } };
 	
 	
 	/* These both need to be changed to take the p-array type instead of */
@@ -160,6 +169,35 @@ SOFTWARE.
 			return( LIBANDRIA4_RESULT_BUILDFAILURE( \
 				(libandria4_failure_result){ LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS } ) ); }
 	
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_FILL( head, parrtype, type ) \
+		libandria4_result head##pascalarray_fill( parrtype *parr, type *src ) \
+			{ if( !parr || !src ) { \
+					return( LIBANDRIA4_RESULT_BUILDFAILURE( \
+							(libandria4_failure_result){ LIBANDRIA4_RESULT_FAILURE_DOMAIN } ) ); } \
+				size_t len = 0; while( len < parr->len ) { \
+					parr->body[ len ] = src[ len ]; ++len; } \
+				return ( LIBANDRIA4_RESULT_BUILDSUCCESS( \
+						(libandria4_success_result){ LIBANDRIA4_RESULT_GENERICTRUE } ) ); }
+		#define LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL_ONFAIL( err ) \
+			fail.val = err.val; goto on_err;
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL( head, parrtype, type ) \
+		parrtype##_result head##pascalarray_buildNfill \
+		( libandria4_memfuncs_t *mf,  size_t len, type *src ) \
+		{ if( !src ) { \
+				return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
+					parrtype, LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+			LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf ); \
+			parrtype *a; libandria4_failure_uipresult fail; \
+			parrtype##_result res1 = head##pascalarray_build( mf,  len ); \
+			LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH( res1, \
+				LIBANDRIA4_OP_SETa, \
+				LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL_ONFAIL ); \
+			libandria4_result res2 = head##pascalarray_fill( a, src ); \
+			LIBANDRIA4_RESULT_BODYMATCH( res2, \
+				LIBANDRIA4_NULL_MACRO, \
+				LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL_ONFAIL ); \
+			return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDSUCCESS( parrtype, a ) ); \
+			on_err: return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( parrtype, fail.val ) ); }
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, parrtype, type ) \
 		void head##pascalarray_visit( parrtype *parr,  \
 			void *data, void (*visitor)( void*, type* ) ) \
@@ -168,17 +206,43 @@ SOFTWARE.
 	
 	
 	
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( head, type ) \
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( head, type ) \
+			/* *init(), *build(), & *rebuild() all store len into the array. */ \
+		int head##pascalarray_init( parrtype *parr, size_t len ); \
+		parrtype##_result head##pascalarray_build( libandria4_memfuncs_t *mf,  size_t len ); \
+			/* *rebuild() responds to a newlen of 0 with LIB4_RESULT_FAILURE_DOMAIN. */ \
+		parrtype##_result head##pascalarray_rebuild( libandria4_memfuncs_t *mf,  parrtype *parr, size_t newlen ); \
+		libandria4_result head##pascalarray_fill( parrtype *parr, type *src ); \
+		parrtype##_result head##pascalarray_buildNfill( libandria4_memfuncs_t *mf,  size_t len, type *src ); \
+		libandria4_result head##pascalarray_destroy( libandria4_memfuncs_t *mf, parrtype *parr ); \
+		void head##pascalarray_visit( parrtype *parr,  void *data, void (*visitor)( void*, type* ) );
+	
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( head, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_INIT( head, head##pascalarray ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BUILD( head, head##pascalarray, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_REBUILD( head, head##pascalarray, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_FILL( head, head##pascalarray, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL( head, head##pascalarray, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_DESTROY( head, head##pascalarray, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type )
 	
 	
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( head, type ) \
+			/* *init(), *build(), & *rebuild() all store len into the array. */ \
+		int head##pascalarray_init( head##pascalarray *parr, size_t len ); \
+		head##pascalarray##_result head##pascalarray_build( size_t len ); \
+			/* *rebuild() responds to a newlen of 0 with LIB4_RESULT_FAILURE_DOMAIN. */ \
+		head##pascalarray##_result head##pascalarray_rebuild( head##pascalarray *parr, size_t newlen ); \
+		libandria4_result head##pascalarray_fill( head##pascalarray *parr, type *src ); \
+		head##pascalarray##_result head##pascalarray_buildNfill( size_t len, type *src ); \
+		libandria4_result head##pascalarray_destroy( head##pascalarray *parr ); \
+		void head##pascalarray_visit( head##pascalarray *parr,  void *data, void (*visitor)( void*, type* ) );
+	
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_INIT( libandria4_definer_##head, head##pascalarray ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BUILD( libandria4_definer_##head, \
 			head##pascalarray, type ) \
@@ -186,7 +250,9 @@ SOFTWARE.
 			head##pascalarray, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_DESTROY( libandria4_definer_##head, \
 			head##pascalarray, type ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_FILL( libandria4_definer_##head, head##pascalarray, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL( libandria4_definer_##head, \
+			head##pascalarray, type ) \
 		int head##pascalarray_init( head##pascalarray *parr, size_t len ) \
 			{ return( libandria4_definer_##head##pascalarray_init( \
 				parr, len ) ); } \
@@ -197,9 +263,16 @@ SOFTWARE.
 			( head##pascalarray *parr, size_t newlen ) \
 			{ return( libandria4_definer_##head##pascalarray_rebuild( \
 				( memfuncs_ptr ),  parr, newlen ) ); } \
+		libandria4_result head##pascalarray_fill( head##pascalarray *parr, type *src ) \
+			{ return( libandria4_definer_##head##pascalarray_fill( \
+				parr, src ) ); } \
+		head##pascalarray_result head##pascalarray_buildNfill( size_t len, type *src ) \
+			{ return( libandria4_definer_##head##pascalarray_buildNfill( \
+				( memfuncs_ptr ), len, src ) ); } \
 		libandria4_result head##pascalarray_destroy( head##pascalarray *parr ) \
 			{ return( libandria4_definer_##head##pascalarray_destroy( \
-				( memfuncs_ptr ),  parr ) ); }
+				( memfuncs_ptr ),  parr ) ); } \
+		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type )
 		
 		
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( head, type ) \
