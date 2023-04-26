@@ -137,7 +137,7 @@ SOFTWARE.
 			else { return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
 				parrtype, b.val ) ); } }
 		/* This also stores newlen directly into the array. */
-		/* Responds to a newlen of 0 with LIB4_RESULT_FAILURE_DOMAIN. */
+		/* Responds to a newlen of 0 with LIBANDRIA4_RESULT_FAILURE_DOMAIN. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_REBUILD( head, parrtype, type ) \
 		parrtype##_result head##pascalarray_rebuild \
 		( libandria4_memfuncs_t *mf,  parrtype *parr, size_t newlen ) \
