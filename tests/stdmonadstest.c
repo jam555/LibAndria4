@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 
-	/* Fore size_t, though I think it's in stdlib.h and stdio.h as well. */
+	/* For size_t, though I think it's in stdlib.h and stdio.h as well. */
 #include <stddef.h>
 	/* For EXIT_SUCCESS and EXIT_FAILURE. */
 #include <stdlib.h>

@@ -65,6 +65,11 @@ SOFTWARE.
 		if( ( var ).is_valid ) { match( ( var ).val ); } else { otherwise(); }
 	#define LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( var, match, otherwise ) \
 		( ( ( var ).is_valid ) ? ( match( ( var ).val ) ) : ( otherwise() ) )
+		/* I'm of mixed views on this, but the "Null Conundrum" video by */
+		/*  Zoran Horvat made mention of it around minute 13, and I CAN see */
+		/*  the utility of it, so I've added it. */
+	#define LIBANDRIA4_MONAD_MAYBE_REDUCE( var, alt ) \
+		( ( ( var ).is_valid ) ? ( ( var ).val ) : ( alt ) )
 	
 		/* Like the *MATCH() stuff above, but intended for chaining. I */
 		/*  honestly don't know if the re-ordering does anything useful, but */

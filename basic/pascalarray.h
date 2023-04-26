@@ -64,8 +64,8 @@ SOFTWARE.
 	/*  attempted to initialize a "flexible array member" as part of the */
 	/*  containing struct, which even for gloabals/statics and even at */
 	/*  compile-time is illegal. Thus, they've been deleted. */
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_STATICBUILD( outername, name, head, type, ... ) \
-		static struct { head##pascalarray name; type libandria4_pascalarray_arrmember[ \
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_STATICBUILD( outername, innername, head, type, ... ) \
+		static struct { head##pascalarray innername; type libandria4_pascalarray_arrmember[ \
 			sizeof( (type[]){ __VA_ARGS__ } ) / sizeof( type ) ]; } outername = \
 			{ (head##pascalarray){ sizeof( (type[]){ __VA_ARGS__ } ) / sizeof( type ) }, \
 				(type[]){ __VA_ARGS__ } };
