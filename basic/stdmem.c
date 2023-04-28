@@ -30,6 +30,7 @@ SOFTWARE.
 #include <errno.h>
 
 
+#include "stdmonads.h"
 #include "stdmem.h"
 #include "simpleops.h"
 
@@ -45,8 +46,8 @@ libandria4_ptrresult libandria4_mallocwrapper( void *ign, size_t size )
 	libandria4_ptrresult ret;
 #define libandria4_mallocwrapper_SUCCESS( val ) \
 		ret = LIBANDRIA4_PTRRESULT_BUILDSUCCESS( mem );
-#define libandria4_mallocwrapper_FAILURE( val ) \
-		ret = LIBANDRIA4_PTRRESULT_BUILDFAILURE( val );
+#define libandria4_mallocwrapper_FAILURE( err ) \
+		ret = LIBANDRIA4_PTRRESULT_BUILDFAILURE( (libandria4_failure_uipresult){ err.val } );
 	LIBANDRIA4_RESULT_BODYMATCH(
 		e,
 		
@@ -68,8 +69,8 @@ libandria4_ptrresult libandria4_reallocwrapper( void *ign,  void *cur, size_t si
 	libandria4_ptrresult ret;
 #define libandria4_reallocwrapper_SUCCESS( val ) \
 		ret = LIBANDRIA4_PTRRESULT_BUILDSUCCESS( mem );
-#define libandria4_reallocwrapper_FAILURE( val ) \
-		ret = LIBANDRIA4_PTRRESULT_BUILDFAILURE( val );
+#define libandria4_reallocwrapper_FAILURE( err ) \
+		ret = LIBANDRIA4_PTRRESULT_BUILDFAILURE( (libandria4_failure_uipresult){ err.val } );
 	LIBANDRIA4_RESULT_BODYMATCH(
 		e,
 		
@@ -86,7 +87,7 @@ libandria4_result libandria4_deallocwrapper( void *ign, void *mem )
 	errno = 0;
 	
 	free( mem );
-	libandria4_result ret = libandria4_errno_2result()
+	libandria4_result ret = libandria4_errno_2result();
 	
 	errno = errmem;
 	

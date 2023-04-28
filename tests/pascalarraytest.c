@@ -60,7 +60,7 @@ void visit_checker( void *ref_, char *elem )
 {
 	char *ref = (char*)ref_;
 	
-	if( !parr )
+	if( !ref )
 	{
 		printf( "   visit_checker() received a null void pointer!\n" );
 		visit_progress = ( visit_progress ? -visit_progress : visit_progress ) - 1;
@@ -128,7 +128,7 @@ int main( int argn, char *argc[] )
 		parr1 = ( parrptr );
 #define BUILDFAIL( wrappederr ) \
 		printf( \
-			"   False failure, allocation failed. Skipping linked tests. Err val: %i\n" \
+			"   False failure, allocation failed. Skipping linked tests. Err val: %i\n", \
 				(int)( ( wrappederr ).val ) ); \
 		teststatus = 0; \
 		if( wrappederr.val == LIBANDRIA4_RESULT_FAILURE_DOMAIN ) { \
@@ -149,7 +149,7 @@ int main( int argn, char *argc[] )
 			( parrref ).body[ ( index ) ] != '\0' ) \
 		{ if( ( reference )[ ( index ) ] != ( parrref ).body[ ( index ) ] ) { \
 			( runstat ) = 0; printf( \
-				"   Content failure at %i: expected \'%c\', found '\%c'\.\n", \
+				"   Content failure at %i: expected \'%c\', found \'%c\'\n", \
 					(int)( index ), \
 					( reference )[ ( index ) ], ( parrref ).body[ ( index ) ] ); \
 			TRUEFAIL( (libandria4_failure_uipresult){ 0 } ); \
@@ -287,7 +287,8 @@ int main( int argn, char *argc[] )
 					++iter1;
 				}
 					/* We've overwritten the old null, but not yet replaced it. */
-				parr1->body[ GROW_INDEX + iter1 ] = [ GROW_INDEX + iter1 ];
+				parr1->body[ GROW_INDEX + iter1 ] =
+					( (char[]){ GROWN_TEXT } )[ GROW_INDEX + iter1 ];
 				
 				TEST_CONTENT( *parr1, (char[]){ GROWN_TEXT }, iter1, teststatus );
 			}
@@ -322,7 +323,7 @@ int main( int argn, char *argc[] )
 					(int)( iter1 )
 			);
 			
-			errval = testchar_pascalarray_init( parr, iter1 );
+			errval = testchar_pascalarray_init( parr1, iter1 );
 			switch( errval )
 			{
 				case 1:

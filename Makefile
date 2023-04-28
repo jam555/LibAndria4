@@ -44,6 +44,8 @@ world: all install
 
 $(BUILDDIR)obj/stdmonads.o: basic/stdmonads.c
 	$(compileonlyCcommand) basic/stdmonads.c $@
+$(BUILDDIR)obj/stdmem.o: basic/stdmem.c
+	$(compileonlyCcommand) basic/stdmem.c $@
 	
 
 # There should eventually be a pre-build option, that builds at least the
@@ -54,6 +56,8 @@ build:
 $(BUILDDIR)test/stdmonadstest.o: tests/stdmonadstest.c
 	$(compileonlyCcommand) tests/stdmonadstest.c $@
 $(BUILDDIR)test/stdmonadstest.exe: $(BUILDDIR)obj/stdmonads.o $(BUILDDIR)test/stdmonadstest.o
+	$(genericcompileCcommand) $@ $^
+$(BUILDDIR)test/pascalarraytest.exe: tests/pascalarraytest.c $(BUILDDIR)obj/stdmonads.o $(BUILDDIR)obj/stdmem.o
 	$(genericcompileCcommand) $@ $^
 
 
@@ -106,6 +110,9 @@ check:
 # Tests.
 
 # Test the source files; unit testing
-sourcecheck: $(BUILDDIR)test/stdmonadstest.exe
-	$^
+sourcecheck: stdmonads_test pascalarray_test
 # Then run tests.
+stdmonads_test: $(BUILDDIR)test/stdmonadstest.exe
+	$^
+pascalarray_test: $(BUILDDIR)test/pascalarraytest.exe
+	$^
