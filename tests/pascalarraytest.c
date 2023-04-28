@@ -109,7 +109,7 @@ int main( int argn, char *argc[] )
 	libandria4_result otherres;
 	testchar_pascalarray *parr1;
 	int ret = EXIT_SUCCESS, teststatus, errval = errno;
-	size_t iter1;
+	size_t iter1, size1;
 	
 	
 #define EARLYSUCC( ignore ) \
@@ -145,8 +145,7 @@ int main( int argn, char *argc[] )
 				(int)( sizeof( reference ) / sizeof( char ) ) ); } \
 		while( \
 			( index ) < ( parrref ).len && \
-			( index ) < ( sizeof( reference ) / sizeof( char ) ) && \
-			( parrref ).body[ ( index ) ] != '\0' ) \
+			( index ) < ( sizeof( reference ) / sizeof( char ) )  ) \
 		{ if( ( reference )[ ( index ) ] != ( parrref ).body[ ( index ) ] ) { \
 			( runstat ) = 0; printf( \
 				"   Content failure at %i: expected \'%c\', found \'%c\'\n", \
@@ -206,8 +205,9 @@ int main( int argn, char *argc[] )
 	
 	
 	teststatus = 1;
-	printf( "  Trying dynamic allocation of pascal array.\n" );
-	buildres = testchar_pascalarray_build( sizeof( (char[]){ STATIC_TEXT } ) / sizeof( char ) );
+	size1 = sizeof( (char[]){ STATIC_TEXT } ) / sizeof( char );
+	printf( "  Trying dynamic allocation of pascal array, intended size == %i.\n", (int)size1 );
+	buildres = testchar_pascalarray_build( size1 );
 	LIBANDRIA4_MONAD_EITHER_BODYMATCH( buildres, BUILDSUCC, BUILDFAIL );
 	if( teststatus )
 	{
@@ -223,7 +223,7 @@ int main( int argn, char *argc[] )
 			);
 			exit( EXIT_FAILURE );
 		}
-		if( parr1->len == sizeof( (char[]){ STATIC_TEXT } ) / sizeof( char ) )
+		if( parr1->len != sizeof( (char[]){ STATIC_TEXT } ) / sizeof( char ) )
 		{
 			printf
 			(
@@ -283,7 +283,7 @@ int main( int argn, char *argc[] )
 				while( iter1 < GROW_LEN )
 				{
 					parr1->body[ GROW_INDEX + iter1 ] =
-						( (char[]){ GROW_TEXT } )[ GROW_INDEX + iter1 ];
+						( (char[]){ GROW_TEXT } )[ iter1 ];
 					++iter1;
 				}
 					/* We've overwritten the old null, but not yet replaced it. */
@@ -385,7 +385,7 @@ int main( int argn, char *argc[] )
 			);
 			exit( EXIT_FAILURE );
 		}
-		if( parr1->len == sizeof( (char[]){ STATIC_TEXT } ) / sizeof( char ) )
+		if( parr1->len != sizeof( (char[]){ STATIC_TEXT } ) / sizeof( char ) )
 		{
 			printf
 			(
