@@ -87,6 +87,10 @@ SOFTWARE.
 		/* EFAULT: Note that this indicates a segfault. */
 	#define LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ( 15 )
 	
+		/* This is for stuff like 1 + 1 == 3, and other such madness. Most */
+		/*  likely a hardware failure or uncaught integer over/underflow. */
+	#define LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ( 16 )
+	
 	
 	#if 0
 		/* These are apparently POSIX values that were added to C++11. */

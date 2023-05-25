@@ -71,10 +71,12 @@ LDLIBS?=
 MAKEFLAGS?= 
 
 DESTDIR?=
-BUILDDIR?=$(project_base)/build/
-SOURCEDIR?=$(project_base)/src/
-TESTSDIR?=$(project_base)/test/
-IMPORTSDIR?=$(project_base)/external_dependencies/
+BUILDDIR?=$(project_base)build/
+SOURCEDIR?=$(project_base)src/
+TESTSDIR?=$(project_base)test/
+
+OBJBUILDS?=$(BUILDDIR)obj/
+TESTBUILDS?=$(BUILDDIR)test/
 
 
 
@@ -114,14 +116,20 @@ rmdircommand?=folderremovefunc () { rm -d $$1 ; } ; folderremovefunc
 # Note that both the basification path and extension get merged: together
 #  they'll form the next path.
 make_run?=$(make) \
-	basification_path=$(basification_path)$(basification_extension) \
-	$(make_fileflag) $(project_base)/$(buildtool_path)common.make
+	$(make_fileflag) $(project_base)$(buildtool_path)common.make \
+	basification_path=$(basification_path)$(basification_extension)
 make_runfile?=$(make) \
+	$(make_fileflag) $(project_base)$(buildtool_path)common.make \
 	basification_path=$(basification_path)$(basification_extension) \
-	$(make_fileflag) $(project_base)/$(buildtool_path)common.make \
+	$(make_fileflag)
+make_nestedrun?=$(make) \
+	$(make_fileflag) $(project_base)../$(buildtool_path)common.make \
+	basification_path=$(basification_path)$(basification_extension)
+make_nestedrunfile?=$(make) \
+	$(make_fileflag) $(project_base)../$(buildtool_path)common.make \
+	basification_path=$(basification_path)$(basification_extension) \
 	$(make_fileflag)
 
 # First arg is the source file, second is the destination.
 compileonlyCcommand?=compileonlyCcommandfunc () { $(CC) $$1 -o $$2 -c ; } ; compileonlyCcommandfunc
-# First arg is the output file, all others will be parsed as compiler sees appropriate.
-genericcompileCcommand?=genericcompileCcommandfunc () { arg1=$$1; shift ; $(CC) -o $$arg1 $$@ ; } ; genericcompileCcommandfunc
+genericcompileCcommand?=genericcompileCcommandfunc () { arg1=$$1; shift ; $(CC) $$@ -o $$arg1 ; } ; genericcompileCcommandfunc

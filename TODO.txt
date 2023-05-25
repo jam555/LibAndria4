@@ -29,7 +29,3 @@ I only just copied this stuff to my Chromebook, and need to spruce things up:
 	Add documentation explaining that dirs updating at the time of their
 		files updating means that dir builds must be in the root makefiles
 		instead of the "normal" makefile.
-	Need to rewrite pascalarray.h's initializer macros: you CAN'T initialize
-		flexible array members directly with a compound literal. We need both
-		a "globals/statics" version, and a initializer function for use inside
-		functions. You apparently also can't set them with the "=" operator.

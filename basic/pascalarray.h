@@ -233,11 +233,11 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( head, type ) \
 			/* *init(), *build(), & *rebuild() all store len into the array. */ \
 		int head##pascalarray_init( head##pascalarray *parr, size_t len ); \
-		head##pascalarray##_result head##pascalarray_build( size_t len ); \
+		head##pascalarray_result head##pascalarray_build( size_t len ); \
 			/* *rebuild() responds to a newlen of 0 with LIB4_RESULT_FAILURE_DOMAIN. */ \
-		head##pascalarray##_result head##pascalarray_rebuild( head##pascalarray *parr, size_t newlen ); \
+		head##pascalarray_result head##pascalarray_rebuild( head##pascalarray *parr, size_t newlen ); \
 		libandria4_result head##pascalarray_fill( head##pascalarray *parr, type *src ); \
-		head##pascalarray##_result head##pascalarray_buildNfill( size_t len, type *src ); \
+		head##pascalarray_result head##pascalarray_buildNfill( size_t len, type *src ); \
 		libandria4_result head##pascalarray_destroy( head##pascalarray *parr ); \
 		void head##pascalarray_visit( head##pascalarray *parr,  void *data, void (*visitor)( void*, type* ) );
 	
