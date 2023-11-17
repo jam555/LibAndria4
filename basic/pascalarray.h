@@ -241,8 +241,8 @@ SOFTWARE.
 		libandria4_result head##pascalarray_destroy( head##pascalarray *parr ); \
 		void head##pascalarray_visit( head##pascalarray *parr,  void *data, void (*visitor)( void*, type* ) );
 	
+		/* This needs to be paired with a LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE() invocation. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_INIT( libandria4_definer_##head, head##pascalarray ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BUILD( libandria4_definer_##head, \
 			head##pascalarray, type ) \

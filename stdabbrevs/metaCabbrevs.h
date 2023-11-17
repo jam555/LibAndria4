@@ -44,6 +44,8 @@ SOFTWARE.
 		LIBANDRIA4_OP_SETa
 	#define LIB4_OP_SETb \
 		LIBANDRIA4_OP_SETb
+	#define LIB4_OP_SETc \
+		LIBANDRIA4_OP_SETc
 	
 	
 		/* Sourced from commontypes.h */
@@ -52,6 +54,7 @@ SOFTWARE.
 	
 	
 		/* From pascalarray.h */
+		/* I believe that *_LITERAL2() should be dropped. */
 	#define LIB4_DEFINE_PASCALARRAY_LITERAL2( head, type, ... ) \
 		LIBANDRIA4_APPLY( LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL2, head, type, __VA_ARGS__ )
 	#define LIB4_DEFINE_PASCALARRAY_STDDEFINE( head, type ) \
@@ -90,6 +93,9 @@ SOFTWARE.
 	#define LIB4_INTRESULT_BODYMATCH( var, matchsucc, matchfail ) \
 		LIBANDRIA4_INTRESULT_BODYMATCH( var, matchsucc, matchfail )
 	
+	#define LIB4_DEFINE_PASCALARRAY_RESULT_BODYMATCH \
+		LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH
+	
 	
 		/* Sourced from commonerrvals.h, often via stdmonads.h */
 	#define LIB4_RESULT_GENERIC \
@@ -101,6 +107,8 @@ SOFTWARE.
 	
 	
 		/* From arraccess.h */
+	#define LIB4_RETURN_1ST \
+		LIBANDRIA4_RETURN_1ST
 	#define LIB4_RETURN_2ND \
 		LIBANDRIA4_RETURN_2ND
 	
