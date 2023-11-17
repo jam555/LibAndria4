@@ -70,5 +70,6 @@ SOFTWARE.
 	#define vt100net_HAND_OSCPUT ( 12 )
 	#define vt100net_HAND_OSCEND ( 13 )
 	#define vt100net_HAND_FALLTHROUGH ( 14 )
+	
 #endif
 /* End libandria4 parsers vt100net stdtables.h */
