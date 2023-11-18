@@ -158,11 +158,6 @@ int vt100net_looper( vt100net_termcontext *term_ctx )
 		);
 		VT100NET_BUILDERRORSTRUCT_SIMPLETYPE(
 			&funcname,
-			ignorenull_unhandled,
-			"FATAL: VT500+ behavior regarding null hasn't been paid attention to yet!"
-		);
-		VT100NET_BUILDERRORSTRUCT_SIMPLETYPE(
-			&funcname,
 			ZDM_unhandled,
 			"FATAL: ECMA-48's ZDM hasn't been paid attention to yet!"
 		);
@@ -191,18 +186,6 @@ int vt100net_looper( vt100net_termcontext *term_ctx )
 					VT100NET_REPORT_ERR(
 						term_ctx,
 						&( CANSUB_unhandled.type.typeid ),
-						__FILE__, __LINE__
-					);
-				term_ctx->res = res;
-				
-				return( -4 );
-			}
-			if( term_ctx->flags1 & vt100net_termcontext_flags1_ignorenull == vt100net_termcontext_flags1_ignorenull )
-			{
-				res = term_ctx->res;
-					VT100NET_REPORT_ERR(
-						term_ctx,
-						&( ignorenull_unhandled.type.typeid ),
 						__FILE__, __LINE__
 					);
 				term_ctx->res = res;
@@ -309,8 +292,19 @@ int vt100net_looper( vt100net_termcontext *term_ctx )
 						return( -4 );
 					}
 					
-						/* We're done, return to the "caller". */
+						/* The VT500+ kept null characters, while older members of */
+						/*  the series discarded nulls before the parser saw them. */
+						/*  This allows this system's user to choose which behavior */
+						/*  to follow. */
+					if
+					(
+						term_ctx->acc_char == '\0' &&
+						term_ctx->flags1 & vt100net_termcontext_flags1_retainnull
+							!= vt100net_termcontext_flags1_retainnull
+					)
 					{
+						/* We're done, return to the "caller". */
+						
 						uint8_t tmp;
 						vt100net_termcontext_dispatch_POP( term_ctx, tmp )
 						

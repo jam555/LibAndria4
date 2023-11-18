@@ -232,7 +232,7 @@ SOFTWARE.
 			/* Enable non-VT320 behavior for CAN and SUB ascii bytes. */
 		vt100net_termcontext_flags1_CANSUB_cancelseq = 8,
 			/* Disable VT500+ behavior in regards to ascii NUL. */
-		vt100net_termcontext_flags1_ignorenull = 16,
+		vt100net_termcontext_flags1_retainnull = 16,
 			/* ZDM treats blank & 0 params identically: it ended with ECMA-48 edition 5. */
 		vt100net_termcontext_flags1_ZDMenable = 32,
 			/* These are graphics capabilities. */
