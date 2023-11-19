@@ -29,9 +29,11 @@ SOFTWARE.
 #ifndef LIBANDRIA4_PARSERS_VT100NET_TERMINAL_H
 # define LIBANDRIA4_PARSERS_VT100NET_TERMINAL_H
 	
-		/* The nearly omniversal utility header... */
-	#include "../../basic/pascalarray.h"
-	#include "../../basic/pascalstring.h"
+	
+	#include "../../basic/commonerr.h"
+	#include "../../basic/stdbuffer.h"
+	
+	
 	
 	/* Just a bunch of pre-defs. */
 	
@@ -44,48 +46,6 @@ SOFTWARE.
 	
 	typedef struct vt100net_handler_mapping vt100net_handler_mapping;
 	typedef struct vt100net_termcontext vt100net_termcontext;
-	
-	
-	
-	
-	/* An error reporting facility. */
-	
-	typedef struct vt100net_errorstruct
-	{
-		uint32_t typeid;
-	};
-	struct vt100net_errorstruct_simple
-	{
-		vt100net_errorstruct type;
-		
-		vt100net_errorstruct_simple *funcname;
-		
-		size_t str_len;
-		char *str;
-	};
-	#define VT100NET_ERRORSTRUCT_NULLTYPE ( 0 )
-	#define VT100NET_ERRORSTRUCT_SIMPLETYPE ( 1 )
-	
-	#define VT100NET_BUILDERRORSTRUCT_SIMPLETYPE( funcname_ptr, varname, strptr ) \
-		static vt100net_errorstruct_simple ( varname ) = { { VT100NET_ERRORSTRUCT_SIMPLETYPE }, 0, 0, strptr }; \
-		if( ( name ).str_len == 0 ) { \
-			( name ).funcname = ( funcname_ptr ); ( name ).str_len = strlen( ( name ).str ); }
-	#define VT100NET_BUILDERRORSTRUCT_SIMPLETYPE_FUNCNAME( varname, namestrptr ) \
-		VT100NET_BUILDERRORSTRUCT_SIMPLETYPE( &( varname ), varname, namestrptr )
-	
-	#define VT100NET_REPORT_ERR( ctx, rep_type_mmbr_ptr, filename, linenum ) \
-		{ int res = vt100net_report_parser_error( (vt100net_termcontext*)( ctx ), (uint32_t*)( rep_type_mmbr_ptr ) ); \
-			if( res != -1 ) { \
-				term_ctx->error_values.file = ( filename ); term_ctx->error_values.line = ( linenum ); } \
-			switch( res ) \
-			{ case -1: \
-					fprintf( stderr, \
-						"ERROR: VT100NET_REPORT_ERR() received a \"bad args\" error in %s at %i.\n", \
-						(char*)(filename), (int)(linenum) ); return( -5 ); \
-				case -4: return( -6 ); \
-				case -2: case -3: return( -7 ); \
-				default: break; } }
-	int vt100net_report_parser_error( vt100net_termcontext *term_ctx, uint32_t *report_type_member );
 	
 	
 	
@@ -181,69 +141,6 @@ SOFTWARE.
 		uint8_t test_count;
 	};
 	intmax_t vt100net_termcontext_chartype_hook_validate( vt100net_termcontext_chartype_hooks* );
-	
-	
-	
-	/* The terminal buffer system. */
-	
-	LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE( vt100net_bytebuffer_, uint8_t );
-	
-	typedef struct vt100net_termbuffer_generic vt100net_termbuffer_generic;
-	
-	#define vt100net_termbuffer_NAMECOMMAND( outername, str ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_STATICBUILD_NONULL( \
-			outername, text, vt100net_bytebuffer_, uint8_t, str )
-	
-		/* The variations on void struct are defined in stdbuffer.h */
-	typedef struct vt100net_termbuffer_func_voidstruct vt100net_termbuffer_func_voidstruct;
-	struct vt100net_termbuffer_func_voidstruct
-	{
-		uint32_t typeid;
-		
-			/* Because we obviously will want this, it's standard. */
-		int (*err)( vt100net_termbuffer_func_voidstruct*, vt100net_errorstruct* );
-	};
-			/* The direct return indicates success or failure, nothing else. */
-			/*  Positive for success, negative for failure. */
-	typedef
-		int (*vt100net_termbuffer_func)
-		(
-			vt100net_termbuffer_generic*,
-			
-				/* Essentially a set of arguments. Treat it sort of like */
-				/*  a printf() formator string. Names are defined below */
-				/*  by vt100net_termbuffer_NAMECOMMAND(), but you could */
-				/*  always add your own... */
-				/* Warning, commands may require the addition of arguments! */
-				/* Note that space-separated arguments FOLLOWED by a */
-				/*  command (so, RPN style) should be what you universally */
-				/*  use, due to ease of parsing. If spaces might be needed */
-				/*  INSIDE an argument or command, then enclose in a */
-				/*  C-style string (e.g. with double-quotes). This is NOT */
-				/*  the place for a complex parser. */
-			libandria4_char_pascalarray*,
-			
-				/* A generic return vector for actual data (as opposed to */
-				/*  a success/failure signal). */
-			void*
-		);
-		/* Fetches the contents of a "bounded box". Requires a pointer to a */
-		/*  vt100net_termbuffer_func_uint8receiver instance, and the area */
-		/*  must be represented as a space-seperated decimal-encoded list */
-		/*  of left-x upper-y fetch-width fetch-height encoded as the FRONT */
-		/*  (for FORTH-ish RPN convenience) of the command pstr. */
-	vt100net_termbuffer_NAMECOMMAND( outername, "fetch" );
-	... /* TO BE CONTINUED! We need more commands. */
-	
-	struct vt100net_termbuffer_generic
-	{
-			/* Measured in character cells, not in e.g. pixels, or inches. */
-		uint32_t width, height;
-		
-		libandria4_memfuncs_t *mfuncs;
-		
-		vt100net_bytebuffer_pascalarray *buf;
-	};
 	
 	
 	
@@ -362,6 +259,7 @@ SOFTWARE.
 		{
 			
 			intptr_t file, line;
+			
 		} error_values;
 		
 		
@@ -379,8 +277,6 @@ SOFTWARE.
 		
 			/* The current state of the buffer. */
 		vt100net_termbuffer_generic *buffer;
-		
-		
 		
 		
 		
