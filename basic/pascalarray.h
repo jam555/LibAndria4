@@ -31,6 +31,7 @@ SOFTWARE.
 	
 	#include <stddef.h>
 	
+	#include "commonmacros.h"
 	#include "stdmem.h"
 	#include "simpleops.h"
 	#include "stdmonads.h"
@@ -39,11 +40,7 @@ SOFTWARE.
 	
 	#define LIBANDRIA4_PASCALARRAY_MEMMANARGS LIBANDRIA4_MEMFUNCS_MEMMANARGS
 	
-	#if 1
-		#define LIBANDRIA4_FLEXARRAY_FILLERLENGTH 
-	#else
-		#error "LibAndria4 pascal arrays only support the C99 default, for e.g. C++ support, improve the header."
-	#endif
+	/* LIBANDRIA4_FLEXARRAY_FILLERLENGTH is now provided by commonmacros.h */
 	
 	
 	
