@@ -223,6 +223,11 @@ int vt100net_looper( vt100net_termcontext *term_ctx )
 					return( -4 );
 					
 				case vt100net_termcontext_INITIAL_ENTRY:
+					VT100NET_BUILDERRORSTRUCT_SIMPLETYPE(
+						&funcname,
+						vt100net_termcontext_INITIAL_ENTRY_failedclear,
+						"FATAL: vt100net_actions_clear() failed in *_INITIAL_ENTRY."
+					);
 					/* The initial entry state. Do some initialization, then goto GROUND. */
 					
 					/* Initialize pointers. */
@@ -231,9 +236,26 @@ int vt100net_looper( vt100net_termcontext *term_ctx )
 					term_ctx->params = term_ctx->parameter_values;
 					
 					/* Initialize values. */
+					
 					term_ctx->callstack[ 0 ] = vt100net_termcontext_GROUND;
+					res = 1;
+					while( res < vt100net_termcontext_DISPSTACK_LEN )
+					{
+						term_ctx->callstack[ 0 ] = vt100net_termcontext_INVALID;
+						
+						res += 1;
+					}
 					term_ctx->dispatch = vt100net_termcontext_FETCHCHAR;
 					term_ctx->run = 1;
+					if( !vt100net_actions_clear( term_ctx, vt100net_termcontext_INVALID ) )
+					{
+						VT100NET_REPORT_ERR(
+							term_ctx,
+							&( vt100net_termcontext_INITIAL_ENTRY_failedclear.type.typeid ),
+							__FILE__, __LINE__
+						);
+						return( -4 );
+					}
 					
 					break;
 					
