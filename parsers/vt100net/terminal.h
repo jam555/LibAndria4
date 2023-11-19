@@ -29,6 +29,10 @@ SOFTWARE.
 #ifndef LIBANDRIA4_PARSERS_VT100NET_TERMINAL_H
 # define LIBANDRIA4_PARSERS_VT100NET_TERMINAL_H
 	
+		/* The nearly omniversal utility header... */
+	#include "../../basic/pascalarray.h"
+	#include "../../basic/pascalstring.h"
+	
 	/* Just a bunch of pre-defs. */
 	
 	typedef struct vt100net_errorstruct vt100net_errorstruct;
@@ -180,6 +184,69 @@ SOFTWARE.
 	
 	
 	
+	/* The terminal buffer system. */
+	
+	LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE( vt100net_bytebuffer_, uint8_t );
+	
+	typedef struct vt100net_termbuffer_generic vt100net_termbuffer_generic;
+	
+	#define vt100net_termbuffer_NAMECOMMAND( outername, str ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_STATICBUILD_NONULL( \
+			outername, text, vt100net_bytebuffer_, uint8_t, str )
+	
+		/* The variations on void struct are defined in stdbuffer.h */
+	typedef struct vt100net_termbuffer_func_voidstruct vt100net_termbuffer_func_voidstruct;
+	struct vt100net_termbuffer_func_voidstruct
+	{
+		uint32_t typeid;
+		
+			/* Because we obviously will want this, it's standard. */
+		int (*err)( vt100net_termbuffer_func_voidstruct*, vt100net_errorstruct* );
+	};
+			/* The direct return indicates success or failure, nothing else. */
+			/*  Positive for success, negative for failure. */
+	typedef
+		int (*vt100net_termbuffer_func)
+		(
+			vt100net_termbuffer_generic*,
+			
+				/* Essentially a set of arguments. Treat it sort of like */
+				/*  a printf() formator string. Names are defined below */
+				/*  by vt100net_termbuffer_NAMECOMMAND(), but you could */
+				/*  always add your own... */
+				/* Warning, commands may require the addition of arguments! */
+				/* Note that space-separated arguments FOLLOWED by a */
+				/*  command (so, RPN style) should be what you universally */
+				/*  use, due to ease of parsing. If spaces might be needed */
+				/*  INSIDE an argument or command, then enclose in a */
+				/*  C-style string (e.g. with double-quotes). This is NOT */
+				/*  the place for a complex parser. */
+			libandria4_char_pascalarray*,
+			
+				/* A generic return vector for actual data (as opposed to */
+				/*  a success/failure signal). */
+			void*
+		);
+		/* Fetches the contents of a "bounded box". Requires a pointer to a */
+		/*  vt100net_termbuffer_func_uint8receiver instance, and the area */
+		/*  must be represented as a space-seperated decimal-encoded list */
+		/*  of left-x upper-y fetch-width fetch-height encoded as the FRONT */
+		/*  (for FORTH-ish RPN convenience) of the command pstr. */
+	vt100net_termbuffer_NAMECOMMAND( outername, "fetch" );
+	... /* TO BE CONTINUED! We need more commands. */
+	
+	struct vt100net_termbuffer_generic
+	{
+			/* Measured in character cells, not in e.g. pixels, or inches. */
+		uint32_t width, height;
+		
+		libandria4_memfuncs_t *mfuncs;
+		
+		vt100net_bytebuffer_pascalarray *buf;
+	};
+	
+	
+	
 	/* The actual terminal parsing system. */
 	
 			/* Note that when this is designated as a "new state", it */
@@ -216,6 +283,9 @@ SOFTWARE.
 		uint8_t nstate;
 		
 	};
+		/* If the new state is *_INVALID, then don't change the state; */
+		/*  otherwise change the current state to match the provided */
+		/*  new state. */
 	int (*vt100net_action_handler)( vt100net_termcontext* /*term_ctx*/, uint8_t /*new_state*/ );
 	
 	typedef enum vt100net_termcontext_flags1
@@ -295,15 +365,20 @@ SOFTWARE.
 		} error_values;
 		
 		
+			/* If a high bit of a param is set, then the param or other is */
+			/*  blank. This is the default state. */
 		struct
 		{
 			uint32_t private_marker;
-				/* If the high bit of a param is set, then the param was encountered blank. */
 			uint32_t *intermediates;
 			uint32_t final_character;
 			
 		} sequence_dispatch;
 		uint16_t *params;
+		
+		
+			/* The current state of the buffer. */
+		vt100net_termbuffer_generic *buffer;
 		
 		
 		
@@ -318,6 +393,9 @@ SOFTWARE.
 			/* Access via params[]. */
 		uint16_t parameter_values[ 16 ];
 	};
+	#define vt100net_termcontext_DISPSTACK_LEN ( 1 )
+	#define vt100net_termcontext_INTERMS_LEN ( 3 )
+	#define vt100net_termcontext_PARAMS_LEN ( 16 )
 
 	/* Utility macros. */
 	#define vt100net_termcontext_dispatch_PUSH( ctx, var ) \
