@@ -28,18 +28,35 @@ SOFTWARE.
 
 
 #include "stdhandlers.h"
+#include "stdbuffer.h"
 
 	
 	/* Just ignores the current character */
 int vt100net_actions_ignore( vt100net_termcontext *term_ctx, uint8_t nstate )
 {
-	???
+	if( term_ctx )
+	{
+		if
+		(
+			nstate > vt100net_termcontext_INVALID &&
+			nstate < vt100net_termcontext_STATES__PAST_END
+		)
+		{
+			term_ctx->dispatch = nstate;
+		}
+		
+		return( 1 );
+	}
+	
+	return( -1 );
 }
 	/* Prints the current character, only happens in GROUND (really GROUND_POSTREAD). */
 	/* Must modify glyph in accordance with current char mappings & shift states. */
 	/*  ASCII 0x20 & 0x7F have somewhat special behavior. */
 int vt100net_actions_print( vt100net_termcontext *term_ctx, uint8_t nstate )
 {
+	???
+	/* It is time to start building the frame buffer. */
 	???
 }
 	/* Perform a C0 or C1 control function. */
@@ -51,7 +68,34 @@ int vt100net_actions_execute( vt100net_termcontext *term_ctx, uint8_t nstate )
 	/*  parameters. Happens entering ESCAPE, CSI_ENTRY, and DCS_ENTRY. */
 int vt100net_actions_clear( vt100net_termcontext *term_ctx, uint8_t nstate )
 {
-	???
+	if( term_ctx )
+	{
+		int loop;
+		
+		term_ctx->sequence_dispatch.private_marker = ( ( (uint32_t)1 ) << 31 );
+		
+		loop = 0;
+		while( loop < vt100net_termcontext_INTERMS_LEN )
+		{
+			term_ctx->sequence_dispatch.intermediates[ loop ] = ( ( (uint32_t)1 ) << 31 );
+			
+			loop += 1;
+		}
+		
+		term_ctx->sequence_dispatch.final_character = ( ( (uint32_t)1 ) << 31 );
+		
+		loop = 0;
+		while( loop < vt100net_termcontext_PARAMS_LEN )
+		{
+			term_ctx->params[ loop ] = ( ( (uint32_t)1 ) << 15 );
+			
+			loop += 1;
+		}
+		
+		return( vt100net_actions_ignore( term_ctx, nstate ) );
+	}
+	
+	return( -1 );
 }
 	/* Store private marker or intermediate character for use when a "final" */
 	/*  character arrives. X3.64 defined control sequences with one intermediate, */
