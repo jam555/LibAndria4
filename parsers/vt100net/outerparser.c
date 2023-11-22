@@ -34,45 +34,18 @@ SOFTWARE.
 
 
 
-int vt100net_report_parser_error( vt100net_termcontext *term_ctx, uint32_t *report_type_member )
-{
-	VT100NET_BUILDERRORSTRUCT_SIMPLETYPE_FUNCNAME( funcname, __func__ );
-		VT100NET_BUILDERRORSTRUCT_SIMPLETYPE(
-			&funcname,
-			no_errrep_func,
-			"FATAL: The vt100net_termcontext error reporting func is directly missing."
-		);
-		VT100NET_BUILDERRORSTRUCT_SIMPLETYPE(
-			&funcname,
-			no_errrep_func2,
-			"FATAL: The vt100net_termcontext error reporting func is indirectly missing."
-		);
-	
-	if( term_ctx && report_type_member )
+#define VT100NET_REPORT_ERR_INNER( val ) return( -5 );
+#define VT100NET_REPORT_ERR( ctx, rep_type_mmbr_ptr, filename, linenum )
 	{
-		if( !( term_ctx->errrec.func ) )
-		{
-			term_ctx->res = (intmax_t)&( no_errrep_func.type.typeid );
-			return( -2 );
-		}
-		if( !( *( term_ctx->errrec.func ) ) )
-		{
-			term_ctx->res = (intmax_t)&( no_errrep_func2.type.typeid );
-			return( -3 );
-		}
-		
-		int res = ( *( term_ctx->erreec.func ) )( &( term_ctx->erreec ), (void*)report_type_member );
-		if( !res )
-		{
-			term_ctx->res = res;
-			return( -4 );
-		}
-		
-		return( 1 );
+		libandria4_error_mayerr VT100NET_REPORT_ERR_res = libandria4_error_print
+			(
+				( ctx )->errrep,
+					(libandria4_error_basalstruct*)rep_type_mmbr_ptr,
+					( linenum ),
+					( filename )
+			);
+		LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( VT100NET_REPORT_ERR_res,  VT100NET_REPORT_ERR_INNER );
 	}
-	
-	return( -1 );
-}
 
 
 

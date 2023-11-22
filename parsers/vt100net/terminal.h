@@ -31,7 +31,7 @@ SOFTWARE.
 	
 	
 	#include "../../basic/commonerr.h"
-	#include "../../basic/stdbuffer.h"
+	#include "../../text/stdbuffer.h"
 	
 	
 	
@@ -250,6 +250,7 @@ SOFTWARE.
 			/*  current configuration requires. These functions are used */
 			/*  so the vt100 parser can provide meaningfull error messages. */
 		vt100net_termcontext_IOhook errrec, errdec, in, out;
+		libandria4_commonio_handle *errrep;
 		vt100net_termcontext_chartype_hooks type_tests;
 		
 		intmax_t res;
