@@ -118,8 +118,16 @@ SOFTWARE.
 		( ( !( (var).is_b ) ) \
 			? ( matcha( (var).val.a ) ) \
 			: ( matchb( (var).val.b ) ) )
-	/* No particular point in having a "chaining" version, so there isn't */
-	/*  one. */
+		/* Chaining doesn't make much sense without a type change; usually */
+		/*  a maybe monad is the correct choice. */
+	#define LIBANDRIA4_MONAD_EITHER_EXPRCHAIN( var, matcha, buildalt ) \
+		( !( ( var ).is_b ) \
+			? ( matcha( (var).val.a ) ) \
+			: ( buildalt( (var).val.b ) ) )
+		/* Unlike for maybe, the signature should match exprmatch, so */
+		/*  we just wrap it. */
+	#define LIBANDRIA4_MONAD_EITHER_REDUCE( var,  reducea, reduceb ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var,  reducea, reduceb )
 	
 		/* Convenience wrappers. Intended to convert between differing */
 		/*  *_EITHER_* wrappers, when the return of one function returning */
@@ -131,6 +139,10 @@ SOFTWARE.
 	#define LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( name, typeb, val ) \
 		return( LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( \
 			name, typeb, ( (typeb)( val ) ) ) );
+	#define LIBANDRIA4_MONAD_EITHER_RETURN_A( name, typea, val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( name, typea, val )
+	#define LIBANDRIA4_MONAD_EITHER_RETURN_B( name, typeb, val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( name, typeb, val )
 	
 #endif
 /* End libandria4 basic monads.h */
