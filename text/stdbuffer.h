@@ -34,6 +34,7 @@ SOFTWARE.
 		/* The nearly omniversal utility header... */
 	#include "../basic/pascalarray.h"
 	#include "../basic/pascalstring.h"
+	#include "../basic/commonio.h"
 		/* This include shouldn't be needed, but let's not delete it just */
 		/*  yet... */
 	/* include "termninal.h" */
@@ -45,61 +46,6 @@ SOFTWARE.
 	LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE( libandria4_bytebuffer_, uint8_t );
 	
 	typedef struct libandria4_termbuffer_generic libandria4_termbuffer_generic;
-	
-	#define libandria4_termbuffer_NAMECOMMAND( outername, str ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_STATICBUILD_NONULL( \
-			outername, text, libandria4_bytebuffer_, uint8_t, str )
-	
-		/* The variations on void struct are defined in stdbuffer.h */
-	typedef struct libandria4_termbuffer_func_voidstruct libandria4_termbuffer_func_voidstruct;
-	struct libandria4_termbuffer_func_voidstruct
-	{
-		uint32_t typeid;
-		
-			/* Because we obviously will want this, it's standard. */
-		int (*err)( libandria4_termbuffer_func_voidstruct*, vt100net_errorstruct* );
-	};
-			/* The direct return indicates success or failure, nothing else. */
-			/*  Positive for success, negative for failure. */
-	typedef
-		int (*libandria4_termbuffer_func)
-		(
-			libandria4_termbuffer_generic*,
-			
-				/* Essentially a set of arguments. Treat it sort of like */
-				/*  a printf() formator string. Names are defined below */
-				/*  by vt100net_termbuffer_NAMECOMMAND(), but you could */
-				/*  always add your own... */
-				/* Warning, commands may require the addition of arguments! */
-				/* Note that space-separated arguments FOLLOWED by a */
-				/*  command (so, RPN style) should be what you universally */
-				/*  use, due to ease of parsing. If spaces might be needed */
-				/*  INSIDE an argument or command, then enclose in a */
-				/*  C-style string (e.g. with double-quotes). This is NOT */
-				/*  the place for a complex parser. */
-			libandria4_char_pascalarray*,
-			
-				/* A generic return vector for actual data (as opposed to */
-				/*  a success/failure signal). */
-			void*
-		);
-		/* Fetches the contents of a "bounded box". Requires a pointer to a */
-		/*  vt100net_termbuffer_func_uint8receiver instance, and the area */
-		/*  must be represented as a space-seperated decimal-encoded list */
-		/*  of left-x upper-y fetch-width fetch-height encoded as the FRONT */
-		/*  (for FORTH-ish RPN convenience) of the command pstr. */
-	libandria4_termbuffer_NAMECOMMAND( outername, "fetch" );
-	... /* TO BE CONTINUED! We need more commands. */
-	
-	struct libandria4_termbuffer_generic
-	{
-			/* Measured in character cells, not in e.g. pixels, or inches. */
-		uint32_t width, height;
-		
-		libandria4_memfuncs_t *mfuncs;
-		
-		libandria4_bytebuffer_pascalarray *buf;
-	};
 	
 	
 	
@@ -133,16 +79,47 @@ SOFTWARE.
 	
 	
 	
-	/* Remember: vt100net_termbuffer_func_voidstruct{} is defined in */
-	/*  terminal.h */
-	
-	typedef struct libandria4_termbuffer_func_uint8receiver
+	struct libandria4_termbuffer_generic
 	{
-		libandria4_termbuffer_func_voidstruct header;
+			/* Measured in character cells, not in e.g. pixels, or inches. */
+		uint32_t width, height;
+		libandria4_bytebuffer_pascalarray *buf;
 		
-		int (*func)( libandria4_termbuffer_func_uint8receiver*, uint8_t );
+		libandria4_memfuncs_t *mfuncs;
+		libandria4_commonio_handle *messaging;
+	};
+	
+	typedef struct libandria4_termbuffer_func_receiver
+	{
+		uintptr_t id;
 		
-	} libandria4_termbuffer_func_uint8receiver;
+		int (*func)
+			(
+				libandria4_termbuffer_func_receiver*,
+					uint32_t /* width aka x */, uint32_t /* height aka y */,
+					libandria4_buffercell_common
+			);
+		
+	} libandria4_termbuffer_func_receiver;
+	
+	int libandria4_termbuffer_fetchcell
+	(
+		libandria4_termbuffer_generic *term,
+			uint32_t x, uint32_t y,
+			libandria4_termbuffer_func_receiver *ret
+	);
+	int libandria4_termbuffer_fetchblock
+	(
+		libandria4_termbuffer_generic *term,
+			uint32_t x, uint32_t y,  uint32_t w, uint32_t h,
+			libandria4_termbuffer_func_receiver *ret
+	);
+	
+	int libandria4_termbuffer_resize
+	(
+		libandria4_termbuffer_generic *term,
+			uint32_t new_w, uint32_t new_h
+	);
 	
 #endif
 /* End libandria4 text stdbuffer.h */
