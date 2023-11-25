@@ -69,21 +69,34 @@ SOFTWARE.
 	/* Note: this is ABSOLUTELY expected to be just 64 bits in size. If it */
 	/*  isn't, then add some compiler pragmas. */
 	
-		/* Another convenience type. */
-	typedef union
+	
+	
+	typedef (*libandria4_termbuffer_generic_setter)
+		(
+			libandria4_termbuffer_generic*,
+				uint32_t /* x */, uint32_t /* y */,
+				libandria4_termbuffer_func_receiver
+		);
+	typedef (*libandria4_termbuffer_generic_resizer)
+		(
+			libandria4_termbuffer_generic*,
+				uint32_t /* new_w */, uint32_t /* new_h */
+		);
+	typedef struct libandria4_termbuffer_generic_vtab
 	{
-		uint8_t bytes[ LIBANDRIA4_FLEXARRAY_FILLERLENGTH ];
-		libandria4_buffercell_common cells[ LIBANDRIA4_FLEXARRAY_FILLERLENGTH ];
+		libandria4_termbuffer_generic_setter setcell;
+		libandria4_termbuffer_generic_setter setblock;
 		
-	} libandria4_buffercell_common_accessor;
-	
-	
+		libandria4_termbuffer_generic_resizer resize;
+		
+	} libandria4_termbuffer_generic_vtab;
 	
 	struct libandria4_termbuffer_generic
 	{
+		libandria4_termbuffer_generic_vtab *funcs;
+		
 			/* Measured in character cells, not in e.g. pixels, or inches. */
 		uint32_t width, height;
-		libandria4_bytebuffer_pascalarray *buf;
 		
 		libandria4_memfuncs_t *mfuncs;
 		libandria4_commonio_handle *messaging;
@@ -102,22 +115,25 @@ SOFTWARE.
 		
 	} libandria4_termbuffer_func_receiver;
 	
-	int libandria4_termbuffer_fetchcell
+	
+	extern libandria4_termbuffer_generic_vtab libandria4_termbuffer_common_vtab;
+	
+	int libandria4_termbuffer_common_setcell
 	(
-		libandria4_termbuffer_generic *term,
+		libandria4_termbuffer_generic *term_,
 			uint32_t x, uint32_t y,
-			libandria4_termbuffer_func_receiver *ret
+			libandria4_buffercell_common val
 	);
-	int libandria4_termbuffer_fetchblock
+	int libandria4_termbuffer_common_setblock
 	(
-		libandria4_termbuffer_generic *term,
+		libandria4_termbuffer_generic *term_,
 			uint32_t x, uint32_t y,  uint32_t w, uint32_t h,
-			libandria4_termbuffer_func_receiver *ret
+			libandria4_buffercell_common *vals
 	);
 	
-	int libandria4_termbuffer_resize
+	int libandria4_termbuffer_common_resize
 	(
-		libandria4_termbuffer_generic *term,
+		libandria4_termbuffer_generic *term_,
 			uint32_t new_w, uint32_t new_h
 	);
 	
