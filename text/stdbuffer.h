@@ -134,7 +134,8 @@ SOFTWARE.
 	int libandria4_termbuffer_common_resize
 	(
 		libandria4_termbuffer_generic *term_,
-			uint32_t new_w, uint32_t new_h
+			uint32_t new_w, uint32_t new_h,
+			libandria4_buffercell_common fill
 	);
 	
 #endif

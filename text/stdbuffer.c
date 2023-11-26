@@ -191,19 +191,82 @@ int libandria4_termbuffer_common_setblock
 int libandria4_termbuffer_common_resize
 (
 	libandria4_termbuffer_generic *term_,
-		uint32_t new_w, uint32_t new_h
+		uint32_t new_w, uint32_t new_h,
+		libandria4_buffercell_common fill
 )
 {
 	if( term_ )
 	{
+		
 		libandria4_termbuffer_common *term;
 		if( !validate_termbuffer_common( term_,  &term ) )
 		{
 			return( -2 );
 		}
 		
-		???
-			libandria4_bytebuffer_pascalarray *new_arr = ;
+		libandria4_bytebuffer_pascalarray_result res1 =
+			libandria4_bytebuffer_pascalarray_build
+			(
+				term_->mfuncs,
+				sizeof( libandria4_buffercell_common ) * new_w * new_h
+			);
+		
+#define libandria4_termbuffer_common_resize_ONERR3( ... ) return( -3 );
+		libandria4_bytebuffer_pascalarray *a;
+		LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
+			res,
+				LIBANDRIA4_OP_SETa,
+				libandria4_termbuffer_common_resize_ONERR1
+		)
+		
+		libandria4_buffercell_common_accessor *src, *dest, val;
+		if( !align_buffercell_accessor ( term,  &src ) )
+		{
+			return( -4 );
+		}
+		{
+			libandria4_bytebuffer_pascalarray *tmp = a;
+			a = term->buf;
+			term->buf = tmp;
+		}
+		if( !align_buffercell_accessor ( term,  &dest ) )
+		{
+			return( -5 );
+		}
+		
+		size_t h_ = 0, w_;
+		while( h_ < new_h )
+		{
+			w_ = 0;
+			
+			while( w_ < new_w )
+			{
+				if( h_ < term_->height && w_ < term_->width )
+				{
+					val = src->cells[ h_ * term_->width + w_ ];
+					
+				} else {
+					
+					val = fill;
+				}
+				
+				dest->cells[ h_ * term_->width + w_ ] = val;
+				
+				++w_;
+			}
+			
+			++h_;
+		}
+		
+		term_->height = new_h;
+		term_->width = new_w;
+		
+		libandria4_result res2 =
+			libandria4_bytebuffer_pascalarray_destroy
+			(
+				term_->mfuncs,
+				a
+			);
 		???
 		
 		return( 1 );
