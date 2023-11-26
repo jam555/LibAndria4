@@ -27,6 +27,8 @@ SOFTWARE.
 */
 
 
+#include "../basic/simpleops.h"
+#include "../basic/nulls.h"
 #include "stdbuffer.h"
 
 typedef struct libandria4_termbuffer_common
@@ -192,7 +194,8 @@ int libandria4_termbuffer_common_resize
 (
 	libandria4_termbuffer_generic *term_,
 		uint32_t new_w, uint32_t new_h,
-		libandria4_buffercell_common fill
+		libandria4_buffercell_common fill,
+		int keep_old
 )
 {
 	if( term_ )
@@ -214,9 +217,9 @@ int libandria4_termbuffer_common_resize
 #define libandria4_termbuffer_common_resize_ONERR3( ... ) return( -3 );
 		libandria4_bytebuffer_pascalarray *a;
 		LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
-			res,
+			res1,
 				LIBANDRIA4_OP_SETa,
-				libandria4_termbuffer_common_resize_ONERR1
+				libandria4_termbuffer_common_resize_ONERR3
 		)
 		
 		libandria4_buffercell_common_accessor *src, *dest, val;
@@ -241,7 +244,7 @@ int libandria4_termbuffer_common_resize
 			
 			while( w_ < new_w )
 			{
-				if( h_ < term_->height && w_ < term_->width )
+				if( keep_old > 0 && h_ < term_->height && w_ < term_->width )
 				{
 					val = src->cells[ h_ * term_->width + w_ ];
 					
@@ -261,37 +264,24 @@ int libandria4_termbuffer_common_resize
 		term_->height = new_h;
 		term_->width = new_w;
 		
+#define libandria4_termbuffer_common_resize_ONERR6( ... ) return( -6 );
 		libandria4_result res2 =
 			libandria4_bytebuffer_pascalarray_destroy
 			(
 				term_->mfuncs,
 				a
 			);
-		???
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH(
+			res2,
+				LIBANDRIA4_NULL_MACRO,
+				libandria4_termbuffer_common_resize_ONERR6
+		)
 		
 		return( 1 );
 	}
 	
 	return( -1 );
 }
-	struct libandria4_termbuffer_generic
-	{
-		libandria4_termbuffer_generic_vtab *funcs;
-		
-			/* Measured in character cells, not in e.g. pixels, or inches. */
-		uint32_t width, height;
-		
-		libandria4_memfuncs_t *mfuncs;
-		libandria4_commonio_handle *messaging;
-	};
-	typedef struct libandria4_termbuffer_common
-	{
-		libandria4_termbuffer_generic common;
-		
-			/* Measured in character cells, not in e.g. pixels, or inches. */
-		libandria4_bytebuffer_pascalarray *buf;
-		
-	} libandria4_termbuffer_common;
 
 
 
