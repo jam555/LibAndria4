@@ -202,7 +202,8 @@ SOFTWARE.
 				{ visitor( data, &( parr->body[ l++ ] ) ); } } }
 	
 	
-	
+	#error "LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE() uses parrtype without receiving it!"
+		/* ... Uh... where is parrtype coming from? */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( head, type ) \
 			/* *init(), *build(), & *rebuild() all store len into the array. */ \
