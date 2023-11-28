@@ -29,6 +29,8 @@ SOFTWARE.
 #ifndef LIBANDRIA4_TEXT_STDBUFFER_H
 # define LIBANDRIA4_TEXT_STDBUFFER_H
 	
+	/* For a default implementation, look in commonbuffer.h/.c */
+	
 	#include "../basic/commonmacros.h"
 	#include "../basic/stdmem.h"
 		/* The nearly omniversal utility header... */

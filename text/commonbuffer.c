@@ -30,23 +30,7 @@ SOFTWARE.
 #include "../basic/simpleops.h"
 #include "../basic/nulls.h"
 #include "stdbuffer.h"
-
-typedef struct libandria4_termbuffer_common
-{
-	libandria4_termbuffer_generic common;
-	
-		/* Measured in character cells, not in e.g. pixels, or inches. */
-	libandria4_bytebuffer_pascalarray *buf;
-	
-} libandria4_termbuffer_common;
-
-	/* Another convenience type. */
-typedef union
-{
-	uint8_t bytes[ LIBANDRIA4_FLEXARRAY_FILLERLENGTH ];
-	libandria4_buffercell_common cells[ LIBANDRIA4_FLEXARRAY_FILLERLENGTH ];
-	
-} libandria4_buffercell_common_accessor;
+#include "commonbuffer.h"
 
 
 
