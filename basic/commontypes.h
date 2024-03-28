@@ -37,5 +37,53 @@ SOFTWARE.
 		typedef ssize_t libandria4_ssize;
 	#endif
 	
+	
+	
+	#include "../basic/monads.h"
+	
+	/* Positive errors are always untranslatable characters, negative are */
+	/*  function-dependant errors. Unicode is expected for *_monadicchar32{}, */
+	/*  so only 22 bit character values, thus posing no overflow risks. */
+	
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE( libandria4_common_monadicchar8, char, int32_t );
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE( libandria4_common_monadicchar32, uint32_t, int32_t );
+	
+	/* These produce the actual values. */
+	#define libandria4_common_monadicchar8_BUILDSUCC( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_common_monadicchar8, uint8_t, val )
+	#define libandria4_common_monadicchar8_BUILDERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_common_monadicchar8, int32_t, val )
+	/* Convenience wrappers. */
+	#define libandria4_common_monadicchar8_RETURNSUCC( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_common_monadicchar8, uint8_t, val )
+	#define libandria4_common_monadicchar8_RETURNERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_common_monadicchar8, int32_t, val )
+	
+	/* These produce the actual values. */
+	#define libandria4_common_monadicchar32_BUILDSUCC( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_common_monadicchar32, uint32_t, val )
+	#define libandria4_common_monadicchar32_BUILDERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_common_monadicchar32, int32_t, val )
+	/* Convenience wrappers. */
+	#define libandria4_common_monadicchar32_RETURNSUCC( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_common_monadicchar32, uint32_t, val )
+	#define libandria4_common_monadicchar32_RETURNERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_common_monadicchar32, int32_t, val )
+	
+	/* These defines are generic, usable both for all the */
+	/*  *_monadicchar*{} types, and any other types derived by */
+	/*  LIBANDRIA4_MONAD_EITHER_BUILDTYPE(). The *BODY* version */
+	/*  takes statements, *EXPR* takes expressions and produces */
+	/*  an expression. */
+	#define libandria4_common_monadicchar_BODYMATCH( var, onsucc, onerr ) \
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, onsucc, onerr )
+	#define libandria4_common_monadicchar_EXPRMATCH( var, onsucc, onerr) \
+		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, onsucc, onerr )
+		/* Chaining doesn't make much sense without a type change; usually */
+		/*  a maybe monad is the correct choice. */
+	#define libandria4_common_monadicchar_EXPRCHAIN( var, onsucc, builderr ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRCHAIN( var, onsucc, builderr )
+	/* Note: If you need reduce(), then just wrap *_EXPRMATCH(). */
+	
 #endif
 /* End libandria4 basic commontypes.h */

@@ -107,6 +107,7 @@ SOFTWARE.
 		/* Note: len gets stored UNALTERED into the pascal array. If you use */
 		/*  it as an index directly, then it will point you past the legal */
 		/*  end of the array. */
+		/* Note that if len is 0, then NO allocation will be performed. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_BUILD( head, parrtype, type ) \
 		parrtype##_result head##pascalarray_build \
 		( libandria4_memfuncs_t *mf,  size_t len ) \
