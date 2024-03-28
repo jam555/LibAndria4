@@ -32,6 +32,8 @@ SOFTWARE.
 	
 	#include "../../basic/commonerr.h"
 	#include "../../text/stdbuffer.h"
+	#include "../../basic/pascalarray.h"
+	#include "../../text/charsettranslators.h"
 	
 	
 	
@@ -40,12 +42,18 @@ SOFTWARE.
 	typedef struct vt100net_errorstruct vt100net_errorstruct;
 	typedef struct vt100net_errorstruct_simple vt100net_errorstruct_simple;
 	
-	typedef struct vt100net_termcontext_IOhook;
+	typedef struct vt100net_termcontext_IOhook vt100net_termcontext_IOhook;
 	
 	typedef struct vt100net_termcontext_chartype_hooks vt100net_termcontext_chartype_hooks;
 	
 	typedef struct vt100net_handler_mapping vt100net_handler_mapping;
 	typedef struct vt100net_termcontext vt100net_termcontext;
+	
+		/* Defines vt100net_uint8_pascalarray{} and */
+		/*  vt100net_uint8arr_pascalarray{}. */
+		/* Convert these into a full bit vector & bit surface implementation. */
+	LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( vt100net_uint8_, uint8_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( vt100net_uint8arr_, vt100net_uint8_pascalarray* );
 	
 	
 	
@@ -103,7 +111,7 @@ SOFTWARE.
 	
 	
 	/* A character-type testing system. Currently unused, but will be */
-	/*  vital (and probably need a little expansion) for e.g. Uincode */
+	/*  vital (and probably need a little expansion) for e.g. Unicode */
 	/*  support. */
 	
 	#define vt100net_termcontext_chartype_INVALIDLEN ( -1 )
@@ -128,6 +136,17 @@ SOFTWARE.
 	typedef int (vt100net_termcontext_chartype_funcptr*)( vt100net_termcontext_chartype_hooks*, uint32_t /* The character. */ );
 	struct vt100net_termcontext_chartype_hooks
 	{
+			/* Input translates characters that will be stored into */
+			/*  vt100net_termcontext->acc_char. Output translates */
+			/*  characters being sent from the vt100net_termcontext{} */
+			/*  towards the source of the characters that are given to */
+			/*  input. The 1/2 difference is SI vs SO. */
+			/* TODO: We need to actually use these. Just move over to */
+			/*  the terminal using Unicode internally by definition */
+			/*  afterwards? */
+		libandria4_text_charsettranslators_fptr output1, output2;
+		libandria4_text_charsettranslators_fptr input1, input2;
+		
 		union
 		{
 			void *vdat;
@@ -179,13 +198,13 @@ SOFTWARE.
 		uint8_t handler_index;
 		uint8_t nstate;
 		
-	};
+	} vt100net_handler_mapping;
 		/* If the new state is *_INVALID, then don't change the state; */
 		/*  otherwise change the current state to match the provided */
 		/*  new state. */
 	int (*vt100net_action_handler)( vt100net_termcontext* /*term_ctx*/, uint8_t /*new_state*/ );
 	
-	typedef enum vt100net_termcontext_flags1
+	typedef enum
 	{
 			/* Not real flags, just markers. */
 		vt100net_termcontext_flags1_INVALID = -1,
@@ -207,7 +226,120 @@ SOFTWARE.
 		
 			/* Not a real flag, just another marker. */
 		vt100net_termcontext_flags1_LAST
-	};
+		
+	} vt100net_termcontext_flags1;
+	typedef enum
+	{
+			/* Not real flags, just markers. */
+		vt100net_termcontext_flags2_INVALID = -1,
+		vt100net_termcontext_flags2_NULL = 0,
+		
+			/* Allow the terminal emulator instance that the *_termcontext{} */
+			/*  is embedded in, to (at least theoretically) send */
+			/*  communications back to whatever other software is the source */
+			/*  of the character stream that this *_termcontext{} is parsing. */
+		vt100net_termcontext_flags2_allowbacktalk = 1,
+			/* In order to respond, "back talk" must be allowed. If backtalk */
+			/*  isn't enabled, then just leave this set as a marker until */
+			/*  either backtalk IS allowed, or the software just exits or */
+			/*  something. */
+			/* Clear this when and ONLY when the enclosing terminal emulator */
+			/*  actually sends a response. */
+		vt100net_termcontext_flags2_responseneeded = 2,
+			/* Like "response needed", but only toggled by this */
+			/*  *_termcontext{}, not by the enclosing terminal emulator */
+			/*  instance (except when first creating the *_termcontext{}). */
+		vt100net_termcontext_flags2_responsepersistent = 4,
+		
+			/* Not a real flag, just another marker. */
+		vt100net_termcontext_flags2_LAST
+		
+	} vt100net_termcontext_flags2;
+	typedef enum
+	{
+			/* Not real flags, just markers. */
+		vt100net_termcontext_flags3_INVALID = -1,
+		vt100net_termcontext_flags3_NULL = 0,
+		
+			/* The SPD system affects cursor progression, and was originally */
+			/*  intended for languages like Hebrew, or traditionally written */
+			/*  Japanese, that DO NOT follow the same left-to-right */
+			/*  progression as English. Some people don't think they've ever */
+			/*  been used, but I see no particular reason not to... WITHIN */
+			/*  SOME BOUNDS. */
+		vt100net_termcontext_flags3_SPDbase = 1,
+		vt100net_termcontext_flags3_SPDmask = 3,
+			/* The actual values. Note that the values still need to be */
+			/*  verified. */
+		vt100net_termcontext_flags3_SPDrightward = 0,
+		vt100net_termcontext_flags3_SPDdownward = 1,
+		vt100net_termcontext_flags3_SPDleftward = 2,
+		vt100net_termcontext_flags3_SPDupward = 3,
+		
+		/* TODO: */
+		/* The ECMA JFY and Fraktur (SGR 20) flags/equivalents should be */
+		/*  looked at to see if they can reasonably be done. */
+		/* VT-52 compat & double high/wide text are rarely implemented. */
+		/* Color extensions are normally supported, but at most an "allow" */
+		/*  flag belongs here, as color is a per-character thing. */
+		/* Common cursor display: <ESC>"[?25h" */
+		/*  And hide it: <ESC>"[?25l" */
+		/* Cannonical mode doesn't send characters until the user hits */
+		/*  enter, raw mode sends characters as they're sent. The */
+		/*  differentiation doesn't really belong here (this is meant */
+		/*  to handle things coming TO the terminal, not sent FROM the */
+		/*  terminal), but cannonical mode IS the correct default, and */
+		/*  mentioning it here is appropriate (especially since the */
+		/*  sending code hasn't been started on yet, and the controlling */
+		/*  code would be in this receiving code). */
+		/* Echo vs non-echo mode is in almost the same camp as cannonical */
+		/*  mode. */
+		/* Cursors: */
+			/* Block: */
+				/* blinking: <ESC>"[0"<SPACE>"q" or <ESC>"[1"<SPACE>"q" */
+				/* steady: <ESC>"[2"<SPACE>"q" */
+			/* Underline: */
+				/* blinking: <ESC>"[3"<SPACE>"q" */
+				/* steady: <ESC>"[4"<SPACE>"q" */
+			/* I-beam: */
+				/* blinking: <ESC>"[5"<SPACE>"q" */
+				/* steady: <ESC>"[6"<SPACE>"q" */
+			
+		
+			/* Not a real flag, just another marker. */
+		vt100net_termcontext_flags3_LAST
+		
+	} vt100net_termcontext_flags3;
+	typedef enum
+	{
+			/* Not real flags, just markers. */
+		vt100net_termcontext_vt100flags_INVALID = -1,
+		vt100net_termcontext_vt100flags_NULL = 0,
+		
+			/* If clear, origin is upper-left of all characters, and cursor may be */
+			/*  placed outside the margins. If set, origin is upper-left position */
+			/*  within the margins, and cursor CANNOT be placed outside the margins. */
+		vt100net_termcontext_vt100flags_originmode = 1,
+			/* These two are tracked, but characteristically will be NO-OPs. */
+		vt100net_termcontext_vt100flags_smoothscrollmode = 2, /* DECSCLM */
+		vt100net_termcontext_vt100flags_interlacemode = 4, /* DECINLM */
+			/* Swaps the foreground & background colors for the entire terminal */
+			/*  screen. This can only be implemented by the rendering code, which */
+			/*  isn't currently being worked on. */
+		vt100net_termcontext_vt100flags_screeninversionmode = 8, /* DECSCNM */
+			/* Allows writes to the right margin to move the cursor to the first */
+			/*  character of the next line for the next write. */
+		vt100net_termcontext_vt100flags_autowrapmode = 16, /* DECAWM */
+		
+			/* Not a real flag, just another marker. */
+		vt100net_termcontext_vt100flags_LAST
+		
+	} vt100net_termcontext_vt100flags;
+	typedef struct vt100net_termcontext_point
+	{
+		uint32_t x, y;
+		
+	} vt100net_termcontext_point;
 	struct vt100net_termcontext
 	{
 			/* Initialized by vt100net_termcontext_INITIAL_ENTRY. Looping */
@@ -215,6 +347,9 @@ SOFTWARE.
 		int run;
 		
 		vt100net_termcontext_flags1 flags1;
+		vt100net_termcontext_flags2 owner_flags;
+		vt100net_termcontext_flags3 flags3;
+		vt100net_termcontext_vt100flags vt100_flags;
 		
 		
 			/* The call stack, we don't need too much space. */
@@ -274,14 +409,96 @@ SOFTWARE.
 			
 		} sequence_dispatch;
 		uint16_t *params;
+		size_t interm_count, param_count;
 		
 		
 			/* The current state of the buffer. */
-		vt100net_termbuffer_generic *buffer;
+			/* Note that many terminals have an "alternate" buffer that's */
+			/*  used for Text UI apps. It's activated with <ESC>"[?1049h", */
+			/*  and sometimes (but buggily) with <ESC>"47h". To reverse */
+			/*  this, use <ESC>"[?1049l". After activation and before */
+			/*  deactivation, <ESC>"[2J" (to clear both screen and scrollback) */
+			/*  should be issued. */
+		libandria4_termbuffer_generic *buffer;
+			/* Currently gets used as a fill character. */
+		libandria4_buffercell_common buffer_flags;
+			/* To set the cursor position, use ‹ESC›"[(r);(c)H", where (r) */
+			/*  is the row as an index (NOT an offset!), and {c} is the */
+			/*  column (also an index). */
+			/* Note that dimensions.x was previously .width, and .y was .height. */
+		vt100net_termcontext_point cursor, dimensions;
+		struct
+		{
+				/* Scrolling ONLY happens at and between these lines. Remember, */
+				/*  "1" indexing instead of "0" offsetting. */
+				/* Lines moved outside of the scrolling region are simply lost, */
+				/*  their contents are NOT backed up anywhere. Top and bottom */
+				/*  must always be different values, thereby ensuring AT LEAST */
+				/*  two scrolling lines. Characters that are genuinely ADDED */
+				/*  OUTSIDE the scrolling region don't cause scrolling: this is */
+				/*  useful for e.g. updating status bars. */
+				/*
+					To put the cursor outside the scrolling region:
+						make certain that DECOM is on "reset", and use cursor
+						position (CUP) or horizontal and vertical position (HVP)
+					To scroll:
+						Use "Index", "Reverse Index",  "Next Line", OR:
+							set "Autowrap Mode", position the cursor on the
+							lower-right margin, and send a displayable character-
+							the scroll will be triggered, and the character placed
+							in the first available column on that line.
+				*/
+				/* By default, the scrolling region is the whole screen. You */
+				/*  have to set it if you want something else. */
+				/* We eventually will want flags that indicate if these */
+				/*  individually are absolute positions, or relative. */ 
+			uint32_t top, bottom;
+			
+		} scrolling_region;
+			/* A bit mask of horizontal tab stops. ->surf.len must be => */
+			/*  line count, ->surf.body is an array of ->surf.len size */
+			/*  and type vt100net_uint8_pascalarray*. Both ->width and */
+			/*  all ->surf.body[]->len * 8 values must be => column count. */
+			/*  Each character position in vt100net_termcontext.buffer */
+			/*  corresponds to the bit at: */
+				/* htabstops->surf.body[ line ]-> */
+				/*  body[ ( column - ( column % 8 ) ) / 8 ] & */
+				/*  ( 1 << ( column % 8 ) ) */
+			/*  If the bit is set, then that position is a horizontal tab */
+			/*  stop, otherwise it isn't. */
+			/* For convenience, use these two functions for access: */
+				/* int libandria4_bitsurface_read( surface*, x, y ) */
+				/* int libandria4_bitsurface_write( surface*, x, y, value ) */
+		libandria4_bitsurface *htabstops;
+			/* A bit set of per-line double-width and double-height flags. */
+			/*  For double-width flag line*4, for double-height flags */
+			/*  (line*4)+1 and (line*4)+2. */
+		libandria4_bitarray *charasizes;
+		
+		
+			/* These are the various pieces of data saved by the VT100 */
+			/*  terminal DECSC control sequence. The character set, cursor */
+			/*  position, and graphic rendition (color, font, etc.) need */
+			/*  to be saved. */
+		struct
+		{
+				/* Mostly important for the .input and .output members, but */
+				/*  the tests are worth remembering too. */
+			vt100net_termcontext_chartype_hooks charhooks;
+			
+				/* Cursor position. */
+			vt100net_termcontext_point cursor;
+				/* Graphic rendition. Only .r, .g,.b, and .style are fully */
+				/*  used, .chara is only used in the bits set in */
+				/*  libandria4_buffercell_common_chara_CHARSET_mask. */
+			libandria4_buffercell_common graphrend;
+			
+		} vt100_curssaves;
 		
 		
 		
-		/* The members below should always stay near the bottom, and never be accessed directly, in case of future resizing. */
+		/* The members below should always stay near the bottom, and never */
+		/*  be accessed directly, in case of future resizing. */
 		
 			/* Use callstack[]. */
 		uint8_t dispatchstack[ 1 ];

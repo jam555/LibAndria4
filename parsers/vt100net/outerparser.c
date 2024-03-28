@@ -34,6 +34,7 @@ SOFTWARE.
 
 
 
+#error "Replace the code below with stuff from basic/commonerr.h"
 #define VT100NET_REPORT_ERR_INNER( val ) return( -5 );
 #define VT100NET_REPORT_ERR( ctx, rep_type_mmbr_ptr, filename, linenum )
 	{
@@ -47,6 +48,16 @@ SOFTWARE.
 		LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( VT100NET_REPORT_ERR_res,  VT100NET_REPORT_ERR_INNER );
 	}
 
+
+
+/* !!!WARNING!!! The macros used below as */
+/*  VT100NET_BUILDERRORSTRUCT_SIMPLETYPE_FUNCNAME() and */
+/*  VT100NET_BUILDERRORSTRUCT_SIMPLETYPE() seem to have been */
+/*  renamed as LIBANDRIA4_ERROR_BUILDFUNCNAME_SIMPLESTRUCT() */
+/*  and LIBANDRIA4_ERROR_BUILD_SIMPLESTRUCT() in */
+/*  ../../basic/commonerr.h without the ew names being used */
+/*  in this file! */
+/* TODO FIXME : Fix the error described in the warning above. */
 
 
 /* The actual parser itself. Note that parsers for e.g. escape codes aren't */
