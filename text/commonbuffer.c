@@ -34,30 +34,35 @@ SOFTWARE.
 
 
 
-static int validate_termbuffer_common( libandria4_termbuffer_common *term_,  libandria4_termbuffer_common **term_2 )
+int libandria4_termbuffer_validatecommon
+(
+	libandria4_termbuffer_generic *term,
+	libandria4_termbuffer_common **term2
+)
 {
 	if( term )
 	{
-		if( term_->funcs != &libandria4_termbuffer_common_vtab )
+		if( term->funcs != &libandria4_termbuffer_common_vtab )
 		{
 			return( -2 );
 		}
 		
-		libandria4_termbuffer_common *term =
+		libandria4_termbuffer_common *term3 =
 			(libandria4_termbuffer_common*)
 			(
-				(char*)term_ +
+				(char*)term +
 				(
 					(char*)( &( ( (libandria4_termbuffer_common*)0 )->common ) ) -
 					(char*)( (libandria4_termbuffer_common*)0 )
 				)
 			);
-		if( term_2 )
+		if( term2 )
 		{
-			*term_2 = term;
+			*term2 = term3;
 		}
-		if( !( term->buf ) )
+		if( !( term3->buf ) )
 		{
+				/* We managed the conversion, but the buffer isn't setup right. */
 			return( -4 );
 		}
 		
@@ -66,7 +71,7 @@ static int validate_termbuffer_common( libandria4_termbuffer_common *term_,  lib
 	
 	return( -1 );
 }
-static int align_buffercell_accessor
+int libandria4_align_buffercell_accessor
 (
 	libandria4_termbuffer_common *term,
 	
@@ -94,6 +99,25 @@ static int align_buffercell_accessor
 	
 	return( -1 );
 }
+int libandria4_align_buffercell_calcoffset
+(
+	libandria4_termbuffer_common *term,
+		uint32_t x, uint32_t y,
+		uint32_t *off
+)
+{
+	if( term && off )
+	{
+		*off = x + ( y * term->start_off ) + term->common.width;
+		*off %= term->common.width * term->common.height;
+		
+		return( 1 );
+	}
+	
+	return( -1 );
+}
+
+
 
 int libandria4_termbuffer_common_setcell
 (
@@ -105,7 +129,7 @@ int libandria4_termbuffer_common_setcell
 	if( term )
 	{
 		libandria4_termbuffer_common *term;
-		if( !validate_termbuffer_common( term_,  &term ) )
+		if( !libandria4_termbuffer_validatecommon( term_,  &term ) )
 		{
 			return( -2 );
 		}
@@ -115,12 +139,17 @@ int libandria4_termbuffer_common_setcell
 		}
 		
 		libandria4_buffercell_common_accessor *acc;
-		if( !align_buffercell_accessor ( term,  &acc ) )
+		if( !libandria4_align_buffercell_accessor( term,  &acc ) )
 		{
 			return( -4 );
 		}
 		
-		acc->cells[ y * term_->width + x ] = val;
+		uint32_t elem;
+		if( !libandria4_align_buffercell_calcoffset( term,  x, y,  &elem ) )
+		{
+			return( -5 );
+		}
+		acc->cells[ elem ] = val;
 		
 		return( 1 );
 	}
@@ -137,7 +166,7 @@ int libandria4_termbuffer_common_setblock
 	if( term_ && vals )
 	{
 		libandria4_termbuffer_common *term;
-		if( !validate_termbuffer_common( term_,  &term ) )
+		if( !libandria4_termbuffer_validatecommon( term_,  &term ) )
 		{
 			return( -2 );
 		}
@@ -147,20 +176,24 @@ int libandria4_termbuffer_common_setblock
 		}
 		
 		libandria4_buffercell_common_accessor *acc;
-		if( !align_buffercell_accessor ( term,  &acc ) )
+		if( !libandria4_align_buffercell_accessor( term,  &acc ) )
 		{
 			return( -4 );
 		}
 		
 		size_t h_ = 0, w_;
+		uint32_t elem;
 		while( h_ < h )
 		{
 			w_ = 0;
 			
 			while( w_ < w )
 			{
-				acc->cells[ ( h_ + y ) * term_->width + ( w_ + x ) ] =
-					val[ h_ * w + w_ ];
+				if( !libandria4_align_buffercell_calcoffset( term,  x + w_, y + h_,  &elem ) )
+				{
+					return( -5 );
+				}
+				acc->cells[ elem ] = val[ h_ * w + w_ ];
 				
 				++w_;
 			}
@@ -186,7 +219,7 @@ int libandria4_termbuffer_common_resize
 	{
 		
 		libandria4_termbuffer_common *term;
-		if( !validate_termbuffer_common( term_,  &term ) )
+		if( !libandria4_termbuffer_validatecommon( term_,  &term ) )
 		{
 			return( -2 );
 		}
@@ -207,7 +240,7 @@ int libandria4_termbuffer_common_resize
 		)
 		
 		libandria4_buffercell_common_accessor *src, *dest, val;
-		if( !align_buffercell_accessor ( term,  &src ) )
+		if( !libandria4_align_buffercell_accessor( term,  &src ) )
 		{
 			return( -4 );
 		}
@@ -216,12 +249,13 @@ int libandria4_termbuffer_common_resize
 			a = term->buf;
 			term->buf = tmp;
 		}
-		if( !align_buffercell_accessor ( term,  &dest ) )
+		if( !libandria4_align_buffercell_accessor( term,  &dest ) )
 		{
 			return( -5 );
 		}
 		
 		size_t h_ = 0, w_;
+		uint32_t elem;
 		while( h_ < new_h )
 		{
 			w_ = 0;
@@ -230,7 +264,11 @@ int libandria4_termbuffer_common_resize
 			{
 				if( keep_old > 0 && h_ < term_->height && w_ < term_->width )
 				{
-					val = src->cells[ h_ * term_->width + w_ ];
+					if( !libandria4_align_buffercell_calcoffset( term,  w_, h_,  &elem ) )
+					{
+						return( -6 );
+					}
+					val = src->cells[ elem ];
 					
 				} else {
 					
@@ -248,7 +286,7 @@ int libandria4_termbuffer_common_resize
 		term_->height = new_h;
 		term_->width = new_w;
 		
-#define libandria4_termbuffer_common_resize_ONERR6( ... ) return( -6 );
+#define libandria4_termbuffer_common_resize_ONERR6( ... ) return( -7 );
 		libandria4_result res2 =
 			libandria4_bytebuffer_pascalarray_destroy
 			(
@@ -267,8 +305,177 @@ int libandria4_termbuffer_common_resize
 	return( -1 );
 }
 
+int libandria4_termbuffer_common_scroll
+(
+	libandria4_termbuffer_generic *term_,
+		libandria4_termbuffer_directions dir,
+		libandria4_buffercell_common fill
+		uint32_t x, uint32_t y,
+		uint32_t w, uint32_t h
+)
+{
+	if( term_ )
+	{
+		if
+		(
+			!(
+				dir > libandria4_termbuffer_directions_invalid &&
+				dir < libandria4_termbuffer_directions_pastmax
+			)
+		)
+		{
+			return( -2 );
+		}
+		if( !( dir < libandria4_termbuffer_directions_islineend ) )
+		{
+			return( -3 );
+		}
+		if( !( w == term_->width && x == 0 && y + h <= term_->height ) )
+		{
+			return( -4 );
+		}
+		
+		if
+		(
+			dir == libandria4_termbuffer_directions_right ||
+			dir == libandria4_termbuffer_directions_left ||
+			h < 1
+		)
+		{
+			return( 0 );
+		}
+		
+		libandria4_termbuffer_common *term;
+		if( !libandria4_termbuffer_validatecommon( term_,  &term ) )
+		{
+			return( -5 );
+		}
+		libandria4_buffercell_common_accessor *acc;
+		if( !libandria4_align_buffercell_accessor( term,  &acc ) )
+		{
+			return( -6 );
+		}
+		
+		uint32_t elem;
+		if( h == term_->height )
+		{
+			/* Full-screen scrolling. */
+			/*  The fast option: just shift around ->start_off instead of moving character cells. */
+			
+			if( dir == libandria4_termbuffer_directions_up )
+			{
+				if( term->start_off <= 0 )
+				{
+					term->start_off == term_->height;
+					if( term->start_off )
+					{
+						term->start_off -= 1;
+					}
+					
+				} else {
+					
+					--( term->start_off );
+				}
+				
+					/* Set which line we're clearing. */
+				h = 0;
+				
+			} else if( dir == libandria4_termbuffer_directions_down )
+			{
+				if( term_->height <= term->start_off )
+				{
+					term->start_off = 0;
+					
+				} else {
+					
+					++( term->start_off );
+				}
+				
+					/* Set which line we're clearing. */
+				h = term_->height - 1;
+			}
+			
+		} else {
+			
+			/* Partial-screen scrolling. */
+			/* This is the slow option, we have to move a lot of characters. */
+			
+			int res;
+			size_t h_ = 0;
+			if( dir == libandria4_termbuffer_directions_up )
+			{
+				h_ = h;
+				while( h_ > 1 )
+				{
+					--h_;
+					
+					if( !libandria4_align_buffercell_calcoffset( term,  x, y + ( h_ - 1 ),  &elem ) )
+					{
+						return( -7 );
+					}
+					
+					res =
+						libandria4_termbuffer_common_setblock
+						(
+							term_,
+							x, y + h_,  w, 1,
+							
+							&( acc->cells[ elem ] )
+						);
+				}
+				
+					/* Set which line we're clearing. */
+				h = y;
+				
+			} else if( dir == libandria4_termbuffer_directions_down )
+			{
+				h_ = 0;
+				while( h_ + 1 < h )
+				{
+					if( !libandria4_align_buffercell_calcoffset( term,  x, y + 1 + h_,  &elem ) )
+					{
+						return( -8 );
+					}
+					
+					res =
+						libandria4_termbuffer_common_setblock
+						(
+							term_,
+							x, y + h_,  w, 1,
+							
+							&( acc->cells[ elem ] )
+						);
+					
+					++h_;
+				}
+				
+					/* Set which line we're clearing. */
+				h = y + ( h - 1 );
+			}
+		}
+		
+			/* Clear the newly blank line. */
+		uint32_t loop = 0;
+		while( loop < term_->width )
+		{
+			if( !libandria4_align_buffercell_calcoffset( term,  loop, h,  &elem ) )
+			{
+				return( -9 );
+			}
+			acc->cells[ elem ] = fill;
+			
+			++loop;
+		}
+		
+		return( 1 );
+	}
+	
+	return( -1 );
+}
 
 
+
+#error "TODO: finish populating libandria4_termbuffer_common_vtab{} in commonbuffer.c"
 libandria4_termbuffer_generic_vtab libandria4_termbuffer_common_vtab =
 	{
 		&libandria4_termbuffer_common_setcell,
