@@ -500,7 +500,7 @@ int vt100net_actionstool_SGR
 
 
 
-	
+
 int vt100net_actionstool_execute
 (
 	vt100net_termcontext *term_ctx,

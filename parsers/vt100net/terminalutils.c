@@ -26,8 +26,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "terminalutils.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+
 #include "../../basic/commonerr.h"
+#include "../../text/stdbuffer.h"
+#include "../../basic/bitarray.h"
+#include "../../text/charsettranslators.h"
+#include "terminalutils.h"
 
 /*
 TODO:
@@ -777,6 +784,7 @@ int vt100net_actionstool_execute
 		uint16_t params[ vt100net_actionstool_execute_PARAMCOUNT ];
 		int res = 0;
 		
+			/* TODO: Do we even use this anywhere? */
 		while( param_count > res && vt100net_actionstool_execute_PARAMCOUNT < res )
 		{
 			params[ res ] = params_[ res ];
@@ -1777,6 +1785,7 @@ int vt100net_actionstool_linedown
 	{
 			/* Note: VERY WRONG. The ACTUAL direction should depend on SPD, */
 			/*  and thus be configurable. Still, this will do for now. */
+			/* Note to self: doesn't adding *_calcdir() obsolete the comment above? */
 		return
 		(
 			vt100net_actionstool_itercursor
@@ -1825,6 +1834,8 @@ int vt100net_actionstool_columnhome
 	{
 			/* Note: VERY WRONG. The ACTUAL direction should depend on SPD, */
 			/*  and thus be configurable. Still, this will do for now. */
+			/* Note: calcdir() probably obsoletes the above message, but */
+			/*  also probably needs special handling for *_isCR. */
 		return
 		(
 			vt100net_actionstool_itercursor
