@@ -39,6 +39,8 @@ SOFTWARE.
 	#include "nulls.h"
 	
 	
+	#define LIBANDRIA4_OP_UNARYIDENTITY( val ) (val)
+	
 		/* These are somewhat "special": they're used when you need to embed */
 		/*  a "set" operation via macro. You can always define more of these */
 		/*  if needed. Try not to though. */
