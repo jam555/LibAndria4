@@ -72,6 +72,9 @@ SOFTWARE.
 		( libandria4_commonio_seekable* )
 	);
 	
+	/* Do I even use these macros anywhere? They may need to be moved */
+	/*  to the bottom and added to documentation. */
+	
 	#define LIBANDRIA4_COMMONIO_MAYERR_JUSTERRABLE( val ) \
 		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_commonio_mayerrable, ( libandria4_commonio_errorable* ), val )
 	#define LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERRABLE( ... ) \
@@ -86,6 +89,8 @@ SOFTWARE.
 	#define LIBANDRIA4_COMMONIO_MAYERR_NOSEEKABLE() \
 		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayseek, ( libandria4_commonio_seekable* ) )
 	
+	
+	/* Function pointers for the various stream I/O operations. */
 	
 	typedef
 		libandria4_commonio_eithgeneric
@@ -192,18 +197,6 @@ SOFTWARE.
 		libandria4_commonio_genericfunc close;
 	};
 	
-		/* Provides single-byte-only unget capabilities. */
-	typedef struct libandria4_commonio_istream_ungetwrapper_vtable
-	{
-		libandria4_commonio_istream here;
-		libandria4_commonio_istream *is;
-		
-		libandria4_commonio_maybyte buffer;
-		
-	} libandria4_commonio_istream_ungetwrapper;
-	
-	
-	
 		/* Welcome to the NEW libandria4_commonio_handle{} system. I */
 		/*  have no idea why I did it the previous way. */
 	typedef enum
@@ -276,6 +269,44 @@ SOFTWARE.
 		libandria4_commonio_eithgeneric libandria4_commonio_handle_CLOSE( hptr )
 	*/
 	
+	
+	
+	/*************************************************************/
+	/*************************************************************/
+	/** Common implementations, for cases where it's practical. **/
+	/*************************************************************/
+	/*************************************************************/
+	
+		/* Uses ->putc() to implement puts_s(). */
+	libandria4_commonio_eithgeneric libandria4_commonio_common_puts_s
+	(
+		libandria4_commonio_handle *io,
+			libandria4_commonio_byte *str, size_t len
+	);
+	
+		/* Provides single-byte-only unget capabilities. */
+	typedef struct libandria4_commonio_istream_ungetwrapper_vtable
+	{
+		libandria4_commonio_istream here;
+		libandria4_commonio_istream *is;
+		
+		libandria4_commonio_maybyte buffer;
+		
+	} libandria4_commonio_istream_ungetwrapper;
+	
+	
+	
+	
+	
+	/************************************************************/
+	/************************************************************/
+	/** Everything below here is meant for implementation, try **/
+	/**  to depend on the documentation above. ******************/
+	/************************************************************/
+	/************************************************************/
+	
+	/* This function and two macros are used "internally" to this header, */
+	/*  but aren't necessarily BAD to use elsewhere. */
 	int libandria4_commonio_handle_verifydispatch( libandria4_commonio_handle* );
 	#define libandria4_commonio_handle_BODYMATCH( var,  fullhand, inhand, outhand,  badhand ) \
 		if( libandria4_commonio_handle_verifydispatch( &( var ) ) ) { \
@@ -301,6 +332,18 @@ SOFTWARE.
 						) : ( \
 							(badhand)( (var).dispatch, &(var) ) ) ) ) \
 			) : ( (badhand)( libandria4_commonio_handle_vtabtype_invalid, &(var) ) ) )
+	
+	
+	
+	/*********************************************************************************/
+	/*********************************************************************************/
+	/** Here begin the convenience macros for calls to libandria4_commonio_handle*. **/
+	/**  Note that the macros are inherently messy by virtue of being macros, so *****/
+	/**  you should default to refering to the documentation a bit further up. Only **/
+	/**  depend on the code if you actually need to. *********************************/
+	/*********************************************************************************/
+	/*********************************************************************************/
+	
 	
 		#define libandria4_commonio_handle_FLUSH_HELPER1( hptr, vtptr ) ( (vtptr)->flush( (hptr) ) )
 		#define libandria4_commonio_handle_FLUSH_HELPER2( type, hptr ) ( \
@@ -530,16 +573,6 @@ SOFTWARE.
 						libandria4_commonio_handle_CLOSE_HELPER1, \
 						libandria4_commonio_handle_CLOSE_HELPER2 ) : \
 					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
-	
-	
-	
-	/* Common implementations, for cases where it's practical. */
-		/* Uses ->putc() to implement puts_s(). */
-	libandria4_commonio_eithgeneric libandria4_commonio_common_puts_s
-	(
-		libandria4_commonio_handle *io,
-			libandria4_commonio_byte *str, size_t len
-	);
 	
 #endif
 /* End libandria4 text stream.h */
