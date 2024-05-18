@@ -30,6 +30,8 @@ SOFTWARE.
 # define LIBANDRIA4_BASIC_SIMPLEOPS_H
 	
 	
+	#include "simpleruntimeops.h"
+	
 		/* For LIBANDRIA4_RETURN_* macros. */
 	#include "arraccess.h"
 		/* Mostly for true/false defines. */
@@ -49,6 +51,30 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETc( val ) ( c = (val) )
 	#define LIBANDRIA4_OP_SETd( val ) ( d = (val) )
 	#define LIBANDRIA4_OP_SETe( val ) ( e = (val) )
+	
+	#define LIBANDRIA4_OP_SETaTOn1( ... ) ( a = -1 )
+	#define LIBANDRIA4_OP_SETbTOn1( ... ) ( b = -1 )
+	#define LIBANDRIA4_OP_SETcTOn1( ... ) ( c = -1 )
+	#define LIBANDRIA4_OP_SETdTOn1( ... ) ( d = -1 )
+	#define LIBANDRIA4_OP_SETeTOn1( ... ) ( e = -1 )
+	
+	#define LIBANDRIA4_OP_SETaTO0( ... ) ( a = 0 )
+	#define LIBANDRIA4_OP_SETbTO0( ... ) ( b = 0 )
+	#define LIBANDRIA4_OP_SETcTO0( ... ) ( c = 0 )
+	#define LIBANDRIA4_OP_SETdTO0( ... ) ( d = 0 )
+	#define LIBANDRIA4_OP_SETeTO0( ... ) ( e = 0 )
+	
+	#define LIBANDRIA4_OP_SETaTO1( ... ) ( a = 1 )
+	#define LIBANDRIA4_OP_SETbTO1( ... ) ( b = 1 )
+	#define LIBANDRIA4_OP_SETcTO1( ... ) ( c = 1 )
+	#define LIBANDRIA4_OP_SETdTO1( ... ) ( d = 1 )
+	#define LIBANDRIA4_OP_SETeTO1( ... ) ( e = 1 )
+	
+	#define LIBANDRIA4_OP_SETaTO2( ... ) ( a = 2 )
+	#define LIBANDRIA4_OP_SETbTO2( ... ) ( b = 2 )
+	#define LIBANDRIA4_OP_SETcTO2( ... ) ( c = 2 )
+	#define LIBANDRIA4_OP_SETdTO2( ... ) ( d = 2 )
+	#define LIBANDRIA4_OP_SETeTO2( ... ) ( e = 2 )
 	
 	
 	#define LIBANDRIA4_OP_RETURNVAL_n1() return( -1 )
@@ -75,6 +101,39 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_RETURNVAL_1024() return( 1024 )
 	#define LIBANDRIA4_OP_RETURNVAL_1k() return( 1024 )
 	#define LIBANDRIA4_OP_RETURNVAL_1K() return( 1024 )
+	
+	
+		/* Reserved: LIBANDRIA4_OP_runable1 MUST be equivalent to a function */
+		/*  pointer, and LIBANDRIA4_OP_runabledata1 MUST be equivalent to a */
+		/*  pointer that it can take as it's first argument. Depending on */
+		/*  your usage case, it CAN accept any variety of other arguments, */
+		/*  and/or return any type. If The pointer is NULL, then the value */
+		/*  of the variable named after *_ELSE will be returned instead of */
+		/*  invoking the function pointer. */
+	#define LIBANDRIA4_OP_RUNifABLE1_ELSEa( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)( LIBANDRIA4_OP_runabledata1, __VA_ARGS__ ) : a )
+	#define LIBANDRIA4_OP_RUNifABLE1_ELSEb( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)( LIBANDRIA4_OP_runabledata1, __VA_ARGS__ ) : b )
+	#define LIBANDRIA4_OP_RUNifABLE1_ELSEc( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)( LIBANDRIA4_OP_runabledata1, __VA_ARGS__ ) : c )
+	#define LIBANDRIA4_OP_RUNifABLE1_ELSEd( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)( LIBANDRIA4_OP_runabledata1, __VA_ARGS__ ) : d )
+	#define LIBANDRIA4_OP_RUNifABLE1_ELSEe( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)( LIBANDRIA4_OP_runabledata1, __VA_ARGS__ ) : e )
+	
+	/* The definitions below are as above, but the hook names have their */
+	/*  contained number swapped to match the relevant macro. */
+	#define LIBANDRIA4_OP_RUNifABLE2_ELSEa( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)( LIBANDRIA4_OP_runabledata2, __VA_ARGS__ ) : a )
+	#define LIBANDRIA4_OP_RUNifABLE2_ELSEb( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)( LIBANDRIA4_OP_runabledata2, __VA_ARGS__ ) : b )
+	#define LIBANDRIA4_OP_RUNifABLE2_ELSEc( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)( LIBANDRIA4_OP_runabledata2, __VA_ARGS__ ) : c )
+	#define LIBANDRIA4_OP_RUNifABLE2_ELSEd( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)( LIBANDRIA4_OP_runabledata2, __VA_ARGS__ ) : d )
+	#define LIBANDRIA4_OP_RUNifABLE2_ELSEe( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)( LIBANDRIA4_OP_runabledata2, __VA_ARGS__ ) : e )
+	
 	
 	
 	#define LIBANDRIA4_STRINGIFY( a ) LIBANDRIA4_INNER_STRINGIFY( a )

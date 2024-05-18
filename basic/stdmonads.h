@@ -37,6 +37,10 @@ SOFTWARE.
 	#include "monads.h"
 	#include "commonerrvals.h"
 	
+		/* Some OTHER standard monads, that are plain maybe wrappers for */
+		/*  standard C types. */
+	#include "stdmaybes.h"
+	
 	
 	
 	/* These are intended to allow success & failure to be encoded via type, */
