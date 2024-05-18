@@ -272,6 +272,7 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type )
 		
 		
+		/* This needs to be paired with a LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE() invocation. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type,  &libandria4_stdmemfuncs )
 	

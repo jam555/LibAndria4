@@ -29,6 +29,8 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_ARRTOOLS_H
 # define LIBANDRIA4_BASIC_ARRTOOLS_H
 	
+	/* Note: The comment below is old, since it references forset.h... */
+	
 	/* ... Perhaps you were looking for strsnarrs.h instead? Or perhaps for */
 	/*  forset.h is more to your interest? These tools only work on things */
 	/*  formatted like a __VA_ARGS__ array. */
