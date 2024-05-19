@@ -252,5 +252,13 @@ SOFTWARE.
 	);
 	int libandria4_commonio_utility_putint( libandria4_commonio_handle *io,  int i );
 	
+	
+	
+	typedef struct libandria4_FILE_handle
+	{
+		FILE *f;
+		uintptr_t ref_count;
+	};
+	
 #endif
 /* End libandria4 basic commonio.h */
