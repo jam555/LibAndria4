@@ -28,24 +28,170 @@ SOFTWARE.
 
 
 
+#include <stdio.h>
+
+#include "???/monads.h"
+
+
+
 /* Note: rewrite things a bit so that the aux data in the refcounter type */
 /*  is specifically a virtual table that implements various I/O functions, */
 /*  including deletion. Also, the bi-tuplic monad should be used to allow */
 /*  various operations to swap refcounter pointers in and out for e.g. */
 /*  composite streams, iterators over text ropes, etc. */
 	
+	typedef struct libandria4_FILE_substream_vtable libandria4_FILE_substream_vtable;
+	
+	
 		/* libandria4_FILE_handle{} probably never had any users, */
 		/*  but just in case there were, it's now named */
 		/*  libandria4_FILE_tracker{}. */
-	LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL( libandria4_FILE_tracker, FILE* );
+	LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL( libandria4_FILE_tracker, libandria4_FILE_substream_vtable* );
 		/* We want to just use malloc() & friends. */
 		/* The ondie handler is vitally important, and needs to interplay with */
 		/*  the rest of this system. See libandria4_FILE_tracker_initialize()'s */
 		/*  note. */
-	??? LIBANDRIA4_MONAD_REFPOINTER_COMMONIMPLEMENTATION( libandria4_FILE_tracker, FILE*,  ondie ) ???
-	typedef libandria4_FILE_tracker_counttype libandria4_FILE_file;
+	??? LIBANDRIA4_MONAD_REFPOINTER_COMMONIMPLEMENTATION( libandria4_FILE_tracker, libandria4_FILE_substream_vtable*,  ondie ) ???
+		/* libandria4_FILE_substream used to be named libandria4_FILE_file. */
+	typedef libandria4_FILE_tracker_counttype libandria4_FILE_substream;
 	
-		/* Complete? */
+		/* EOF is 0, because EOF isn't really an error, and ( error * 0 ) */
+		/*  should obviously be no error at all. */
+	typedef uintptr_t libandria4_newstreams_err;
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_newstreams_result1,
+			size_t,
+			libandria4_newstreams_err
+	);
+	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
+		libandria4_newstreams_result2,
+			libandria4_newstreams_err
+	);
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_newstreams_result3,
+			char,
+			libandria4_newstreams_err
+	);
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_newstreams_result4,
+			intmax_t,
+			libandria4_newstreams_err
+	);
+	
+	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
+		libandria4_newstreams_bituplic1,
+			libandria4_newstreams_result1,
+			libandria4_FILE_substream*
+	);
+	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
+		libandria4_newstreams_bituplic2,
+			libandria4_newstreams_result2,
+			libandria4_FILE_substream*
+	);
+	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
+		libandria4_newstreams_bituplic3,
+			libandria4_newstreams_result3,
+			libandria4_FILE_substream*
+	);
+	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
+		libandria4_newstreams_bituplic4,
+			libandria4_newstreams_result4,
+			libandria4_FILE_substream*
+	);
+	
+	
+	
+	/* Things that won't be supported: */
+		/* Directories */
+			/* That's another layer's job. */
+		/* char* setlocale (int category, const char* locale); */
+			/* Need three wrappers, two providing default behaviors ("C" verses system-current). */
+		/* string.h */
+			/* Need LOTS of wrappers. */
+		/*
+				void* bsearch
+				(
+					const void* key, const void* base,
+					size_t num, size_t size,
+					int (*compar)(const void*,const void*)
+				);
+			and
+				void qsort
+				(
+					void* base, size_t num, size_t size,
+					int (*compar)(const void*,const void*)
+				);
+		*/
+			/* Only noted because I need to make a wrapper... elsewhere. */
+		/*
+				char* asctime( const struct tm * timeptr );
+			and
+				char* ctime( const time_t * timer );
+			and
+				size_t strftime( char* ptr, size_t maxsize, const char* format,  const struct tm* timeptr );
+		*/
+			/* Only noted because I need to make a wrapper... elsewhere. */
+		/* char* getenv (const char* name); */
+			/* Only noted because I need to make a wrapper... elsewhere. */
+		/* FILE * fopen ( const char * filename, const char * mode ); */
+			/* That's another layer's job. */
+		/* int remove ( const char * filename ); */
+			/* That's another layer's job. */
+		/* int rename ( const char * oldname, const char * newname ); */
+			/* That's another layer's job. */
+		/* FILE * tmpfile ( void ); */
+			/* That's another layer's job. */
+		/* char * tmpnam ( char * str ); */
+			/* That's another layer's job. */
+		/* void setbuf ( FILE * stream, char * buffer ); & friend(s). */
+			/* "Somebody else's problem", aka "make the caller do it". */
+		/* int ungetc ( int character, FILE * stream ); */
+			/* As setbuf(), but probably a wrapper in specific. */
+	struct libandria4_FILE_substream_vtable
+	{
+		/* printf() will be supported by discrete external function: it's a big job, */
+		/*  and should only been done once. Same for scanf(). */
+		
+		int (*is_eof)( void* /* FILE* */ );
+			/* If there isn't an error, then it MIGHT still indicate eof. */
+		libandria4_newstreams_result2 (*error)( void* /* FILE* */ );
+		
+		libandria4_newstreams_bituplic2 (*clearerr)( void* /* FILE* */ );
+		
+		
+		libandria4_newstreams_bituplic4 (*tell)( void* /* FILE* */, intmax_t, int /* Reference point. */ );
+		libandria4_newstreams_bituplic2 (*seek)( void* /* FILE* */, intmax_t, int /* Reference point. */ );
+		
+		libandria4_newstreams_bituplic2 (*reopen)( void* /* FILE* */,  /* char* name */, /* char* mode */ );
+		libandria4_newstreams_bituplic2 (*rewind)( void* /* FILE* */ );
+		
+		libandria4_newstreams_bituplic2 (*flush)( void* /* FILE* */ );
+		
+		
+		libandria4_newstreams_bituplic3 (*get_c)( void* /* FILE* */ );
+		libandria4_newstreams_bituplic1 (*put_c)( void* /* FILE* */, char );
+		
+		libandria4_newstreams_bituplic1
+			(*get_s)
+			( void* /* FILE* */, /* pascalarray< char >* */, size_t /* offset */ );
+		libandria4_newstreams_bituplic1
+			(*put_s)
+			( void* /* FILE* */, /* pascalarray< char >* */, size_t /* offset */ );
+		
+		libandria4_newstreams_bituplic1
+			(*block_read)
+			( void* /* FILE* */, void* /* buffer */, size_t size, size_t count );
+		libandria4_newstreams_bituplic1
+			(*block_write)
+			( void* /* FILE* */, void* /* buffer */, size_t size, size_t count );
+		
+		libandria4_newstreams_bituplic2 (*close)( void* /* FILE* */ );
+	};
+	static libandria4_FILE_substream_vtable lib4_FILE_vtab = { ??? };
+	
+	
+	
+		/* Complete. Note that THE POINTER ITSELF is null. */
 	int libandria4_FILE_tracker_initialize_null( libandria4_FILE_tracker *trk )
 	{
 		if( trk )
@@ -73,7 +219,7 @@ SOFTWARE.
 			static void *auxdata = (void*)0;
 			
 			LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT(
-				libandria4_FILE_tracker, *trk, f, auxdata,
+				libandria4_FILE_tracker, *trk, &lib4_FILE_vtab, (void*)f,
 				libandria4_FILE_tracker_initialize_ONFULL,
 				libandria4_FILE_tracker_initialize_BADALLOC, badalloc_data );
 			

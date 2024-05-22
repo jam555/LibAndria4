@@ -146,6 +146,75 @@ SOFTWARE.
 	
 	
 	
+	/* Either, but with three types instead of one! Also, the name is a pun. */
+	
+		/* This should ALSO be specialized for packing purposes. */
+		/* This should probably do the "struct type type;" thing directly... */
+	#define LIBANDRIA4_MONAD_TRIETHER_BUILDTYPE_DEFINITION( name, typea, typeb, typec ) \
+		struct name \
+			{ union{ typea a; typeb b;, typec c; } val; \
+				unsigned char val_id; };
+	#define LIBANDRIA4_MONAD_TRIETHER_BUILDTYPE( name, typea, typeb, typec ) \
+		typedef struct name name; \
+		LIBANDRIA4_MONAD_TRIETHER_BUILDTYPE_DEFINITION( name, typea, typeb, typec );
+	
+		/* These produce the actual values. */
+	#define LIBANDRIA4_MONAD_TRIETHER_BUILDLEFT( name, typea, val ) \
+		( (name){ { .a = (typea)( val ) }, 1 } )
+	#define LIBANDRIA4_MONAD_TRIETHER_BUILDCENTER( name, typeb, val ) \
+		( (name){ { .b = (typeb)( val ) }, 2 } )
+	#define LIBANDRIA4_MONAD_TRIETHER_BUILDRIGHT( name, typec, val ) \
+		( (name){ { .c = (typec)( val ) }, 3 } )
+	
+		/* The *BODY* version takes statements, *EXPR* takes expressions. */
+	#define LIBANDRIA4_MONAD_TRIETHER_BODYMATCH( var, matcha, matchb, matchc ) \
+		if( ( (var).val_id == 1 ) ) { \
+			matcha( (var).val.a ); \
+		} else if( ( (var).val_id == 2 ) ) { \
+			matchb( (var).val.b ); \
+		} else { \
+			matchc( (var).val.c ); }
+	#define LIBANDRIA4_MONAD_TRIETHER_EXPRMATCH( var, matcha, matchb, matchc ) \
+		( ( ( (var).val_id == 1 ) \
+			? ( matcha( (var).val.a ) ) \
+			: ( ( (var).val_id == 2 ) \
+				? ( matchb( (var).val.b ) ) \
+				: ( matchc( (var).val.c ) ) ) ) )
+		/* Chaining doesn't make much sense without a type change; usually */
+		/*  a maybe monad is the correct choice. */
+	#define LIBANDRIA4_MONAD_TRIETHER_EXPRCHAIN( var, matcha, buildb, buildc ) \
+		( ( (var).val_id == 1 ) \
+			? ( matcha( (var).val.a ) ) \
+			: ( (var).val_id == 2 ) \
+				? ( buildb( (var).val.b ) ) \
+				: ( buildc( (var).val.c ) ) )
+		/* Unlike for maybe, the signature should match exprmatch, so */
+		/*  we just wrap it. */
+	#define LIBANDRIA4_MONAD_TRIETHER_REDUCE( var,  reducea, reduceb, reducec ) \
+		LIBANDRIA4_MONAD_TRIETHER_EXPRMATCH( var,  reducea, reduceb, reducec )
+	
+		/* Convenience wrappers. Intended to convert between differing */
+		/*  *_EITHER_* wrappers, when the return of one function returning */
+		/*  an either-type can be DIRECTLY derived from an either-type */
+		/*  returned by one of it's own internal calls. */
+	#define LIBANDRIA4_MONAD_TRIETHER_RETURNLEFT( name, typea, val ) \
+		return( LIBANDRIA4_MONAD_TRIETHER_BUILDLEFT( \
+			name, typea, ( (typea)( val ) ) ) );
+	#define LIBANDRIA4_MONAD_TRIETHER_RETURNCENTER( name, typeb, val ) \
+		return( LIBANDRIA4_MONAD_TRIETHER_BUILDCENTER( \
+			name, typeb, ( (typeb)( val ) ) ) );
+	#define LIBANDRIA4_MONAD_TRIETHER_RETURNRIGHT( name, typec, val ) \
+		return( LIBANDRIA4_MONAD_TRIETHER_BUILDRIGHT( \
+			name, typec, ( (typec)( val ) ) ) );
+	#define LIBANDRIA4_MONAD_TRIETHER_RETURN_A( name, typea, val ) \
+		LIBANDRIA4_MONAD_TRIETHER_RETURNLEFT( name, typea, val )
+	#define LIBANDRIA4_MONAD_TRIETHER_RETURN_B( name, typeb, val ) \
+		LIBANDRIA4_MONAD_TRIETHER_RETURNCENTER( name, typeb, val )
+	#define LIBANDRIA4_MONAD_TRIETHER_RETURN_C( name, typec, val ) \
+		LIBANDRIA4_MONAD_TRIETHER_RETURNRIGHT( name, typec, val )
+	
+	
+	
 	/* The bi-tuplic monad is metaphoroically two maybes in a trenchcoat. */
 	
 	#define LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE_DEFINITION( name, typea, typeb ) \
@@ -502,10 +571,6 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDIMPL( \
 			name, valuetype, &libandria4_stdmemfuncs, \
 			onattend, onneglect, ondie )
-	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT( name, var, innerval, aux, memfuncs_ptr,  failinit, badalloc, badata ) \
-		{ name##_counttype * name##_ptr = &( (var).counted ); \
-			LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_EXPRINIT( name##_counttype, name##_ptr, \
-				innerval, aux,  failinit, badalloc, badata ); }
 	
 		/* This needs to be paired with a LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL() */
 		/*  invocation, and the related operation macros. */
