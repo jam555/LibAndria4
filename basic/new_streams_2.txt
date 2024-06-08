@@ -160,10 +160,11 @@ SOFTWARE.
 		libandria4_newstreams_bituplic2 (*clear_err)( void* /* FILE* */ );
 		
 		
-		libandria4_newstreams_bituplic4 (*tell)( void* /* FILE* */, intmax_t, int /* Reference point. */ );
+			/* For "Reference point" use SEEK_SET, SEEK_CUR, or SEEK_END, all from stdio.h */
+		libandria4_newstreams_bituplic4 (*tell)( void* /* FILE* */, int /* Reference point. */ );
 		libandria4_newstreams_bituplic2 (*seek)( void* /* FILE* */, intmax_t, int /* Reference point. */ );
 		
-		libandria4_newstreams_bituplic2 (*reopen)( void* /* FILE* */,  /* char* name */, /* char* mode */ );
+		libandria4_newstreams_bituplic2 (*reopen)( void* /* FILE* */,  char* /* name */, char* /* mode */ );
 		libandria4_newstreams_bituplic2 (*rewind)( void* /* FILE* */ );
 		
 		libandria4_newstreams_bituplic2 (*flush)( void* /* FILE* */ );
@@ -181,14 +182,14 @@ SOFTWARE.
 		
 		libandria4_newstreams_bituplic1
 			(*block_read)
-			( void* /* FILE* */, void* /* buffer */, size_t size, size_t count );
+			( void* /* FILE* */, void* /* buffer */, size_t /* size */, size_t /* count */ );
 		libandria4_newstreams_bituplic1
 			(*block_write)
-			( void* /* FILE* */, void* /* buffer */, size_t size, size_t count );
+			( void* /* FILE* */, void* /* buffer */, size_t /* size */, size_t /* count */ );
 		
 		libandria4_newstreams_bituplic2 (*close)( void* /* FILE* */ );
 	};
-	static libandria4_FILE_substream_vtable lib4_FILE_vtab = { ??? };
+	static libandria4_FILE_substream_vtable lib4_FILE_vtab;
 	
 	
 		/* The ondie handler is vitally important, and needs to interplay with */
@@ -201,7 +202,7 @@ SOFTWARE.
 	#define LIBANDRIA4_NEWSTREAMS_ONDIE( file_p, vtab_p ) \
 		( ( ( vtab_p ) && (vtab_p)->close ) \
 			? (vtab_p)->close( (file_p) ) \
-			: LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH(
+			: LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH( \
 					libandria4_newstreams_bituplic2, \
 						LIBANDRIA4_MONAD_MAYBE_BUILDJUST( \
 								libandria4_newstreams_result2, \
@@ -213,7 +214,7 @@ SOFTWARE.
 						vala, valb \
 				) )
 		/* We want to just use malloc() & friends. */
-	LIBANDRIA4_MONAD_REFPOINTER_COMMONIMPLEMENTATION(
+	LIBANDRIA4_MONAD_REFPOINTER_COMMONIMPL(
 			libandria4_FILE_tracker,
 				libandria4_FILE_substream_vtable*,
 				
@@ -380,14 +381,226 @@ SOFTWARE.
 		
 		return( -1 );
 	}
-	struct libandria4_FILE_substream_vtable
-	{
-		libandria4_newstreams_bituplic2 (*close)( void* /* FILE* */ );
-	};
 	LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL(
 		libandria4_FILE_tracker,
 			libandria4_FILE_substream_vtable*
 	);
+
+
+
+
+
+
+	int libandria4_FILE_tracker_apply
+	(
+		libandria4_FILE_tracker *trk,
+		int *res,
+		
+			/* The argument in the va_list* will be the relevant FILE*. */
+		int (*operation)( void*, va_list* ),
+		void *op_data,
+		
+			/* The argument in the va_list* will be the provided */
+			/*  libandria4_FILE_tracker{} BY VALUE. */
+		int (*on_null)( void*, va_list* ),
+		void *null_data
+	)
+	{
+		if( trk && operation && on_null )
+		{
+				/* The value of "a" just doesn't matter. */
+			int a;
+			libandria4_op_indirfunc_int_voidp_valist_data functor1, functor2;
+			int (*LIBANDRIA4_OP_runable1)( void *dat_, ... ) =
+				&libandria4_op_indirfunc_int_voidp;
+			int (*LIBANDRIA4_OP_runable2)( void *dat_, ... ) =
+				&libandria4_op_indirfunc_int_voidp;
+			void *LIBANDRIA4_OP_runabledata1, *LIBANDRIA4_OP_runabledata2;
+			
+			LIBANDRIA4_OP_runabledata1 = (void*)&functor1;
+			functor1.func = operation;
+			functor1.data = op_data;
+			
+			LIBANDRIA4_OP_runabledata2 = (void*)&functor2;
+			functor2.func = on_null;
+			functor2.data = null_data;
+			
+			
+			int res_ =
+				LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY(
+					*trk,
+						LIBANDRIA4_OP_RUNifABLE1_ELSEa,
+						LIBANDRIA4_OP_RUNifABLE2_ELSEa
+				);
+			if( res )
+			{
+				*res = res_;
+			}
+			
+			
+			return( 1 );
+		}
+		
+		return( -1 );
+	}
+
+
+
+
+
+
+	static int libandria4_FILE_tracker_feof( void *f )
+	{
+		return( feof( (FILE*)f ) );
+	}
+	static libandria4_newstreams_result2 libandria4_FILE_tracker_geterror( void *f )
+	{
+		int res = ferror( (FILE*)f );
+		
+		???
+	}
+	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_clearerr( void *f )
+	{
+		void clearerr( (FILE*)f );
+		
+		???
+	}
+	
+	static libandria4_newstreams_bituplic4 libandria4_FILE_tracker_tell( void* f, int refpt )
+	{
+		if( refpt != SEEK_SET )
+		{
+			???
+		}
+		
+		long ftell( (FILE*)f );
+		
+		???
+	}
+	static libandria4_newstreams_bituplic4 libandria4_FILE_tracker_seek( void* f, intmax_t off, int refpt )
+	{
+		if( off > LONG_MAX )
+		{
+			???
+		}
+		switch( refpt )
+		{
+			case SEEK_SET:   case SEEK_CUR:   case SEEK_END:
+				break;
+			default:
+				???
+		}
+		
+		int fseek( (FILE*)f, off, refpt );
+		
+		???
+	}
+	
+	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_reopen( void* f,  char* name, char* mode )
+	{
+		FILE *freopen( const char *restrict filename, const char *restrict mode,
+               FILE *restrict stream );
+		
+		errno_t freopen_s( FILE *restrict *restrict newstreamptr,
+                   const char *restrict filename, const char *restrict mode,
+                   FILE *restrict stream );
+		
+		???
+	}
+	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_rewind( void* f )
+	{
+		void rewind( (FILE*)f );
+		
+		???
+	}
+	
+	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_flush( void* f )
+	{
+		int fflush( (FILE*)f );
+		
+		???
+	}
+	
+	static libandria4_newstreams_bituplic3 libandria4_FILE_tracker_getc( void* f )
+	{
+		int fgetc( (FILE*)f );
+		
+		???
+	}
+	static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_putc( void* f, char ch )
+	{
+		int fputc( ch, (FILE*)f );
+		
+		???
+	}
+	
+	static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_gets
+		( void* (FILE*), /* pascalarray< char >* */, size_t offset )
+	{
+		/* Read "manually". */
+		
+		???
+	}
+	static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_puts
+		( void* (FILE*), /* pascalarray< char >* */, size_t offset )
+	{
+		/* Write "manually". */
+		
+		???
+	}
+	
+	static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_block_read
+		( void* f, void* buffer, size_t size, size_t count )
+	{
+		size_t fread( buffer, size, count, (FILE*)f );
+		
+		???
+	}
+	static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_block_write
+		( void* f, void* buffer, size_t size, size_t count )
+	{
+		size_t fwrite( buffer, size, count, (FILE*)f );
+		
+		???
+	}
+	
+	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_close( void* f )
+	{
+		int fclose( (FILE*)f );
+		
+		???
+	}
+	static libandria4_FILE_substream_vtable lib4_FILE_vtab =
+	{
+		&libandria4_FILE_tracker_feof,
+			/* If there isn't an error, then it MIGHT still indicate eof. */
+		&libandria4_FILE_tracker_geterror,
+		
+		&libandria4_FILE_tracker_clearerr,
+		
+		
+		&libandria4_FILE_tracker_tell,
+		&libandria4_FILE_tracker_seek,
+		
+		&libandria4_FILE_tracker_reopen,
+		&libandria4_FILE_tracker_rewind,
+		
+		&libandria4_FILE_tracker_flush,
+		
+		
+		&libandria4_FILE_tracker_getc,
+		&libandria4_FILE_tracker_putc,
+		
+		&libandria4_FILE_tracker_gets,
+		&libandria4_FILE_tracker_puts,
+		
+		&libandria4_FILE_tracker_block_read,
+		&libandria4_FILE_tracker_block_write,
+		
+		&libandria4_FILE_tracker_close
+	};
+
+
 
 
 

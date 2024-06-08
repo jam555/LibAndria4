@@ -574,7 +574,7 @@ SOFTWARE.
 	
 		/* This needs to be paired with a LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL() */
 		/*  invocation, and the related operation macros. */
-	#define LIBANDRIA4_MONAD_REFPOINTER_COMMONIMPLEMENTATION( name, valuetype,  ondie ) \
+	#define LIBANDRIA4_MONAD_REFPOINTER_COMMONIMPL( name, valuetype,  ondie ) \
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_STDIMPL( \
 			name, valuetype,  LIBANDRIA4_NULL_MACRO, LIBANDRIA4_NULL_MACRO, ondie )
 	
