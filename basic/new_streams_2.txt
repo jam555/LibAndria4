@@ -39,6 +39,8 @@ SOFTWARE.
 /*  including deletion. Also, the bi-tuplic monad should be used to allow */
 /*  various operations to swap refcounter pointers in and out for e.g. */
 /*  composite streams, iterators over text ropes, etc. */
+/* TODO: */
+	/* Complete libandria4_FILE_tracker_redirect() */
 	
 	typedef struct libandria4_FILE_substream_vtable libandria4_FILE_substream_vtable;
 	
@@ -50,27 +52,9 @@ SOFTWARE.
 			libandria4_FILE_tracker,
 				libandria4_FILE_substream_vtable*
 		);
-		/* The ondie handler is vitally important, and needs to interplay with */
-		/*  the rest of this system. See libandria4_FILE_tracker_initialize()'s */
-		/*  note. */
-		/* Note that we SHOULD give this a better name later. */
-		/* The first argument will be ->aux, the second will be ->data, but */
-		/*  we're storing the FILE pointer in aux and the virtual table in val, */
-		/*  so this is actually correct. */
-	#define LIBANDRIA4_NEWSTREAMS_ONDIE( file_p, vtab_p ) \
-		( vtab_p ) \
-			? (vtab_p)->close( (file_p) ) \
-			: libandria4_newstreams_bituplic2
-		ondie( ( *ptr )->auxiliary, ( *ptr )->val );
-		/* We want to just use malloc() & friends. */
-	LIBANDRIA4_MONAD_REFPOINTER_COMMONIMPLEMENTATION(
-			libandria4_FILE_tracker,
-				libandria4_FILE_substream_vtable*,
-				
-				LIBANDRIA4_NEWSTREAMS_ONDIE
-		);
 		/* libandria4_FILE_substream used to be named libandria4_FILE_file. */
 	typedef libandria4_FILE_tracker_counttype libandria4_FILE_substream;
+	
 	
 		/* EOF is 0, because EOF isn't really an error, and ( error * 0 ) */
 		/*  should obviously be no error at all. */
@@ -207,6 +191,36 @@ SOFTWARE.
 	static libandria4_FILE_substream_vtable lib4_FILE_vtab = { ??? };
 	
 	
+		/* The ondie handler is vitally important, and needs to interplay with */
+		/*  the rest of this system. See libandria4_FILE_tracker_initialize()'s */
+		/*  note. */
+		/* Note that we SHOULD give this a better name later. */
+		/* The first argument will be ->aux, the second will be ->data, but */
+		/*  we're storing the FILE pointer in aux and the virtual table in val, */
+		/*  so this is actually correct. */
+	#define LIBANDRIA4_NEWSTREAMS_ONDIE( file_p, vtab_p ) \
+		( ( ( vtab_p ) && (vtab_p)->close ) \
+			? (vtab_p)->close( (file_p) ) \
+			: LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH(
+					libandria4_newstreams_bituplic2, \
+						LIBANDRIA4_MONAD_MAYBE_BUILDJUST( \
+								libandria4_newstreams_result2, \
+								libandria4_newstreams_err, \
+								val \
+							) \
+						libandria4_newstreams_result2, \
+						libandria4_FILE_substream*, \
+						vala, valb \
+				) )
+		/* We want to just use malloc() & friends. */
+	LIBANDRIA4_MONAD_REFPOINTER_COMMONIMPLEMENTATION(
+			libandria4_FILE_tracker,
+				libandria4_FILE_substream_vtable*,
+				
+				LIBANDRIA4_NEWSTREAMS_ONDIE
+		);
+	
+	
 	
 		/* Complete. Note that THE POINTER ITSELF is null. */
 	int libandria4_FILE_tracker_initialize_null( libandria4_FILE_tracker *trk )
@@ -264,8 +278,8 @@ SOFTWARE.
 		{
 			LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET(
 				libandria4_FILE_tracker, var, valptr,
-						/* These four need to actually be set to something. */
-					failneglect, failattend, succneglect, succattend, ondead
+						/* These five need to actually be set to something. */
+					??? failneglect, failattend, succneglect, succattend, ondead ???
 			);
 			
 			return( 1 );
@@ -353,12 +367,12 @@ SOFTWARE.
 			functor1.func = on_failedrelease;
 			functor1.data = failedrelease_data;
 			
-			LIBANDRIA4_MONAD_REFPOINTER_BODYDEINIT
+			LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYDEINIT
 			(
 				libandria4_FILE_tracker, *trk,
-					LIBANDRIA4_OP_RUNifABLE1_ELSEa,
-					LIBANDRIA4_NULL_MACRO,
-					LIBANDRIA4_NULL_MACRO
+					LIBANDRIA4_OP_RUNifABLE1_ELSEa, /* failneglect */
+					LIBANDRIA4_NULL_MACRO, /* succneglect */
+					LIBANDRIA4_NULL_MACRO /* ondead */
 			);
 			
 			return( 1 );
@@ -366,6 +380,14 @@ SOFTWARE.
 		
 		return( -1 );
 	}
+	struct libandria4_FILE_substream_vtable
+	{
+		libandria4_newstreams_bituplic2 (*close)( void* /* FILE* */ );
+	};
+	LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL(
+		libandria4_FILE_tracker,
+			libandria4_FILE_substream_vtable*
+	);
 
 
 
