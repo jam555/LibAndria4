@@ -41,6 +41,8 @@ SOFTWARE.
 /*  composite streams, iterators over text ropes, etc. */
 /* TODO: */
 	/* Complete libandria4_FILE_tracker_redirect() */
+	/* LIBANDRIA4_NEWSTREAMS_ONDIE() has a note about an error: fix it. */
+	/* This .txt file needs to be seperated into both a .h and a .c file. */
 	
 	typedef struct libandria4_FILE_substream_vtable libandria4_FILE_substream_vtable;
 	
@@ -55,50 +57,251 @@ SOFTWARE.
 		/* libandria4_FILE_substream used to be named libandria4_FILE_file. */
 	typedef libandria4_FILE_tracker_counttype libandria4_FILE_substream;
 	
+	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT( var, innerval, aux,  failinit, badalloc, badata ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT( \
+			libandria4_FILE_tracker, \
+				var, innerval, aux, \
+				failinit, badalloc, badata )
+	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET( var, valptr,  failneglect, failattend, succneglect, succattend, ondead ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET( \
+			libandria4_FILE_tracker, \
+				var, valptr, \
+				failneglect, failattend, succneglect, succattend, ondead )
+	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYDEINIT( var,  failneglect, succneglect, ondead ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYDEINIT( \
+			libandria4_FILE_tracker, \
+				var, \
+				failneglect, succneglect, ondead )
+	
+		/* If "just", replace your previous substream with this provided */
+		/*  one. If "nothing", continue using your current substream. */
+	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
+		libandria4_FILE_redirection,
+			libandria4_FILE_substream*
+	);
+	#define LIBANDRIA4_FILE_REDIRECTION_TOTARGET( val ) \
+		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_FILE_redirection, libandria4_FILE_substream*, val )
+	#define LIBANDRIA4_FILE_REDIRECTION_TOCURRENT( ... ) \
+		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_FILE_redirection, libandria4_FILE_substream* )
+	#define LIBANDRIA4_FILE_REDIRECTION_RETURNTARGET( val ) \
+		LIBANDRIA4_MONAD_MAYBE_RETURNLEFT( libandria4_FILE_redirection, libandria4_FILE_substream*, val )
+	#define LIBANDRIA4_FILE_REDIRECTION_RETURNCURRENT( ... ) \
+		LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( libandria4_FILE_redirection, libandria4_FILE_substream* )
+	
+	/* LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE() is */
+	/*  libandria4_FILE_redirection{}'s equivalent of *_BODYMATCH(). */
+	/*  It specifically updates a libandria4_FILE_tracker{} instance */
+	/*  if AND ONLY IF a non-nothing libandria4_FILE_redirection{} */
+	/*  instance is provided to it, otherwise leaving the */
+	/*  libandria4_FILE_tracker{} untouched. It exists to make */
+	/*  certain that libandria4_FILE_tracker{} and */
+	/*  libandria4_FILE_redirection{} interact correctly. */
+			#define LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE_INNERTOOL( val ) \
+				( LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE_trip = 1, \
+					LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE_trig = (val) )
+		/* FILE_tracker is a libandria4_FILE_tracker{} variable. */
+		/* redir_var is a libandria4_FILE_redirection{} variable. */
+		/* on_failattend() and: */
+		/* on_failneglect() are just for logging, neither gets an */
+		/*  argument. */
+		/* on_redir() is for... whatever you feel like, it receives */
+		/*  FILE_tracker by value as it's argument. */
+	#define LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE( FILE_tracker, redir_var,  on_failattend, on_failneglect, on_redir ) \
+		{ \
+			libandria4_FILE_substream *LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE_trig = \
+				(libandria4_FILE_substream*)0; \
+			int LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE_trip = 0; \
+			LIBANDRIA4_MONAD_MAYBE_BODYMATCH( \
+				redir_var, \
+				LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE_INNERTOOL, \
+				LIBANDRIA4_NULL_MACRO ); \
+			if( LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE_trip ) { \
+					LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET( \
+						FILE_tracker, redir_var, \
+						on_failneglect, on_failattend, \
+						LIBANDRIA4_NULL_MACRO, LIBANDRIA4_NULL_MACRO, \
+						LIBANDRIA4_NULL_MACRO /* on_dead( ptr ), just for logging. */ ); \
+					on_redir( FILE_tracker ); } }
+	
 	
 		/* EOF is 0, because EOF isn't really an error, and ( error * 0 ) */
-		/*  should obviously be no error at all. */
+		/*  should "obviously" be no error at all. */
 	typedef uintptr_t libandria4_newstreams_err;
 	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
 		libandria4_newstreams_result1,
 			size_t,
 			libandria4_newstreams_err
 	);
+	#define LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDSIZET( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_newstreams_result1, size_t, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_newstreams_result1, libandria4_newstreams_err, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT1_RETURNSIZET( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_newstreams_result1, size_t, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT1_RETURNERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_newstreams_result1, libandria4_newstreams_err, val )
+	
 	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
 		libandria4_newstreams_result2,
 			libandria4_newstreams_err
 	);
+	#define LIBANDRIA4_NEWSTREAMS_RESULT2_BUILDJUST( val ) \
+		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_newstreams_result2, libandria4_newstreams_err, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT2_BUILDNOTHING( ... ) \
+		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_newstreams_result2, libandria4_newstreams_err )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT2_RETURNJUST( val ) \
+		LIBANDRIA4_MONAD_MAYBE_RETURNLEFT( libandria4_newstreams_result2, libandria4_newstreams_err, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT2_RETURNNOTHING( ... ) \
+		LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( libandria4_newstreams_result2, libandria4_newstreams_err )
+	
 	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
 		libandria4_newstreams_result3,
 			char,
 			libandria4_newstreams_err
 	);
+	#define LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDCHAR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_newstreams_result3, char, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_newstreams_result3, libandria4_newstreams_err, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT3_RETURNCHAR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_newstreams_result3, char, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT3_RETURNERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_newstreams_result3, libandria4_newstreams_err, val )
+	
 	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
 		libandria4_newstreams_result4,
 			intmax_t,
 			libandria4_newstreams_err
 	);
+	#define LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDINT( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_newstreams_result4, intmax_t, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_newstreams_result4, libandria4_newstreams_err, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT4_RETURNINT( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_newstreams_result4, intmax_t, val )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT4_RETURNERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_newstreams_result4, libandria4_newstreams_err, val )
+	
 	
 	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
 		libandria4_newstreams_bituplic1,
 			libandria4_newstreams_result1,
-			libandria4_FILE_substream*
+			libandria4_FILE_redirection
 	);
+	#define LIBANDRIA4_NEWSTREAMS_BITUP1_BUILDJUSTSTREAM( strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( \
+			libandria4_newstreams_bituplic1, \
+			libandria4_newstreams_result1, \
+			libandria4_FILE_redirection, \
+			strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP1_BUILDJUSTBOTH( reslt, strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH( \
+			libandria4_newstreams_bituplic1, \
+			libandria4_newstreams_result1, \
+			libandria4_FILE_redirection, \
+			reslt, strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP1_RETURNSTREAM( strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_RETURNRIGHT( \
+			libandria4_newstreams_bituplic1, \
+			libandria4_newstreams_result1, \
+			libandria4_FILE_redirection, \
+			strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP1_RETURNBOTH( reslt, strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( \
+			libandria4_newstreams_bituplic1, \
+			libandria4_newstreams_result1, \
+			libandria4_FILE_redirection, \
+			reslt, strmptr )
+	
 	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
 		libandria4_newstreams_bituplic2,
-			libandria4_newstreams_result2,
-			libandria4_FILE_substream*
+			libandria4_newstreams_err,
+			libandria4_FILE_redirection
 	);
+	#define LIBANDRIA4_NEWSTREAMS_BITUP2_BUILDJUSTSTREAM( strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( \
+			libandria4_newstreams_bituplic2, \
+			libandria4_newstreams_err, \
+			libandria4_FILE_redirection, \
+			strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP2_BUILDJUSTBOTH( reslt, strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH( \
+			libandria4_newstreams_bituplic2, \
+			libandria4_newstreams_err, \
+			libandria4_FILE_redirection, \
+			reslt, strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP2_RETURNSTREAM( strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_RETURNRIGHT( \
+			libandria4_newstreams_bituplic2, \
+			libandria4_newstreams_err, \
+			libandria4_FILE_redirection, \
+			strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP2_RETURNBOTH( reslt, strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( \
+			libandria4_newstreams_bituplic2, \
+			libandria4_newstreams_err, \
+			libandria4_FILE_redirection, \
+			reslt, strmptr )
+	
 	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
 		libandria4_newstreams_bituplic3,
 			libandria4_newstreams_result3,
-			libandria4_FILE_substream*
+			libandria4_FILE_redirection
 	);
+	#define LIBANDRIA4_NEWSTREAMS_BITUP3_BUILDJUSTSTREAM( strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( \
+			libandria4_newstreams_bituplic3, \
+			libandria4_newstreams_result3, \
+			libandria4_FILE_redirection, \
+			strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP3_BUILDJUSTBOTH( reslt, strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH( \
+			libandria4_newstreams_bituplic3, \
+			libandria4_newstreams_result3, \
+			libandria4_FILE_redirection, \
+			reslt, strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP3_RETURNSTREAM( strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_RETURNRIGHT( \
+			libandria4_newstreams_bituplic3, \
+			libandria4_newstreams_result3, \
+			libandria4_FILE_redirection, \
+			strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP3_RETURNBOTH( reslt, strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( \
+			libandria4_newstreams_bituplic3, \
+			libandria4_newstreams_result3, \
+			libandria4_FILE_redirection, \
+			reslt, strmptr )
+	
 	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
 		libandria4_newstreams_bituplic4,
 			libandria4_newstreams_result4,
-			libandria4_FILE_substream*
+			libandria4_FILE_redirection
 	);
+	#define LIBANDRIA4_NEWSTREAMS_BITUP4_BUILDJUSTSTREAM( strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( \
+			libandria4_newstreams_bituplic4, \
+			libandria4_newstreams_result4, \
+			libandria4_FILE_redirection, \
+			strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP4_BUILDJUSTBOTH( reslt, strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH( \
+			libandria4_newstreams_bituplic4, \
+			libandria4_newstreams_result4, \
+			libandria4_FILE_redirection, \
+			reslt, strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNSTREAM( strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_RETURNRIGHT( \
+			libandria4_newstreams_bituplic4, \
+			libandria4_newstreams_result4, \
+			libandria4_FILE_redirection, \
+			strmptr )
+	#define LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH( reslt, strmptr ) \
+		LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( \
+			libandria4_newstreams_bituplic4, \
+			libandria4_newstreams_result4, \
+			libandria4_FILE_redirection, \
+			reslt, strmptr )
 	
 	
 	
@@ -135,6 +338,8 @@ SOFTWARE.
 		/* char* getenv (const char* name); */
 			/* Only noted because I need to make a wrapper... elsewhere. */
 		/* FILE * fopen ( const char * filename, const char * mode ); */
+			/* This is probably not appropriate for this system. */
+		/* reopen( ) */
 			/* That's another layer's job. */
 		/* int remove ( const char * filename ); */
 			/* That's another layer's job. */
@@ -164,7 +369,6 @@ SOFTWARE.
 		libandria4_newstreams_bituplic4 (*tell)( void* /* FILE* */, int /* Reference point. */ );
 		libandria4_newstreams_bituplic2 (*seek)( void* /* FILE* */, intmax_t, int /* Reference point. */ );
 		
-		libandria4_newstreams_bituplic2 (*reopen)( void* /* FILE* */,  char* /* name */, char* /* mode */ );
 		libandria4_newstreams_bituplic2 (*rewind)( void* /* FILE* */ );
 		
 		libandria4_newstreams_bituplic2 (*flush)( void* /* FILE* */ );
@@ -199,19 +403,13 @@ SOFTWARE.
 		/* The first argument will be ->aux, the second will be ->data, but */
 		/*  we're storing the FILE pointer in aux and the virtual table in val, */
 		/*  so this is actually correct. */
+		/* ??? ERROR IN *_ONDIE()!!! Look at the next to last line... WHERE are */
+		/*  those arguments coming from? ??? */
 	#define LIBANDRIA4_NEWSTREAMS_ONDIE( file_p, vtab_p ) \
 		( ( ( vtab_p ) && (vtab_p)->close ) \
 			? (vtab_p)->close( (file_p) ) \
-			: LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH( \
-					libandria4_newstreams_bituplic2, \
-						LIBANDRIA4_MONAD_MAYBE_BUILDJUST( \
-								libandria4_newstreams_result2, \
-								libandria4_newstreams_err, \
-								val \
-							) \
-						libandria4_newstreams_result2, \
-						libandria4_FILE_substream*, \
-						vala, valb \
+			: LIBANDRIA4_NEWSTREAMS_BITUP2_BUILDJUSTBOTH( \
+					reslt, strmptr \
 				) )
 		/* We want to just use malloc() & friends. */
 	LIBANDRIA4_MONAD_REFPOINTER_COMMONIMPL(
@@ -391,6 +589,7 @@ SOFTWARE.
 
 
 
+		/* This is just a reference copy. */
 	int libandria4_FILE_tracker_apply
 	(
 		libandria4_FILE_tracker *trk,
@@ -449,89 +648,235 @@ SOFTWARE.
 
 
 
+	/* Require <errno.h> */
+	
+	/* ??? Warning! Go back through and add code to check for null pointers! ??? */
+	
 	static int libandria4_FILE_tracker_feof( void *f )
 	{
 		return( feof( (FILE*)f ) );
-	}
+	} 
 	static libandria4_newstreams_result2 libandria4_FILE_tracker_geterror( void *f )
 	{
-		int res = ferror( (FILE*)f );
+		int tmperr = errno;
+		errno = 0;
+			int res = ferror( (FILE*)f );
+			if( errno != 0 )
+			{
+				???
+			}
+		errno = tmperr;
 		
-		???
+		if( res )
+		{
+			LIBANDRIA4_NEWSTREAMS_RESULT2_RETURNJUST( res );
+		}
+		
+		LIBANDRIA4_NEWSTREAMS_RESULT2_RETURNNOTHING();
 	}
 	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_clearerr( void *f )
 	{
-		void clearerr( (FILE*)f );
+		libandria4_newstreams_bituplic2 ret =
+			LIBANDRIA4_MONAD_BITUP2_BUILDJUSTSTREAM( ??? strmptr ??? );
 		
-		???
+		int tmperr = errno;
+		errno = 0;
+			clearerr( (FILE*)f );
+			if( errno != 0 )
+			{
+				int tmp = errno;
+				ret =
+					LIBANDRIA4_NEWSTREAMS_BITUP2_BUILDJUSTBOTH(
+						tmp,
+						LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+					);
+			}
+		errno = tmperr;
+		
+		return( ret );
 	}
 	
 	static libandria4_newstreams_bituplic4 libandria4_FILE_tracker_tell( void* f, int refpt )
 	{
 		if( refpt != SEEK_SET )
 		{
-			???
+			LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
+				LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR( ??? val ??? ), /* libandria4_newstreams_err */
+				LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+			);
 		}
 		
-		long ftell( (FILE*)f );
-		
-		???
+		long pos = ftell( (FILE*)f );
+		if( pos >= 0 )
+		{
+			if( pos > INTMAX_MAX )
+			{
+				/* But how??? */
+				
+				LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
+					LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR( ??? ), /* libandria4_newstreams_err */
+					LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+				);
+			}
+			
+			LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
+				LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDINT( pos ), /* intmax_t */
+				LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+			);
+			
+		} else {
+			
+			int tmp = errno;
+			errno = 0;
+			
+			LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
+				LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR( tmp ), /* libandria4_newstreams_err */
+				LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+			);
+		}
 	}
 	static libandria4_newstreams_bituplic4 libandria4_FILE_tracker_seek( void* f, intmax_t off, int refpt )
 	{
 		if( off > LONG_MAX )
 		{
-			???
+			LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
+				LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR( ??? val ??? ), /* libandria4_newstreams_err */
+				LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+			);
 		}
 		switch( refpt )
 		{
 			case SEEK_SET:   case SEEK_CUR:   case SEEK_END:
+					/* Same handling for all three. */
 				break;
 			default:
-				???
+				{
+					LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
+						LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR( ??? val ??? ), /* libandria4_newstreams_err */
+						LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+					);
+				}
 		}
 		
-		int fseek( (FILE*)f, off, refpt );
-		
-		???
+		int res = fseek( (FILE*)f, off, refpt );
+		if( res != 0 )
+		{
+			LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
+				LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR( res ), /* libandria4_newstreams_err */
+				LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+			);
+			
+		} else {
+			
+			LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
+				LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDINT( pos ), /* intmax_t */
+				LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+			);
+		}
 	}
 	
-	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_reopen( void* f,  char* name, char* mode )
-	{
-		FILE *freopen( const char *restrict filename, const char *restrict mode,
-               FILE *restrict stream );
-		
-		errno_t freopen_s( FILE *restrict *restrict newstreamptr,
-                   const char *restrict filename, const char *restrict mode,
-                   FILE *restrict stream );
-		
-		???
-	}
 	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_rewind( void* f )
 	{
-		void rewind( (FILE*)f );
+		libandria4_newstreams_bituplic2 ret =
+			LIBANDRIA4_MONAD_BITUP2_BUILDJUSTSTREAM( ??? strmptr ??? );
 		
-		???
+		int tmp = errno;
+		errno = 0;
+			rewind( (FILE*)f );
+			if( errno != 0 )
+			{
+				int tmp = errno;
+				ret =
+					LIBANDRIA4_NEWSTREAMS_BITUP2_BUILDJUSTBOTH(
+						tmp,
+						LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+					);
+			}
+		errno = tmp;
+		
+		return( ret );
 	}
 	
 	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_flush( void* f )
 	{
-		int fflush( (FILE*)f );
+		libandria4_newstreams_bituplic2 ret =
+			LIBANDRIA4_MONAD_BITUP2_BUILDJUSTSTREAM( ??? strmptr ??? );
 		
-		???
+		int res = fflush( (FILE*)f );
+		if( res != 0 )
+		{
+			if( res != EOF )
+			{
+				ret =
+					LIBANDRIA4_NEWSTREAMS_BITUP2_BUILDJUSTBOTH(
+						??? err ???,
+						LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+					);
+				
+			} else {
+				
+				ret =
+					LIBANDRIA4_NEWSTREAMS_BITUP2_BUILDJUSTBOTH(
+						EOF,
+						LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+					);
+			}
+		}
+		
+		return( ret );
 	}
 	
 	static libandria4_newstreams_bituplic3 libandria4_FILE_tracker_getc( void* f )
 	{
-		int fgetc( (FILE*)f );
+		libandria4_newstreams_bituplic3 ret =
+			LIBANDRIA4_MONAD_BITUP3_BUILDJUSTSTREAM( ??? strmptr ??? );
 		
-		???
+		int res = fgetc( (FILE*)f );
+		if( res == EOF )
+		{
+			ret =
+				LIBANDRIA4_NEWSTREAMS_BITUP3_BUILDJUSTBOTH(
+					LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDERR( EOF ),
+					LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+				);
+			
+		} else {
+			
+			ret =
+				LIBANDRIA4_NEWSTREAMS_BITUP3_BUILDJUSTBOTH(
+					LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDCHAR( ??? ),
+					LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+				);
+		}
+		
+		return( ret );
 	}
+	
 	static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_putc( void* f, char ch )
 	{
-		int fputc( ch, (FILE*)f );
+		libandria4_newstreams_bituplic1 ret =
+			LIBANDRIA4_MONAD_BITUP1_BUILDJUSTSTREAM(
+				LIBANDRIA4_FILE_REDIRECTION_TOCURRENT() );
 		
-		???
+		int res = fputc( ch, (FILE*)f );
+		if( res == EOF )
+		{
+			ret =
+				LIBANDRIA4_NEWSTREAMS_BITUP1_BUILDJUSTBOTH(
+					LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDERR( EOF ),
+					LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+				);
+			
+		} else {
+			
+			ret =
+				LIBANDRIA4_NEWSTREAMS_BITUP1_BUILDJUSTBOTH(
+					LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDSIZET( 1 ),
+					LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+				);
+		}
+		
+		return( ret );
 	}
 	
 	static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_gets
@@ -552,24 +897,43 @@ SOFTWARE.
 	static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_block_read
 		( void* f, void* buffer, size_t size, size_t count )
 	{
-		size_t fread( buffer, size, count, (FILE*)f );
-		
-		???
+		size_t read = fread( buffer, size, count, (FILE*)f );
+		LIBANDRIA4_NEWSTREAMS_BITUP1_RETURNBOTH(
+			LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDSIZET( read ),
+			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+		);
 	}
 	static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_block_write
 		( void* f, void* buffer, size_t size, size_t count )
 	{
-		size_t fwrite( buffer, size, count, (FILE*)f );
-		
-		???
+		size_t read = fwrite( buffer, size, count, (FILE*)f );
+		LIBANDRIA4_NEWSTREAMS_BITUP1_RETURNBOTH(
+			LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDSIZET( read ),
+			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+		);
 	}
 	
 	static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_close( void* f )
 	{
-		int fclose( (FILE*)f );
-		
-		???
+		int res = fclose( (FILE*)f );
+		if( res != EOF )
+		{
+			ret =
+				LIBANDRIA4_NEWSTREAMS_BITUP2_RETURNSTREAM(
+					LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+				);
+			
+		} else {
+			
+			ret =
+				LIBANDRIA4_NEWSTREAMS_BITUP2_RETURNBOTH(
+					EOF,
+					LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+				);
+		}
 	}
+	
+	
 	static libandria4_FILE_substream_vtable lib4_FILE_vtab =
 	{
 		&libandria4_FILE_tracker_feof,
@@ -582,7 +946,6 @@ SOFTWARE.
 		&libandria4_FILE_tracker_tell,
 		&libandria4_FILE_tracker_seek,
 		
-		&libandria4_FILE_tracker_reopen,
 		&libandria4_FILE_tracker_rewind,
 		
 		&libandria4_FILE_tracker_flush,
