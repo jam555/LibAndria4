@@ -244,6 +244,7 @@ SOFTWARE.
 				( ( ( var ).valid_flags & 1 ) ? ( matchleft( ( var ).left ), 1 ) : 0 ) + \
 				( ( ( var ).valid_flags & 2 ) ? ( matchright( ( var ).right ), 1 ) : 0 ) > 0 \
 			? 1 : onempty() )
+		/* Named after a biological process. */
 		/* The rough equivalent of *_MAYBE_*'s *_REDUCE(). maya & mayb */
 		/*  are the names of the desired "maybe" types, typea and typeb */
 		/*  are the data types. reducer() should GENERALLY return an */
@@ -552,14 +553,15 @@ SOFTWARE.
 				innerval, aux,  failinit, badalloc, badata ); }
 	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET( name, var, valptr,  failneglect, failattend, succneglect, succattend, ondead ) \
 		{ if( (var).counted == (valptr) ) { /* Do nothing. */ ; } \
-			else { if( (var).counted ) { \
+			else { if( valptr ) { \
+					LIBANDRIA4_MONAD_REFCOUNTED_BODYATTEND( \
+						name##_counttype, (var).counted,  failattend, succattend ); } \
+				if( (var).counted ) { \
 					LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( \
 						name##_counttype, (var).counted, \
 						failneglect, succneglect, ondead ); } \
 				(var).counted = valptr; \
-				if( valptr ) { \
-					LIBANDRIA4_MONAD_REFCOUNTED_BODYATTEND( \
-						name##_counttype, (var).counted,  failattend, succattend ); } } }
+				 } }
 	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYDEINIT( name, var,  failneglect, succneglect, ondead ) \
 		{ name##_counttype * name##_ptr = &( (var).counted ); \
 			LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( name##_counttype, name##_ptr, \
