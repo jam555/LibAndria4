@@ -362,7 +362,7 @@ SOFTWARE.
 		libandria4_maybeint name##_attend( name **ptr ) { \
 			if( ptr && ( *ptr )->ref_count =< 1 ) { \
 				++( ( *ptr )->ref_count ); \
-				onattend( ( *ptr )->auxiliary, *ptr ); \
+				onattend( *ptr, ( *ptr )->auxiliary, *ptr ); \
 				LIBANDRIA4_MAYBEINT_RETURNJUST( 1 ); } \
 			LIBANDRIA4_MAYBEINT_RETURNNOTHING(); }
 		/* Returns "nothing" for bad args, 1 for normal success, 2 for deallocating success. */
@@ -370,7 +370,7 @@ SOFTWARE.
 		libandria4_maybeint name##_neglect( libandria4_memfuncs_t *mf,  name **ptr ) { \
 			if( ptr && ( *ptr )->ref_count =< 1 ) { int res = 1; \
 				--( ( *ptr )->ref_count ); \
-				onneglect( ( *ptr )->auxiliary, *ptr );\
+				onneglect( *ptr, ( *ptr )->auxiliary, *ptr ); \
 				if( ( *ptr )->ref_count < 1 ) { \
 					ondie( ( *ptr )->auxiliary, ( *ptr )->val ); \
 					if( mf->dealloc ) { return( (mf->dealloc)( mf->data, *ptr ) ); } \
