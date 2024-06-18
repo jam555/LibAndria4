@@ -27,10 +27,13 @@ SOFTWARE.
 */
 
 
+/* We need monads.h, but what else? */
+
+#ifndef LIBANDRIA4_BASIC_MUTABLESTREAMS_innertypes_H
+# define LIBANDRIA4_BASIC_MUTABLESTREAMS_innertypes_H
+	/* Change this macro name eventually. */
 	
-	
-	
-	/* Start a separate type definitions file for the below. */
+	/* The stuff below should probably be merged into another file. */
 	
 	
 	
@@ -221,4 +224,5 @@ SOFTWARE.
 	
 	/* End the separate type definitions file, switch back to the */
 	/*  primary new-streams file. */
-
+	
+#endif
