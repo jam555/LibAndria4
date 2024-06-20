@@ -26,8 +26,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
+
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <limits.h>
+#include <errno.h>
+
 #include "mutablestreams.h"
-/* Require <errno.h> */
+
+
+
+	/* We do need to define the types instead of just declaring. */
+LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL(
+	libandria4_FILE_tracker,
+		libandria4_FILE_substream_vtable*
+);
+
+	/* Pre-defs, because some of the functions need to see these names. */
+static libandria4_FILE_substream_vtable
+	lib4_FILE_EOFvtab, lib4_FILE_vtab;
+
 
 
 	/* Complete. Note that THE POINTER ITSELF is null. */
@@ -40,19 +60,22 @@ int libandria4_FILE_tracker_initialize_null( libandria4_FILE_tracker *trk )
 	
 	return( -1 );
 }
-static void libandria4_FILE_tracker_initialize_badalloc
-(
-	void*, /* "this" pointer. */
-	
-	libandria4_FILE_tracker_counttype**,
-		libandria4_FILE_substream_vtable*,
-		void* /* FILE* */
-)
-{
-	/* Do nothing, but we REALLY SHOULD log an error. */
-	
-	return;
-}
+		/* This is just a logging function for */
+		/*  libandria4_FILE_tracker_initialize(). It does no logging. Fix */
+		/*  that. */
+	static void libandria4_FILE_tracker_initialize_badalloc
+	(
+		void*, /* "this" pointer. */
+		
+		libandria4_FILE_tracker_counttype**,
+			libandria4_FILE_substream_vtable*,
+			void* /* FILE* */
+	)
+	{
+		??? /* Do nothing, but we REALLY SHOULD log an error. */ ???
+		
+		return;
+	}
 	/* Complete? */
 int libandria4_FILE_tracker_initialize( libandria4_FILE_tracker *trk,  FILE *f )
 {
@@ -62,7 +85,7 @@ int libandria4_FILE_tracker_initialize( libandria4_FILE_tracker *trk,  FILE *f )
 		{
 			return( -2 );
 		}
-	/* Signature:  void (*onfull)( libandria4_FILE_file**,  FILE*, void* /* aux */ ) */
+	/* Signature:  void (*onfull)( libandria4_FILE_substream**,  libandria4_FILE_substream_vtable*, void* (FILE*) ) */
 #define libandria4_FILE_tracker_initialize_ONFULL( ctr_ptr, vtab_ptr, f_p ) \
 	( ( (vtab_ptr) != &lib4_FILE_vtab ? return( -3 ) : 1 ) \
 		, ( (f_p) != f ? return( -4 ) : 1 ) \
@@ -84,6 +107,7 @@ int libandria4_FILE_tracker_redirect( libandria4_FILE_tracker *tracker, libandri
 {
 	if( tracker & donor )
 	{
+		/* Switch to LIBANDRIA4_FILE_REDIRECTION_BODYUPDATE( FILE_tracker, redir_var,  on_failattend, on_failneglect, on_redir )? */
 		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET(
 			libandria4_FILE_tracker, var, valptr,
 					/* These five need to actually be set to something. */
@@ -188,10 +212,11 @@ int libandria4_FILE_tracker_deinitialize
 	
 	return( -1 );
 }
-LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL(
-	libandria4_FILE_tracker,
-		libandria4_FILE_substream_vtable*
-);
+
+
+
+
+
 
 
 
@@ -257,7 +282,9 @@ static libandria4_newstreams_result2 libandria4_FILE_tracker_deathlessEOFgeterro
 static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_clearerr( void *f )
 {
 	libandria4_newstreams_bituplic2 ret =
-		LIBANDRIA4_MONAD_BITUP2_BUILDJUSTSTREAM( ??? strmptr ??? );
+		LIBANDRIA4_MONAD_BITUP2_BUILDJUSTSTREAM(
+			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+		);
 	
 	int tmperr = errno;
 	errno = 0;
@@ -326,7 +353,8 @@ static libandria4_newstreams_bituplic4 libandria4_FILE_tracker_deathlessEOFtell(
 {
 	LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
 			LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR(
-				LIBANDRIA4_NEWSTREAMS_EOF ), /* libandria4_newstreams_err */
+				LIBANDRIA4_NEWSTREAMS_EOF
+			), /* libandria4_newstreams_err */
 			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
 		);
 }
@@ -373,7 +401,8 @@ static libandria4_newstreams_bituplic4 libandria4_FILE_tracker_deathlessEOFseek(
 {
 	LIBANDRIA4_NEWSTREAMS_BITUP4_RETURNBOTH(
 			LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR(
-				LIBANDRIA4_NEWSTREAMS_EOF ), /* libandria4_newstreams_err */
+				LIBANDRIA4_NEWSTREAMS_EOF
+			), /* libandria4_newstreams_err */
 			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
 		);
 }
@@ -381,7 +410,9 @@ static libandria4_newstreams_bituplic4 libandria4_FILE_tracker_deathlessEOFseek(
 static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_rewind( void* f )
 {
 	libandria4_newstreams_bituplic2 ret =
-		LIBANDRIA4_MONAD_BITUP2_BUILDJUSTSTREAM( ??? strmptr ??? );
+		LIBANDRIA4_MONAD_BITUP2_BUILDJUSTSTREAM(
+			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+		);
 	
 	int tmp = errno;
 	errno = 0;
@@ -410,7 +441,9 @@ static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_deathlessEOFrewin
 static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_flush( void* f )
 {
 	libandria4_newstreams_bituplic2 ret =
-		LIBANDRIA4_MONAD_BITUP2_BUILDJUSTSTREAM( ??? strmptr ??? );
+		LIBANDRIA4_MONAD_BITUP2_BUILDJUSTSTREAM(
+			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+		);
 	
 	int res = fflush( (FILE*)f );
 	if( res != 0 )
@@ -446,7 +479,9 @@ static libandria4_newstreams_bituplic2 libandria4_FILE_tracker_deathlessEOFflush
 static libandria4_newstreams_bituplic3 libandria4_FILE_tracker_getc( void* f )
 {
 	libandria4_newstreams_bituplic3 ret =
-		LIBANDRIA4_MONAD_BITUP3_BUILDJUSTSTREAM( ??? strmptr ??? );
+		LIBANDRIA4_MONAD_BITUP3_BUILDJUSTSTREAM(
+			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+		);
 	
 	int res = fgetc( (FILE*)f );
 	if( res == EOF )
@@ -454,7 +489,8 @@ static libandria4_newstreams_bituplic3 libandria4_FILE_tracker_getc( void* f )
 		ret =
 			LIBANDRIA4_NEWSTREAMS_BITUP3_BUILDJUSTBOTH(
 				LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDERR(
-					LIBANDRIA4_NEWSTREAMS_EOF ),
+					LIBANDRIA4_NEWSTREAMS_EOF
+				),
 				LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
 			);
 		
@@ -473,7 +509,8 @@ static libandria4_newstreams_bituplic3 libandria4_FILE_tracker_deathlessEOFgetc(
 {
 	LIBANDRIA4_NEWSTREAMS_BITUP3_RETURNJUSTBOTH(
 			LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDERR(
-				LIBANDRIA4_NEWSTREAMS_EOF ),
+				LIBANDRIA4_NEWSTREAMS_EOF
+			),
 			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
 		);
 }
@@ -482,7 +519,8 @@ static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_putc( void* f, ch
 {
 	libandria4_newstreams_bituplic1 ret =
 		LIBANDRIA4_MONAD_BITUP1_BUILDJUSTSTREAM(
-			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT() );
+			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
+		);
 	
 	int res = fputc( ch, (FILE*)f );
 	if( res == EOF )
@@ -490,7 +528,8 @@ static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_putc( void* f, ch
 		ret =
 			LIBANDRIA4_NEWSTREAMS_BITUP1_BUILDJUSTBOTH(
 				LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDERR(
-					LIBANDRIA4_NEWSTREAMS_EOF ),
+					LIBANDRIA4_NEWSTREAMS_EOF
+				),
 				LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
 			);
 		
@@ -509,7 +548,8 @@ static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_deathlessEOFputc(
 {
 	LIBANDRIA4_NEWSTREAMS_BITUP1_BUILDJUSTBOTH(
 			LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDERR(
-				LIBANDRIA4_NEWSTREAMS_EOF ),
+				LIBANDRIA4_NEWSTREAMS_EOF
+			),
 			LIBANDRIA4_FILE_REDIRECTION_TOCURRENT()
 		);
 }
@@ -535,7 +575,6 @@ static void libandria4_FILE_tracker_deathlessclose( void *f )
 }
 
 
-	/* ??? Should this be a global instead? ??? */
 static libandria4_FILE_substream_vtable
 	lib4_FILE_vtab =
 	{
@@ -565,7 +604,6 @@ static libandria4_FILE_substream_vtable
 
 
 
-	/* ??? Should this be a global instead? ??? */
 static libandria4_FILE_substream_vtable
 	lib4_FILE_EOFvtab =
 	{
