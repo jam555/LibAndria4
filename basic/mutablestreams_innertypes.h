@@ -27,11 +27,26 @@ SOFTWARE.
 */
 
 
-/* We need monads.h, but what else? */
+
+	/* This will initially trigger a recursion loop, but it'll end on the */
+	/*  SECOND inclusion of "mutablestreams.h", as that one only includes */
+	/*  this file INSIDE of an include guard. Also, the original inclusion */
+	/*  of this file will (if it was done directly) never actually include */
+	/*  the contents of it's include guard, as it's SECOND inclusion will */
+	/*  under those conditions define the include guard before the first */
+	/*  invocation has a chance to do the same. */
+#include "mutablestreams.h"
 
 #ifndef LIBANDRIA4_BASIC_MUTABLESTREAMS_innertypes_H
 # define LIBANDRIA4_BASIC_MUTABLESTREAMS_innertypes_H
 	/* Change this macro name eventually. */
+	
+	#include <stddef.h>
+	#include <stdint.h>
+	
+	#include "monads.h"
+	
+	
 	
 	/* The stuff below should probably be merged into another file. */
 	
@@ -219,10 +234,5 @@ SOFTWARE.
 			libandria4_newstreams_result4, \
 			libandria4_FILE_redirection, \
 			reslt, strmptr )
-	
-	
-	
-	/* End the separate type definitions file, switch back to the */
-	/*  primary new-streams file. */
 	
 #endif
