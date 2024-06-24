@@ -61,8 +61,8 @@ int libandria4_FILE_tracker_initialize_null( libandria4_FILE_tracker *trk )
 	return( -1 );
 }
 		/* This is just a logging function for */
-		/*  libandria4_FILE_tracker_initialize(). It does no logging. Fix */
-		/*  that. */
+		/*  libandria4_FILE_tracker_initialize(). */
+		/* ??? It does no logging. Fix that. ??? */
 	static void libandria4_FILE_tracker_initialize_badalloc
 	(
 		void*, /* "this" pointer. */
@@ -72,7 +72,7 @@ int libandria4_FILE_tracker_initialize_null( libandria4_FILE_tracker *trk )
 			void* /* FILE* */
 	)
 	{
-		??? /* Do nothing, but we REALLY SHOULD log an error. */ ???
+		/* Do nothing, but we REALLY SHOULD log an error. */
 		
 		return;
 	}
@@ -111,7 +111,10 @@ int libandria4_FILE_tracker_redirect( libandria4_FILE_tracker *tracker, libandri
 		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET(
 			libandria4_FILE_tracker, var, valptr,
 					/* These five need to actually be set to something. */
-				??? failneglect, failattend, succneglect, succattend, ondead ???
+				LIBANDRIA4_NULL_MACRO /* failneglect */, LIBANDRIA4_NULL_MACRO /* failattend */,
+					/* These two are successes. */
+				LIBANDRIA4_NULL_MACRO, LIBANDRIA4_NULL_MACRO,
+				LIBANDRIA4_NULL_MACRO /* ondead */
 		);
 		
 		return( 1 );
