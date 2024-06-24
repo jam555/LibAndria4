@@ -40,34 +40,12 @@ SOFTWARE.
 	typedef uint8_t libandria4_commonio_byte;
 	typedef uint32_t libandria4_commonio_succ;
 	typedef uint32_t libandria4_commonio_err;
+	typedef uintptr_t libandria4_commonio_perr;
 	
 	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
 		libandria4_commonio_maybyte,
 		libandria4_commonio_byte
 	);
-	
-	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
-		libandria4_commonio_mayerr,
-		libandria4_commonio_err
-	);
-	
-	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
-		libandria4_commonio_eithbyte,
-			libandria4_commonio_byte,
-			libandria4_commonio_err
-	);
-	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
-		libandria4_commonio_eithgeneric,
-			libandria4_commonio_succ,
-			libandria4_commonio_err
-	);
-	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
-		libandria4_commonio_eithlong,
-			long,
-			libandria4_commonio_err
-	);
-	
-	
 	
 	#define LIBANDRIA4_COMMONIO_MAYBYTE_JUSTBYTE( val ) \
 		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_commonio_maybyte, libandria4_commonio_byte, val )
@@ -101,6 +79,12 @@ SOFTWARE.
 		return( LIBANDRIA4_COMMONIO_MAYBYTE_NOBYTE() );
 	
 	
+	
+	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
+		libandria4_commonio_mayerr,
+		libandria4_commonio_err
+	);
+	
 	#define LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( val ) \
 		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_commonio_mayerr, libandria4_commonio_err, val )
 	#define LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERR( ... ) \
@@ -125,6 +109,13 @@ SOFTWARE.
 	#define LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( var,  onerr ) \
 		LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, onerr, LIBANDRIA4_NOACTION )
 	
+	
+	
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_commonio_eithbyte,
+			libandria4_commonio_byte,
+			libandria4_commonio_err
+	);
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_COMMONIO_EITHBYTE_BYTE( val ) \
@@ -155,6 +146,13 @@ SOFTWARE.
 				LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERR, \
 				LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
 	
+	
+	
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_commonio_eithgeneric,
+			libandria4_commonio_succ,
+			libandria4_commonio_err
+	);
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_COMMONIO_EITHGENERIC_BYTE( val ) \
@@ -191,6 +189,13 @@ SOFTWARE.
 		return( LIBANDRIA4_COMMONIO_EITHGENERIC_ERR( val ) );
 	
 	
+	
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_commonio_eithlong,
+			long,
+			libandria4_commonio_err
+	);
+	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_COMMONIO_EITHLONG_BYTE( val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonio_eithlong, long, val )
@@ -220,6 +225,77 @@ SOFTWARE.
 				LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERR, \
 				LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
 	
+	
+	
+	/* The types below all have *2 names: this indicates that they use */
+	/*  libandria4_commonio_perr instead of libandria4_commonio_err. */
+	
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_commonio_eithsize2,
+			size_t,
+			libandria4_commonio_perr
+	);
+	#define LIBANDRIA4_COMMONIO_EITHSIZE2_BUILDSIZE( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonio_eithsize2, size_t, val )
+	#define LIBANDRIA4_COMMONIO_EITHSIZE2_BUILDERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_commonio_eithsize2, libandria4_commonio_perr, val )
+	#define LIBANDRIA4_COMMONIO_EITHSIZE2_RETURNSIZE( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_commonio_eithsize2, size_t, val )
+	#define LIBANDRIA4_COMMONIO_EITHSIZE2_RETURNERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_commonio_eithsize2, libandria4_commonio_perr, val )
+	
+	
+	
+	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
+		libandria4_commonio_mayerr2,
+			libandria4_commonio_perr
+	);
+	#define LIBANDRIA4_COMMONIO_MAYERR2_BUILDJUST( val ) \
+		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_commonio_mayerr2, libandria4_commonio_perr, val )
+	#define LIBANDRIA4_COMMONIO_MAYERR2_BUILDNOTHING( ... ) \
+		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayerr2, libandria4_commonio_perr )
+	#define LIBANDRIA4_COMMONIO_MAYERR2_RETURNJUST( val ) \
+		LIBANDRIA4_MONAD_MAYBE_RETURNLEFT( libandria4_commonio_mayerr2, libandria4_commonio_perr, val )
+	#define LIBANDRIA4_COMMONIO_MAYERR2_RETURNNOTHING( ... ) \
+		LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( libandria4_commonio_mayerr2, libandria4_commonio_perr )
+	
+	
+	
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_commonio_eithchar2,
+			char,
+			libandria4_commonio_perr
+	);
+	#define LIBANDRIA4_COMMONIO_EITHCHAR2_BUILDCHAR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonio_eithchar2, char, val )
+	#define LIBANDRIA4_COMMONIO_EITHCHAR2_BUILDERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_commonio_eithchar2, libandria4_commonio_perr, val )
+	#define LIBANDRIA4_COMMONIO_EITHCHAR2_RETURNCHAR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_commonio_eithchar2, char, val )
+	#define LIBANDRIA4_COMMONIO_EITHCHAR2_RETURNERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_commonio_eithchar2, libandria4_commonio_perr, val )
+	
+	
+	
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_commonio_eithintmax2,
+			intmax_t,
+			libandria4_commonio_perr
+	);
+	#define LIBANDRIA4_COMMONIO_EITHINTMAX2_BUILDINT( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonio_eithintmax2, intmax_t, val )
+	#define LIBANDRIA4_COMMONIO_EITHINTMAX2_BUILDERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_commonio_eithintmax2, libandria4_commonio_perr, val )
+	#define LIBANDRIA4_COMMONIO_EITHINTMAX2_RETURNINT( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_commonio_eithintmax2, intmax_t, val )
+	#define LIBANDRIA4_COMMONIO_EITHINTMAX2_RETURNERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_commonio_eithintmax2, libandria4_commonio_perr, val )
+	
+	
+	
+	
+	
+	/* These exist for convenience. */
 	
 	#define libandria4_commonio_int_RETERR1( ... ) return( -1 );
 	#define libandria4_commonio_int_RETERR2( ... ) return( -2 );
@@ -259,6 +335,11 @@ SOFTWARE.
 		FILE *f;
 		uintptr_t ref_count;
 	};
+	
+	
+	
+		/* Common values for IO systems. */
+	#include "commoniovals.h"
 	
 #endif
 /* End libandria4 basic commonio.h */

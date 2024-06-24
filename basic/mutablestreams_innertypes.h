@@ -45,75 +45,61 @@ SOFTWARE.
 	#include <stdint.h>
 	
 	#include "monads.h"
+	#include "commonio.h"
 	
 	
 	
-	/* The stuff below should probably be merged into another file. */
+	/* These are temps to retain compatibility while the mutablestreams */
+	/*  files move over to the permanent names. */
 	
+	typedef libandria4_commonio_perr libandria4_newstreams_err;
+	#define libandria4_newstreams_eof ( libandria4_commoniovals_eof )
+	#define LIBANDRIA4_NEWSTREAMS_EOF ( libandria4_commoniovals_eof )
 	
+	#define libandria4_newstreams_result1 ( libandria4_commonio_eithsize2 )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDSIZET( ... ) \
+		LIBANDRIA4_COMMONIO_EITHSIZE2_BUILDSIZE( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDERR( ... ) \
+		LIBANDRIA4_COMMONIO_EITHSIZE2_BUILDERR( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT1_RETURNSIZET( ... ) \
+		LIBANDRIA4_COMMONIO_EITHSIZE2_RETURNSIZE( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT1_RETURNERR( ... ) \
+		LIBANDRIA4_COMMONIO_EITHSIZE2_RETURNERR( __VA_ARGS__ )
 	
-		/* EOF is 0, because EOF isn't really an error, and ( error * 0 ) */
-		/*  should "obviously" be no error at all. */
-	typedef uintptr_t libandria4_newstreams_err;
-	static const libandria4_newstreams_err libandria4_newstreams_eof =
-		(libandria4_newstreams_err)0;
-	#define LIBANDRIA4_NEWSTREAMS_EOF ( libandria4_newstreams_eof )
-	
-	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
-		libandria4_newstreams_result1,
-			size_t,
-			libandria4_newstreams_err
-	);
-	#define LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDSIZET( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_newstreams_result1, size_t, val )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDERR( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_newstreams_result1, libandria4_newstreams_err, val )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT1_RETURNSIZET( val ) \
-		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_newstreams_result1, size_t, val )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT1_RETURNERR( val ) \
-		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_newstreams_result1, libandria4_newstreams_err, val )
-	
-	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
-		libandria4_newstreams_result2,
-			libandria4_newstreams_err
-	);
-	#define LIBANDRIA4_NEWSTREAMS_RESULT2_BUILDJUST( val ) \
-		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_newstreams_result2, libandria4_newstreams_err, val )
+	#define libandria4_newstreams_result2 ( libandria4_commonio_mayerr2 )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT2_BUILDJUST( ... ) \
+		LIBANDRIA4_COMMONIO_MAYERR2_BUILDJUST( __VA_ARGS__ )
 	#define LIBANDRIA4_NEWSTREAMS_RESULT2_BUILDNOTHING( ... ) \
-		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_newstreams_result2, libandria4_newstreams_err )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT2_RETURNJUST( val ) \
-		LIBANDRIA4_MONAD_MAYBE_RETURNLEFT( libandria4_newstreams_result2, libandria4_newstreams_err, val )
+		LIBANDRIA4_COMMONIO_MAYERR2_BUILDNOTHING( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT2_RETURNJUST( ... ) \
+		LIBANDRIA4_COMMONIO_MAYERR2_RETURNJUST( __VA_ARGS__ )
 	#define LIBANDRIA4_NEWSTREAMS_RESULT2_RETURNNOTHING( ... ) \
-		LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( libandria4_newstreams_result2, libandria4_newstreams_err )
+		LIBANDRIA4_COMMONIO_MAYERR2_RETURNNOTHING( __VA_ARGS__ )
 	
-	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
-		libandria4_newstreams_result3,
-			char,
-			libandria4_newstreams_err
-	);
-	#define LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDCHAR( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_newstreams_result3, char, val )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDERR( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_newstreams_result3, libandria4_newstreams_err, val )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT3_RETURNCHAR( val ) \
-		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_newstreams_result3, char, val )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT3_RETURNERR( val ) \
-		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_newstreams_result3, libandria4_newstreams_err, val )
+	#define libandria4_newstreams_result3 ( libandria4_commonio_eithchar2 )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDCHAR( ... ) \
+		LIBANDRIA4_COMMONIO_EITHCHAR2_BUILDCHAR( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT3_BUILDERR( ... ) \
+		LIBANDRIA4_COMMONIO_EITHCHAR2_BUILDERR( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT3_RETURNCHAR( ... ) \
+		LIBANDRIA4_COMMONIO_EITHCHAR2_RETURNCHAR( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT3_RETURNERR( ... ) \
+		LIBANDRIA4_COMMONIO_EITHCHAR2_RETURNERR( __VA_ARGS__ )
 	
-	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
-		libandria4_newstreams_result4,
-			intmax_t,
-			libandria4_newstreams_err
-	);
-	#define LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDINT( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_newstreams_result4, intmax_t, val )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_newstreams_result4, libandria4_newstreams_err, val )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT4_RETURNINT( val ) \
-		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_newstreams_result4, intmax_t, val )
-	#define LIBANDRIA4_NEWSTREAMS_RESULT4_RETURNERR( val ) \
-		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_newstreams_result4, libandria4_newstreams_err, val )
+	#define libandria4_newstreams_result4 ( libandria4_commonio_eithintmax2 )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDINT( ... ) \
+		LIBANDRIA4_COMMONIO_EITHINTMAX2_BUILDINT( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT4_BUILDERR( ... ) \
+		LIBANDRIA4_COMMONIO_EITHINTMAX2_BUILDERR( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT4_RETURNINT( ... ) \
+		LIBANDRIA4_COMMONIO_EITHINTMAX2_RETURNINT( __VA_ARGS__ )
+	#define LIBANDRIA4_NEWSTREAMS_RESULT4_RETURNERR( ... ) \
+		LIBANDRIA4_COMMONIO_EITHINTMAX2_RETURNERR( __VA_ARGS__ )
 	
+	
+	
+	/* The types below this will remain here: they exist to support special */
+	/*  mutablestream capabilities instead of normal commonio stuff. */
 	
 	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
 		libandria4_newstreams_bituplic1,
