@@ -159,6 +159,7 @@ SOFTWARE.
 		
 		libandria4_commonio_storebyte ungetc;
 		
+			/* Note: these are maybes, NOT function pointers. */
 		libandria4_commonio_mayseek seekable;
 		libandria4_commonio_mayerrable errable;
 		
@@ -171,6 +172,7 @@ SOFTWARE.
 		libandria4_commonio_storebyte putc;
 		libandria4_commonio_strfunc puts_s;
 		
+			/* Note: these are maybes, NOT function pointers. */
 		libandria4_commonio_mayseek seekable;
 		libandria4_commonio_mayerrable errable;
 		
@@ -283,18 +285,34 @@ SOFTWARE.
 		libandria4_commonio_handle *io,
 			libandria4_commonio_byte *str, size_t len
 	);
+		/* Uses ->getc() to implement gets_s(). */
+	libandria4_commonio_eithgeneric libandria4_commonio_common_gets_s
+	(
+		libandria4_commonio_handle *io,
+			libandria4_commonio_byte *dest, size_t len
+	);
+	
+	
 	
 		/* Provides single-byte-only unget capabilities. */
 	typedef struct libandria4_commonio_istream_ungetwrapper_vtable
 	{
-		libandria4_commonio_istream here;
-		libandria4_commonio_istream *is;
+		libandria4_commonio_istream_vtable here;
+		libandria4_commonio_istream_vtable *is;
 		
 		libandria4_commonio_maybyte buffer;
 		
 	} libandria4_commonio_istream_ungetwrapper;
-	
-	
+	#define libandria4_commonio_istream_ungetwrapper_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
+		(libandria4_commonio_istream_ungetwrapper_vtable*)( \
+			(char*)( (libandria4_commonio_istream_vtable*)(vtab_ptr) ) + ( \
+				( (char*)&( ( ( (libandria4_commonio_istream_ungetwrapper_vtable*)0 )[ 1 ] ).here ) ) - \
+				( (char*)&( ( (libandria4_commonio_istream_ungetwrapper_vtable*)0 )[ 1 ] ) ) ) )
+	int libandria4_commonio_istream_ungetwrapper_init
+	(
+		libandria4_commonio_istream_ungetwrapper_vtable *ugvtab,
+		libandria4_commonio_istream *host
+	);
 	
 	
 	
