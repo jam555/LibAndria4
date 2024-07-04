@@ -33,6 +33,8 @@ SOFTWARE.
 	/* These defines were pulled out of stdmonads.h, and does have at least */
 	/*  one reference back to that file (look for the reference to C++ and */
 	/*  POSIX). */
+	/* TODO: There's a function elsewhere that converts from errno to these: */
+	/*  update it. */
 	
 	
 	
@@ -57,12 +59,13 @@ SOFTWARE.
 	
 		/* The domain of a mathematical function is the full set of it's */
 		/*  legal inputs. So if you get a domain error, you fed it wrong. */
-		/*  Probably not by feeding it after midnight though. */
+		/*  Probably not by feeding it after midnight though. e.g. EINVAL */
 	#define LIBANDRIA4_RESULT_FAILURE_DOMAIN ( 3 )
 		/* Meanwhile, the RANGE is the valid OUTPUTS of a mathematical */
 		/*  function. If you get this error, think of it as an overflow */
 		/*  error. */
 	#define LIBANDRIA4_RESULT_FAILURE_RANGE ( 4 )
+		/* EILSEQ */
 		/* And this one is expected to be unrelated to math, as it's an */
 		/*  "invalid sequence" error. Mostly relevant for multi-byte */
 		/*  character sequences, much like trying to cross a bridge AFTER */
@@ -75,13 +78,22 @@ SOFTWARE.
 	#define LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED ( 7 )
 		/* Should be obvious enough... but intentionally vague. */
 	#define LIBANDRIA4_RESULT_FAILURE_GENERICMISMATCH ( 8 )
+		/* e.g. E2BIG, EMSGSIZE, alternative to */
+		/*  LIBANDRIA4_RESULT_FAILURE_MEMORYFULL when SMALLER blocks are */
+		/*  available. You tried to specifically use an argument that in */
+		/*  some way was the wrong size. */
 	#define LIBANDRIA4_RESULT_FAILURE_SIZEMISMATCH ( 9 )
 	#define LIBANDRIA4_RESULT_FAILURE_TYPEMISMATCH ( 10 )
+		/* e.g. EROFS (read-only filesys), ENOSYS, ENOTTY */
 	#define LIBANDRIA4_RESULT_FAILURE_MODEMISMATCH ( 11 )
 		/* Array stuff. */
 	#define LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS ( 12 )
 	#define LIBANDRIA4_RESULT_FAILURE_ABOVEBOUNDS ( 13 )
-		/* File & directory stuff. */
+		/* File & directory stuff, but never used directly by those */
+		/*  functions in LibAndria. Instead, this is only produced by */
+		/*  more generic functions that interact with standard-library's */
+		/*  "errno" system, as LibAndria's EOF is 0, but errno treats 0 */
+		/*  as "no message". */
 	#define LIBANDRIA4_RESULT_FAILURE_EOF ( 14 )
 	
 		/* EFAULT: Note that this indicates a segfault. */
@@ -92,112 +104,81 @@ SOFTWARE.
 	#define LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ( 16 )
 	
 	
+	
+	/* Note: These aren't yet handled by any errno-repackaging functions. */
+	
+		/* ENOMEM, there's not enough memory available. Often this refers */
+		/*  specifically to virtual memory, but can mean any memory type. */
+	#define LIBANDRIA4_RESULT_FAILURE_MEMORYFULL ( 17 )
+		/* ENOSPC, EDQUOT, EFBIG, ENOBUFS, ENOSR, etc. You've run out */
+		/*  of some limited-amount resource. Never DIRECTLY means memory. */
+	#define LIBANDRIA4_RESULT_FAILURE_RATIONFULL1 ( 18 )
+	
+		/* ENOTSOCK, ENOSTR, ENOTSUP, EOPNOTSUPP, ENOTDIR, EISDIR, */
+		/*  ESPIPE, etc. Note that "broken pipe" is actually EPIPE, not */
+		/*  ESPIPE. */
+	#define LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ( 19 )
+		/* EIO. Usually hardware related. */
+	#define LIBANDRIA4_RESULT_FAILURE_IOERROR ( 20 )
+	
+		/* ENOTCONN, EBADF, EPIPE, ESTALE, ECONNRESET, EOWNERDEAD, etc: */
+		/*  The I/O handle isn't connected to anything. The reason for */
+		/*  the disconnection... well, who knows. */
+	#define LIBANDRIA4_RESULT_FAILURE_NOTCONN ( 21 )
+		/* EDESTADDRREQ ; You e.g. need to bind() the socket before */
+		/*  using it. More specific version of *_NOTCONN */
+	#define LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ( 22 )
+	
+		/* e.g. "Broken handle, close it.", ENETDOWN, ENETRESET, ENOLINK, EIDRM, EPROTO */
+	#define LIBANDRIA4_RESULT_FAILURE_BROKEN ( 23 )
+		/* ETIME, ETIMEDOUT ; A more-specific *_BROKEN */
+	#define LIBANDRIA4_RESULT_FAILURE_TIMEOUT ( 24 )
+		/* e.g. "This process is broken, exit it." */
+	#define LIBANDRIA4_RESULT_FAILURE_KILLING ( 25 )
+	
+		/* e.g. EBADMSG */
+	#define LIBANDRIA4_RESULT_FAILURE_CORRUPTED ( 26 )
+		/* e.g. ENOMSG, ENODATA, ENOATTR ; SPECIFIC data not available. */
+	#define LIBANDRIA4_RESULT_FAILURE_NARROWEOF ( 27 )
+		/* EOVERFLOW, ENAMETOOLONG ; Data value too large for destination */
+		/*  field (e.g. 64-bit time into 32-bit time). Note: never means */
+		/*  the same as *_SIZEMISMATCH */
+	#define LIBANDRIA4_RESULT_FAILURE_OVERFLOW ( 28 )
+	
+		/* EDEADLK, ENOLOCK, ETXTBSY: A resource is bound incompatibily */
+		/*  with the operation, resolve and try again. In the case of */
+		/*  ETXTBSY for example, you're trying to open a file for writing */
+		/*  that's currently read-only for execution. */
+	#define LIBANDRIA4_RESULT_FAILURE_WOULDCLOG ( 29 )
+		/* EWOULDBLOCK, EBUSY, EAGAIN, EINTR, ERESTART: A non-blocking */
+		/*  resource/action would be forced to block/wait, try again. */
+		/*  It's usually best to wait a few seconds before the next */
+		/*  attempt. */
+	#define LIBANDRIA4_RESULT_FAILURE_WOULDBLOCK ( 30 )
+		/* EINPROGRESS, EALREADY: An alternative to *_WOULDBLOCK for */
+		/*  innately-blocking things like "connect". */
+	#define LIBANDRIA4_RESULT_FAILURE_ONGOING ( 31 )
+		/* ECANCELED, ECONNABORTED */
+	#define LIBANDRIA4_RESULT_FAILURE_STOPPED ( 32 )
+	
+	
 	#if 0
-		/* These are apparently POSIX values that were added to C++11. */
-		
 		/* Note: renumber these. */
-		
-			/* EBADF */
-		#define LIBANDRIA4_RESULT_FAILURE_BADFILEDESC ( 5 )
-			/* EEXIST */
-		#define LIBANDRIA4_RESULT_FAILURE_FILEEXISTS ( 6 )
-			/* ENAMETOOLONG */
-		#define LIBANDRIA4_RESULT_FAILURE_NAMETOOLONG ( 7 )
-			/* ESPIPE, note that "broken pipe" is actually EPIPE. */
-		#define LIBANDRIA4_RESULT_FAILURE_INVALIDSEEK ( 8 )
-			/* EIO. Usually hardware related. */
-		#define LIBANDRIA4_RESULT_FAILURE_IOERROR ( 9 )
-			/* EISDIR */
-		#define LIBANDRIA4_RESULT_FAILURE_ISDIR ( 10 )
-			/* ENOENT, "no entry". */
-		#define LIBANDRIA4_RESULT_FAILURE_NOFILEORDIR ( 11 )
-			/* ENOTDIR */
-		#define LIBANDRIA4_RESULT_FAILURE_NOTDIR ( 12 )
-			/* EACCES */
-		#define LIBANDRIA4_RESULT_FAILURE_ACCESSDENIED ( 13 )
-			/* EROFS */
-		#define LIBANDRIA4_RESULT_FAILURE_ROFILESYS ( 14 )
+	
+			/* ELOOP, EXDEV, etc., too many levels of travel. */
+		#define LIBANDRIA4_RESULT_FAILURE_TOODEEP ( 20 )
+			/* EACCES, EPERM, ECONNREFUSED */
+		#define LIBANDRIA4_RESULT_FAILURE_PERMSDENIED ( 25 )
+			/* EEXIST, EADDRNOTAVAIL, EADDRINUSE, ENOTEMPTY, EISCONN */
+		#define LIBANDRIA4_RESULT_FAILURE_EXISTS ( 6 )
+			/* ENOENT, EAFNOSUPPORT, EPROTONOSUPPORT, EPROTOTYPE, ENOPROTOOPT, ENODEV, ENXIO, ESRCH, ECHILD, ENETUNREACH, EHOSTUNREACH */
+		#define LIBANDRIA4_RESULT_FAILURE_NOENTRY ( 11 )
 			/* EMFILE, too many open in PROCESS specifically. */
-		#define LIBANDRIA4_RESULT_FAILURE_TOOMANYOPFILES ( 15 )
+		#define LIBANDRIA4_RESULT_FAILURE_RATIONFULL2 ( 15 )
 			/* ENFILE, too many open in SYSTEM specifically. */
-		#define LIBANDRIA4_RESULT_FAILURE_TOOMANYOPFILES2 ( 16 )
-			/* ELOOP */
-		#define LIBANDRIA4_RESULT_FAILURE_SYMLINKSTOODEEP ( 17 )
-			/* EOVERFLOW */
-		#define LIBANDRIA4_RESULT_FAILURE_OVERFLOW ( 18 )
-			/* ENOMEM, there's not enough memory available. */
-		#define LIBANDRIA4_RESULT_FAILURE_MEMORYFULL ( 20 )
-		
-		/* The following are pairings of C++11 enum members and the */
-		/*  C++11-standardized posix error macros that they correspond to. */
-		/* These have not yet been brought in, but it would be good if they */
-		/*  were. Note that the POSIX meanings should probably be followed. */
-		/*  Also, while POSIX standardizes the macro names, it does not */
-		/*  attempt to standardize the values, as many of them would likely */
-		/*  have been defined in some form by already existing pre-POSIX */
-		/*  Unix distributions, such as the early BSD variants. */
-		/*
-			address_family_not_supported	EAFNOSUPPORT
-			address_in_use	EADDRINUSE
-			address_not_available	EADDRNOTAVAIL
-			already_connected	EISCONN
-			argument_list_too_long	E2BIG
-			bad_message	EBADMSG
-			broken_pipe	EPIPE
-			connection_aborted	ECONNABORTED
-			connection_already_in_progress	EALREADY
-			connection_refused	ECONNREFUSED
-			connection_reset	ECONNRESET
-			cross_device_link	EXDEV
-			destination_address_required	EDESTADDRREQ
-			device_or_resource_busy	EBUSY
-			directory_not_empty	ENOTEMPTY
-			executable_format_error	ENOEXEC
-			file_too_large	EFBIG
-			function_not_supported	ENOSYS
-			host_unreachable	EHOSTUNREACH
-			identifier_removed	EIDRM
-			illegal_byte_sequence	EILSEQ
-			inappropriate_io_control_operation	ENOTTY
-			interrupted	EINTR
-			invalid_argument	EINVAL
-			message_size	EMSGSIZE
-			network_down	ENETDOWN
-			network_reset	ENETRESET
-			network_unreachable	ENETUNREACH
-			no_buffer_space	ENOBUFS
-			no_child_process	ECHILD
-			no_link	ENOLINK
-			no_lock_available	ENOLOCK
-			no_message	ENOMSG
-			no_message_available	ENODATA
-			no_protocol_option	ENOPROTOOPT
-			no_space_on_device	ENOSPC
-			no_stream_resources	ENOSR
-			no_such_device	ENODEV
-			no_such_device_or_address	ENXIO
-			no_such_process	ESRCH
-			not_a_socket	ENOTSOCK
-			not_a_stream	ENOSTR
-			not_connected	ENOTCONN
-			not_supported	ENOTSUP
-			operation_canceled	ECANCELED
-			operation_in_progress	EINPROGRESS
-			operation_not_permitted	EPERM
-			operation_not_supported	EOPNOTSUPP
-			operation_would_block	EWOULDBLOCK
-			owner_dead	EOWNERDEAD
-			protocol_error	EPROTO
-			protocol_not_supported	EPROTONOSUPPORT
-			resource_deadlock_would_occur	EDEADLK
-			resource_unavailable_try_again	EAGAIN
-			state_not_recoverable	ENOTRECOVERABLE
-			stream_timeout	ETIME
-			text_file_busy	ETXTBSY
-			timed_out	ETIMEDOUT
-			too_many_links	EMLINK
-			wrong_protocol_type	EPROTOTYPE
-		*/
+		#define LIBANDRIA4_RESULT_FAILURE_RATIONFULL3 ( 16 )
+			/* e.g. directly executing a library; ENOEXEC, ELIBEXEC */
+		#define LIBANDRIA4_RESULT_FAILURE_WRONGFORMAT ( 30 )
 	#endif
 	/* If you add to this, add support in libandria4_errno_2result() too. Note */
 	/*  that C++11 added a number of errno errors from POSIX, so there IS */
