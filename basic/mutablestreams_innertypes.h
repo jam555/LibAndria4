@@ -54,7 +54,7 @@ SOFTWARE.
 	
 	typedef libandria4_commonio_perr libandria4_newstreams_err;
 	#define libandria4_newstreams_eof ( libandria4_commoniovals_eof )
-	#define LIBANDRIA4_NEWSTREAMS_EOF ( libandria4_commoniovals_eof )
+	#define LIBANDRIA4_NEWSTREAMS_EOF ( LIBANDRIA4_COMMONIOVALS_EOF )
 	
 	#define libandria4_newstreams_result1 ( libandria4_commonio_eithsize2 )
 	#define LIBANDRIA4_NEWSTREAMS_RESULT1_BUILDSIZET( ... ) \
@@ -103,7 +103,7 @@ SOFTWARE.
 	
 	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
 		libandria4_newstreams_bituplic1,
-			libandria4_newstreams_result1,
+			libandria4_newstreams_result1, /* libandria4_commonio_eithsize2 */
 			libandria4_FILE_redirection
 	);
 	#define LIBANDRIA4_NEWSTREAMS_BITUP1_BUILDJUSTSTREAM( strmptr ) \
@@ -163,7 +163,7 @@ SOFTWARE.
 	
 	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
 		libandria4_newstreams_bituplic3,
-			libandria4_newstreams_result3,
+			libandria4_newstreams_result3, /* libandria4_commonio_eithchar2 */
 			libandria4_FILE_redirection
 	);
 	#define LIBANDRIA4_NEWSTREAMS_BITUP3_BUILDJUSTSTREAM( strmptr ) \
@@ -193,7 +193,7 @@ SOFTWARE.
 	
 	LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE(
 		libandria4_newstreams_bituplic4,
-			libandria4_newstreams_result4,
+			libandria4_newstreams_result4, /* libandria4_commonio_eithintmax2 */
 			libandria4_FILE_redirection
 	);
 	#define LIBANDRIA4_NEWSTREAMS_BITUP4_BUILDJUSTSTREAM( strmptr ) \
