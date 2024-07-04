@@ -587,7 +587,9 @@ SOFTWARE.
 	#define LIBANDRIA4_MONAD_REFPOINTER_EXPRINIT_NULL( name, var ) \
 		(( (var).counted = (name##_counttype*)0, 1 ))
 	#define LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY( var,  func, onnull ) \
-		( (var).counted ?   ( func( (var).counted->val ) ) :   ( onnull( var ) ) )
+		( (var).counted ? \
+			( func( (var).counted->val, (var).counted->auxiliary ) ) : \
+			( onnull( var ) ) )
 		/* Note that *_neglect() will actually null out our pointer, so */
 		/*  there's no need to do it ourselves. */
 	
