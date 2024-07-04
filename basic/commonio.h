@@ -42,6 +42,20 @@ SOFTWARE.
 	typedef uint32_t libandria4_commonio_err;
 	typedef uintptr_t libandria4_commonio_perr;
 	
+	#define LIBANDRIA4_COMMONIO_BYTE_MIN 0
+	#define LIBANDRIA4_COMMONIO_BYTE_MAX UINT8_MAX
+	
+	#define LIBANDRIA4_COMMONIO_SUCC_MIN 0
+	#define LIBANDRIA4_COMMONIO_SUCC_MAX UINT32_MAX
+	
+	#define LIBANDRIA4_COMMONIO_ERR_MIN 0
+	#define LIBANDRIA4_COMMONIO_ERR_MAX UINT32_MAX
+	
+	#define LIBANDRIA4_COMMONIO_PERR_MIN 0
+	#define LIBANDRIA4_COMMONIO_PERR_MAX UINTPTR_MAX
+	
+	
+	
 	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
 		libandria4_commonio_maybyte,
 		libandria4_commonio_byte
@@ -56,20 +70,20 @@ SOFTWARE.
 	
 		/* *BODY* takes statements, *EXPR* takes expressions, *REDUCE */
 		/*  extracts values. */
-	#define LIBANDRIA4_COMMONIO_MAYBYTE_BODYMATCH( var,  onerr, onsucc ) \
-		LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, onerr, onsucc )
-	#define LIBANDRIA4_COMMONIO_MAYBYTE_EXPRMATCH( var,  onerr, onsucc ) \
-		LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( var, onerr, onsucc )
+	#define LIBANDRIA4_COMMONIO_MAYBYTE_BODYMATCH( var,  onval, onnothing ) \
+		LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, onval, onnothing )
+	#define LIBANDRIA4_COMMONIO_MAYBYTE_EXPRMATCH( var,  onval, onnothing ) \
+		LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( var, onval, onnothing )
 		/* "onsucc" always produces a "nothing" monad, so onerr should do */
 		/*  something compatible. Basically only useful for translating */
 		/*  between "maybe" types. */
-	#define LIBANDRIA4_COMMONIO_MAYBYTE_EXPRCHAIN( var,  name, type, onerr ) \
-		LIBANDRIA4_MONAD_MAYBE_EXPRCHAIN( name, type,  var,  onerr )
+	#define LIBANDRIA4_COMMONIO_MAYBYTE_EXPRCHAIN( var,  name, type, onval ) \
+		LIBANDRIA4_MONAD_MAYBE_EXPRCHAIN( name, type,  var,  onval )
 			/* alt gets subbed in for "nothing". */
 	#define LIBANDRIA4_COMMONIO_MAYBYTE_REDUCE( var,  alttype, altval ) \
 		LIBANDRIA4_MONAD_MAYBE_REDUCE( var,  alttype, altval )
-	#define LIBANDRIA4_COMMONIO_MAYBYTE_NULLSUCC( var,  onerr ) \
-		LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, onerr, LIBANDRIA4_NOACTION )
+	#define LIBANDRIA4_COMMONIO_MAYBYTE_NULLSUCC( var,  onval ) \
+		LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, onval, LIBANDRIA4_NOACTION )
 	
 	#define LIBANDRIA4_COMMONIO_MAYBYTE_RETTBYTE( val ) \
 		return( LIBANDRIA4_COMMONIO_MAYBYTE_JUSTBYTE( val ) );
@@ -94,10 +108,10 @@ SOFTWARE.
 	
 		/* *BODY* takes statements, *EXPR* takes expressions, *REDUCE */
 		/*  extracts values. */
-	#define LIBANDRIA4_COMMONIO_MAYERR_BODYMATCH( var,  onerr, onsucc ) \
-		LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, onerr, onsucc )
-	#define LIBANDRIA4_COMMONIO_MAYERR_EXPRMATCH( var,  onerr, onsucc ) \
-		LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( var, onerr, onsucc )
+	#define LIBANDRIA4_COMMONIO_MAYERR_BODYMATCH( var,  onerr, onnothing ) \
+		LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, onerr, onnothing )
+	#define LIBANDRIA4_COMMONIO_MAYERR_EXPRMATCH( var,  onerr, onnothing ) \
+		LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( var, onerr, onnothing )
 		/* "onsucc" always produces a "nothing" monad, so onerr should do */
 		/*  something compatible. Basically only useful for translating */
 		/*  between "maybe" types. */
@@ -145,6 +159,11 @@ SOFTWARE.
 			var, \
 				LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERR, \
 				LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
+	
+	#define LIBANDRIA4_COMMONIO_EITHBYTE_RETBYTE( val ) \
+		return( LIBANDRIA4_COMMONIO_EITHBYTE_BYTE( val ) )
+	#define LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( val ) \
+		return( LIBANDRIA4_COMMONIO_EITHBYTE_ERR( val ) )
 	
 	
 	
@@ -224,6 +243,12 @@ SOFTWARE.
 			var, \
 				LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERR, \
 				LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
+	
+		/* Returns. */
+	#define LIBANDRIA4_COMMONIO_EITHLONG_RETBYTE( val ) \
+		return( LIBANDRIA4_COMMONIO_EITHLONG_BYTE( val ) )
+	#define LIBANDRIA4_COMMONIO_EITHLONG_RETERR( val ) \
+		return( LIBANDRIA4_COMMONIO_EITHLONG_ERR( val ) )
 	
 	
 	
@@ -330,6 +355,7 @@ SOFTWARE.
 	
 	
 	
+		/* Does this get used ANYWHERE? */
 	typedef struct libandria4_FILE_handle
 	{
 		FILE *f;
