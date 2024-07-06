@@ -294,6 +294,14 @@ SOFTWARE.
 	
 	
 	
+	#define libandria4_commonio_handlevtable_FROM_SRCVTABLE( src_type, dest_type, vtab_ptr ) \
+		(dest_type*)( \
+			(char*)( (src_type*)(vtab_ptr) ) + ( \
+				( (char*)&( ( ( (dest_type*)0 )[ 1 ] ).here ) ) - \
+				( (char*)&( ( (dest_type*)0 )[ 1 ] ) ) ) )
+	
+	
+	
 		/* Provides single-byte-only unget capabilities. */
 	typedef struct libandria4_commonio_istream_ungetwrapper_vtable
 	{
@@ -304,15 +312,57 @@ SOFTWARE.
 		
 	} libandria4_commonio_istream_ungetwrapper;
 	#define libandria4_commonio_istream_ungetwrapper_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
-		(libandria4_commonio_istream_ungetwrapper_vtable*)( \
-			(char*)( (libandria4_commonio_istream_vtable*)(vtab_ptr) ) + ( \
-				( (char*)&( ( ( (libandria4_commonio_istream_ungetwrapper_vtable*)0 )[ 1 ] ).here ) ) - \
-				( (char*)&( ( (libandria4_commonio_istream_ungetwrapper_vtable*)0 )[ 1 ] ) ) ) )
+		libandria4_commonio_handlevtable_FROM_SRCVTABLE( \
+			libandria4_commonio_istream_vtable, libandria4_commonio_istream_ungetwrapper_vtable, \
+			vtab_ptr )
 	int libandria4_commonio_istream_ungetwrapper_init
 	(
 		libandria4_commonio_istream_ungetwrapper_vtable *ugvtab,
-		libandria4_commonio_istream *host
+		libandria4_commonio_istream_vtable *host
 	);
+	
+	
+	
+	typedef struct libandria4_commonio_handlevtable_2istream
+	{
+		libandria4_commonio_istream_vtable here;
+		libandria4_commonio_handle_vtable *is;
+		
+	} libandria4_commonio_handlevtable_2istream;
+	#define libandria4_commonio_handlevtable_2istream_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
+		libandria4_commonio_handlevtable_FROM_SRCVTABLE( \
+			libandria4_commonio_istream_vtable, libandria4_commonio_handlevtable_2istream, \
+			vtab_ptr )
+	typedef struct libandria4_commonio_handlevtable_2ostream
+	{
+		libandria4_commonio_ostream_vtable here;
+		libandria4_commonio_handle_vtable *is;
+		
+	} libandria4_commonio_handlevtable_2ostream;
+	#define libandria4_commonio_handlevtable_2istream_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
+		libandria4_commonio_handlevtable_FROM_SRCVTABLE( \
+			libandria4_commonio_handlevtable_2ostream, libandria4_commonio_handlevtable_2istream, \
+			vtab_ptr )
+	typedef struct libandria4_commonio_handlevtable_2seekable
+	{
+		libandria4_commonio_seekable_vtable here;
+		libandria4_commonio_handle_vtable *is;
+		
+	} libandria4_commonio_handlevtable_2seekable;
+	#define libandria4_commonio_handlevtable_2istream_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
+		libandria4_commonio_handlevtable_FROM_SRCVTABLE( \
+			libandria4_commonio_handlevtable_2seekable, libandria4_commonio_handlevtable_2istream, \
+			vtab_ptr )
+	typedef struct libandria4_commonio_handlevtable_2errorable
+	{
+		libandria4_commonio_errorable_vtable here;
+		libandria4_commonio_handle_vtable *is;
+		
+	} libandria4_commonio_handlevtable_2errorable;
+	#define libandria4_commonio_handlevtable_2istream_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
+		libandria4_commonio_handlevtable_FROM_SRCVTABLE( \
+			libandria4_commonio_handlevtable_2errorable, libandria4_commonio_handlevtable_2istream, \
+			vtab_ptr )
 	
 	
 	
