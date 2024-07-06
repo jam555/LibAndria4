@@ -329,40 +329,63 @@ SOFTWARE.
 		libandria4_commonio_handle_vtable *is;
 		
 	} libandria4_commonio_handlevtable_2istream;
-	#define libandria4_commonio_handlevtable_2istream_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
+	#define libandria4_commonio_handlevtable_2istream_vtable_FROM_HANDLEVTABPTR( vtab_ptr ) \
 		libandria4_commonio_handlevtable_FROM_SRCVTABLE( \
 			libandria4_commonio_istream_vtable, libandria4_commonio_handlevtable_2istream, \
 			vtab_ptr )
+	int libandria4_commonio_handlevtable_2istream_init
+	(
+		libandria4_commonio_handlevtable_2istream *wrapper,
+		libandria4_commonio_handle_vtable *host
+	);
+	
 	typedef struct libandria4_commonio_handlevtable_2ostream
 	{
 		libandria4_commonio_ostream_vtable here;
 		libandria4_commonio_handle_vtable *is;
 		
 	} libandria4_commonio_handlevtable_2ostream;
-	#define libandria4_commonio_handlevtable_2istream_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
+	#define libandria4_commonio_handlevtable_2ostream_vtable_FROM_HANDLEVTABPTR( vtab_ptr ) \
 		libandria4_commonio_handlevtable_FROM_SRCVTABLE( \
 			libandria4_commonio_handlevtable_2ostream, libandria4_commonio_handlevtable_2istream, \
 			vtab_ptr )
+	int libandria4_commonio_handlevtable_2ostream_init
+	(
+		libandria4_commonio_handlevtable_2ostream *wrapper,
+		libandria4_commonio_handle_vtable *host
+	);
+	
 	typedef struct libandria4_commonio_handlevtable_2seekable
 	{
 		libandria4_commonio_seekable_vtable here;
 		libandria4_commonio_handle_vtable *is;
 		
 	} libandria4_commonio_handlevtable_2seekable;
-	#define libandria4_commonio_handlevtable_2istream_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
+	#define libandria4_commonio_handlevtable_2seekable_vtable_FROM_HANDLEVTABPTR( vtab_ptr ) \
 		libandria4_commonio_handlevtable_FROM_SRCVTABLE( \
 			libandria4_commonio_handlevtable_2seekable, libandria4_commonio_handlevtable_2istream, \
 			vtab_ptr )
+	int libandria4_commonio_handlevtable_seekable_init
+	(
+		libandria4_commonio_handlevtable_2seekable *wrapper,
+		libandria4_commonio_handle_vtable *host
+	);
+	
 	typedef struct libandria4_commonio_handlevtable_2errorable
 	{
 		libandria4_commonio_errorable_vtable here;
 		libandria4_commonio_handle_vtable *is;
 		
 	} libandria4_commonio_handlevtable_2errorable;
-	#define libandria4_commonio_handlevtable_2istream_vtable_FROM_ISTREAMVTABPTR( vtab_ptr ) \
+	#define libandria4_commonio_handlevtable_2errorable_vtable_FROM_HANDLEVTABPTR( vtab_ptr ) \
 		libandria4_commonio_handlevtable_FROM_SRCVTABLE( \
 			libandria4_commonio_handlevtable_2errorable, libandria4_commonio_handlevtable_2istream, \
 			vtab_ptr )
+	int libandria4_commonio_handlevtable_errorable_init
+	(
+		libandria4_commonio_handlevtable_2errorable *wrapper,
+		libandria4_commonio_handle_vtable *host
+	);
 	
 	
 	
