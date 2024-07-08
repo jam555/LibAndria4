@@ -33,6 +33,7 @@ SOFTWARE.
 	#include <stdio.h>
 	
 	#include "monads.h"
+	#include "commonio.h"
 	
 	
 	
@@ -221,24 +222,24 @@ SOFTWARE.
 		/* printf() will be supported by discrete external function: it's a big job, */
 		/*  and should only been done once. Same for scanf(). */
 		
-		int (*is_eof)( void* /* FILE* */ );
+		int (*is_eof)( void* /* FILE* */ ); /* Done. */
 			/* If there isn't an error, then it MIGHT still indicate eof. */
-		libandria4_newstreams_result2 (*get_error)( void* /* FILE* */ );
+		libandria4_newstreams_result2 (*get_error)( void* /* FILE* */ ); /* Done. */
 		
-		libandria4_newstreams_bituplic2 (*clear_err)( void* /* FILE* */ );
+		libandria4_newstreams_bituplic2 (*clear_err)( void* /* FILE* */ ); /* Done. */
 		
 		
 			/* For "Reference point" use SEEK_SET, SEEK_CUR, or SEEK_END, all from stdio.h */
-		libandria4_newstreams_bituplic4 (*tell)( void* /* FILE* */, int /* Reference point. */ );
-		libandria4_newstreams_bituplic2 (*seek)( void* /* FILE* */, intmax_t, int /* Reference point. */ );
+		libandria4_newstreams_bituplic4 (*tell)( void* /* FILE* */, int /* Reference point. */ ); /* Done. */
+		libandria4_newstreams_bituplic2 (*seek)( void* /* FILE* */, intmax_t, int /* Reference point. */ ); /* Done. */
 		
-		libandria4_newstreams_bituplic2 (*rewind)( void* /* FILE* */ );
+		libandria4_newstreams_bituplic2 (*rewind)( void* /* FILE* */ ); /* Done. */
 		
-		libandria4_newstreams_bituplic2 (*flush)( void* /* FILE* */ );
+		libandria4_newstreams_bituplic2 (*flush)( void* /* FILE* */ ); /* Done. */
 		
 		
-		libandria4_newstreams_bituplic3 (*get_c)( void* /* FILE* */ );
-		libandria4_newstreams_bituplic1 (*put_c)( void* /* FILE* */, char );
+		libandria4_newstreams_bituplic3 (*get_c)( void* /* FILE* */ ); /* Done. */
+		libandria4_newstreams_bituplic1 (*put_c)( void* /* FILE* */, char ); /* Done. */
 		
 			/* See LIBANDRIA4_NEWSTREAMS_ONDIE() for the cannonical approach to */
 			/*  this return value... but feel free to do otherwise if it makes */
@@ -278,5 +279,20 @@ SOFTWARE.
 				LIBANDRIA4_FILE_REDIRECTION_ONNEGLECT,
 				LIBANDRIA4_FILE_REDIRECTION_ONDIE
 		);
+	
+	
+	
+	
+	
+	typedef struct libandria4_mutastream_2stream
+	{
+		libandria4_commonio_handle handle;
+		libandria4_commonio_istream_ungetwrapper_vtable uget_host;
+		libandria4_commonio_istream_vtable uget_support;
+		libandria4_FILE_tracker trk;
+		
+	} libandria4_mutastream_2stream;
+	
+	/* We need to build a type derived from libandria4_commonio_handle{} for our purposes. */
 	
 #endif
