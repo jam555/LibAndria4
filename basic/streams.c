@@ -325,6 +325,76 @@ static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_, 
 			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
 		return( ( hand->is->ungetc )( hand_, val ) ); } \
 	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+#define libandria4_commonio_GENERICPUTC( name, typeenum, desttype, converter, frommember ) \
+static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_, libandria4_commonio_byte val ) { \
+	if( hand_ ) { \
+		if( hand_->dispatch != typeenum ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+		desttype *hand = converter( hand_->vtab. frommember ); \
+		if( !hand || !( hand->is ) || !( hand->is->putc ) ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+		return( ( hand->is->putc )( hand_, val ) ); } \
+	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+#define libandria4_commonio_GENERICTELL( name, typeenum, desttype, converter, frommember ) \
+static libandria4_commonio_eithlong name( libandria4_commonio_handle *hand_ ) { \
+	if( hand_ ) { \
+		if( hand_->dispatch != typeenum ) { \
+			LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+		desttype *hand = converter( hand_->vtab. frommember ); \
+		if( !hand || !( hand->is ) || !( hand->is->tell ) ) { \
+			LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+		return( ( hand->is->tell )( hand_ ) ); } \
+	LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+#define libandria4_commonio_GENERICSEEK( name, typeenum, desttype, converter, frommember ) \
+static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_, long off, int ori ) { \
+	if( hand_ ) { \
+		if( hand_->dispatch != typeenum ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+		desttype *hand = converter( hand_->vtab. frommember ); \
+		if( !hand || !( hand->is ) || !( hand->is->seek ) ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+		return( ( hand->is->seek )( hand_,  off, ori ) ); } \
+	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+#define libandria4_commonio_GENERICREWIND( name, typeenum, desttype, converter, frommember ) \
+static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+	if( hand_ ) { \
+		if( hand_->dispatch != typeenum ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+		desttype *hand = converter( hand_->vtab. frommember ); \
+		if( !hand || !( hand->is ) || !( hand->is->rewind ) ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+		return( ( hand->is->rewind )( hand_ ) ); } \
+	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+#define libandria4_commonio_GENERICCLEARERR( name, typeenum, desttype, converter, frommember ) \
+static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+	if( hand_ ) { \
+		if( hand_->dispatch != typeenum ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+		desttype *hand = converter( hand_->vtab. frommember ); \
+		if( !hand || !( hand->is ) || !( hand->is->clearerr ) ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+		return( ( hand->is->clearerr )( hand_ ) ); } \
+	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+#define libandria4_commonio_GENERICEOF( name, typeenum, desttype, converter, frommember ) \
+static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+	if( hand_ ) { \
+		if( hand_->dispatch != typeenum ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+		desttype *hand = converter( hand_->vtab. frommember ); \
+		if( !hand || !( hand->is ) || !( hand->is->eof ) ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+		return( ( hand->is->eof )( hand_ ) ); } \
+	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+#define libandria4_commonio_GENERICERROR( name, typeenum, desttype, converter, frommember ) \
+static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+	if( hand_ ) { \
+		if( hand_->dispatch != typeenum ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+		desttype *hand = converter( hand_->vtab. frommember ); \
+		if( !hand || !( hand->is ) || !( hand->is->error ) ) { \
+			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+		return( ( hand->is->error )( hand_ ) ); } \
+	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 ???
 
 
@@ -393,17 +463,23 @@ libandria4_commonio_GENERICFLUSH(
 		libandria4_commonio_handle_vtabtype_ostream,
 		libandria4_commonio_handlevtable_2ostream,
 		libandria4_commonio_handlevtable_2ostream_vtable_FROM_HANDLEVTABPTR,
-		istr
+		ostr
 );
 
-???
+libandria4_commonio_GENERICPUTC(
+	libandria4_commonio_ostream_vtable_wrapperputc,
+		libandria4_commonio_handle_vtabtype_ostream,
+		libandria4_commonio_handlevtable_2ostream,
+		libandria4_commonio_handlevtable_2ostream_vtable_FROM_HANDLEVTABPTR,
+		ostr
+);
 
 libandria4_commonio_GENERICCLOSE(
 	libandria4_commonio_ostream_vtable_wrapperclose,
 		libandria4_commonio_handle_vtabtype_ostream,
 		libandria4_commonio_handlevtable_2ostream,
 		libandria4_commonio_handlevtable_2ostream_vtable_FROM_HANDLEVTABPTR,
-		istr
+		ostr
 );
 
 int libandria4_commonio_handlevtable_2ostream_init
@@ -415,8 +491,8 @@ int libandria4_commonio_handlevtable_2ostream_init
 	if( wrapper && host )
 	{
 		wrapper->here.flush = &libandria4_commonio_ostream_vtable_wrapperflush;
-		wrapper->here.putc = & putc;
-		wrapper->here.puts_s = & puts_s;
+		wrapper->here.putc = &libandria4_commonio_ostream_vtable_wrapperputc;
+		wrapper->here.puts_s = &libandria4_commonio_common_puts_s;
 		wrapper->here.close = &libandria4_commonio_ostream_vtable_wrapperclose;
 		
 		wrapper->is = host;
@@ -438,17 +514,37 @@ libandria4_commonio_GENERICFLUSH(
 		libandria4_commonio_handle_vtabtype_seekable,
 		libandria4_commonio_handlevtable_2seekable,
 		libandria4_commonio_handlevtable_2seekable_vtable_FROM_HANDLEVTABPTR,
-		istr
+		seek
 );
 
-???
+libandria4_commonio_GENERICTELL(
+	libandria4_commonio_seekable_vtable_wrappertell,
+		libandria4_commonio_handle_vtabtype_seekable,
+		libandria4_commonio_handlevtable_2seekable,
+		libandria4_commonio_handlevtable_2seekable_vtable_FROM_HANDLEVTABPTR,
+		seek
+);
+libandria4_commonio_GENERICSEEK(
+	libandria4_commonio_seekable_vtable_wrapperseek,
+		libandria4_commonio_handle_vtabtype_seekable,
+		libandria4_commonio_handlevtable_2seekable,
+		libandria4_commonio_handlevtable_2seekable_vtable_FROM_HANDLEVTABPTR,
+		seek
+);
+libandria4_commonio_GENERICREWIND(
+	libandria4_commonio_seekable_vtable_wrapperrewind,
+		libandria4_commonio_handle_vtabtype_seekable,
+		libandria4_commonio_handlevtable_2seekable,
+		libandria4_commonio_handlevtable_2seekable_vtable_FROM_HANDLEVTABPTR,
+		seek
+);
 
 libandria4_commonio_GENERICCLOSE(
 	libandria4_commonio_seekable_vtable_wrapperclose,
 		libandria4_commonio_handle_vtabtype_seekable,
 		libandria4_commonio_handlevtable_2seekable,
 		libandria4_commonio_handlevtable_2seekable_vtable_FROM_HANDLEVTABPTR,
-		istr
+		seek
 );
 
 int libandria4_commonio_handlevtable_seekable_init
@@ -460,9 +556,9 @@ int libandria4_commonio_handlevtable_seekable_init
 	if( wrapper && host )
 	{
 		wrapper->here.flush = &libandria4_commonio_seekable_vtable_wrapperflush;
-		wrapper->here.tell = & tell;
-		wrapper->here.seek = & seek;
-		wrapper->here.rewind = & rewind;
+		wrapper->here.tell = &libandria4_commonio_seekable_vtable_wrappertell;
+		wrapper->here.seek = &libandria4_commonio_seekable_vtable_wrapperseek;
+		wrapper->here.rewind = &libandria4_commonio_seekable_vtable_wrapperrewind;
 		wrapper->here.close = &libandria4_commonio_seekable_vtable_wrapperclose;
 		
 		wrapper->is = host;
@@ -482,17 +578,37 @@ libandria4_commonio_GENERICFLUSH(
 		libandria4_commonio_handle_vtabtype_errorable,
 		libandria4_commonio_handlevtable_2errorable,
 		libandria4_commonio_handlevtable_2errorable_vtable_FROM_HANDLEVTABPTR,
-		istr
+		err
 );
 
-???
+libandria4_commonio_GENERICCLEARERR(
+	libandria4_commonio_errorable_vtable_wrapperclearerr,
+		libandria4_commonio_handle_vtabtype_errorable,
+		libandria4_commonio_handlevtable_2errorable,
+		libandria4_commonio_handlevtable_2errorable_vtable_FROM_HANDLEVTABPTR,
+		err
+);
+libandria4_commonio_GENERICEOF(
+	libandria4_commonio_errorable_vtable_wrappereof,
+		libandria4_commonio_handle_vtabtype_errorable,
+		libandria4_commonio_handlevtable_2errorable,
+		libandria4_commonio_handlevtable_2errorable_vtable_FROM_HANDLEVTABPTR,
+		err
+);
+libandria4_commonio_GENERICERROR(
+	libandria4_commonio_errorable_vtable_wrappererror,
+		libandria4_commonio_handle_vtabtype_errorable,
+		libandria4_commonio_handlevtable_2errorable,
+		libandria4_commonio_handlevtable_2errorable_vtable_FROM_HANDLEVTABPTR,
+		err
+);
 
 libandria4_commonio_GENERICCLOSE(
 	libandria4_commonio_errorable_vtable_wrapperclose,
 		libandria4_commonio_handle_vtabtype_errorable,
 		libandria4_commonio_handlevtable_2errorable,
 		libandria4_commonio_handlevtable_2errorable_vtable_FROM_HANDLEVTABPTR,
-		istr
+		err
 );
 
 int libandria4_commonio_handlevtable_errorable_init
@@ -504,9 +620,9 @@ int libandria4_commonio_handlevtable_errorable_init
 	if( wrapper && host )
 	{
 		wrapper->here.flush = &libandria4_commonio_errorable_vtable_wrapperflush;
-		wrapper->here.clearerr = & clearerr;
-		wrapper->here.eof = & eof;
-		wrapper->here.error = & error;
+		wrapper->here.clearerr = &libandria4_commonio_errorable_vtable_wrapperclearerr;
+		wrapper->here.eof = &libandria4_commonio_errorable_vtable_wrappereof;
+		wrapper->here.error = &libandria4_commonio_errorable_vtable_wrappererror;
 		wrapper->here.close = &libandria4_commonio_errorable_vtable_wrapperclose;
 		
 		wrapper->is = host;
