@@ -83,31 +83,33 @@ SOFTWARE.
 		void (*attending)( uintptr_t *count );
 		void (*neglecting)( uintptr_t *count );
 		
-		int (*is_eof)( void* /* FILE* */ ); /* Done. */
+		int (*is_eof)( void* /* FILE* */ );
 			/* If there isn't an error, then it MIGHT still indicate eof. */
-		libandria4_newstreams_result2 (*get_error)( void* /* FILE* */ ); /* Done. */
+		libandria4_newstreams_result2 (*get_error)( void* );
 		
-		libandria4_newstreams_bituplic2 (*clear_err)( void* /* FILE* */ ); /* Done. */
-		
-		
-			/* For "Reference point" use SEEK_SET, SEEK_CUR, or SEEK_END, all from stdio.h */
-		libandria4_newstreams_bituplic4 (*tell)( void* /* FILE* */, int /* Reference point. */ ); /* Done. */
-		libandria4_newstreams_bituplic2 (*seek)( void* /* FILE* */, intmax_t, int /* Reference point. */ ); /* Done. */
-		
-		libandria4_newstreams_bituplic2 (*rewind)( void* /* FILE* */ ); /* Done. */
-		
-		libandria4_newstreams_bituplic2 (*flush)( void* /* FILE* */ ); /* Done. */
+		libandria4_newstreams_bituplic2 (*clear_err)( void* );
 		
 		
-		libandria4_newstreams_bituplic3 (*get_c)( void* /* FILE* */ ); /* Done. */
-		libandria4_newstreams_bituplic1 (*put_c)( void* /* FILE* */, char ); /* Done. */
+			/* For the int argument, use SEEK_SET, SEEK_CUR, or SEEK_END, */
+			/*  all from stdio.h . The intmax_t is an offset in reference */
+			/*  to the point specified to the regular int. */
+		libandria4_newstreams_bituplic4 (*tell)( void*, int );
+		libandria4_newstreams_bituplic2 (*seek)( void*, intmax_t, int );
+		
+		libandria4_newstreams_bituplic2 (*rewind)( void* );
+		
+		libandria4_newstreams_bituplic2 (*flush)( void* );
+		
+		
+		libandria4_newstreams_bituplic3 (*get_c)( void* );
+		libandria4_newstreams_bituplic1 (*put_c)( void*, char );
 		
 			/* This is used directly by libandria4_FILE_tracker{}. */
 		void (*close)( void* /* FILE* */ );
 	};
 	
 	
-	/* TODO: I think this stuf needs to move to the head of the .c file? */
+	/* TODO: I think this stuff needs to move to the head of the .c file? */
 		/* The ondie handler is vitally important, and needs to interplay with */
 		/*  the rest of this system. See libandria4_FILE_tracker_initialize()'s */
 		/*  note. */

@@ -29,6 +29,36 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_MUTASTREAMS_MUTA2STD_H
 # define LIBANDRIA4_BASIC_MUTASTREAMS_MUTA2STD_H
 	
+	/*
+		Wrapper progress:
+	struct libandria4_FILE_substream_vtable
+	{
+		void (*attending)( uintptr_t *count );
+		void (*neglecting)( uintptr_t *count );
+		
+		
+		
+		int (*is_eof)( void* ( FILE* ) );																Done.
+		libandria4_newstreams_result2 (*get_error)( void* ( FILE* ) );									Done.
+		
+		libandria4_newstreams_bituplic2 (*clear_err)( void* ( FILE* ) );								Done.
+		
+		libandria4_newstreams_bituplic4 (*tell)( void* ( FILE* ), int (Reference point.) );				Done.
+		libandria4_newstreams_bituplic2 (*seek)( void* ( FILE* ), intmax_t, int (Reference point.) );	Done.
+		
+		libandria4_newstreams_bituplic2 (*rewind)( void* ( FILE* 0 );									Done.
+		
+		libandria4_newstreams_bituplic2 (*flush)( void* ( FILE* ) );									Done.
+		
+		libandria4_newstreams_bituplic3 (*get_c)( void* ( FILE* ) );									Done.
+		libandria4_newstreams_bituplic1 (*put_c)( void* ( FILE* ), char );								Done.
+		
+		
+		
+		void (*close)( void* ( FILE* ) );
+	};
+	*/
+	
 	typedef struct libandria4_mutastream_2stream
 	{
 		libandria4_commonio_handle handle;
@@ -37,5 +67,6 @@ SOFTWARE.
 		libandria4_FILE_tracker trk;
 		
 	} libandria4_mutastream_2stream;
+	
 #endif
 /* End muta2std.h */
