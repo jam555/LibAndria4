@@ -73,7 +73,7 @@ SOFTWARE.
 	
 	
 	
-		/* The virtual table for the whole thing. A void ointer will also be */
+		/* The virtual table for the whole thing. A void pointer will also be */
 		/*  provided by libandria4_FILE_tracker{}, but that type is fixed by */
 		/*  *_substream{}, not configurable. */
 		/* Refer to mutastreams/muta_notes.h to understand missing elements. */

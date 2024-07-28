@@ -366,21 +366,22 @@ static libandria4_newstreams_bituplic1 libandria4_FILE_tracker_putc( void* f, ch
 	/* Note: need a "permanently EOF" stream to redirect to! */
 static void libandria4_FILE_tracker_commonclose( void *f )
 {
-	/* TODO: add logging everywhere ??? appears. */
-	
 	if( !f )
 	{
-		???
-	}
-	
-	int res = fclose( (FILE*)f );
-	if( res != EOF )
-	{
-		???
+		/* TODO: add logging. */
 		
 	} else {
 		
-		???
+		int res = fclose( (FILE*)f );
+		if( res == 0 || res == EOF )
+		{
+				/* Good state, do nothing else... unless we add logging. */
+			return;
+			
+		} else {
+			
+			/* TODO: add logging. */
+		}
 	}
 }
 

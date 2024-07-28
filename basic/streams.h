@@ -39,9 +39,6 @@ SOFTWARE.
 	/* TODO: */
 		/* Convert commonio.h/.c (and anything else relevant) to use this */
 		/*  new interface instead of the old one. */
-		/* We need some more common implementations, e.g. we need to */
-		/*  implement the "unget" wrapper, and to implement a common */
-		/*  gets_s() version. */
 	/*
 		This is the mostly new LibAndria4 I/O stream system. Previous stabs at
 		this have variously been incomplete, or gotten things very wrong
@@ -49,12 +46,16 @@ SOFTWARE.
 		is meant to fix all of that. Note that while some incomplete attempts
 		have included a "get descriptors" function that itself took a callback
 		pointer, this version does not: that may need to be changed in the
-		future, but will be left along for now. The system is slightly complex,
+		future, but will be left alone for now. The system is slightly complex,
 		and thus several function-macros have been provided: they are
 		documented in a big block comment to the extent that they need to be,
 		so use them.
 	*/
 	
+	
+	/* TODO: I think we need: */
+		/* typedef struct libandria4_commonio_handle libandria4_commonio_handle; */
+	/* here? */
 	
 	typedef struct libandria4_commonio_handle_vtable libandria4_commonio_handle_vtable;
 	typedef struct libandria4_commonio_errorable_vtable libandria4_commonio_errorable_vtable;
@@ -294,6 +295,8 @@ SOFTWARE.
 	
 	
 	
+		/* TODO: Should be a wrapper for a version in */
+		/*  simpleops.h ... which I think doesn't exist. */
 	#define libandria4_commonio_handlevtable_FROM_SRCVTABLE( src_type, dest_type, vtab_ptr ) \
 		(dest_type*)( \
 			(char*)( (src_type*)(vtab_ptr) ) + ( \
@@ -301,6 +304,11 @@ SOFTWARE.
 				( (char*)&( ( (dest_type*)0 )[ 1 ] ) ) ) )
 	
 	
+	
+	/* TODO: Build a variant on libandria4_commonio_istream_ungetwrapper_vtable{} */
+	/*  that DOESN'T CARE if .is points to an istream or a full stream. Requiring */
+	/*  that is an unnecessary space consumer for something that gets allocated */
+	/*  arbitrarily often. */
 	
 		/* Provides single-byte-only unget capabilities. */
 	typedef struct libandria4_commonio_istream_ungetwrapper_vtable
