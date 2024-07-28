@@ -1165,7 +1165,7 @@ SOFTWARE.
 	
 	
 		/* This category is for characters that are missing from Unicode. */
-	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_highkey_missingcharas ( 4 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_highkey_missingcharas ( 5 )
 	
 	
 	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_buildmissingcharas( high, mod ) \
@@ -1271,6 +1271,176 @@ SOFTWARE.
 	/* See also LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clarity_*. */
 	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_MissingCharas_Thai_maihanakat_maitho \
 		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_MissingCharas( 42 )
+	
+	
+	
+		/* This category is for audio keyboards and notes. To find a note, combine */
+		/*  all of the sub-categories that you care about. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_highkey_audioboardkeys ( 6 )
+	
+	
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_buildaudioboardkeys( high, mod ) \
+		( ( ( LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_illegal_droppedmask & ( high ) ) << 21 ) | \
+			( LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_legalmask & ( low ) ) )
+	
+	
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( num ) \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_buildaudioboardkeys( \
+			LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_highkey_audioboardkeys, num )
+	
+	
+	/* Note that the common "12 equal temper" chromatic scale, in addition to the 7 */
+	/*  notes below, also includes 5 flat/sharp notes: Af/Gs, Bf/As, Df/Cs, Ef/Ds, */
+	/*  and Gf/Fs: two options are given for each because in 12et both versions are */
+	/*  the same note from a different perspective. In this system, they must be */
+	/*  represented with either the Flat & Sharp modifiers, or using the "customkeys" */
+	/*  category further below: note that: */
+		/* LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_GenericNoteMod */
+	/*  exists for the later case. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_A \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 1 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_B \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 2 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_C \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 3 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_D \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 4 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_E \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 5 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_F \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 6 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_G \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 7 )
+	
+		/* A deadkey marking the following character as a "CommonNote": use */
+		/*  CustomKeys, with the "1" position corresponding to A, "2" to B, etc. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_GenericNoteMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 17 )
+			/* Moves the note it's associated with to a lower pitch, a stylized */
+			/*  version of a lower-case letter B. Note that in common 12et, C */
+			/*  flat is simply B. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_FlatMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 18 )
+			/* Moves the note it's associated with to a higher pitch, a version */
+			/*  of the octothorpe (#) with tilted horizontal lines INSTEAD OF */
+			/*  tilted verticals is used to mark it. Note that in common 12et, B */
+			/*  sharp is simply C. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_SharpMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 19 )
+			/* Indicates that a sharp or flat that was "sticky" (continued to */
+			/*  apply, even if the symbol was no longer present) is now cancelled. */
+			/*  Represented by a symbol that looks like a square with it's left */
+			/*  line extended down, and it's right line extended up. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_NaturalMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 20 )
+	
+			/* A flat of half the distance of a demiflat. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_CommaFlatMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 25 )
+	/* The rest of these are just the flat-note equivalents of the similar sharps */
+	/*  below. They won't be further documented, as there's no strong need (at */
+	/*  least in my eyes). */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_DemiFlatMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 26 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_SesquiFlatMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 27 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_DoubleFlatMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 28 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_TripleFlatMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 29 )
+	
+			/* Raises the reference note by a "quarter tone", or in 12et a */
+			/*  frequency multiplier of 2 to the one-twentyfourth power of the */
+			/*  reference frequency. On a logarithmic scale it's half of a */
+			/*  semi-tone, and is stereotypically used in Middle-Eastern music. */
+			/*  It's commonly depicted with either the left or right half of an */
+			/*  octothorpe (so, two plus signs arranged like a colon, with their */
+			/*  vertical lines merged), or as two plus signs side-by-side. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_DemiSharpMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 39 )
+			/* Raises the reference note by "three-quarters" of a tone, an */
+			/*  addition of the effects of a sharp and a demisharp. Indicated by */
+			/*  a demisharp indicator merged with a sharp indicator so there are */
+			/*  two horizontal lines and three vertical lines. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_SesquiSharpMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 40 )
+			/* Applies a sharp twice: B becomes C sharp instead of just C. It's */
+			/*  indicator often resembles an X, or an octothorpe that has had it's */
+			/*  points curved towards each other until they form "rain drops" at */
+			/*  the corners of a square. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_DoubleSharpMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 41 )
+			/* A double-sharp and a sharp. Indicated by a double-sharp sign */
+			/*  following a sharp sign. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_CommonNotes_TripleSharpMod \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 42 )
+	
+		/* This is the standard reference pitch for modern Western music: an A */
+		/*  note at 440 Hz. Aka Stuttgart pitch, and ISO 16 from 1975 onwards. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_StandardPitch_A440 \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 47 )
+			/* 430 Hz, also suggested by Austria in 1885. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_StandardPitch_1860sFrench \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 47 )
+			/* 439 Hz, also suggested by Austria in 1885. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_StandardPitch_1899British \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 47 )
+			/* 442 Hz, New York Philharmonic. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_StandardPitch_Bernstein \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 47 )
+			/* 415 Hz. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_StandardPitch_Baroque \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 47 )
+			/* 466 Hz. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_StandardPitch_Chorton \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 47 )
+			/* 427-430 Hz. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_StandardPitch_Classical \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 47 )
+	
+		/* The standard note system used in Western music: 12 octaves, equally */
+		/*  spaced along a logarithmic scale. The spacing is specifically that */
+		/*  each note has a frequence of 2 to the power of one-twelfth times the */
+		/*  frequency of the note immediately below it: this distance is called */
+		/*  the semi-tone, for reasons I don't need to know. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_Octaves_12EqualTemper \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 129 )
+			/* An old systyem rarely used these days; there were TWO sizes of */
+			/*  semitone instead of just one (as with 12et). */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_Octaves_Pythagorean \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 130 )
+			/* Proposed by Claudius Ptolemy in the second century, a "5-limit */
+			/*  just intonation". */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_Octaves_PtolemyIntenseDiatonic \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 131 )
+			/* Both of these were devised by Wendy Carlos in the 1980s. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_Octaves_WendyCarlosAlpha \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 130 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys_Octaves_WendyCarlosBeta \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_AudioBoardKeys( 130 )
+	/* There are several other systems, but I'll leave it as a later exercise to add them. */
+	
+	
+	
+		/* This category is for arbitrary keys. It just exists so that custom */
+		/*  builders can have custom keys without stepping on or being stepped */
+		/*  on by updates to this file. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_highkey_customkeys ( 7 )
+	
+	
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_buildcustomkeys( high, mod ) \
+		( ( ( LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_illegal_droppedmask & ( high ) ) << 21 ) | \
+			( LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_legalmask & ( low ) ) )
+	
+	
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CustomKeys( num ) \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_buildcustomkeys( \
+			LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_highkey_customkeys, num )
+	
+	
+	/* No custom keys will be specified, because literally the implementer */
+	/*  should do it themselves. Having said that, remember that '0' should */
+	/*  never be allocated, leave it as a null. Allocate from 1 upwards. */
 	
 #endif
 /* End libandria4 basic commoniokeysyms.h */
