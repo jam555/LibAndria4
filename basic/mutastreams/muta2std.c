@@ -45,19 +45,32 @@ SOFTWARE.
 
 /* THIS FILE IS INCOMPLETE! */
 
-
-	struct libandria4_FILE_substream_vtable
-	{
-		void (*attending)( uintptr_t *count );
-		void (*neglecting)( uintptr_t *count );
-		
-		...
-		
-			/* See LIBANDRIA4_NEWSTREAMS_ONDIE() for the cannonical approach to */
-			/*  this return value... but feel free to do otherwise if it makes */
-			/*  sense for your case. */
-		void (*close)( void* /* FILE* */ );
-	};
+/* Note: in libandria4_mutastream_2stream: */
+	/* .impl has become .uget_support, with a change from */
+	/*  *_FILE_substream_vtable to *_commonio_istream_vtable. */
+		/* This reflects the fact that *_ungetwrapper_vtable needs a */
+		/*  *_commonio_istream_vtable to defer to. */
+	/* .muta has become .trk, with a change from *_substream_vtable to */
+	/*  *_tracker. */
+		/* Because we bothered to build all that reference-counting stuff, */
+		/*  so it should be used where appropriate. */
+	/* Both of these changes SEEM to have been accounted for in the code */
+	/*  below, but it hasn't yet been THOROUGHLY reviewed, and IS absolutely */
+	/*  wrong: */
+		/* Pretty much everwhere that ->trk is referenced, it's accessed via */
+		/*  a type that doesn't have it, and which needs to first be */
+		/*  converted to a pointer to a libandria4_mutastream_2stream{}. */
+		/*  Given that the code in question was copy-pasta'd basically */
+		/*  everywhere that "trk" is referenced, the cast needs to be added */
+		/*  "everywhere". Best method is probably to build a wrapper for */
+		/*  LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY() that takes the same */
+		/*  arguments, except for dropping ->trk from the first arg to do it */
+		/*  inside the wrapper after conversion instead, and subbing in the */
+		/*  new to replace the old. */
+	libandria4_mutastream_2stream* muta2std_from_handle( libandria4_commonio_handle *hand_ptr )
+		{ return( libandria4_commonio_mutastream2stream_FROM_HANDLE( hand_ptr ) ); }
+	#define MUTA2STD_REFPOINTER_EXPRAPPLY( varptr,  func, onnull ) \
+		LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY( muta2std_from_handle( varptr ),  func, onnull )
 
 	#define libandria4_mutastream_2stream_GENERICONV_ONEMPTY() \
 		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_UNRETURNABLE );
@@ -69,7 +82,9 @@ SOFTWARE.
 		( vt = (vtab), vf = (vptr) )
 #define libandria4_mutastream_2stream_GENERICONV( func ) \
 	if( strm ) { int a = 0; libandria4_FILE_substream_vtable *vt; void *vf; \
-		LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY( strm->trk,  libandria4_mutastream_2stream_GENERICONV_VALID, LIBANDRIA4_OP_SETaTO1 ); \
+		MUTA2STD_REFPOINTER_EXPRAPPLY( strm, \
+			libandria4_mutastream_2stream_GENERICONV_VALID, \
+			LIBANDRIA4_OP_SETaTO1 ); \
 		if( a || !vt ) { LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
 		else if( vt-> func ) { libandria4_newstreams_bituplic2 res = (vt-> func )( vf ); \
 			libandria4_newstreams_err err_val; libandria4_FILE_redirection redir_val; int flag = 0; \
@@ -182,8 +197,8 @@ libandria4_commonio_eithgeneric libandria4_mutastream_2stream_putc( libandria4_c
 		libandria4_FILE_substream_vtable *vt;
 		void *vf;
 		
-		LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY(
-			strm->trk,
+		MUTA2STD_REFPOINTER_EXPRAPPLY(
+			strm,
 			
 			libandria4_mutastream_2stream_GENERICONV_VALID,
 			LIBANDRIA4_OP_SETaTO1
@@ -268,8 +283,8 @@ libandria4_commonio_eithlong libandria4_mutastream_2stream_tell( libandria4_comm
 		libandria4_FILE_substream_vtable *vt;
 		void *vf;
 		
-		LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY(
-			strm->trk,
+		MUTA2STD_REFPOINTER_EXPRAPPLY(
+			strm,
 			
 			libandria4_mutastream_2stream_GENERICONV_VALID,
 			LIBANDRIA4_OP_SETaTO1
@@ -347,8 +362,8 @@ libandria4_commonio_eithgeneric libandria4_mutastream_2stream_seek( libandria4_c
 		libandria4_FILE_substream_vtable *vt;
 		void *vf;
 		
-		LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY(
-			strm->trk,
+		MUTA2STD_REFPOINTER_EXPRAPPLY(
+			strm,
 			
 			libandria4_mutastream_2stream_GENERICONV_VALID,
 			LIBANDRIA4_OP_SETaTO1
@@ -418,8 +433,8 @@ libandria4_commonio_eithgeneric libandria4_mutastream_2stream_eof( libandria4_co
 		libandria4_FILE_substream_vtable *vt;
 		void *vf;
 		
-		LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY(
-			strm->trk,
+		MUTA2STD_REFPOINTER_EXPRAPPLY(
+			strm,
 			
 			libandria4_mutastream_2stream_GENERICONV_VALID,
 			LIBANDRIA4_OP_SETaTO1
@@ -457,8 +472,8 @@ libandria4_commonio_eithgeneric libandria4_mutastream_2stream_error( libandria4_
 		libandria4_FILE_substream_vtable *vt;
 		void *vf;
 		
-		LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY(
-			strm->trk,
+		MUTA2STD_REFPOINTER_EXPRAPPLY(
+			strm,
 			
 			libandria4_mutastream_2stream_GENERICONV_VALID,
 			LIBANDRIA4_OP_SETaTO1
@@ -487,36 +502,40 @@ libandria4_commonio_eithgeneric libandria4_mutastream_2stream_error( libandria4_
 	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS );
 }
 
-libandria4_commonio_eithgeneric libandria4_mutastream_2stream_close( libandria4_commonio_handle* );
+	/* This should redirect libandria4_mutastream_2stream.trk to point at the EOF */
+	/*  stream and other such stuff, it shouldn't care about the mutable stream's */
+	/*  close() at all. */
+libandria4_commonio_eithgeneric libandria4_mutastream_2stream_close( libandria4_commonio_handle* )
+{
+	???
+};
+/* Reminder, this is out real type:
 	typedef struct libandria4_mutastream_2stream
 	{
 		libandria4_commonio_handle handle;
 		libandria4_commonio_istream_ungetwrapper_vtable uget_host;
-		libandria4_FILE_substream_vtable impl;
-		
-		libandria4_FILE_substream_vtable *muta;
+		libandria4_commonio_istream_vtable uget_support;
+		libandria4_FILE_tracker trk;
 		
 	} libandria4_mutastream_2stream;
+*/
 
-typedef struct libandria4_commonio_istream_ungetwrapper_vtable
-{
-	libandria4_commonio_istream here;
-	libandria4_commonio_istream *is;
-	
-	libandria4_commonio_maybyte buffer;
-	
-} libandria4_commonio_istream_ungetwrapper;
-typedef struct libandria4_commonio_handle
-{
-	union
+
+		/* This is just here to track the functions that HAVEN'T been */
+		/*  implemented yet. Given the current state of the */
+		/*  libandria4_mutastream_2stream{} type, I think the correct */
+		/*  approach is to just do the norm for these three, but have the */
+		/*  close() accessed via the .handle member just set .trk to the EOF */
+		/*  stream. Then we just handle allocation and deallocation of */
+		/*  libandria4_mutastream_2stream{} happen through a different */
+		/*  mechanism, probably tracked in a per-variant array so that it's */
+		/*  easier to just free them through a discrete function. */
+	struct libandria4_FILE_substream_vtable
 	{
-		libandria4_commonio_handle_vtable *hand;
-		libandria4_commonio_istream_vtable *istr;
-		libandria4_commonio_ostream_vtable *ostr;
-		libandria4_commonio_seekable_vtable *seek;
-		libandria4_commonio_errorable_vtable *err;
+		void (*attending)( uintptr_t *count );
+		void (*neglecting)( uintptr_t *count );
 		
-	} vtab;
-	libandria4_commonio_handle_vtabtype dispatch;
-	
-} libandria4_commonio_handle;
+		...
+		
+		void (*close)( void* /* FILE* */ );
+	};

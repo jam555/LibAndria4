@@ -59,6 +59,8 @@ SOFTWARE.
 	};
 	*/
 	
+		/* We need derived types for all of the stream types (to store the */
+		/*  type pointed to by .handle). And matching builder functions. */
 	typedef struct libandria4_mutastream_2stream
 	{
 		libandria4_commonio_handle handle;
@@ -67,6 +69,13 @@ SOFTWARE.
 		libandria4_FILE_tracker trk;
 		
 	} libandria4_mutastream_2stream;
+	#define libandria4_commonio_mutastream2stream_FROM_HANDLE( hand_ptr ) \
+		(libandria4_mutastream_2stream*)( \
+			(char*)( (libandria4_commonio_handle*)(hand_ptr) ) + ( \
+				( (char*)&( ( ( (libandria4_mutastream_2stream*)0 )[ 1 ] ).handle ) ) - \
+				( (char*)&( ( (libandria4_mutastream_2stream*)0 )[ 1 ] ) ) ) )
+	
+	??? builder-functions need to exist! ???
 	
 #endif
 /* End muta2std.h */
