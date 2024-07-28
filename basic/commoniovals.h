@@ -34,9 +34,13 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_COMMONIOVALS_H
 # define LIBANDRIA4_BASIC_COMMONIOVALS_H
 	
-		/* EOF is 0, because EOF isn't really an error, and ( error * 0 ) */
-		/*  should "obviously" be no error at all. */
-	#define LIBANDRIA4_COMMONIOVALS_EOF ( (libandria4_commonio_perr)0 )
+	#define LIBANDRIA4_COMMONIOVALS_SUCCESS ( (libandria4_commonio_perr)0 )
+		/* This was previously 0, because EOF isn't always an error and */
+		/*  error * 0 OBVIOUSLY is no error at all, but it became ever */
+		/*  more clear that I REALLY DO want a distinct "success" value, */
+		/*  so EOF had to make way. Note though that it still doesn't */
+		/*  have *_ERR_* in it's name. */
+	#define LIBANDRIA4_COMMONIOVALS_EOF ( LIBANDRIA4_RESULT_FAILURE_EOF )
 	const libandria4_commonio_perr libandria4_commoniovals_eof =
 		LIBANDRIA4_COMONIOVALS_EOF;
 	const libandria4_commonio_mayerr libandria4_commoniovals_justeof =
