@@ -48,6 +48,16 @@ SOFTWARE.
 	/*  they happen AFTER the modified keys instead of BEFORE the modified */
 	/*  keys. */
 	
+	/* Check this: */
+		/* https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h */
+	/*  to see if this list is "sufficient". Same with this: */
+		/* https://gist.github.com/MightyPork/6da26e382a7ad91b5496ee55fdc73db2 */
+	/* , and this: */
+		/* https://wiki.libsdl.org/SDL2/SDL_Scancode */
+	
+	/* An example of the first file drawn from is here: */
+		/* https://www.cl.cam.ac.uk/~mgk25/ucs/keysymdef.h */
+	
 	
 	
 	
@@ -631,6 +641,13 @@ SOFTWARE.
 			/*  XK_Eisu_toggle */
 	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_LatinateToggle \
 		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Commonedit_modalprefix( 38 )
+	
+	/* These two are extensions to SS2 and SS3 from ISO 2022. If you want SS2 or */
+	/*  SS3 then just use them directly from Unicode. */
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_SingleShift0 \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Commonedit_modalprefix( 39 )
+	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_SingleShift1 \
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Commonedit_modalprefix( 40 )
  
  
  
