@@ -1,6 +1,18 @@
+The LibAndria4 streams interface:
 
-To use libandria4_commonio_handle{}, use the following macros (formatted
-as C functions for informational purposes only):
+	To use the streams system, you should default to streams.h instead of any
+mutable-streams files:
+		The mutable-streams files are meant for back-end work (and are a base
+	to do things like starting a stream with in-memory stuff, and then follow
+	it with something on disk, or spanning a stream over multiple files);
+		The streams files are meant for a convenient and normalish interface
+	similar to the standard C file API.
+So, use streams.h. The normal "file" type is libandria4_commonio_handle{},
+which can support any of several types of handles (all-purpose, input, output,
+seekable, and error-info), and includes an identifier for what TYPE it is.
+
+	To use libandria4_commonio_handle{}, use the following macros (formatted as
+C functions for informational purposes only):
 	COMMONIO_EITHGENERIC	libandria4_commonio_handle_FLUSH( libandria4_commonio_handle* )
 	
 	COMMONIO_EITHBYTE		libandria4_commonio_handle_GETC( libandria4_commonio_handle* )
@@ -20,9 +32,8 @@ as C functions for informational purposes only):
 	
 	COMMONIO_EITHGENERIC	libandria4_commonio_handle_CLOSE( libandria4_commonio_handle* )
 
-These macros will automatically compensate for the different types of
-handle (e.g. input, errorable, etc.), are always expressions, and
-return the either-types libandria4_commonio_eithgeneric{},
-libandria4_commonio_eithbyte{}, or libandria4_commonio_eithlong{} from
-commonio.h; these either-type returns are used to encode errors if
-e.g. you attempt to write to an errorable handle.
+	These macros will automatically compensate for the different types of handle
+(e.g. input, errorable, etc.), are always expressions, and return the
+either-types libandria4_commonio_eithgeneric{}, libandria4_commonio_eithbyte{},
+or libandria4_commonio_eithlong{} from commonio.h; these either-type returns are
+used to encode errors if e.g. you attempt to write to an errorable handle.
