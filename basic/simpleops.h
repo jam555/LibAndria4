@@ -77,8 +77,13 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETeTO2( ... ) ( e = 2 )
 	
 	
+	#define LIBANDRIA4_OP_RETURNVAL_n4() return( -4 )
+	#define LIBANDRIA4_OP_RETURNVAL_n3() return( -3 )
+	#define LIBANDRIA4_OP_RETURNVAL_n2() return( -2 )
 	#define LIBANDRIA4_OP_RETURNVAL_n1() return( -1 )
+	
 	#define LIBANDRIA4_OP_RETURNVAL_0() return( 0 )
+	
 	#define LIBANDRIA4_OP_RETURNVAL_1() return( 1 )
 	#define LIBANDRIA4_OP_RETURNVAL_2() return( 2 )
 	#define LIBANDRIA4_OP_RETURNVAL_3() return( 3 )
@@ -107,7 +112,7 @@ SOFTWARE.
 		/*  pointer, and LIBANDRIA4_OP_runabledata1 MUST be equivalent to a */
 		/*  pointer that it can take as it's first argument. Depending on */
 		/*  your usage case, it CAN accept any variety of other arguments, */
-		/*  and/or return any type. If The pointer is NULL, then the value */
+		/*  and/or return any type. If the pointer is NULL, then the value */
 		/*  of the variable named after *_ELSE will be returned instead of */
 		/*  invoking the function pointer. */
 	#define LIBANDRIA4_OP_RUNifABLE1_ELSEa( ... ) \
@@ -133,6 +138,82 @@ SOFTWARE.
 		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)( LIBANDRIA4_OP_runabledata2, __VA_ARGS__ ) : d )
 	#define LIBANDRIA4_OP_RUNifABLE2_ELSEe( ... ) \
 		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)( LIBANDRIA4_OP_runabledata2, __VA_ARGS__ ) : e )
+		
+	
+	/* The definitions below are as above, but the functions take no args. */
+	#define LIBANDRIA4_OP_RUNifABLE1argless_ELSEa( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)(  ) : a )
+	#define LIBANDRIA4_OP_RUNifABLE1argless_ELSEb( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)(  ) : b )
+	#define LIBANDRIA4_OP_RUNifABLE1argless_ELSEc( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)(  ) : c )
+	#define LIBANDRIA4_OP_RUNifABLE1argless_ELSEd( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)(  ) : d )
+	#define LIBANDRIA4_OP_RUNifABLE1argless_ELSEe( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)(  ) : e )
+	
+	/* As above. */
+	#define LIBANDRIA4_OP_RUNifABLE2argless_ELSEa( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)(  ) : a )
+	#define LIBANDRIA4_OP_RUNifABLE2argless_ELSEb( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)(  ) : b )
+	#define LIBANDRIA4_OP_RUNifABLE2argless_ELSEc( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)(  ) : c )
+	#define LIBANDRIA4_OP_RUNifABLE2argless_ELSEd( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)(  ) : d )
+	#define LIBANDRIA4_OP_RUNifABLE2argless_ELSEe( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)(  ) : e )
+	
+	
+	/* As above, except that the result is returned instead of just */
+	/*  floating around to be used. */
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1_ELSEa( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1_ELSEa( __VA_ARGS__ ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1_ELSEb( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1_ELSEb( __VA_ARGS__ ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1_ELSEc( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1_ELSEc( __VA_ARGS__ ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1_ELSEd( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1_ELSEd( __VA_ARGS__ ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1_ELSEe( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1_ELSEe( __VA_ARGS__ ) ) );
+	
+	/* As above. */
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2_ELSEa( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2_ELSEa( __VA_ARGS__ ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2_ELSEb( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2_ELSEb( __VA_ARGS__ ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2_ELSEc( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2_ELSEc( __VA_ARGS__ ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2_ELSEd( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2_ELSEd( __VA_ARGS__ ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2_ELSEe( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2_ELSEe( __VA_ARGS__ ) ) );
+	
+	
+	/* As above. */
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEa( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1argless_ELSEa(  ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEb( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1argless_ELSEb(  ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEc( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1argless_ELSEc(  ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEd( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1argless_ELSEd(  ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEe( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1argless_ELSEe(  ) ) );
+	
+	/* As above. */
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2argless_ELSEa( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2argless_ELSEa(  ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2argless_ELSEb( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2argless_ELSEb(  ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2argless_ELSEc( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2argless_ELSEc(  ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2argless_ELSEd( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2argless_ELSEd(  ) ) );
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2argless_ELSEe( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2argless_ELSEe(  ) ) );
 	
 	
 	
