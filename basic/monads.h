@@ -239,7 +239,7 @@ SOFTWARE.
 		else { \
 			if( ( var ).valid_flags & 1 ) { matchleft( ( var ).left ); } \
 			if( ( var ).valid_flags & 2 ) { matchright( ( var ).right ); } }
-	#define LIBANDRIA4_MONAD_BITUPLIC_EXPRMATCH( var, match, otherwise ) \
+	#define LIBANDRIA4_MONAD_BITUPLIC_EXPRMATCH( var, matchleft, matchright, onempty ) \
 		( \
 				( ( ( var ).valid_flags & 1 ) ? ( matchleft( ( var ).left ), 1 ) : 0 ) + \
 				( ( ( var ).valid_flags & 2 ) ? ( matchright( ( var ).right ), 1 ) : 0 ) > 0 \
@@ -260,8 +260,8 @@ SOFTWARE.
 					( LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( mayb, typeb ) ) ) ) \
 			: (alttype)( altval ) )
 	
-	#define LIBANDRIA4_MONAD_BITUPLIC_RETURNNOTHING( name, type ) \
-		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDNOTHING( name, type ) );
+	#define LIBANDRIA4_MONAD_BITUPLIC_RETURNNOTHING( name, typea, typeb ) \
+		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDNOTHING( name, typea, typeb ) );
 	#define LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( name, typea, typeb, val ) \
 		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTLEFT( name, typea, typeb, ( (typea)( val ) ) ) );
 	#define LIBANDRIA4_MONAD_BITUPLIC_RETURNRIGHT( name, typea, typeb, val ) \
