@@ -91,10 +91,10 @@ SOFTWARE.
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 		/*  The matches must be function-style, though function macros are */
 		/*  allowed. */
-	#define LIBANDRIA4_RESULT_BODYMATCH( var, matcha, matchb ) \
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, matcha, matchb )
-	#define LIBANDRIA4_RESULT_EXPRMATCH( var, matcha, matchb ) \
-		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, matcha, matchb )
+	#define LIBANDRIA4_RESULT_BODYMATCH( var, onsucc, onfail ) \
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, onsucc, onfail )
+	#define LIBANDRIA4_RESULT_EXPRMATCH( var, onsucc, onfail ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, onsucc, onfail )
 	
 		/* Convenience wrappers. See monads.h for more details. */
 	#define LIBANDRIA4_RESULT_RETURNSUCCESS( val ) \

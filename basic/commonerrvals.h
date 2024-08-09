@@ -53,6 +53,10 @@ SOFTWARE.
 	/*  that got brought into C++ from POSIX is currently hidden by the */
 	/*  preprocessor. */
 	
+	/* Note that these values may be used for completely different */
+	/*  meanings in some circumstances. For example, 0 was for a short */
+	/*  time used as EOF, and afterwards in those same cases used as "no */
+	/*  message". */
 	#define LIBANDRIA4_RESULT_GENERICFALSE ( 0 )
 	#define LIBANDRIA4_RESULT_GENERICTRUE ( 1 )
 	#define LIBANDRIA4_RESULT_GENERIC ( 2 )
@@ -94,6 +98,7 @@ SOFTWARE.
 		/*  more generic functions that interact with standard-library's */
 		/*  "errno" system, as LibAndria's EOF is 0, but errno treats 0 */
 		/*  as "no message". */
+		/* Except that has changed, this IS now the LibAndria EOF. */
 	#define LIBANDRIA4_RESULT_FAILURE_EOF ( 14 )
 	
 		/* EFAULT: Note that this indicates a segfault. */

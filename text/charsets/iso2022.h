@@ -144,6 +144,8 @@ SOFTWARE.
 	#define LIBANDRIA4_CHARSETS_ISO2022_FUNCTION_SS3_ESCAPE \
 		LIBANDRIA4_CHARSETS_ISO2022_ESCAPESEQUENCE( LIBANDRIA4_CHARSETS_ASCII_O )
 	
+		/* Note that ISO 2022 / ECMA 35 defines these next two to NOT */
+		/*  affect the control character space. */
 			/* Set GL to G0. */
 	#define LIBANDRIA4_CHARSETS_ISO2022_FUNCTION_LS0 LIBANDRIA4_CHARSETS_ASCII_shiftin
 			/* Set GL to G1. */

@@ -60,6 +60,8 @@ SOFTWARE.
 	#define LIBANDRIA4_CHARSETS_ASCII_formfeed (), 0x0C
 	#define LIBANDRIA4_CHARSETS_ASCII_carriagereturn (), 0x0D
 	
+		/* Note that ISO 2022 / ECMA 35 defines these next two to NOT */
+		/*  affect the control character space. */
 	#define LIBANDRIA4_CHARSETS_ASCII_shiftout (), 0x0E
 	#define LIBANDRIA4_CHARSETS_ASCII_shiftin (), 0x0F
 	#define LIBANDRIA4_CHARSETS_ASCII_datalinkescape (), 0x10

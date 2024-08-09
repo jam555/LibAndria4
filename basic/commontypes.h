@@ -44,6 +44,7 @@ SOFTWARE.
 	/* Positive errors are always untranslatable characters, negative are */
 	/*  function-dependant errors. Unicode is expected for *_monadicchar32{}, */
 	/*  so only 22 bit character values, thus posing no overflow risks. */
+	/* ... Isn't Unicode 21 bit instead of 22? */
 	
 	LIBANDRIA4_MONAD_EITHER_BUILDTYPE( libandria4_common_monadicchar8, char, int32_t );
 	LIBANDRIA4_MONAD_EITHER_BUILDTYPE( libandria4_common_monadicchar32, uint32_t, int32_t );

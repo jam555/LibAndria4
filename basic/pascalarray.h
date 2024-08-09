@@ -84,10 +84,10 @@ SOFTWARE.
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 		/*  The matches must be function-style, though function macros are */
 		/*  allowed. */
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH( var, matcha, matchb ) \
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, matcha, matchb )
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_EXPRMATCH( var, matcha, matchb ) \
-		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, matcha, matchb )
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH( var, onsucc, onfail ) \
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, onsucc, onfail )
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_EXPRMATCH( var, onsucc, onfail ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, onsucc, onfail )
 	
 		/* Used to make it easier to convert from one return-wrapper type to */
 		/*  another. */
