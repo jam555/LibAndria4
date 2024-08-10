@@ -103,22 +103,54 @@ SOFTWARE.
 	/*  the name of the pointer array would need to be ADDED here, as */
 	/*  the builder macros can't know it before hand. */
 	#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_DECLARE( head, nodetype, ... ) \
-		LIBANDRIA4_RECURSIVETRANSACTOR_DECLARE( \
-			head ## transactor_, nodetype );
+		LIBANDRIA4_RECURSIVETRANSACTOR_DECLARE( head ## transactor_, nodetype ); \
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE( head ## bitup, libandria4_commonio_err, (nodetype) * );
 		/* This needs to be called in a .c file to create needed */
 		/*  functions. */
 	#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_DEFINE( head, nodetype ) \
-			LIBANDRIA4_RECURSIVETRANSACTOR_DEFINE( head, nodetype );
-		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_GETLEFT( ... )
-		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_GETRIGHT( ... )
-		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_STARTTRANSACTION( ... )
-			#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_TRANSTRACKPTRTYPE
-			#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_SETLEFT( ... )
-			#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_SETRIGHT( ... )
-		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_CANCELTRANSACTION( ... )
-		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_COMPLETETRANSACTION( ... )
-		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_COMPAREk( ... )
-		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_COMPAREn( ... )
+			LIBANDRIA4_RECURSIVETRANSACTOR_DEFINE( head ## transactor_, nodetype );
+		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_GETLEFT( head, nodetype, nodeptr ) \
+			LIBANDRIA4_BINTREES_GETLEFTPTR( head ## bitup, nodetype, nodeptr )
+		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_GETRIGHT( head, nodetype, nodeptr ) \
+			LIBANDRIA4_BINTREES_GETRIGHTPTR( head ## bitup, nodetype, nodeptr )
+		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_STARTTRANSACTION( ... ) \
+				/* This style doesn't need initialization. */
+			#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_TRANSTRACKPTRTYPE( head ) \
+				head ## transactor_transactionset
+			#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_SETLEFT( ... ) ???
+				/*
+					This function adds a change to those that can be reversed.
+					int
+						( head ## track )
+						(
+							libandria4_memfuncs_t *mf,
+								( head ## transactionset ) *set,
+								( head ## transactionelement ) elem
+						);
+				*/
+			#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_SETRIGHT( ... ) ???
+				/*
+					This function adds a change to those that can be reversed.
+					int
+						( head ## track )
+						(
+							libandria4_memfuncs_t *mf,
+								( head ## transactionset ) *set,
+								( head ## transactionelement ) elem
+						);
+				*/
+		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_CANCELTRANSACTION( ... ) ???
+			/*
+				int ( head ## revert ) ( ( head ## transactionset ) *set );
+				int ( head ## destroyarr ) ( libandria4_memfuncs_t *mf,  ( head ## transactionset ) *set );
+			*/
+		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_COMPLETETRANSACTION( ... ) ???
+			/*
+				int ( head ## clear ) ( ( head ## transactionset ) *set );
+				int ( head ## destroyarr ) ( libandria4_memfuncs_t *mf,  ( head ## transactionset ) *set );
+			*/
+		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_COMPAREk( ... ) ???
+		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_COMPAREn( ... ) ???
 	
 	
 	#define LIBANDRIA4_BINTREES_UTILITY_RETURNroute( ... ) return( route )
