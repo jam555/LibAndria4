@@ -36,6 +36,11 @@ SOFTWARE.
 	#include "../nulls.h"
 	
 	
+	
+	/* Is there anythiung we want from stdmaybes.h ? What about commonio.h (note: libandria4_commonio_err ?) ? */
+	
+	
+	
 		/* Normal style. */
 	#define LIBANDRIA4_BINTREES_GETLEFTPTR( name, nodetype, nodeptr ) \
 		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( \
@@ -253,7 +258,7 @@ SOFTWARE.
 						libandria4_commonio_err, nodetype*, \
 						LIBANDRIA4_RESULT_FAILURE_DOMAIN ); }
 	#define LIBANDRIA4_BINTREES_BUILDLEFTROT( name,  nodetype,  macroset ) \
-		( macroset ## _bitup ) \
+		( name ## _bitup ) \
 			name ## _rotateleft( nodetype *base ) { /* Raise the height of the lower-valued side of the tree. */ \
 				if( base ) { \
 					( name ## _bitup ) route, \
@@ -306,7 +311,7 @@ SOFTWARE.
 						libandria4_commonio_err, nodetype*, \
 						LIBANDRIA4_RESULT_FAILURE_DOMAIN ); }
 	#define LIBANDRIA4_BINTREES_BUILDRIGHTROT( name,  nodetype,  macroset ) \
-		( macroset ## _bitup ) \
+		( name ## _bitup ) \
 			name ## _rotateright( nodetype *base ) { /* Raise the height of the lower-valued side of the tree. */ \
 				if( base ) { \
 					( name ## _bitup ) route, \
@@ -362,7 +367,7 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE_DEFINITION( LIBANDRIA4_CAT( (name), _bitup ), libandria4_commonio_err, nodetype* ) \
 		( name ## _bitup ) ( name ## _bitup_buildIOErr ) () { \
 				LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( ( name ## _bitup ), \
-					libandria4_commonio_err, nodetype, \
+					libandria4_commonio_err, nodetype*, \
 					LIBANDRIA4_RESULT_FAILURE_IOERROR ); \
 			} \
 		LIBANDRIA4_BINTREES_BUILDSEARCHk( name,  nodetype, keytype,  macroset ) \
