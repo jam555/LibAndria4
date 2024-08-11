@@ -51,7 +51,7 @@ SOFTWARE.
 			size_t unusedlen; /* Hide old elems instead of deallocating. */ }; \
 		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( \
 			head##transactionset_result, \
-			head##transactionset*, uintptr_t /* Error type */ ) \
+			head##transactionset*, uintptr_t /* Error type */ ); \
 		int ( head ## track ) ( libandria4_memfuncs_t *mf, \
 			( head ## transactionset ) *set, ( head ## transactionelement ) elem ); \
 		head##transactionset_result ( head ## build ) ( libandria4_memfuncs_t *mf ); \
@@ -60,7 +60,7 @@ SOFTWARE.
 		int ( head ## destroyarr ) \
 			( libandria4_memfuncs_t *mf,  ( head ## transactionset ) *set ); \
 		libandria4_result ( head ## destroyset ) \
-			( libandria4_memfuncs_t *mf,  ( head ## transactionset ) *set )
+			( libandria4_memfuncs_t *mf,  ( head ## transactionset ) *set );
 	
 		/* Builds an actual element. You should wrap this with something */
 		/*  that has a shorter name and hardwires the first two arguments. */
