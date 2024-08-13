@@ -135,69 +135,47 @@ SOFTWARE.
 			} else {
 				
 				/* Imbalanced in this node, rotate: */
-				??? /* Is this correct? Couldn't the tallest sub-branch get transfered, keeping the height the same? */ ???
 				
 				libandria4_commonio_err d;
+				static ( name ## _bitup_errsznodp ) e = ??? ;
 				int trip = 0;
+				c = 0;
 				
 				if( a + 1 < b )
 				{
 					/* Case: b is AT LEAST two larger than a. Which is illegal */
 					/*  and must be rebalanced. */
 					
-					static ( name ## _bitup_errsznodp ) a = ??? ;
-					
-					c = 0;
+					a = b;
 					rot = ( name ## _rotateleft )( n );
-					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH(
-						rot,
-							LIBANDRIA4_BARETREES_HEIGHTBALANCE_SETdANDtrip,
-							LIBANDRIA4_OP_SETc,
-							LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEa );
-					
-					if( trip )
-					{
-						return
-						(
-							( name ## _bitup_errsznodp_nodal )
-								( ( name ## _eitherrsz_err )( d ), c )
-						);
-					}
-					
-						/* Always return the tallest height, minus 1 to */
-						/*  compensate for the rotation. */
-						/* Shouldn't we drop the "- 1", since we need to add THIS node's height? */
-					return( ( name ## _bitup_errsznodp_nodal ) ( ( name ## _eitherrsz_size )( b - 1 ), c ) );
 					
 				} else {
 					
 					/* Case: a is AT LEAST two larger than b. Which is illegal */
 					/*  and must be rebalanced. */
 					
-					static ( name ## _bitup_errsznodp ) b = ??? ;
-					
-					c = 0;
 					rot = ( name ## _rotateright )( n );
-					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH(
-						rot,
-							LIBANDRIA4_BARETREES_HEIGHTBALANCE_SETdANDtrip,
-							LIBANDRIA4_OP_SETc,
-							LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEb );
-					
-					if( trip )
-					{
-						return
-						(
-							( name ## _bitup_errsznodp_nodal )
-								( ( name ## _eitherrsz_err )( d ), c )
-						);
-					}
-					
-						/* Always return the tallest height, minus 1 to */
-						/*  compensate for the rotation. */
-						/* Shouldn't we drop the "- 1", since we need to add THIS node's height? */
-					return( ( name ## _bitup_errsznodp_nodal ) ( ( name ## _eitherrsz_size )( a - 1 ), c ) );
 				}
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH(
+					rot,
+						LIBANDRIA4_BARETREES_HEIGHTBALANCE_SETdANDtrip,
+						LIBANDRIA4_OP_SETc,
+						LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEe );
+				
+				if( trip )
+				{
+					return
+					(
+						( name ## _bitup_errsznodp_nodal )
+							( ( name ## _eitherrsz_err )( d ), c )
+					);
+				}
+				
+				/* Note that the height doesn't matter, because the node being */
+				/*  returned will force another invocation of _heightbalance() */
+				/*  on this branch, thereby overwriting the height returned */
+				/*  here. */
+				return( ( name ## _bitup_errsznodp_nodal ) ( ( name ## _eitherrsz_size )( a ), c ) );
 			}
 		}
 		
