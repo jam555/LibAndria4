@@ -37,7 +37,11 @@ SOFTWARE.
 	
 	
 	
-	/* Is there anythiung we want from stdmaybes.h ? What about commonio.h (note: libandria4_commonio_err ?) ? */
+	/* TODO: */
+		/* Is there anythiung we want from stdmaybes.h ? What about */
+		/*  commonio.h (note: libandria4_commonio_err ?) ? */
+		/* Build a "total count" function to count the totral number of */
+		/*  nodes in a tree. */
 	
 	
 	
@@ -92,9 +96,11 @@ SOFTWARE.
 			/*  transaction. One of two ways to "reduce the layers" of */
 			/*  transaction. Technically just discards the "undo info". */
 		/* _COMPAREk */ /* Compares a node-contained key to a bare key */
-			/*  value. */
+			/*  value. Return -1 if node>bare, 0 if node==bare, 1 if */
+			/*  node<bare. */
 		/* _COMPAREn */ /* Compares two node keys, not currently used, */
-			/*  but there is naming space for it. */
+			/*  but there is naming space for it. Same behavior as */
+			/*  _COMPAREk() . */
 	/* This pattern is followed so that users need only specify the */
 	/*  prefix to the builder macros in this file, and ensure that */
 	/*  appropriately named implementations are already in-scope. */
@@ -154,12 +160,19 @@ SOFTWARE.
 				int ( head ## clear ) ( ( head ## transactionset ) *set );
 				int ( head ## destroyarr ) ( libandria4_memfuncs_t *mf,  ( head ## transactionset ) *set );
 			*/
+			/* Arguments: pointer to node being travelled through, then the key to compare to. */
+			/* Returns: */
+				/* -1: The node's key is larger than the comparison key. */
+				/* 0: The node is a null pointer, or it's key equals the comparison key. THIS IS IMPORTANT! */
+				/* 1: The node's key is smaller than the comparison key. */
 		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_COMPAREk( ... ) ???
+			/* As COMPAREk, but the comparison key is conmtained inside another node. */
 		#define LIBANDRIA4_BINTREES_MACROSET_NAMEDMEMS_COMPAREn( ... ) ???
 	
 	
 	#define LIBANDRIA4_BINTREES_UTILITY_RETURNroute( ... ) return( route )
-	#define LIBANDRIA4_BINTREES_UTILITY_SETlibandria4_base( val ) libandria4_base = (val);
+	#define LIBANDRIA4_BINTREES_UTILITY_SETlibandria4_base( val ) \
+		if( old_base ) { *old_base = libandria4_base; } libandria4_base = (val);
 	
 		/* If the left member of the bi-tuplic is set, then there was an error. */
 		/* Errors: */
@@ -172,7 +185,7 @@ SOFTWARE.
 		/* Note that if getleft() or getright() return a bi-tuplic with it's left member set, then that bi-tuplic is returned directly. */
 	#define LIBANDRIA4_BINTREES_BUILDSEARCHk( name,  nodetype, keytype,  macroset ) \
 		( name ## _bitup ) \
-			name ## _searchk( (nodetype) *libandria4_base, keytype libandria4_key ) { \
+			name ## _searchk( (nodetype) *libandria4_base, keytype libandria4_key, (nodetype) **old_base ) { \
 				if( libandria4_base && libandria4_dest ) { \
 					( name ## _bitup ) route, \
 						a = LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTLEFT( \
@@ -194,7 +207,7 @@ SOFTWARE.
 							default: LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( \
 										( name ## _bitup ), \
 											libandria4_commonio_err, nodetype*, \
-											libandria4_base, LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ); } \
+											LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED, libandria4_base ); } \
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							route, \
 								LIBANDRIA4_BINTREES_UTILITY_RETURNroute, \
@@ -204,10 +217,7 @@ SOFTWARE.
 						( name ## _bitup ), \
 							libandria4_commonio_err, nodetype*, \
 							LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
-				LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( \
-					( name ## _bitup ), \
-						libandria4_commonio_err, nodetype*, \
-						LIBANDRIA4_RESULT_FAILURE_DOMAIN ); }
+				return( ( name ## _bitup_buildDomainErr )() ); }
 	#define LIBANDRIA4_BINTREES_BUILDVISIT( name,  nodetype,  macroset ) \
 		( name ## _bitup ) \
 			name ## _visit \
@@ -253,13 +263,10 @@ SOFTWARE.
 					LIBANDRIA4_MONAD_BITUPLIC_RETURNNOTHING( \
 						( name ## _bitup ), \
 							libandria4_commonio_err, nodetype* ); } \
-				LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( \
-					( name ## _bitup ), \
-						libandria4_commonio_err, nodetype*, \
-						LIBANDRIA4_RESULT_FAILURE_DOMAIN ); }
+				return( ( name ## _bitup_buildDomainErr )() ); }
 	#define LIBANDRIA4_BINTREES_BUILDLEFTROT( name,  nodetype,  macroset ) \
 		( name ## _bitup ) \
-			name ## _rotateleft( nodetype *base ) { /* Raise the height of the lower-valued side of the tree. */ \
+			name ## _rotateleft( nodetype *base ) { /* Move nodes toward the lower-valued (left) side of the tree. */ \
 				if( base ) { \
 					( name ## _bitup ) route, \
 						a = LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTLEFT( \
@@ -306,13 +313,10 @@ SOFTWARE.
 						( name ## _bitup ), \
 							libandria4_commonio_err, nodetype*, \
 							c ); } \
-				LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( \
-					( name ## _bitup ), \
-						libandria4_commonio_err, nodetype*, \
-						LIBANDRIA4_RESULT_FAILURE_DOMAIN ); }
+				return( ( name ## _bitup_buildDomainErr )() ); }
 	#define LIBANDRIA4_BINTREES_BUILDRIGHTROT( name,  nodetype,  macroset ) \
 		( name ## _bitup ) \
-			name ## _rotateright( nodetype *base ) { /* Raise the height of the lower-valued side of the tree. */ \
+			name ## _rotateright( nodetype *base ) { /* Move nodes toward the higher-valued (right) side of the tree. */ \
 				if( base ) { \
 					( name ## _bitup ) route, \
 						a = LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTLEFT( \
@@ -323,7 +327,7 @@ SOFTWARE.
 					( name ## _bitup ) (*LIBANDRIA4_OP_runable1)() = &( ( name ## _bitup_buildIOErr ) ); \
 						/* This should become a thread-static for optimization purposes. */ \
 					( macroset ## _TRANSTRACKPTRTYPE ) transact; \
-					int e = 0; \
+					libandria4_commonio_err e = 0; \
 					route = macroset ## _GETLEFT( base ); \
 					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 						route, \
@@ -359,21 +363,109 @@ SOFTWARE.
 						( name ## _bitup ), \
 							libandria4_commonio_err, nodetype*, \
 							c ); } \
-				LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( \
-					( name ## _bitup ), \
-						libandria4_commonio_err, nodetype*, \
-						LIBANDRIA4_RESULT_FAILURE_DOMAIN ); }
+				return( ( name ## _bitup_buildDomainErr )() ); }
+	#define LIBANDRIA4_BINTREES_BUILDDOUBLEROT( name,  nodetype,  macroset ) \
+		( name ## _bitup ) _doublerotateleft( nodetype *base ) { \
+			if( base ) { \
+				( name ## _bitup ) res; \
+				( name ## _bitup ) (*LIBANDRIA4_OP_runable1)() = &( ( name ## _bitup_buildIOErr ) ); \
+				nodetype *c; \
+				int b = 0; \
+				libandria4_commonio_err e; \
+				res = macroset ## _GETRIGHT( base ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					res, \
+						LIBANDRIA4_OP_SETb, \
+						LIBANDRIA4_OP_SETc, \
+						LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEa ); \
+				if( b ) { \
+					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+						res, \
+							LIBANDRIA4_OP_SETe, \
+							LIBANDRIA4_NULL_MACRO, \
+							LIBANDRIA4_NULL_MACRO ); \
+					LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( \
+						( name ## _bitup ), \
+							libandria4_commonio_err, nodetype*, \
+							e ); } \
+				res = name ## _rotateright( c ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					route, \
+						LIBANDRIA4_BINTREES_UTILITY_RETURNroute, \
+						LIBANDRIA4_OP_SETc, \
+						LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEa ); \
+				res = macroset ## _SETRIGHT( base, c ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					route, \
+						LIBANDRIA4_BINTREES_UTILITY_RETURNroute, \
+						LIBANDRIA4_NULL_MACRO, \
+						LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEa ); \
+				return( name ## _rotateleft( base ) ); } \
+			return( ( name ## _bitup_buildDomainErr )() ); } \
+		( name ## _bitup ) _doublerotateright( nodetype *base ) { \
+			if( base ) { \
+				( name ## _bitup ) res; \
+				( name ## _bitup ) (*LIBANDRIA4_OP_runable1)() = &( ( name ## _bitup_buildIOErr ) ); \
+				nodetype *c; \
+				int b = 0; \
+				libandria4_commonio_err e; \
+				res = macroset ## _GETLEFT( base ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					res, \
+						LIBANDRIA4_OP_SETb, \
+						LIBANDRIA4_OP_SETc, \
+						LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEa ); \
+				if( b ) { \
+					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+						res, \
+							LIBANDRIA4_OP_SETe, \
+							LIBANDRIA4_NULL_MACRO, \
+							LIBANDRIA4_NULL_MACRO ); \
+					LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( \
+						( name ## _bitup ), \
+							libandria4_commonio_err, nodetype*, \
+							e ); } \
+				res = name ## _rotateleft( c ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					route, \
+						LIBANDRIA4_BINTREES_UTILITY_RETURNroute, \
+						LIBANDRIA4_OP_SETc, \
+						LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEa ); \
+				res = macroset ## _SETLEFT( base, c ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					route, \
+						LIBANDRIA4_BINTREES_UTILITY_RETURNroute, \
+						LIBANDRIA4_NULL_MACRO, \
+						LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEa ); \
+				return( name ## _rotateright( base ) ); } \
+			return( ( name ## _bitup_buildDomainErr )() ); }
+	
 	#define LIBANDRIA4_BINTREES_BASICSBUILDER( name,  nodetype, keytype,  macroset ) \
 		LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE_DEFINITION( LIBANDRIA4_CAT( (name), _bitup ), libandria4_commonio_err, nodetype* ) \
-		( name ## _bitup ) ( name ## _bitup_buildIOErr ) () { \
-				LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( ( name ## _bitup ), \
-					libandria4_commonio_err, nodetype*, \
-					LIBANDRIA4_RESULT_FAILURE_IOERROR ); \
-			} \
+		inline ( name ## _bitup ) ( name ## _bitup_buildError )( libandria4_commonio_err err ) { \
+			LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( ( name ## _bitup ), \
+				libandria4_commonio_err, nodetype*,  err ); } \
+		inline ( name ## _bitup ) ( name ## _bitup_buildNodeptr )( nodetype *ptr ) { \
+			LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( ( name ## _bitup ), \
+				libandria4_commonio_err, nodetype*,  ptr ); } \
+		inline ( name ## _bitup ) ( name ## _bitup_buildBoth )( libandria4_commonio_err err, nodetype *ptr ) { \
+			LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( ( name ## _bitup ), \
+				libandria4_commonio_err, nodetype*,  err, ptr ); } \
+		inline ( name ## _bitup ) ( name ## _bitup_buildIOErr ) () { \
+			return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_IOERROR ) ); } \
+		inline ( name ## _bitup ) ( name ## _bitup_buildDomainErr ) () { \
+			return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+		inline ( name ## _bitup ) ( name ## _bitup_buildIndrDomainErr ) () { \
+			return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) ); } \
 		LIBANDRIA4_BINTREES_BUILDSEARCHk( name,  nodetype, keytype,  macroset ) \
 		LIBANDRIA4_BINTREES_BUILDVISIT( name,  nodetype,  macroset ) \
 		LIBANDRIA4_BINTREES_BUILDLEFTROT( name,  nodetype,  macroset ) \
-		LIBANDRIA4_BINTREES_BUILDRIGHTROT( name,  nodetype,  macroset )
-	
+		LIBANDRIA4_BINTREES_BUILDRIGHTROT( name,  nodetype,  macroset ) \
+		LIBANDRIA4_BINTREES_BUILDDOUBLEROT( name,  nodetype,  macroset )
+	/*
+		( name ## _bitup ) ( name ## _bitup_buildError )( libandria4_commonio_err err );
+		( name ## _bitup ) ( name ## _bitup_buildNodeptr )( nodetype *ptr );
+		( name ## _bitup ) ( name ## _bitup_buildBoth )( libandria4_commonio_err err, nodetype *ptr );
+	*/
 #endif
 /* End libandria4 basic bintrees bintrees.h */
