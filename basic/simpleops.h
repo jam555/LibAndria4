@@ -46,35 +46,49 @@ SOFTWARE.
 		/* These are somewhat "special": they're used when you need to embed */
 		/*  a "set" operation via macro. You can always define more of these */
 		/*  if needed. Try not to though. */
+	#define LIBANDRIA4_OP_SETtmp( val ) ( tmp = (val) )
 	#define LIBANDRIA4_OP_SETa( val ) ( a = (val) )
 	#define LIBANDRIA4_OP_SETb( val ) ( b = (val) )
 	#define LIBANDRIA4_OP_SETc( val ) ( c = (val) )
 	#define LIBANDRIA4_OP_SETd( val ) ( d = (val) )
 	#define LIBANDRIA4_OP_SETe( val ) ( e = (val) )
 	
+	#define LIBANDRIA4_OP_SETtmpTOn1( val ) ( tmp = -1 )
 	#define LIBANDRIA4_OP_SETaTOn1( ... ) ( a = -1 )
 	#define LIBANDRIA4_OP_SETbTOn1( ... ) ( b = -1 )
 	#define LIBANDRIA4_OP_SETcTOn1( ... ) ( c = -1 )
 	#define LIBANDRIA4_OP_SETdTOn1( ... ) ( d = -1 )
 	#define LIBANDRIA4_OP_SETeTOn1( ... ) ( e = -1 )
 	
+	#define LIBANDRIA4_OP_SETtmpTO0( val ) ( tmp = 0 )
 	#define LIBANDRIA4_OP_SETaTO0( ... ) ( a = 0 )
 	#define LIBANDRIA4_OP_SETbTO0( ... ) ( b = 0 )
 	#define LIBANDRIA4_OP_SETcTO0( ... ) ( c = 0 )
 	#define LIBANDRIA4_OP_SETdTO0( ... ) ( d = 0 )
 	#define LIBANDRIA4_OP_SETeTO0( ... ) ( e = 0 )
 	
+	#define LIBANDRIA4_OP_SETtmpTO1( val ) ( tmp = 1 )
 	#define LIBANDRIA4_OP_SETaTO1( ... ) ( a = 1 )
 	#define LIBANDRIA4_OP_SETbTO1( ... ) ( b = 1 )
 	#define LIBANDRIA4_OP_SETcTO1( ... ) ( c = 1 )
 	#define LIBANDRIA4_OP_SETdTO1( ... ) ( d = 1 )
 	#define LIBANDRIA4_OP_SETeTO1( ... ) ( e = 1 )
 	
+	#define LIBANDRIA4_OP_SETtmpTO2( val ) ( tmp = 2 )
 	#define LIBANDRIA4_OP_SETaTO2( ... ) ( a = 2 )
 	#define LIBANDRIA4_OP_SETbTO2( ... ) ( b = 2 )
 	#define LIBANDRIA4_OP_SETcTO2( ... ) ( c = 2 )
 	#define LIBANDRIA4_OP_SETdTO2( ... ) ( d = 2 )
 	#define LIBANDRIA4_OP_SETeTO2( ... ) ( e = 2 )
+	
+	
+		/* Returns to match the sets above. */
+	#define LIBANDRIA4_OP_RETtmp( ... ) ( return( tmp ) )
+	#define LIBANDRIA4_OP_RETa( ... ) ( return( a ) )
+	#define LIBANDRIA4_OP_RETb( ... ) ( return( b ) )
+	#define LIBANDRIA4_OP_RETc( ... ) ( return( c ) )
+	#define LIBANDRIA4_OP_RETd( ... ) ( return( d ) )
+	#define LIBANDRIA4_OP_RETe( ... ) ( return( e ) )
 	
 	
 	#define LIBANDRIA4_OP_RETURNVAL_n4() return( -4 )
@@ -115,6 +129,8 @@ SOFTWARE.
 		/*  and/or return any type. If the pointer is NULL, then the value */
 		/*  of the variable named after *_ELSE will be returned instead of */
 		/*  invoking the function pointer. */
+	#define LIBANDRIA4_OP_RUNifABLE1_ELSEtmp( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)( LIBANDRIA4_OP_runabledata1, __VA_ARGS__ ) : tmp )
 	#define LIBANDRIA4_OP_RUNifABLE1_ELSEa( ... ) \
 		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)( LIBANDRIA4_OP_runabledata1, __VA_ARGS__ ) : a )
 	#define LIBANDRIA4_OP_RUNifABLE1_ELSEb( ... ) \
@@ -128,6 +144,8 @@ SOFTWARE.
 	
 	/* The definitions below are as above, but the hook names have their */
 	/*  contained number swapped to match the relevant macro. */
+	#define LIBANDRIA4_OP_RUNifABLE2_ELSEtmp( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)( LIBANDRIA4_OP_runabledata2, __VA_ARGS__ ) : tmp )
 	#define LIBANDRIA4_OP_RUNifABLE2_ELSEa( ... ) \
 		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)( LIBANDRIA4_OP_runabledata2, __VA_ARGS__ ) : a )
 	#define LIBANDRIA4_OP_RUNifABLE2_ELSEb( ... ) \
@@ -141,6 +159,8 @@ SOFTWARE.
 		
 	
 	/* The definitions below are as above, but the functions take no args. */
+	#define LIBANDRIA4_OP_RUNifABLE1argless_ELSEtmp( ... ) \
+		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)(  ) : tmp )
 	#define LIBANDRIA4_OP_RUNifABLE1argless_ELSEa( ... ) \
 		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)(  ) : a )
 	#define LIBANDRIA4_OP_RUNifABLE1argless_ELSEb( ... ) \
@@ -153,6 +173,8 @@ SOFTWARE.
 		( (LIBANDRIA4_OP_runable1) ? (LIBANDRIA4_OP_runable1)(  ) : e )
 	
 	/* As above. */
+	#define LIBANDRIA4_OP_RUNifABLE2argless_ELSEtmp( ... ) \
+		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)(  ) : tmp )
 	#define LIBANDRIA4_OP_RUNifABLE2argless_ELSEa( ... ) \
 		( (LIBANDRIA4_OP_runable2) ? (LIBANDRIA4_OP_runable2)(  ) : a )
 	#define LIBANDRIA4_OP_RUNifABLE2argless_ELSEb( ... ) \
@@ -167,6 +189,8 @@ SOFTWARE.
 	
 	/* As above, except that the result is returned instead of just */
 	/*  floating around to be used. */
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1_ELSEtmp( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1_ELSEtmp( __VA_ARGS__ ) ) );
 	#define LIBANDRIA4_OP_RETURN_RUNifABLE1_ELSEa( ... ) \
 		( return( LIBANDRIA4_OP_RUNifABLE1_ELSEa( __VA_ARGS__ ) ) );
 	#define LIBANDRIA4_OP_RETURN_RUNifABLE1_ELSEb( ... ) \
@@ -179,6 +203,8 @@ SOFTWARE.
 		( return( LIBANDRIA4_OP_RUNifABLE1_ELSEe( __VA_ARGS__ ) ) );
 	
 	/* As above. */
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2_ELSEtmp( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2_ELSEtmp( __VA_ARGS__ ) ) );
 	#define LIBANDRIA4_OP_RETURN_RUNifABLE2_ELSEa( ... ) \
 		( return( LIBANDRIA4_OP_RUNifABLE2_ELSEa( __VA_ARGS__ ) ) );
 	#define LIBANDRIA4_OP_RETURN_RUNifABLE2_ELSEb( ... ) \
@@ -192,6 +218,8 @@ SOFTWARE.
 	
 	
 	/* As above. */
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEtmp( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE1argless_ELSEtmp(  ) ) );
 	#define LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEa( ... ) \
 		( return( LIBANDRIA4_OP_RUNifABLE1argless_ELSEa(  ) ) );
 	#define LIBANDRIA4_OP_RETURN_RUNifABLE1argless_ELSEb( ... ) \
@@ -204,6 +232,8 @@ SOFTWARE.
 		( return( LIBANDRIA4_OP_RUNifABLE1argless_ELSEe(  ) ) );
 	
 	/* As above. */
+	#define LIBANDRIA4_OP_RETURN_RUNifABLE2argless_ELSEtmp( ... ) \
+		( return( LIBANDRIA4_OP_RUNifABLE2argless_ELSEtmp(  ) ) );
 	#define LIBANDRIA4_OP_RETURN_RUNifABLE2argless_ELSEa( ... ) \
 		( return( LIBANDRIA4_OP_RUNifABLE2argless_ELSEa(  ) ) );
 	#define LIBANDRIA4_OP_RETURN_RUNifABLE2argless_ELSEb( ... ) \
