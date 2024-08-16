@@ -40,6 +40,13 @@ SOFTWARE.
 	
 	
 	
+	/* Existing systems: */
+		/* Batch-balanced binary balanced-height tree. */
+		/* Replace LIBANDRIA4_BARETREES_heightbalance_nullrot with */
+		/*  LIBANDRIA4_BINTREES_countnodes_nullrot. */
+	
+	
+	
 	/*
 		Need to build for the basic tree:
 			Add node
@@ -343,29 +350,9 @@ SOFTWARE.
 	
 	#define LIBANDRIA4_BARETREES_BASICSBUILDER( name,  nodetype, keytype,  macroset ) \
 		LIBANDRIA4_BINTREES_BASICSBUILDER( name,  nodetype, keytype,  macroset ) \
-		LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( name ## _maynodp, nodetype* ); \
-			( name ## _maynodep ) ( name ## _maynodp_nothing )() \
-				{ return( LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name ## _maynodp, nodetype* ) ); } \
-			( name ## _maynodep ) ( name ## _maynodp_just )( nodetype *n ) \
-				{ return( LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name ## _maynodp, nodetype*, n ) ); } \
-		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( name ## _eitherrsz, unsigned, size_t ); \
-			( name ## _eitherrsz ) ( name ## _eitherrsz_err )( unsigned err ) \
-				{ return( LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name ## _maynodp, unsigned, err ) ); } \
-			( name ## _eitherrsz ) ( name ## _eitherrsz_size )( size_t sz ) \
-				{ return( LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( name ## _maynodp, size_t, sz ) ); } \
-		typedef struct ( name ## _bitup_errsznodp ) ( name ## _bitup_errsznodp ); \
-		struct ( name ## _bitup_errsznodp ) { \
-				( name ## _eitherrsz ) left; ( name ## _maynodp ) right; }; \
-			( name ## _bitup_errsznodp ) ( name ## _bitup_errsznodp_nodeless ) ( ( name ## _eitherrsz ) ersz ) \
-				{ return( ( name ## _bitup_errsznodp ){ ersz, ( ( name ## _maynodp_nothing )() ) } ); } \
-			( name ## _bitup_errsznodp ) ( name ## _bitup_errsznodp_nodal ) ( ( name ## _eitherrsz ) ersz, nodetype *n ) \
-				{ return( ( name ## _bitup_errsznodp ){ ersz, ( ( name ## _maynodp_just )( n ) ) } ); } \
-			( name ## _bitup_errsznodp ) ( name ## _bitup_errsznodp_nullreterr )( ... ) { \
-				return( ( name ## _bitup_errsznodp_nodeless )( \
-						( name ## _eitherrsz_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) ) ); } \
-			LIBANDRIA4_BARETREES_BUILDHBALANCE( name,  nodetype,  macroset ); \
-			LIBANDRIA4_BARETREES_BUILDINSERT( name,  nodetype, keytype,  macroset ); \
-			LIBANDRIA4_BARETREES_BUILDDELETE( name,  nodetype, keytype );
+		LIBANDRIA4_BARETREES_BUILDHBALANCE( name,  nodetype,  macroset ); \
+		LIBANDRIA4_BARETREES_BUILDINSERT( name,  nodetype, keytype,  macroset ); \
+		LIBANDRIA4_BARETREES_BUILDDELETE( name,  nodetype, keytype );
 	
 #endif
 /* End libandria4 basic bintrees baretrees.h */

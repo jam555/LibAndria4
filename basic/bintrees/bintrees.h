@@ -40,8 +40,6 @@ SOFTWARE.
 	/* TODO: */
 		/* Is there anythiung we want from stdmaybes.h ? What about */
 		/*  commonio.h (note: libandria4_commonio_err ?) ? */
-		/* Build a "total count" function to count the totral number of */
-		/*  nodes in a tree. */
 	
 	
 	
@@ -53,7 +51,8 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( \
 			(name),  libandria4_commonio_err, nodetype*,  ( (nodeptr)->right ) )
 	
-		/* EternallyConfuzzled style (RIP site, seek on Wayback Machine). There's 6 options in case of more complex node styles */
+		/* EternallyConfuzzled style (RIP site, seek on Wayback Machine). */
+		/*  There's 6 options in case of more complex node styles */
 	#define LIBANDRIA4_BINTREES_GET0PTR( name, nodetype, nodeptr, arrname ) \
 		LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( \
 			(name),  libandria4_commonio_err, nodetype*,  ( (nodeptr)->(arrname)[ 0 ] ) )
@@ -440,32 +439,93 @@ SOFTWARE.
 				return( name ## _rotateright( base ) ); } \
 			return( ( name ## _bitup_buildDomainErr )() ); }
 	
+		#define LIBANDRIA4_BINTREES_countnodes_brancherr( err ) \
+			return( ( name ## _bitup_errsznodp_nodal ) ( ( name ## _eitherrsz_err )( err ), base ) );
+		#define LIBANDRIA4_BINTREES_countnodes_nullrot( ... ) \
+			return( ( name ## _bitup_errsznodp_nodal ) \
+				( ( name ## _eitherrsz_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ), c ) );
+	#define LIBANDRIA4_BINTREES_BUILDCOUNTNODES( name,  nodetype,  macroset ) \
+	( name ## _bitup_errsznodp ) ( name ## _countnodes )( nodetype *base ) { \
+		if( !base ) { \
+			return ( \
+				( name ## _bitup_errsznodp_nodeless )( \
+					( name ## _eitherrsz_size )( 0 ) ) ); } \
+		( name ## _bitup_errsznodp ) tmp; ( name ## _bitup ) res; \
+		nodetype *a, *b; int c, d; \
+		/* Get the sub-trees. */ \
+		res = ( macroset ## _GETLEFT( base ) ); \
+		LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+			res, \
+				LIBANDRIA4_BINTREES_countnodes_brancherr, \
+				LIBANDRIA4_OP_SETa, \
+				LIBANDRIA4_BINTREES_countnodes_nullrot ); \
+		res = ( macroset ## _GETRIGHT( base ) ); \
+		LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+			res, \
+				LIBANDRIA4_BINTREES_countnodes_brancherr, \
+				LIBANDRIA4_OP_SETb, \
+				LIBANDRIA4_BINTREES_countnodes_nullrot ); \
+		/* Get the sizes of the sub-branches. */ \
+		tmp = ( name ## _countnodes )( a ); \
+		/* A proper monad would force us to at least use */ \
+		/*  LIBANDRIA4_NULL_MACRO(), but C doesn't have a mechanism for */ \
+		/*  that. */ \
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( \
+			tmp.left,  LIBANDRIA4_OP_RETtmp, LIBANDRIA4_OP_SETc ); \
+		tmp = ( name ## _countnodes )( b ); \
+		/* A proper monad would force us to at least use */ \
+		/*  LIBANDRIA4_NULL_MACRO(), but C doesn't have a mechanism for */ \
+		/*  that. */ \
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( \
+			tmp.left,  LIBANDRIA4_OP_RETtmp, LIBANDRIA4_OP_SETd ); \
+		/* Return the size. */ \
+		return ( \
+			( name ## _bitup_errsznodp_nodeless )( \
+				( name ## _eitherrsz_size )( c + d + 1 ) ) ); }
+	
 	#define LIBANDRIA4_BINTREES_BASICSBUILDER( name,  nodetype, keytype,  macroset ) \
 		LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE_DEFINITION( LIBANDRIA4_CAT( (name), _bitup ), libandria4_commonio_err, nodetype* ) \
-		inline ( name ## _bitup ) ( name ## _bitup_buildError )( libandria4_commonio_err err ) { \
-			LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( ( name ## _bitup ), \
-				libandria4_commonio_err, nodetype*,  err ); } \
-		inline ( name ## _bitup ) ( name ## _bitup_buildNodeptr )( nodetype *ptr ) { \
-			LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( ( name ## _bitup ), \
-				libandria4_commonio_err, nodetype*,  ptr ); } \
-		inline ( name ## _bitup ) ( name ## _bitup_buildBoth )( libandria4_commonio_err err, nodetype *ptr ) { \
-			LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( ( name ## _bitup ), \
-				libandria4_commonio_err, nodetype*,  err, ptr ); } \
-		inline ( name ## _bitup ) ( name ## _bitup_buildIOErr ) () { \
-			return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_IOERROR ) ); } \
-		inline ( name ## _bitup ) ( name ## _bitup_buildDomainErr ) () { \
-			return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
-		inline ( name ## _bitup ) ( name ## _bitup_buildIndrDomainErr ) () { \
-			return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) ); } \
+			inline ( name ## _bitup ) ( name ## _bitup_buildError )( libandria4_commonio_err err ) { \
+				LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( ( name ## _bitup ), \
+					libandria4_commonio_err, nodetype*,  err ); } \
+			inline ( name ## _bitup ) ( name ## _bitup_buildNodeptr )( nodetype *ptr ) { \
+				LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( ( name ## _bitup ), \
+					libandria4_commonio_err, nodetype*,  ptr ); } \
+			inline ( name ## _bitup ) ( name ## _bitup_buildBoth )( libandria4_commonio_err err, nodetype *ptr ) { \
+				LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( ( name ## _bitup ), \
+					libandria4_commonio_err, nodetype*,  err, ptr ); } \
+			inline ( name ## _bitup ) ( name ## _bitup_buildIOErr ) () { \
+				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_IOERROR ) ); } \
+			inline ( name ## _bitup ) ( name ## _bitup_buildDomainErr ) () { \
+				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+			inline ( name ## _bitup ) ( name ## _bitup_buildIndrDomainErr ) () { \
+				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) ); } \
+		LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( name ## _maynodp, nodetype* ); \
+			( name ## _maynodep ) ( name ## _maynodp_nothing )() \
+				{ return( LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name ## _maynodp, nodetype* ) ); } \
+			( name ## _maynodep ) ( name ## _maynodp_just )( nodetype *n ) \
+				{ return( LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name ## _maynodp, nodetype*, n ) ); } \
+		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( name ## _eitherrsz, unsigned, size_t ); \
+			( name ## _eitherrsz ) ( name ## _eitherrsz_err )( unsigned err ) \
+				{ return( LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name ## _maynodp, unsigned, err ) ); } \
+			( name ## _eitherrsz ) ( name ## _eitherrsz_size )( size_t sz ) \
+				{ return( LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( name ## _maynodp, size_t, sz ) ); } \
+		typedef struct ( name ## _bitup_errsznodp ) ( name ## _bitup_errsznodp ); \
+		struct ( name ## _bitup_errsznodp ) { \
+				( name ## _eitherrsz ) left; ( name ## _maynodp ) right; }; \
+			( name ## _bitup_errsznodp ) ( name ## _bitup_errsznodp_nodeless ) ( ( name ## _eitherrsz ) ersz ) \
+				{ return( ( name ## _bitup_errsznodp ){ ersz, ( ( name ## _maynodp_nothing )() ) } ); } \
+			( name ## _bitup_errsznodp ) ( name ## _bitup_errsznodp_nodal ) ( ( name ## _eitherrsz ) ersz, nodetype *n ) \
+				{ return( ( name ## _bitup_errsznodp ){ ersz, ( ( name ## _maynodp_just )( n ) ) } ); } \
+			( name ## _bitup_errsznodp ) ( name ## _bitup_errsznodp_nullreterr )( ... ) { \
+				return( ( name ## _bitup_errsznodp_nodeless )( \
+						( name ## _eitherrsz_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) ) ); } \
 		LIBANDRIA4_BINTREES_BUILDSEARCHk( name,  nodetype, keytype,  macroset ) \
 		LIBANDRIA4_BINTREES_BUILDVISIT( name,  nodetype,  macroset ) \
 		LIBANDRIA4_BINTREES_BUILDLEFTROT( name,  nodetype,  macroset ) \
 		LIBANDRIA4_BINTREES_BUILDRIGHTROT( name,  nodetype,  macroset ) \
-		LIBANDRIA4_BINTREES_BUILDDOUBLEROT( name,  nodetype,  macroset )
-	/*
-		( name ## _bitup ) ( name ## _bitup_buildError )( libandria4_commonio_err err );
-		( name ## _bitup ) ( name ## _bitup_buildNodeptr )( nodetype *ptr );
-		( name ## _bitup ) ( name ## _bitup_buildBoth )( libandria4_commonio_err err, nodetype *ptr );
-	*/
+		LIBANDRIA4_BINTREES_BUILDDOUBLEROT( name,  nodetype,  macroset ) \
+		LIBANDRIA4_BINTREES_BUILDCOUNTNODES( name,  nodetype,  macroset )
+	
 #endif
 /* End libandria4 basic bintrees bintrees.h */
