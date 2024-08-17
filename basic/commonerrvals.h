@@ -99,6 +99,7 @@ SOFTWARE.
 		/*  "errno" system, as LibAndria's EOF is 0, but errno treats 0 */
 		/*  as "no message". */
 		/* Except that has changed, this IS now the LibAndria EOF. */
+		/* Now also being used for the end of a list. */
 	#define LIBANDRIA4_RESULT_FAILURE_EOF ( 14 )
 	
 		/* EFAULT: Note that this indicates a segfault. */
@@ -122,6 +123,7 @@ SOFTWARE.
 		/* ENOTSOCK, ENOSTR, ENOTSUP, EOPNOTSUPP, ENOTDIR, EISDIR, */
 		/*  ESPIPE, etc. Note that "broken pipe" is actually EPIPE, not */
 		/*  ESPIPE. */
+		/* Now also used when trying to go the wrong way on a one-way list. */
 	#define LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ( 19 )
 		/* EIO. Usually hardware related. */
 	#define LIBANDRIA4_RESULT_FAILURE_IOERROR ( 20 )
