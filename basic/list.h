@@ -29,7 +29,20 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_LIST_H
 # define LIBANDRIA4_BASIC_LIST_H
 	
-	#include "../commonerrvals.h"
+	#include "simpleops.h"
+	#include "monads.h"
+		/* libandria4_commonio_err */
+	#include "commonio.h"
+	#include "commonerrvals.h"
+	
+	/* Note that the compilation unit MUST contain at least the four left & */
+	/*  right macroset macros, so that the implementations below can work */
+	/*  correctly. */
+	
+	
+	/* TODO: */
+		/* Add insertion functions (must ALL require the list pointer.). */
+		/* Add a doubly-linked list builder. */
 	
 	
 	#define LIBANDRIA4_LIST_BUILDPREV( name,  nodetype,  macroset ) \
