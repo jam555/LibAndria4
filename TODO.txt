@@ -1,5 +1,12 @@
 LibAndria version 4
 TODO:
+	Fully replace the definition of libandria4_failure_result{}
+		(basic/stdmonads.h) with libandria4_commonio_err (commonio.h).
+		Trying to foist proper typing in was nice and all, but it's really
+		just too much hassle. Afterwards, move all uses of
+		libandria4_commonio_err to the new definition of
+		libandria4_failure_result (since libandria4_commonio_err will be
+		superfluous).
 
 I only just copied this stuff to my Chromebook, and need to spruce things up:
 	Add more abbreviations to stdabbrevs/metaCabbrevs.h.
