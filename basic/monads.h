@@ -334,6 +334,9 @@ SOFTWARE.
 		struct name \
 			{ uintptr_t ref_count; \
 				void *auxiliary; \
+				/* Note that for the sake of supporting arrays (pascal or */ \
+				/*  otherwise), the valuetype member MUST be the last in */ \
+				/*  the structure. */ \
 				valuetype val; };
 	#define LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name, valuetype ) \
 		typedef struct name name; \

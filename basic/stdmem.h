@@ -41,9 +41,9 @@ SOFTWARE.
 	{
 		void *data;
 		
-		libandria4_ptrresult (*alloc)( void*, size_t );
-		libandria4_ptrresult (*realloc)( void*,  void* /*mem*/, size_t );
-		libandria4_result (*dealloc)( void*, void* /*mem*/ );
+		libandria4_ptrresult (*alloc)( void* /* this->data */, size_t );
+		libandria4_ptrresult (*realloc)( void* /* this->data */,  void* /*mem*/, size_t );
+		libandria4_result (*dealloc)( void* /* this->data */, void* /*mem*/ );
 		
 	} libandria4_memfuncs_t;
 	extern libandria4_memfuncs_t libandria4_stdmemfuncs;

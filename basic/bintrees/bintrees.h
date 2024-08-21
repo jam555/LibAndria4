@@ -31,6 +31,7 @@ SOFTWARE.
 	
 	#include "../simpleops.h"
 	#include "../monads.h"
+		/* libandria4_commonio_err */
 	#include "../commonio.h"
 	#include "../commonerrvals.h"
 	#include "../nulls.h"
@@ -40,8 +41,7 @@ SOFTWARE.
 	
 	
 	/* TODO: */
-		/* Is there anything we want from stdmaybes.h ? What about */
-		/*  commonio.h (note: libandria4_commonio_err ?) ? */
+		/* Is there anything we want from stdmaybes.h ? */
 		/* Add a const var that JUST exists to tell "in-place allocators" */
 		/*  how much memory to pretend that they're allocating, so that we */
 		/*  can get SOME detection of out-of-control allocations, while */
