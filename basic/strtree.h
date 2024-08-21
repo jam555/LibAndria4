@@ -41,7 +41,7 @@ SOFTWARE.
 	
 	
 	
-	#define LIBANDRIA4_STRTREE_8NODEHASHFUNC( name,  elemtype ) \
+	#define LIBANDRIA4_STRTREE_8NODEHASHFUNC( name,  ign1, ign2, elemtype,  ign3 ) \
 		(elemtype) ( name ## _hashfunc )( (elemtype) val ) { \
 			const (elemtype) anti7 = ~( (elemtype)7 ); \
 			(elemtype) ret = val & 7; val = ( val & anti7 ) >> 3; \
@@ -116,7 +116,7 @@ SOFTWARE.
 				return( ( name ## _eitherrptr_ptr )( found ) ); }
 	
 	
-	#define LIBANDRIA4_STRTREE_DECLARE_nNODE( name,  nodenum, pascalstrtype, elemtype,  memfuncs_ptr ) \
+	#define LIBANDRIA4_STRTREE_DECLARE_nNODE( name,  nodenum, pascalstrtype, elemtype,  hashfunc,  memfuncs_ptr ) \
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREDECL( ( name ## _tracker ),  pascalstrtype ); \
 		typedef (name##_tracker_counttype) (name##_strtype); \
 		typedef struct (name) (name); \
@@ -177,13 +177,13 @@ SOFTWARE.
 				return( ( name ## _eitherrstrptr_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
 			inline ( name ## _eitherrstrptr ) ( name ## _eitherrstrptr_buildIndrDomainErr )( ) { \
 				return( ( name ## _eitherrstrptr_err )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) ); } \
-		inline LIBANDRIA4_STRTREE_8NODEHASHFUNC( name,  elemtype ); \
+		inline hashfunc( name,  nodenum, pascalstrtype, elemtype,  memfuncs_ptr ); \
 		inline LIBANDRIA4_STRTREE_BUILDFETCHSTRPTR( name,  pascalstrtype ); \
 		( name ## _eitherrptr ) ( name ## _innersearch )( \
 			name **base, (elemtype) (*hfunc)( (elemtype) val ), int recurse, \
 			size_t stroff, (pascalstrtype) *str,  name ***last );
 	
-	#define LIBANDRIA4_STRTREE_DEFINE_nNODE( name,  nodenum, pascalstrtype, elemtype,  memfuncs_ptr ) \
+	#define LIBANDRIA4_STRTREE_DEFINE_nNODE( name,  nodenum, pascalstrtype, elemtype,  hashfunc,  memfuncs_ptr ) \
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREIMPL( name,  pascalstrtype, \
 			LIBANDRIA4_NULL_MACRO, LIBANDRIA4_NULL_MACRO, LIBANDRIA4_NULL_MACRO ); \
 		libandria4_ptrresult ( name ## _generalalloc )( void* ign, size_t s ) { \
@@ -210,15 +210,21 @@ SOFTWARE.
 				LIBANDRIA4_RESULT_RETURNFAILURE( (libandria4_failure_result){ \
 					LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED } ); } \
 			return( mf->dealloc( mf, mem ) ); } \
-		LIBANDRIA4_STRTREE_8NODEHASHFUNC( name,  elemtype ); \
+		hashfunc( name,  elemtype ); \
 		LIBANDRIA4_STRTREE_BUILDFETCHSTRPTR( name,  pascalstrtype ); \
 		LIBANDRIA4_STRTREE_BUILDINNERSEARCH( name,  pascalstrtype, elemtype );
 	
 	
 	#define LIBANDRIA4_STRTREE_DECLARE_8NODE( name,  pascalstrtype, elemtype,  memfuncs_ptr ) \
-		LIBANDRIA4_STRTREE_DECLARE_nNODE( name,  8, pascalstrtype, elemtype,  memfuncs_ptr )
+		LIBANDRIA4_STRTREE_DECLARE_nNODE( name, \
+			8, pascalstrtype, elemtype, \
+			LIBANDRIA4_STRTREE_8NODEHASHFUNC, \
+			memfuncs_ptr )
 	#define LIBANDRIA4_STRTREE_DEFINE_8NODE( name,  pascalstrtype, elemtype,  memfuncs_ptr ) \
-		LIBANDRIA4_STRTREE_DEFINE_nNODE( name,  8, pascalstrtype, elemtype,  memfuncs_ptr )
+		LIBANDRIA4_STRTREE_DEFINE_nNODE( name, \
+			8, pascalstrtype, elemtype, \
+			LIBANDRIA4_STRTREE_8NODEHASHFUNC, \
+			memfuncs_ptr )
 	
 	
 	
