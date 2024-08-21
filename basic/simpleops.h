@@ -47,34 +47,56 @@ SOFTWARE.
 		/*  a "set" operation via macro. You can always define more of these */
 		/*  if needed. Try not to though. */
 	#define LIBANDRIA4_OP_SETtmp( val ) ( tmp = (val) )
+	#define LIBANDRIA4_OP_SETret( val ) ( ret = (val) )
+	#define LIBANDRIA4_OP_SETres( val ) ( res = (val) )
 	#define LIBANDRIA4_OP_SETa( val ) ( a = (val) )
 	#define LIBANDRIA4_OP_SETb( val ) ( b = (val) )
 	#define LIBANDRIA4_OP_SETc( val ) ( c = (val) )
 	#define LIBANDRIA4_OP_SETd( val ) ( d = (val) )
 	#define LIBANDRIA4_OP_SETe( val ) ( e = (val) )
 	
-	#define LIBANDRIA4_OP_SETtmpTOn1( val ) ( tmp = -1 )
+		/* Take the pointers of variables instead. */
+	#define LIBANDRIA4_OP_SETtmp( var ) ( tmp = &(var) )
+	#define LIBANDRIA4_OP_SETret( var ) ( ret = &(var) )
+	#define LIBANDRIA4_OP_SETres( var ) ( res = &(var) )
+	#define LIBANDRIA4_OP_SETa( var ) ( a = &(var) )
+	#define LIBANDRIA4_OP_SETb( var ) ( b = &(var) )
+	#define LIBANDRIA4_OP_SETc( var ) ( c = &(var) )
+	#define LIBANDRIA4_OP_SETd( var ) ( d = &(var) )
+	#define LIBANDRIA4_OP_SETe( var ) ( e = &(var) )
+	
+	/* These are all about hard-wired values. */
+	
+	#define LIBANDRIA4_OP_SETtmpTOn1( ... ) ( tmp = -1 )
+	#define LIBANDRIA4_OP_SETretTOn1( ... ) ( ret = -1 )
+	#define LIBANDRIA4_OP_SETresTOn1( ... ) ( res = -1 )
 	#define LIBANDRIA4_OP_SETaTOn1( ... ) ( a = -1 )
 	#define LIBANDRIA4_OP_SETbTOn1( ... ) ( b = -1 )
 	#define LIBANDRIA4_OP_SETcTOn1( ... ) ( c = -1 )
 	#define LIBANDRIA4_OP_SETdTOn1( ... ) ( d = -1 )
 	#define LIBANDRIA4_OP_SETeTOn1( ... ) ( e = -1 )
 	
-	#define LIBANDRIA4_OP_SETtmpTO0( val ) ( tmp = 0 )
+	#define LIBANDRIA4_OP_SETtmpTO0( ... ) ( tmp = 0 )
+	#define LIBANDRIA4_OP_SETretTO0( ... ) ( ret = 0 )
+	#define LIBANDRIA4_OP_SETresTO0( ... ) ( res = 0 )
 	#define LIBANDRIA4_OP_SETaTO0( ... ) ( a = 0 )
 	#define LIBANDRIA4_OP_SETbTO0( ... ) ( b = 0 )
 	#define LIBANDRIA4_OP_SETcTO0( ... ) ( c = 0 )
 	#define LIBANDRIA4_OP_SETdTO0( ... ) ( d = 0 )
 	#define LIBANDRIA4_OP_SETeTO0( ... ) ( e = 0 )
 	
-	#define LIBANDRIA4_OP_SETtmpTO1( val ) ( tmp = 1 )
+	#define LIBANDRIA4_OP_SETtmpTO1( ... ) ( tmp = 1 )
+	#define LIBANDRIA4_OP_SETretTO1( ... ) ( ret = 1 )
+	#define LIBANDRIA4_OP_SETresTO1( ... ) ( res = 1 )
 	#define LIBANDRIA4_OP_SETaTO1( ... ) ( a = 1 )
 	#define LIBANDRIA4_OP_SETbTO1( ... ) ( b = 1 )
 	#define LIBANDRIA4_OP_SETcTO1( ... ) ( c = 1 )
 	#define LIBANDRIA4_OP_SETdTO1( ... ) ( d = 1 )
 	#define LIBANDRIA4_OP_SETeTO1( ... ) ( e = 1 )
 	
-	#define LIBANDRIA4_OP_SETtmpTO2( val ) ( tmp = 2 )
+	#define LIBANDRIA4_OP_SETtmpTO2( ... ) ( tmp = 2 )
+	#define LIBANDRIA4_OP_SETretTO2( ... ) ( ret = 2 )
+	#define LIBANDRIA4_OP_SETresTO2( ... ) ( res = 2 )
 	#define LIBANDRIA4_OP_SETaTO2( ... ) ( a = 2 )
 	#define LIBANDRIA4_OP_SETbTO2( ... ) ( b = 2 )
 	#define LIBANDRIA4_OP_SETcTO2( ... ) ( c = 2 )
@@ -82,8 +104,39 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETeTO2( ... ) ( e = 2 )
 	
 	
+		/* Sometimes we need to set two at once. */
+	#define LIBANDRIA4_OP_SETretres( ret_, res_ ) ( ret = (ret_), res = (res_) )
+	#define LIBANDRIA4_OP_SETab( aa, bb ) ( a = (aa), b = (bb) )
+	#define LIBANDRIA4_OP_SETbc( bb, cc ) ( b = (bb), c = (cc) )
+	#define LIBANDRIA4_OP_SETcd( cc, dd ) ( c = (cc), d = (dd) )
+	#define LIBANDRIA4_OP_SETde( dd, ee ) ( d = (dd), e = (ee) )
+	
+		/* As above, but take the pointer of the first val. */
+	#define LIBANDRIA4_OP_SETretPTRres( ret_, res_ ) ( ret = &(ret_), res = (res_) )
+	#define LIBANDRIA4_OP_SETaPTRb( aa, bb ) ( a = &(aa), b = (bb) )
+	#define LIBANDRIA4_OP_SETbPTRc( bb, cc ) ( b = &(bb), c = (cc) )
+	#define LIBANDRIA4_OP_SETcPTRd( cc, dd ) ( c = &(cc), d = (dd) )
+	#define LIBANDRIA4_OP_SETdPTRe( dd, ee ) ( d = &(dd), e = (ee) )
+	
+		/* The pointer of the second val. */
+	#define LIBANDRIA4_OP_SETretresPTR( ret_, res_ ) ( ret = (ret_), res = &(res_) )
+	#define LIBANDRIA4_OP_SETabPTR( aa, bb ) ( a = (aa), b = &(bb) )
+	#define LIBANDRIA4_OP_SETbcPTR( bb, cc ) ( b = (bb), c = &(cc) )
+	#define LIBANDRIA4_OP_SETcdPTR( cc, dd ) ( c = (cc), d = &(dd) )
+	#define LIBANDRIA4_OP_SETdePTR( dd, ee ) ( d = (dd), e = &(ee) )
+	
+		/* The pointer of the both vals. */
+	#define LIBANDRIA4_OP_SETretPTRresPTR( ret_, res_ ) ( ret = &(ret_), res = &(res_) )
+	#define LIBANDRIA4_OP_SETaPTRbPTR( aa, bb ) ( a = &(aa), b = &(bb) )
+	#define LIBANDRIA4_OP_SETbPTRcPTR( bb, cc ) ( b = &(bb), c = &(cc) )
+	#define LIBANDRIA4_OP_SETcPTRdPTR( cc, dd ) ( c = &(cc), d = &(dd) )
+	#define LIBANDRIA4_OP_SETdPTRePTR( dd, ee ) ( d = &(dd), e = &(ee) )
+	
+	
 		/* Returns to match the sets above. */
 	#define LIBANDRIA4_OP_RETtmp( ... ) ( return( tmp ) )
+	#define LIBANDRIA4_OP_RETret( ... ) ( return( ret ) )
+	#define LIBANDRIA4_OP_RETres( ... ) ( return( res ) )
 	#define LIBANDRIA4_OP_RETa( ... ) ( return( a ) )
 	#define LIBANDRIA4_OP_RETb( ... ) ( return( b ) )
 	#define LIBANDRIA4_OP_RETc( ... ) ( return( c ) )
