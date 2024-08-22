@@ -41,6 +41,16 @@ SOFTWARE.
 	
 	
 	
+		/* Packages the algorithm to convert from a structure element's */
+		/*  address to the structure's address. */
+	#define LIBANDRIA4_STRUCTADDRfromELEMADDR( structtype, elemname,  elemptr ) \
+		( ( (structtype) *)( \
+			(char*)( elemptr ) + ( \
+				(char*)&( ( ( (structtype) *)0 )->( elemname ) ) - \
+				(char*)( ( (structtype) *)0 ) ) ) )
+	
+	
+	
 	#define LIBANDRIA4_RETURN_1ST( n, ... ) n
 	#define LIBANDRIA4_RETURN_2ND( x, n, ... ) n
 	#define LIBANDRIA4_RETURN_3RD( x1, x2, n, ... ) n
