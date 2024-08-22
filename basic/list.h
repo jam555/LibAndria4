@@ -41,7 +41,9 @@ SOFTWARE.
 	
 	
 	/* TODO: */
-		/* Add insertion functions (must ALL require the list pointer.). */
+		/* Add insertion functions (must ALL require the list pointer). */
+		/* Add deletion functions (same note as above). */
+		/* Add a visit function. */
 		/* Add a doubly-linked list builder. */
 	
 	
