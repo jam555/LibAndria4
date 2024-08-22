@@ -41,6 +41,39 @@ SOFTWARE.
 	
 	
 	
+	/* Note: rename to "prefix tree" or something similar, since I */
+	/*  apparently got the name screwed up... We want this to be some */
+	/*  radit-tree variant. */
+	/* TODO: */
+		/* Inner-search should use the elemcount macro value for range */
+		/*  checking! */
+		/* Finish op the "TODO: Search" entries further down. */
+	/* Needed functions: */
+		/* Full search (we have partial). */
+		/* Insert. */
+			/* Split (utility function). */
+				/* WARNING: do something to mark data nodes! Just checking */
+				/*  the length won't necessarily work! */
+				/*  Actually, is that true? If we NEVER generate a custom */
+				/*  string, then all strings will be provided with a data */
+				/*  node, so we just need to adapt in a different way, and */
+				/*  all non-data nodes will NOT reach the end of their */
+				/*  tracked string, RIGHT? This needs to be verified. */
+		/* Delete. */
+			/* Merge (utility function). */
+		/* Height count. */
+		/* Node count. */
+		/* Visit all. */
+			/* Should take a "base" pointer, so that it can be used along */
+			/*  with the "last" argument of inner-search to aid stuff like */
+			/*  tab-completion (search for your stub, maybe ignore a success */
+			/*  return, use visit() to list the remaining options). */
+	
+	
+	
+	#define LIBANDRIA4_STRTREE_PASSTHROUGHHASHFUNC( name,  ign1, ign2, elemtype,  ign3 ) \
+		(elemtype) ( name ## _hashfunc )( (elemtype) val ) { \
+			return( val ); }
 	#define LIBANDRIA4_STRTREE_8NODEHASHFUNC( name,  ign1, ign2, elemtype,  ign3 ) \
 		(elemtype) ( name ## _hashfunc )( (elemtype) val ) { \
 			const (elemtype) anti7 = ~( (elemtype)7 ); \
@@ -106,7 +139,7 @@ SOFTWARE.
 							loop = 0; } \
 						else { iter += 1; } } \
 					/* We now have the matching length of the strings. */ } \
-				if( recurse && iter == found->excerptlen ) { \
+				if( recurse && iter == found->excerptlen && iter + stroff < str->len ) { \
 					/* All the way through the found node, so move to the next child array. */ \
 					return( \
 						( name ## _innersearch )( \
@@ -114,6 +147,49 @@ SOFTWARE.
 							stroff + iter, str, \
 							last ) ); } \
 				return( ( name ## _eitherrptr_ptr )( found ) ); }
+	#define LIBANDRIA4_STRTREE_BUILDPARENTSEARCH( name,  pascalstrtype, elemtype ) \
+		( name ## _eitherrptr ) ( name ## _parentsearch )( \
+			name **base, (elemtype) (*hfunc)( (elemtype) val ), (pascalstrtype) *str ) \
+		{ \
+			if( !base ) { \
+				return( ( name ## _eitherrptr_buildDomainErr )( ) ); } \
+			(name) **last_arr = ( (name) **)0; \
+			( name ## _eitherrptr ) res = ( name ## _innersearch )( base, hfunc, 1,  0, str,  &( last_arr ) ); \
+			(name) *a = ( (name) *)0; \
+			LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETa ); \
+			if( !a ) { \
+				return( ( name ## _eitherrptr_buildNotInitedErr )( ) ); } \
+			if( base == last_arr ) { \
+				return( ( name ## _eitherrptr_err )( LIBANDRIA4_RESULT_FAILURE_TYPEMISMATCH ) ); } \
+				/* Calculate the parent-node's address (usually will be (name*)last_arr, BUT...). */ \
+			return( \
+				( name ## _eitherrptr_ptr ) ( \
+					LIBANDRIA4_STRUCTADDRfromELEMADDR( name, children,  last_arr ) ) ); }
+	#define LIBANDRIA4_STRTREE_BUILDFULLSEARCH( name,  pascalstrtype, elemtype ) \
+		( name ## _eitherrptr ) ( name ## _search )( \
+			name **base, (elemtype) (*hfunc)( (elemtype) val ), (pascalstrtype) *str ) \
+		{ \
+			if( !base ) { \
+				return( ( name ## _eitherrptr_buildDomainErr )( ) ); } \
+			(name) **last_arr = ( (name) **)0; \
+			( name ## _eitherrptr ) res = ( name ## _innersearch )( base, hfunc, 1,  0, str,  &( last_arr ) ); \
+			(name) *a = ( (name) *)0; \
+			LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETa ); \
+			if( !a ) { \
+				return( ( name ## _eitherrptr_buildNotInitedErr )( ) ); } \
+			return( \
+				( name ## _eitherrptr_ptr ) ( a ) ); }
+	/* TODO: Search variants to build, in order of construction/complexity: */
+		/* Find all shallow (the non-null members of the nearest array) */
+		/*  children. */
+		/* Find all deep (all of the nodes, IN GENERAL) children. */
+	/* Note that while predecessor / successor (using "alphabetic" order) */
+	/*  searches are real things, they won't be included here due to being */
+	/*  more of a specialized thing than prefix trees in general. */
+		/* Predecessor: the largest string that's smaller than the given */
+		/*  string, per lexographic ("alphabetic") order. */
+		/* Successor: the smallest string that's larger than the given */
+		/*  string. */
 	
 	
 	#define LIBANDRIA4_STRTREE_DECLARE_nNODE( name,  nodenum, pascalstrtype, elemtype,  hashfunc,  memfuncs_ptr ) \
@@ -181,7 +257,9 @@ SOFTWARE.
 		inline LIBANDRIA4_STRTREE_BUILDFETCHSTRPTR( name,  pascalstrtype ); \
 		( name ## _eitherrptr ) ( name ## _innersearch )( \
 			name **base, (elemtype) (*hfunc)( (elemtype) val ), int recurse, \
-			size_t stroff, (pascalstrtype) *str,  name ***last );
+			size_t stroff, (pascalstrtype) *str,  name ***last ); \
+		inline LIBANDRIA4_STRTREE_BUILDPARENTSEARCH( name,  pascalstrtype, elemtype ); \
+		inline LIBANDRIA4_STRTREE_BUILDFULLSEARCH( name,  pascalstrtype, elemtype );
 	
 	#define LIBANDRIA4_STRTREE_DEFINE_nNODE( name,  nodenum, pascalstrtype, elemtype,  hashfunc,  memfuncs_ptr ) \
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREIMPL( name,  pascalstrtype, \
@@ -212,7 +290,9 @@ SOFTWARE.
 			return( mf->dealloc( mf, mem ) ); } \
 		hashfunc( name,  elemtype ); \
 		LIBANDRIA4_STRTREE_BUILDFETCHSTRPTR( name,  pascalstrtype ); \
-		LIBANDRIA4_STRTREE_BUILDINNERSEARCH( name,  pascalstrtype, elemtype );
+		LIBANDRIA4_STRTREE_BUILDINNERSEARCH( name,  pascalstrtype, elemtype ); \
+		LIBANDRIA4_STRTREE_BUILDPARENTSEARCH( name,  pascalstrtype, elemtype ); \
+		LIBANDRIA4_STRTREE_BUILDFULLSEARCH( name,  pascalstrtype, elemtype );
 	
 	
 	#define LIBANDRIA4_STRTREE_DECLARE_8NODE( name,  pascalstrtype, elemtype,  memfuncs_ptr ) \
@@ -224,6 +304,18 @@ SOFTWARE.
 		LIBANDRIA4_STRTREE_DEFINE_nNODE( name, \
 			8, pascalstrtype, elemtype, \
 			LIBANDRIA4_STRTREE_8NODEHASHFUNC, \
+			memfuncs_ptr )
+	
+	/* Note that YOU MUST know the needed number of node pointers per node for this to work reliably. */
+	#define LIBANDRIA4_STRTREE_DECLARE_PASSTHROUGH( name,  nodenum, pascalstrtype, elemtype,  memfuncs_ptr ) \
+		LIBANDRIA4_STRTREE_DECLARE_nNODE( name, \
+			nodenum, pascalstrtype, elemtype, \
+			LIBANDRIA4_STRTREE_PASSTHROUGHHASHFUNC, \
+			memfuncs_ptr )
+	#define LIBANDRIA4_STRTREE_DEFINE_PASSTHROUGH( name,  nodenum, pascalstrtype, elemtype,  memfuncs_ptr ) \
+		LIBANDRIA4_STRTREE_DEFINE_nNODE( name, \
+			nodenum, pascalstrtype, elemtype, \
+			LIBANDRIA4_STRTREE_PASSTHROUGHHASHFUNC, \
 			memfuncs_ptr )
 	
 	
