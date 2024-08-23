@@ -102,7 +102,10 @@ SOFTWARE.
 		/* Now also being used for the end of a list. */
 	#define LIBANDRIA4_RESULT_FAILURE_EOF ( 14 )
 	
-		/* EFAULT: Note that this indicates a segfault. */
+		/* EFAULT. Note that this indicates a segfault, or something */
+		/*  similar, you tried to access (or do something with) an address */
+		/*  that isn't contextually valid (the context DOESN'T HAVE TO BE */
+		/*  the entire program). */
 	#define LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ( 15 )
 	
 		/* This is for stuff like 1 + 1 == 3, and other such madness. Most */
