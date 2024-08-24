@@ -181,6 +181,8 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_RETe( ... ) ( return( e ) )
 	
 	
+	#define LIBANDRIA4_OP_RETURNvoid( ... ) return( )
+	
 	#define LIBANDRIA4_OP_RETURNVAL_n4( ... ) return( -4 )
 	#define LIBANDRIA4_OP_RETURNVAL_n3( ... ) return( -3 )
 	#define LIBANDRIA4_OP_RETURNVAL_n2( ... ) return( -2 )
