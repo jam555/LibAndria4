@@ -41,9 +41,6 @@ SOFTWARE.
 	
 	
 	/* TODO: */
-		/* Add insertion functions (must ALL require the list pointer). */
-		/* Add deletion functions (same note as above). */
-		/* Add a visit function. */
 		/* Add a doubly-linked list builder. */
 	
 	
@@ -88,7 +85,7 @@ SOFTWARE.
 				return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_EOF ) ); } \
 			return( ( name ## _eitherrnod_nodeptr )( c ) ); }
 	
-	#define LIBANDRIA4_LIST_BUILDNOPREV( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDNOPREV( name,  nodetype,  macroset ) \
 		( name ## _eitherrnod ) ( name ## _getprev )( ( name ## _eitherrnod ) tmp ) { \
 			(nodetype) *a; \
 			LIBANDRIA4_MONAD_EITHER_BODYMATCH( \
@@ -96,7 +93,7 @@ SOFTWARE.
 			if( !a ) { \
 				return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED ) ); } \
 			return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ) ); }
-	#define LIBANDRIA4_LIST_BUILDNONEXT( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDNONEXT( name,  nodetype,  macroset ) \
 		( name ## _eitherrnod ) ( name ## _getnext )( ( name ## _eitherrnod ) tmp ) { \
 			(nodetype) *a; \
 			LIBANDRIA4_MONAD_EITHER_BODYMATCH( \
@@ -105,7 +102,7 @@ SOFTWARE.
 				return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED ) ); } \
 			return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ) ); }
 	
-	#define LIBANDRIA4_LIST_BUILDINSPREV( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDINSPREV( name,  nodetype,  macroset ) \
 		libandria4_commonio_mayerr \
 			( name ## _insertptr_prev )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *add ) { \
 				if( !base || !add ) { \
@@ -138,7 +135,7 @@ SOFTWARE.
 				return( ret == 0 ? \
 					LIBANDRIA4_COMMONIO_MAYERR_NOERR() : \
 					LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( ret ) ); }
-	#define LIBANDRIA4_LIST_BUILDINSNEXT( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDINSNEXT( name,  nodetype,  macroset ) \
 		libandria4_commonio_mayerr \
 			( name ## _insertptr_next )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *add ) { \
 				if( !base || !add ) { \
@@ -186,11 +183,11 @@ SOFTWARE.
 				\
 				return( LIBANDRIA4_COMMONIO_MAYERR_NOERR() ); }
 	
-	#define LIBANDRIA4_LIST_BUILDNOINSPREV( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDNOINSPREV( name,  nodetype,  macroset ) \
 		libandria4_commonio_mayerr \
 			( name ## _insertptr_prev )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *add ) { \
 				return( LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ) ); }
-	#define LIBANDRIA4_LIST_BUILDNOINSNEXT( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDNOINSNEXT( name,  nodetype,  macroset ) \
 		libandria4_commonio_mayerr \
 			( name ## _insertptr_next )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *add ) { \
 				return( LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ) ); }
@@ -205,7 +202,7 @@ SOFTWARE.
 	
 		/* DOES NOT delete the previous node, deletes the EXPLICITLY */
 		/*  IDENTIFIED node in a list with ->prev pointers. */
-	#define LIBANDRIA4_LIST_BUILDDELPREV( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDDELPREV( name,  nodetype,  macroset ) \
 		( name ## _eitherrnod ) \
 			( name ## _deleteptr_prev )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *del ) { \
 				if( !base ) { return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
@@ -248,7 +245,7 @@ SOFTWARE.
 				if( base->tail == del ) { base->tail = prev; } \
 				\
 				return( ( name ## _eitherrnod_nodeptr )( del ) ); }
-	#define LIBANDRIA4_LIST_BUILDDELNEXT( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDDELNEXT( name,  nodetype,  macroset ) \
 		( name ## _eitherrnod ) \
 			( name ## _deleteptr_next )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *del ) { \
 				if( !base ) { return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
@@ -319,11 +316,11 @@ SOFTWARE.
 				return( tmp ); }
 	;
 	
-	#define LIBANDRIA4_LIST_BUILDNODELPREV( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDNODELPREV( name,  nodetype,  macroset ) \
 		( name ## _eitherrnod ) \
 			( name ## _deleteptr_prev )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *add ) { \
 				return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ) ); }
-	#define LIBANDRIA4_LIST_BUILDNODELNEXT( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDNODELNEXT( name,  nodetype,  macroset ) \
 		( name ## _eitherrnod ) \
 			( name ## _deleteptr_next )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *add ) { \
 				return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ) ); }
@@ -336,13 +333,15 @@ SOFTWARE.
 			( name ## _insertptr )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *add ) { \
 				return( ( name ## _deleteptr_prev )( base, prev, next,  add ) ); }
 	
-	#define LIBANDRIA4_LIST_BUILDVISITPREV( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDVISITPREV( name,  nodetype,  macroset ) \
 		libandria4_commonio_mayerr \
 			( name ## _visitprev )( \
 				(name) *base, \
 				void *data, void (*func)( void*,  uintptr_t, ((nodetype)*) ) ) { \
 					if( !base || !func ) { \
 						return( LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+					if( ( base->head ? 1 : 0 ) != ( base->tail ? 1 : 0 ) ) { \
+						return( LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ) ); } \
 					( name ## _bitup ) res; \
 					static const libandria4_commonio_mayerr c = \
 						LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); \
@@ -362,13 +361,15 @@ SOFTWARE.
 						/* Should never happen, so almost guaranteed loop. */ \
 						return( LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_ABOVEBOUNDS ) ); } \
 					return( LIBANDRIA4_COMMONIO_MAYERR_NOERR() ); }
-	#define LIBANDRIA4_LIST_BUILDVISITNEXT( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDVISITNEXT( name,  nodetype,  macroset ) \
 		libandria4_commonio_mayerr \
 			( name ## _visitnext )( \
 				(name) *base, \
 				void *data, void (*func)( void*,  uintptr_t, ((nodetype)*) ) ) { \
 					if( !base || !func ) { \
 						return( LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+					if( ( base->head ? 1 : 0 ) != ( base->tail ? 1 : 0 ) ) { \
+						return( LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ) ); } \
 					( name ## _bitup ) res; \
 					static const libandria4_commonio_mayerr c = \
 						LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); \
@@ -389,14 +390,156 @@ SOFTWARE.
 						return( LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_ABOVEBOUNDS ) ); } \
 					return( LIBANDRIA4_COMMONIO_MAYERR_NOERR() ); }
 	
-	#define LIBANDRIA4_LIST_BUILDNOVISITPREV( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDNOVISITPREV( name,  nodetype,  macroset ) \
 		libandria4_commonio_mayerr ( name ## _visitprev )( \
 				(name) *base,  void *data, void (*func)( void*,  uintptr_t, ((nodetype)*) ) ) { \
 					return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ) ); }
-	#define LIBANDRIA4_LIST_BUILDNOVISITNEXT( name,  nodetype ) \
+	#define LIBANDRIA4_LIST_BUILDNOVISITNEXT( name,  nodetype,  macroset ) \
 		libandria4_commonio_mayerr ( name ## _visitnext )( \
 				(name) *base,  void *data, void (*func)( void*,  uintptr_t, ((nodetype)*) ) ) { \
 					return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_INVALIDOPER ) ); }
+	
+	#define LIBANDRIA4_LIST_BUILDVERIFYHELPER( name,  nodetype,  macroset ) \
+		typedef struct ( name ## _verifyhelper_dat ) ( name ## _verifyhelper_dat ); \
+		struct ( name ## _verifyhelper_dat ) { (nodetype) *node; uintptr_t len; }; \
+		void ( name ## _verifyhelper )( void *dat,  uintptr_t len, (nodetype) *n ) { \
+			if( dat ) { \
+				( name ## _verifyhelper_dat ) *data = (( name ## _verifyhelper_dat )*)dat; \
+				data->node = n; data->len = len; } }
+	#define LIBANDRIA4_LIST_BUILDVERIFYHELPERBIDIR( name,  nodetype,  macroset ) \
+		typedef struct ( name ## _verifyhelper_dat ) ( name ## _verifyhelper_dat ); \
+		struct ( name ## _verifyhelper_dat ) { (nodetype) *node; uintptr_t len; int badaddr; }; \
+		void ( name ## _verifyhelper )( void *dat,  uintptr_t len, (nodetype) *n ) { \
+			if( dat ) { \
+				( name ## _verifyhelper_dat ) *data = (( name ## _verifyhelper_dat )*)dat; \
+				data->node = n; data->len = len; \
+				( name ## _bitup ) res; (nodetype) *a; libandria4_commonio_err e = 0; \
+				if( data->badaddr == 0 ) { \
+					if( n ) { \
+						res = macroset ## _GETLEFT( n ); \
+						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+							res, \
+								LIBANDRIA4_OP_SETe, \
+								LIBANDRIA4_OP_SETa, \
+								LIBANDRIA4_OP_RETURNvoid ); \
+						if( e ) { data->badaddr = -e; } \
+						else { \
+							res = macroset ## _GETRIGHT( a ); \
+							LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+								res, \
+									LIBANDRIA4_OP_SETe, \
+									LIBANDRIA4_OP_SETa, \
+									LIBANDRIA4_OP_RETURNvoid ); \
+							if( e ) { data->badaddr = e; } \
+							else { data->badaddr = ( a != n ) ? 1 : 0; } } } \
+					else { data->badaddr = 1; } } } }
+	#define LIBANDRIA4_LIST_BUILDVERIFYNONEXT( name,  nodetype,  macroset ) \
+		int ( name ## _verify )( (name) *base, uintptr_t *count, (nodetype) **n ) { \
+			libandria4_commonio_err e = 0; \
+			if( !base ) { return( LIBANDRIA4_RESULT_FAILURE_DOMAIN ); } \
+			if( ( base->head ? 1 : 0 ) != ( base->tail ? 1 : 0 ) ) { \
+				return( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ); } \
+			if( base->head ) { \
+				( name ## _bitup ) res; (nodetype) *a; \
+				res = macroset ## _GETLEFT( base->head ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					res, \
+						LIBANDRIA4_OP_SETe, \
+						LIBANDRIA4_OP_SETa, \
+						LIBANDRIA4_OP_RETURNVAL_1 ); \
+				if( e ) { return( -e ); }; \
+				if( a ) { return( LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS ); } } \
+			( name ## _verifyhelper_dat ) vhdat = { 0, 0 }; \
+			libandria4_commonio_mayerr tmp = ( name ## _visitprev )( base, (void*)&vhdat, &( name ## _verifyhelper ) ); \
+				if( count ) { *count = vhdat.len; } \
+				if( n ) { *n = vhdat->node; } \
+			LIBANDRIA4_COMMONIO_MAYERR_BODYMATCH( tmp,  LIBANDRIA4_OP_SETe, LIBANDRIA4_NULL_MACRO ); \
+				if( e ) { return( e ); } \
+			if( vhdat->node != base->tail ) { return( LIBANDRIA4_RESULT_FAILURE_GENERICMISMATCH ); } \
+			/* Success. */ return( 0 ); }
+	#define LIBANDRIA4_LIST_BUILDVERIFYNOPREV( name,  nodetype,  macroset ) \
+		int ( name ## _verify )( (name) *base, uintptr_t *count, (nodetype) **n ) { \
+			libandria4_commonio_err e = 0; \
+			if( !base ) { return( LIBANDRIA4_RESULT_FAILURE_DOMAIN ); } \
+			if( ( base->head ? 1 : 0 ) != ( base->tail ? 1 : 0 ) ) { \
+				return( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ); } \
+			if( base->tail ) { \
+				( name ## _bitup ) res; (nodetype) *a; \
+				res = macroset ## _GETRIGHT( base->tail ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					res, \
+						LIBANDRIA4_OP_SETe, \
+						LIBANDRIA4_OP_SETa, \
+						LIBANDRIA4_OP_RETURNVAL_1 ); \
+				if( e ) { return( -e ); }; \
+				if( a ) { return( LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS ); } } \
+			( name ## _verifyhelper_dat ) vhdat = { 0, 0 }; \
+			libandria4_commonio_mayerr tmp = ( name ## _visitnext )( base, (void*)&vhdat, &( name ## _verifyhelper ) ); \
+				if( count ) { *count = vhdat.len; } \
+				if( n ) { *n = vhdat->node; } \
+			LIBANDRIA4_COMMONIO_MAYERR_BODYMATCH( tmp,  LIBANDRIA4_OP_SETe, LIBANDRIA4_NULL_MACRO ); \
+				if( e ) { return( e ); } \
+			if( vhdat->node != base->tail ) { return( LIBANDRIA4_RESULT_FAILURE_GENERICMISMATCH ); } \
+			/* Success. */ return( 0 ); }
+	#define LIBANDRIA4_LIST_BUILDVERIFYBIDIR( name,  nodetype,  macroset ) \
+		int ( name ## _verify )( (name) *base, uintptr_t *count, (nodetype) **n ) { \
+			if( !base ) { return( LIBANDRIA4_RESULT_FAILURE_DOMAIN ); } \
+			if( ( base->head ? 1 : 0 ) != ( base->tail ? 1 : 0 ) ) { \
+				return( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ); } \
+			( name ## _bitup ) res; (nodetype) *a; libandria4_commonio_err e = 0; \
+			if( base->head ) { \
+				res = macroset ## _GETLEFT( base->head ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					res, \
+						LIBANDRIA4_OP_SETe, \
+						LIBANDRIA4_OP_SETa, \
+						LIBANDRIA4_OP_RETURNVAL_1 ); \
+				if( e ) { return( -e ); }; \
+				if( a ) { return( LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS ); } } \
+			if( base->tail ) { \
+				res = macroset ## _GETRIGHT( base->tail ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					res, \
+						LIBANDRIA4_OP_SETe, \
+						LIBANDRIA4_OP_SETa, \
+						LIBANDRIA4_OP_RETURNVAL_1 ); \
+				if( e ) { return( -e ); }; \
+				if( a ) { return( LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS ); } } \
+			( name ## _verifyhelper_dat ) vhdat = { 0, 0, 0 }; \
+			libandria4_commonio_mayerr tmp = ( name ## _visitprev )( base, (void*)&vhdat, &( name ## _verifyhelper ) ); \
+				if( count ) { *count = vhdat.len; } \
+				if( n ) { *n = vhdat->node; } \
+			LIBANDRIA4_COMMONIO_MAYERR_BODYMATCH( tmp,  LIBANDRIA4_OP_SETe, LIBANDRIA4_NULL_MACRO ); \
+				if( e ) { return( e ); } \
+				if( vhdat->badaddr ) { return( LIBANDRIA4_RESULT_FAILURE_BROKEN ); } \
+			if( vhdat->node != base->tail ) { return( LIBANDRIA4_RESULT_FAILURE_GENERICMISMATCH ); } \
+			/* Success. */ return( 0 ); }
+	
+	#define LIBANDRIA4_LIST_BUILDLENGTHHELPER( name,  nodetype ) \
+		typedef struct ( name ## _lengthhelper_dat ) ( name ## _lengthhelper_dat ); \
+		struct ( name ## _lengthhelper_dat ) { uintptr_t len; }; \
+		void ( name ## _lengthhelper )( void *dat,  uintptr_t len, (nodetype) *ignore ) { \
+			if( dat ) { ( (( name ## _verifyhelper_dat )*)dat )->len = len; } }
+	#define LIBANDRIA4_LIST_BUILDLENGTHNONEXT( name,  nodetype ) \
+		int ( name ## _length )( (name) *base, uintptr_t *count ) { \
+			if( !base || !count ) { return( LIBANDRIA4_RESULT_FAILURE_DOMAIN ); } \
+			if( ( base->head ? 1 : 0 ) != ( base->tail ? 1 : 0 ) ) { \
+				return( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ); } \
+			libandria4_commonio_err e = 0; ( name ## _lengthhelper_dat ) lhdat = { 0 }; \
+			libandria4_commonio_mayerr tmp = ( name ## _visitprev )( base, (void*)&lhdat, &( name ## _lengthhelper ) ); \
+				*count = lhdat.len; \
+			LIBANDRIA4_COMMONIO_MAYERR_BODYMATCH( tmp,  LIBANDRIA4_OP_SETe, LIBANDRIA4_NULL_MACRO ); \
+				if( e ) { return( e ); } /* Success. */ return( 0 ); }
+	#define LIBANDRIA4_LIST_BUILDLENGTHNOPREV( name,  nodetype ) \
+		int ( name ## _length )( (name) *base, uintptr_t *count ) { \
+			if( !base || !count ) { return( LIBANDRIA4_RESULT_FAILURE_DOMAIN ); } \
+			if( ( base->head ? 1 : 0 ) != ( base->tail ? 1 : 0 ) ) { \
+				return( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ); } \
+			libandria4_commonio_err e = 0; ( name ## _lengthhelper_dat ) lhdat = { 0 }; \
+			libandria4_commonio_mayerr tmp = ( name ## _visitnext )( base, (void*)&lhdat, &( name ## _lengthhelper ) ); \
+				*count = lhdat.len; \
+			LIBANDRIA4_COMMONIO_MAYERR_BODYMATCH( tmp,  LIBANDRIA4_OP_SETe, LIBANDRIA4_NULL_MACRO ); \
+				if( e ) { return( e ); } /* Success. */ return( 0 ); }
 	
 		/* For a doubly-linked list, replace the following "starting" macros */
 		/*  with the respective "trailing" macro: */
@@ -406,6 +549,8 @@ SOFTWARE.
 			/* LIBANDRIA4_LIST_BUILDNODELPREV -> LIBANDRIA4_LIST_BUILDDELPREV */
 			/* LIBANDRIA4_LIST_BUILDDELBIDIR_NOPREV -> LIBANDRIA4_LIST_BUILDDELBIDIR */
 			/* LIBANDRIA4_LIST_BUILDNOVISITPREV -> LIBANDRIA4_LIST_BUILDVISITPREV */
+			/* LIBANDRIA4_LIST_BUILDVERIFYHELPER -> LIBANDRIA4_LIST_BUILDVERIFYHELPERBIDIR */
+			/* LIBANDRIA4_LIST_BUILDVERIFYNOPREV -> LIBANDRIA4_LIST_BUILDVERIFYBIDIR */
 		/*  Note that nodetype MUST have an equivalent of a ->next pointer */
 		/*  accessible through the "right" macroset macros.*/
 	#define LIBANDRIA4_LIST_BASICBUILDER_SINGLELINKED( name,  nodetype,  macroset ) \
@@ -453,16 +598,20 @@ SOFTWARE.
 			if( !( list->head && list->tail ) ) \
 				{ return( ( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED ) ); } \
 			return( ( name ## _eitherrnod_nodeptr )( list->tail ) ); } \
-		LIBANDRIA4_LIST_BUILDNOPREV( name,  nodetype ); \
+		LIBANDRIA4_LIST_BUILDNOPREV( name,  nodetype,  macroset ); \
 		LIBANDRIA4_LIST_BUILDNEXT( name,  nodetype,  macroset ); \
-		LIBANDRIA4_LIST_BUILDINSNEXT( name,  nodetype ); \
-		LIBANDRIA4_LIST_BUILDNOINSPREV( name,  nodetype ); \
+		LIBANDRIA4_LIST_BUILDINSNEXT( name,  nodetype,  macroset ); \
+		LIBANDRIA4_LIST_BUILDNOINSPREV( name,  nodetype,  macroset ); \
 		LIBANDRIA4_LIST_BUILDINSBIDIR_NOPREV( name,  nodetype ); \
-		LIBANDRIA4_LIST_BUILDDELNEXT( name,  nodetype ); \
-		LIBANDRIA4_LIST_BUILDNODELPREV( name,  nodetype ); \
+		LIBANDRIA4_LIST_BUILDDELNEXT( name,  nodetype,  macroset ); \
+		LIBANDRIA4_LIST_BUILDNODELPREV( name,  nodetype,  macroset ); \
 		LIBANDRIA4_LIST_BUILDDELBIDIR_NOPREV( name,  nodetype ); \
-		LIBANDRIA4_LIST_BUILDVISITNEXT( name,  nodetype ); \
-		LIBANDRIA4_LIST_BUILDNOVISITPREV( name,  nodetype );
+		LIBANDRIA4_LIST_BUILDVISITNEXT( name,  nodetype,  macroset ); \
+		LIBANDRIA4_LIST_BUILDNOVISITPREV( name,  nodetype,  macroset ); \
+		LIBANDRIA4_LIST_BUILDVERIFYHELPER( name,  nodetype,  macroset ); \
+		LIBANDRIA4_LIST_BUILDVERIFYNOPREV( name,  nodetype,  macroset ); \
+		LIBANDRIA4_LIST_BUILDLENGTHHELPER( name,  nodetype ); \
+		LIBANDRIA4_LIST_BUILDLENGTHNOPREV( name,  nodetype );
 	
 #endif
 /* End libandria4 basic list.h */
