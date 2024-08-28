@@ -99,6 +99,39 @@ SOFTWARE.
 			if( mf ) { *mf = b; } \
 			return( ( name ## _eitherrstrptr_ptr )( a ) ); }
 	
+	#define LIBANDRIA4_STRTREE_BUILDHASHSEARCH( name,  pascalstrtype, elemtype ) \
+		( name ## _eitherrptr ) ( name ## _hashsearch )( \
+			name **base, (elemtype) (*hfunc)( (elemtype) val ), \
+			size_t stroff, (pascalstrtype) *str,  name ***host ) \
+			{ \
+				if( !( base && str ) ) { return( ( name ## _eitherrptr_buildDomainErr )() ); } \
+				if( !( *base ) ) { return( ( name ## _eitherrptr_buildIndrDomainErr )() ); } \
+				if( str->len <= stroff ) { return( ( name ## _eitherrptr_buildAboveBoundsErr )() ); } \
+				(elemtype) hashval = hfunc( str->body[ stroff ] ); \
+				(name) **tmp = ((name) **)0; if( !host ) { host = &tmp; } **host = &( base[ hashval ] ); \
+				if( !( **host ) ) { return( ( name ## _eitherrptr_ptr )( ( (name) *)0 ) ); } \
+				(pascalstrtype) *a = ( (pascalstrtype) *)0; { \
+						/* We don't need the memfuncs{}. */ \
+					( name ## _eitherrstrptr ) *fstr = \
+						( name ## _fetchstrptr )( &( ( **host )->str ),  (lib4_memfuncs_t**)0 ); \
+					unsigned e = 0; \
+					LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa ); \
+					while( !e && a && a->len > stroff && str->body[ stroff ] != a->body[ stroff ] ) { \
+						if( ( **host )->peer ) { \
+							*host = &( ( **host )->peer ); \
+							fstr = ( name ## _fetchstrptr )( &( ( **host )->str ),  (lib4_memfuncs_t**)0 ); \
+							LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa ); } \
+						else { /* No match. */ \
+							return( ( name ## _eitherrptr_ptr )( ( (name) *)0 ) ); } } \
+					if( a->len <= stroff ) { \
+							/* This should NEVER happen, so if it ever DOES, then that's a corruption issue. */ \
+						return( ( name ## _eitherrptr_err )( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ) ); } \
+					if( e ) { \
+						return( ( name ## _eitherrptr_err )( e ) ); } \
+					if( !a ) { \
+						return( ( name ## _eitherrptr_buildNotInitedErr )( ) ); } \
+					/* At this point, ***host is a node with the correct "first" character, and *a is it's pascal string. */ } \
+				return( ( name ## _eitherrptr_ptr )( **host ) ); }
 		/* *last will contain the last value of base that was used, IF last is non-null. */
 		/*
 			The returns will be as follows:
@@ -261,6 +294,7 @@ SOFTWARE.
 				return( ( name ## _eitherrstrptr_err )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) ); } \
 		inline hashfunc( name,  nodenum, pascalstrtype, elemtype,  memfuncs_ptr ); \
 		inline LIBANDRIA4_STRTREE_BUILDFETCHSTRPTR( name,  pascalstrtype ); \
+		inline LIBANDRIA4_STRTREE_BUILDHASHSEARCH( name,  pascalstrtype, elemtype ); \
 		( name ## _eitherrptr ) ( name ## _innersearch )( \
 			name **base, (elemtype) (*hfunc)( (elemtype) val ), int recurse, \
 			size_t stroff, (pascalstrtype) *str,  name ***last ); \
@@ -296,6 +330,7 @@ SOFTWARE.
 			return( mf->dealloc( mf, mem ) ); } \
 		hashfunc( name,  elemtype ); \
 		LIBANDRIA4_STRTREE_BUILDFETCHSTRPTR( name,  pascalstrtype ); \
+		LIBANDRIA4_STRTREE_BUILDHASHSEARCH( name,  pascalstrtype, elemtype ); \
 		LIBANDRIA4_STRTREE_BUILDINNERSEARCH( name,  pascalstrtype, elemtype ); \
 		LIBANDRIA4_STRTREE_BUILDPARENTSEARCH( name,  pascalstrtype, elemtype ); \
 		LIBANDRIA4_STRTREE_BUILDFULLSEARCH( name,  pascalstrtype, elemtype );
@@ -356,81 +391,35 @@ SOFTWARE.
 				return( LIBANDRIA4_RESULT_FAILURE_DOMAIN );
 			}
 			
-			size_t strstart = base->strstart;
-			(name) **last_arr = ((nanme)**)0;
-			unsigned e = 0;
 			
-			??? /* Wrong order! We need to be testing the strings here! */ ???
-			
-			
-			
-			
-			
-			
-			/* Search for the node, get the last array searched. */
-			(name) *a;
-			( name ## _eitherrptr ) res =
-				( name ## _innersearch )
-				(
-					&base, hashfuncptr, 1,
-					strstart, srch,  &last_arr
-				);
-			LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa );
-			if( e )
-			{
-				return( e );
-			}
-			if( a )
-			{
-				/* Node found, failure. */
-				return( LIBANDRIA4_RESULT_FAILURE_EXISTS );
-				
-				??? /* Actually, IS this failure? Do we get a FULL match? */ ???
-			}
-			
-			/* Get the last array's containing node, it's distance along the */
-			/*  string, the hash of the "first current" character, and it's */
-			/*  actual string. */
-			a = LIBANDRIA4_STRUCTADDRfromELEMADDR( name, children,  last_arr );
-			if( !a )
-			{
-				return( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED );
-			}
+				/* You know, normally 'a' would come first, but this DOES seem poetic... */
 			(pascalstrtype) *b = 0;
-			fstr = ( name ## _fetchstrptr )( &( a->str ),  (lib4_memfuncs_t**)0 );
+			unsigned e = 0;
+			fstr = ( name ## _fetchstrptr )( &( base->str ),  (lib4_memfuncs_t**)0 );
 			LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETb );
 			if( e )
 			{
 				return( e );
 			}
-			strstart = a->strstart;
+			size_t strstart = base->strstart;
 			if( strstart => srch->len )
 			{
 				return( LIBANDRIA4_RESULT_FAILURE_ABOVEBOUNDS );
 			}
-				??? /* Is this the RIGHT array element? Should we be using */
-				/*  strstart + host->excerptlen ? Find out! */ ???
-			(elemtype) hash = ( name ## _hashfunc )( srch->body[ strstart ] );
-			
-			
-			
-			
-			
-			
+			size_t strmatch = 0;
 			
 			/* Get the match length, and insert accordingly. */
-			size_t strmatch = 0;
 			while
 			(
 				strstart + strmatch < srch->len &&
 				strstart + strmatch < b->len &&
-				strmatch < a->excerptlen &&
+				strmatch < base->excerptlen &&
 				srch->body[ strstart + strmatch ] == b->body[ strstart + strmatch ]
 			)
 			{
 				strmatch += 1;
 			}
-			if( strmatch < a->excerptlen )
+			if( strmatch < base->excerptlen )
 			{
 				/* Split *host so that our matched characters are still in */
 				/*  *host, and it's children[] array moves into it's new */
@@ -438,49 +427,58 @@ SOFTWARE.
 				
 				??? /* Split. */
 				
-					/* Recalculate the hash... do we need to do this? */
-				hash = ( name ## _hashfunc )( srch->body[ strstart ] );
-				
 				??? /*  */
 				
 				/* Now we fall-through to the NEXT if() block. */
 			}
 			
-			
-			
-			
-			
-			
-			
 			/* Exact length match. */
-			if( strmatch == a->excerptlen )
+			if( strmatch == base->excerptlen )
 			{
-				if( srch->len > strstart + strmatch && ??? )
+					/* Is this the RIGHT array element? Should we be using */
+					/*  strstart + host->excerptlen ? Find out! */
+				(name) *a, **found;
+				( name ## _eitherrptr ) eep =
+					( name ## _hashsearch )
+					(
+						&base, &hashfuncptr, strstart + strmatch, srch,  &found
+					);
+				LIBANDRIA4_MONAD_EITHER_BODYMATCH( eep, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa );
+				if( e )
 				{
-					??? return( _innerinsert( a,  n, srch ) ); ???
+					return( e );
+				}
+					/* If a, then a FULL match was found for the first byte checked. */
+				if( a )
+				{
+						/* + 1, because the hash-search did a seaerch over an extra byte, so we need to factor that in. */
+					if( srch->len > strstart + strmatch + 1 )
+					{
+						return( _innerinsert( a,  n, srch ) );
+						
+					} else {
+						
+						/* Error, node already exists. */
+						
+						return( LIBANDRIA4_RESULT_FAILURE_EXISTS );
+					}
 					
 				} else {
 					
 					/* Insert directly. */
-					n->peer = a->children[ hash ];
-					a->children[ hash ] = n;
+					n->peer = *found;
+					( *found ) = n;
 					n->strstart = strstart + strmatch;
 					n->excerptlen = ( srch->len ) - n->strstart;
 					
-					return( ??? ); /* Success. */
+					return( 0 ); /* Success. */
 				}
 				
-			} else {
-				
-				/* Error, strmatch != host->excerptlen */
-				return( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT );
 			}
-			
-			
-			
-			
-			???
-			// ;
+				
+				/* Error, strmatch != base->excerptlen . */
+				/*  The split-if() above should prevent this, so reaching this return GUARANTEES the existence of an error. */
+			return( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT );
 		}
 	;
 		struct (name) { \
