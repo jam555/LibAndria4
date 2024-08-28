@@ -100,6 +100,12 @@ SOFTWARE.
 			return( ( name ## _eitherrstrptr_ptr )( a ) ); }
 	
 		/* *last will contain the last value of base that was used, IF last is non-null. */
+		/*
+			The returns will be as follows:
+				Errors are errors, surprising noone.
+				Null pointers == nothing found.
+				Else true match found.
+		*/
 	#define LIBANDRIA4_STRTREE_BUILDINNERSEARCH( name,  pascalstrtype, elemtype ) \
 		( name ## _eitherrptr ) ( name ## _innersearch )( \
 			name **base, (elemtype) (*hfunc)( (elemtype) val ), int recurse, \
@@ -320,6 +326,162 @@ SOFTWARE.
 	
 	
 	
+	#define LIBANDRIA4_STRTREE_BUILDINSERT( name,  pascalstrtype, elemtype, hashfuncptr ) ;
+		int /* name ## */ _insert( (name) *base,  (name) *n )
+		{
+			if( !base || !n )
+			{
+				return( LIBANDRIA4_RESULT_FAILURE_DOMAIN );
+			}
+			
+			(pascalstrtype) *a = 0;
+			unsigned e = 0;
+			
+			/* Get the string. */
+			( name ## _eitherrstrptr ) fstr =
+				( name ## _fetchstrptr )( &( n->str ),  (lib4_memfuncs_t**)0 );
+			LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa );
+			if( e )
+			{
+				return( e );
+			}
+			
+			return( _innerinsert( base,  n, a ) );
+		}
+	#define LIBANDRIA4_STRTREE_BUILDINNERINSERT( name,  pascalstrtype, elemtype, hashfuncptr ) ;
+		int /* name ## */ _innerinsert( (name) *base,  (name) *n, (pascalstrtype) *srch )
+		{
+			if( !base || !n || !srch )
+			{
+				return( LIBANDRIA4_RESULT_FAILURE_DOMAIN );
+			}
+			
+			size_t strstart = base->strstart;
+			(name) **last_arr = ((nanme)**)0;
+			unsigned e = 0;
+			
+			??? /* Wrong order! We need to be testing the strings here! */ ???
+			
+			
+			
+			
+			
+			
+			/* Search for the node, get the last array searched. */
+			(name) *a;
+			( name ## _eitherrptr ) res =
+				( name ## _innersearch )
+				(
+					&base, hashfuncptr, 1,
+					strstart, srch,  &last_arr
+				);
+			LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa );
+			if( e )
+			{
+				return( e );
+			}
+			if( a )
+			{
+				/* Node found, failure. */
+				return( LIBANDRIA4_RESULT_FAILURE_EXISTS );
+				
+				??? /* Actually, IS this failure? Do we get a FULL match? */ ???
+			}
+			
+			/* Get the last array's containing node, it's distance along the */
+			/*  string, the hash of the "first current" character, and it's */
+			/*  actual string. */
+			a = LIBANDRIA4_STRUCTADDRfromELEMADDR( name, children,  last_arr );
+			if( !a )
+			{
+				return( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED );
+			}
+			(pascalstrtype) *b = 0;
+			fstr = ( name ## _fetchstrptr )( &( a->str ),  (lib4_memfuncs_t**)0 );
+			LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETb );
+			if( e )
+			{
+				return( e );
+			}
+			strstart = a->strstart;
+			if( strstart => srch->len )
+			{
+				return( LIBANDRIA4_RESULT_FAILURE_ABOVEBOUNDS );
+			}
+				??? /* Is this the RIGHT array element? Should we be using */
+				/*  strstart + host->excerptlen ? Find out! */ ???
+			(elemtype) hash = ( name ## _hashfunc )( srch->body[ strstart ] );
+			
+			
+			
+			
+			
+			
+			
+			/* Get the match length, and insert accordingly. */
+			size_t strmatch = 0;
+			while
+			(
+				strstart + strmatch < srch->len &&
+				strstart + strmatch < b->len &&
+				strmatch < a->excerptlen &&
+				srch->body[ strstart + strmatch ] == b->body[ strstart + strmatch ]
+			)
+			{
+				strmatch += 1;
+			}
+			if( strmatch < a->excerptlen )
+			{
+				/* Split *host so that our matched characters are still in */
+				/*  *host, and it's children[] array moves into it's new */
+				/*  SOLITARY child. */
+				
+				??? /* Split. */
+				
+					/* Recalculate the hash... do we need to do this? */
+				hash = ( name ## _hashfunc )( srch->body[ strstart ] );
+				
+				??? /*  */
+				
+				/* Now we fall-through to the NEXT if() block. */
+			}
+			
+			
+			
+			
+			
+			
+			
+			/* Exact length match. */
+			if( strmatch == a->excerptlen )
+			{
+				if( srch->len > strstart + strmatch && ??? )
+				{
+					??? return( _innerinsert( a,  n, srch ) ); ???
+					
+				} else {
+					
+					/* Insert directly. */
+					n->peer = a->children[ hash ];
+					a->children[ hash ] = n;
+					n->strstart = strstart + strmatch;
+					n->excerptlen = ( srch->len ) - n->strstart;
+					
+					return( ??? ); /* Success. */
+				}
+				
+			} else {
+				
+				/* Error, strmatch != host->excerptlen */
+				return( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT );
+			}
+			
+			
+			
+			
+			???
+			// ;
+		}
 	;
 		struct (name) { \
 				/* peer is used in case of hash collisions to track "the other */ \
@@ -327,8 +489,14 @@ SOFTWARE.
 			(name) *children[ nodenum ], *peer; \
 			size_t strstart, excerptlen; \
 			( name ## _tracker ) str; };
+		typedef struct (name ## _root) { \
+			(name) *children[ nodenum ]; }; \
 		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( name ## _eitherrstrptr, unsigned, (pascalstrtype)* );
 	;
+		int /* name ## */ _insert( ( name ## _root ) *root, (name) *n )
+		{
+			// ;
+		}
 	
 	
 	
