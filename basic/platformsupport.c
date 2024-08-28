@@ -65,7 +65,7 @@ SOFTWARE.
 libandria4_int_errint libandria4_fseek( FILE *stream, libandria4_either_fofft offset, int origin )
 {
 		/* Used internally. */
-	#define libandria4_fseek_ONSUCC val ) \
+	#define libandria4_fseek_ONSUCC( val ) \
 		res = LIBANDRIA4_FSEEK( stream, val, origin );
 	#define libandria4_fseek_ONERR( val ) \
 		ret = (libandria4_int_errint){ -2, val }; errno = err; return( ret );
