@@ -215,21 +215,44 @@ SOFTWARE.
 	#define LIBANDRIA4_STRTREE_BUILDINNERSEARCH( name,  nodenum, pascalstrtype, elemtype ) \
 		( name ## _eitherrptr ) ( name ## _innersearch )( \
 			name **base, (elemtype) (*hfunc)( (elemtype) val ), int recurse, \
-			size_t stroff, (pascalstrtype) *str,  name ***last ) \
-			{ \
-				if( !( base && str ) ) { return( ( name ## _eitherrptr_buildDomainErr )() ); } \
+			size_t stroff, (pascalstrtype) *str,  name ***last ) { \
+				if( !( base && hfunc && str ) ) { return( ( name ## _eitherrptr_buildDomainErr )() ); } \
 				if( !( *base ) ) { return( ( name ## _eitherrptr_buildIndrDomainErr )() ); } \
 				if( str->len <= stroff ) { return( ( name ## _eitherrptr_buildAboveBoundsErr )() ); } \
-				recurse = ( recurse > 0 ? 1 : 0 ); \
-				(elemtype) hashval = hfunc( str->body[ stroff ] ); if( hashval >= nodenum ) { \
+				\
+				recurse = ( recurse > 0 ? 1 : 0 ); if( last ) { *last = base; } \
+				\
+				/* Fetch the base's string. */ (pascalstrtype) *a = ( (pascalstrtype) *)0; unsigned e = 0; { \
+						/* We don't need the memfuncs{}. */ \
+					( name ## _eitherrstrptr ) *fstr = ( name ## _fetchstrptr )( &( ( *base )->str ),  (lib4_memfuncs_t**)0 ); \
+					LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa ); \
+					if( a->len <= stroff ) { \
+							/* This should NEVER happen, so if it ever DOES, */ \
+							/*  then that's a corruption issue. */ \
+						return( ( name ## _eitherrptr_err )( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ) ); } \
+					if( e ) { return( ( name ## _eitherrptr_err )( e ) ); } \
+					if( !a ) { return( ( name ## _eitherrptr_buildNotInitedErr )( ) ); } } \
+				\
+				/* String check. */ size_t iter = 0; { \
+					while( iter < ( *base )->excerptlen && stroff + iter < str->len && stroff + iter < a->len ) { \
+						if( str->body[ stroff + iter ] != a->body[ stroff + iter ] ) { \
+							/* No match: divergent strings. */ return( ( name ## _eitherrptr_ptr )( 0 ) ); } \
+						else { iter += 1; } } \
+					if( iter != ( *base )->excerptlen ) { \
+							/* Invalid result: the body string was shorter than the excerpt length. */ \
+						return( ( name ## _eitherrptr_err )( LIBANDRIA4_RESULT_FAILURE_SIZEMISMATCH ) ); } \
+					if( stroff + iter < a->len ) { \
+						/* No match: short target. */ return( ( name ## _eitherrptr_ptr )( 0 ) ); } } \
+				/* We've confirmed the relevant length. */ \
+				\
+				/* Hash stuff. */ \
+				(elemtype) hashval = hfunc( str->body[ stroff ] ); \
+				if( hashval >= (nodenum) ) { \
 					return( ( name ## _eitherrptr_err )( LIBANDRIA4_RESULT_FAILURE_OVERFLOW ) ); } \
 				(name) *found = base[ hashval ]; \
 				if( !found ) { return( ( name ## _eitherrptr_ptr )( ( (name) *)0 ) ); } \
-				(pascalstrtype) *a = ( (pascalstrtype) *)0; { \
-						/* We don't need the memfuncs{}. */ \
-					( name ## _eitherrstrptr ) *fstr = ( name ## _fetchstrptr )( &( found->str ),  (lib4_memfuncs_t**)0 ); \
-					unsigned e = 0; \
-					LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa ); \
+				\
+				/* Peer check. */ { \
 					while( !e && a && a->len > stroff && str->body[ stroff ] != a->body[ stroff ] ) { \
 						if( found->peer ) { \
 							found = found->peer; \
@@ -237,33 +260,19 @@ SOFTWARE.
 							LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa ); } \
 						else { /* No match. */ \
 							return( ( name ## _eitherrptr_ptr )( ( (name) *)0 ) ); } } \
-					if( a->len <= stroff ) { \
-							/* This should NEVER happen, so if it ever DOES, */ \
-							/*  then that's a corruption issue. */ \
-						return( ( name ## _eitherrptr_err )( LIBANDRIA4_RESULT_FAILURE_CORRUPTED ) ); } \
-					if( e ) { \
-						return( ( name ## _eitherrptr_err )( e ) ); } \
-					if( !a ) { \
-						return( ( name ## _eitherrptr_buildNotInitedErr )( ) ); } \
 					/* At this point, *found is a node with the correct */ \
 					/*  "first" character, and *a is it's pascal string. */ } \
-				if( last ) { *last = base; } \
-				size_t iter; { \
-					iter = 1; size_t loop = 1; \
-					while( loop && iter < found->excerptlen && stroff + iter < str->len && stroff + iter < a->len ) { \
-						if( str->body[ stroff ] != a->body[ stroff ] ) { \
-							loop = 0; } \
-						else { iter += 1; } } \
-					/* We now have the matching length of the strings. */ } \
+				\
+				/* Return steering. */ \
 				if( recurse && iter == found->excerptlen && iter + stroff < str->len ) { \
 					/* All the way through the found node, so move to the */ \
 					/*  next child array. */ \
-					return( \
-						( name ## _innersearch )( \
+					return( ( name ## _innersearch )( \
 							&( found->children ), hfunc, 1, \
 							stroff + iter, str, \
 							last ) ); } \
 				return( ( name ## _eitherrptr_ptr )( found ) ); }
+				
 	#define LIBANDRIA4_STRTREE_BUILDPARENTSEARCH( name,  pascalstrtype, elemtype ) \
 		( name ## _eitherrptr ) ( name ## _parentsearch )( \
 			name **base, (elemtype) (*hfunc)( (elemtype) val ), (pascalstrtype) *str ) \
@@ -285,12 +294,13 @@ SOFTWARE.
 					LIBANDRIA4_STRUCTADDRfromELEMADDR( name, children,  last_arr ) ) ); }
 	#define LIBANDRIA4_STRTREE_BUILDFULLSEARCH( name,  pascalstrtype, elemtype ) \
 		( name ## _eitherrptr ) ( name ## _search )( \
-			name **base, (elemtype) (*hfunc)( (elemtype) val ), (pascalstrtype) *str ) \
+			( name ## _root ) *root, (elemtype) (*hfunc)( (elemtype) val ), (pascalstrtype) *str ) \
 		{ \
-			if( !base ) { \
+			if( !root || !( root->tree ) ) { \
 				return( ( name ## _eitherrptr_buildDomainErr )( ) ); } \
 			(name) **last_arr = ( (name) **)0; \
-			( name ## _eitherrptr ) res = ( name ## _innersearch )( base, hfunc, 1,  0, str,  &( last_arr ) ); \
+			( name ## _eitherrptr ) res = \
+				( name ## _innersearch )( &( root->tree ), hfunc, 1,  0, str,  &( last_arr ) ); \
 			(name) *a = ( (name) *)0; \
 			LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETa ); \
 			if( !a ) { \
