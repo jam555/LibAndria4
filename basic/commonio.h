@@ -173,8 +173,10 @@ SOFTWARE.
 			libandria4_commonio_err
 	);
 	
+		/* Just in case I used *_BYTE() somewhere. */
+	#define LIBANDRIA4_COMMONIO_EITHGENERIC_BYTE( val ) LIBANDRIA4_COMMONIO_EITHGENERIC_SUCC( val )
 		/* These produce the actual values. */
-	#define LIBANDRIA4_COMMONIO_EITHGENERIC_BYTE( val ) \
+	#define LIBANDRIA4_COMMONIO_EITHGENERIC_SUCC( val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonio_eithgeneric, libandria4_commonio_succ, val )
 	#define LIBANDRIA4_COMMONIO_EITHGENERIC_ERR( val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_commonio_eithgeneric, libandria4_commonio_err, val )
@@ -202,7 +204,11 @@ SOFTWARE.
 				LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERR, \
 				LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
 	
+		/* Just in case I used *_BYTE() somewhere. */
 	#define LIBANDRIA4_COMMONIO_EITHGENERIC_RETBYTE( val ) \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETSUCC( val )
+			/* The actual returns. */
+	#define LIBANDRIA4_COMMONIO_EITHGENERIC_RETSUCC( val ) \
 		return( LIBANDRIA4_COMMONIO_EITHGENERIC_BYTE( val ) );
 	#define LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( val ) \
 		return( LIBANDRIA4_COMMONIO_EITHGENERIC_ERR( val ) );

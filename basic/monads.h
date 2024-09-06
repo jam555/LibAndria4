@@ -400,7 +400,7 @@ SOFTWARE.
 			onfull( pointer,  value, aux ) )
 		/* Drop reference. */
 	#define LIBANDRIA4_MONAD_REFCOUNTED_BARE_BODYNEGLECT( name, pointer, memfuncs_ptr,  onbad, onsucc, ondead ) \
-		{ name ** name##_ptr = &(pointer); \
+		{ name ** name##_ptr = (pointer); \
 			libandria4_maybeint name##res = name##_neglect( ( memfuncs_ptr ),  name##_ptr ); \
 			int a = 0;   LIBANDRIA4_MAYBEINT_BODYMATCH( name##res,  LIBANDRIA4_OP_SETa, onbad ); \
 			if( a == 1 ) { onsucc( name##_ptr ); } \
@@ -426,7 +426,7 @@ SOFTWARE.
 			onfull( pointer,  value, aux ) )
 		/* Drop reference. */
 	#define LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( name, pointer,  onbad, onsucc, ondead ) \
-		{ name ** name##_ptr = &(pointer);  libandria4_maybeint name##res = name##_neglect( name##_ptr ); \
+		{ name ** name##_ptr = (pointer);  libandria4_maybeint name##res = name##_neglect( name##_ptr ); \
 			int a = 0;   LIBANDRIA4_MAYBEINT_BODYMATCH( name##res,  LIBANDRIA4_OP_SETa, onbad ); \
 			if( a == 1 ) { onsucc( name##_ptr ); } \
 			else { ondead( name##_ptr ); } }
@@ -539,8 +539,8 @@ SOFTWARE.
 						failneglect, succneglect, ondead ); } \
 				(var).counted = valptr; } }
 	#define LIBANDRIA4_MONAD_REFPOINTER_BARE_BODYDEINIT( name, var, memfuncs_ptr,  failneglect, succneglect, ondead ) \
-		{ name##_counttype * name##_ptr = &( (var).counted ); \
-			LIBANDRIA4_MONAD_REFCOUNTED_BODYNEGLECT( name##_counttype, name##_ptr, ( memfuncs_ptr ), \
+		{ name##_counttype ** name##_ptr = &( (var).counted ); \
+			LIBANDRIA4_MONAD_BARE_REFCOUNTED_BODYNEGLECT( name##_counttype, name##_ptr, ( memfuncs_ptr ), \
 				failneglect, succneglect, ondead ) }
 	
 	#define LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL( name, valuetype ) \
@@ -551,7 +551,7 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPPEDIMPL( \
 			name##_counttype, valuetype, memfuncs_ptr,  onattend, onneglect, ondie )
 	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT( name, var, innerval, aux,  failinit, badalloc, badata ) \
-		{ name##_counttype * name##_ptr = &( (var).counted ); \
+		{ name##_counttype ** name##_ptr = &( (var).counted ); \
 			LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_EXPRINIT( name##_counttype, name##_ptr, \
 				innerval, aux,  failinit, badalloc, badata ); }
 	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET( name, var, valptr,  failneglect, failattend, succneglect, succattend, ondead ) \
@@ -566,7 +566,7 @@ SOFTWARE.
 				(var).counted = valptr; \
 				 } }
 	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYDEINIT( name, var,  failneglect, succneglect, ondead ) \
-		{ name##_counttype * name##_ptr = &( (var).counted ); \
+		{ name##_counttype ** name##_ptr = &( (var).counted ); \
 			LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( name##_counttype, name##_ptr, \
 				failneglect, succneglect, ondead ) }
 	
