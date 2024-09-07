@@ -663,7 +663,7 @@ SOFTWARE.
 				LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( gen,  LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe );
 				if( e )
 				{
-					return( ( name ## _bitup_buildError )( e ) );
+					return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) );
 				}
 			
 			/* Get the hash value for a child. */
@@ -685,36 +685,25 @@ SOFTWARE.
 			
 			if( strstart + strmatch == srch->len )
 			{
-				/* We have found the node to delete. */
+				/* We have found the node to delete, and already tested that the match cover's it's whole length. */
 				ret = *base;
 				
-				if( !d && !( ( *base )->peer ) )
+				if( a < 1 )
 				{
-					/* No replacements, plain deletion. */
-					*base = ((name)*)0;
-					
-					/* Reset deleted node. */
-					ret->excerptlen += ret->strstart;
-					ret->strstart = 0;
-					
-					return( ( name ## _bitup_buildNodeptr )( ret ) );
-					
-				} else if( a < 1 )
-				{
-					/* No children, direct replacement. */
+					/* No children, direct replacement, even if peer is null. */
 					*base = ret->peer;
 					
 					/* Reset deleted node. */
 					ret->excerptlen += ret->strstart;
 					ret->strstart = 0;
+						/* Because perhaps there IS a peer. */
 					ret->peer = 0;
-					ret->children[ hash ] = 0;
 					
 					return( ( name ## _bitup_buildNodeptr )( ret ) );
 					
 				} else if( a == 1 && !( d->peer ) )
 				{
-					/* One or less children, child has no peer, direct replacement. */
+					/* One child, CHILD has no peer, direct replacement. */
 					*base = d;
 					
 					if( *base )
@@ -740,7 +729,7 @@ SOFTWARE.
 				void *c;
 				( name ## _eitherrptr ) mem = ( name ## _build )();
 					LIBANDRIA4_MONAD_EITHER_BODYMATCH( mem, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETc );
-					if( !c ) { return( ( name ## _bitup_buildError )( e ) ); }
+					if( !c ) { return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_MEMORYFULL ) ); }
 				
 				(name) *res = ((name) *)c;
 						/* Inject the new node. */
@@ -813,7 +802,7 @@ SOFTWARE.
 				
 				/* Recurse. */
 				( name ## _bitup ) res = ( name ## _innerdelete )( dblptr,  srch );
-					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETd, LIBANDRIA4_OP_SETeTO1 );
+					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETret, LIBANDRIA4_OP_SETeTO1 );
 					if( e )
 					{
 						/* There was NO return value, that's bad. */
@@ -830,9 +819,10 @@ SOFTWARE.
 					LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( gen,  LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe );
 					if( e )
 					{
-						return( ( name ## _bitup_buildBoth )( e , ret ) );
+						return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN, ret ) );
 					}
 				
+				/* Try to replace this node with a peer or lone child, and if able then list it for freeing. */
 				(name) *tmp = ((name)*)0;
 				if
 				(
@@ -873,7 +863,7 @@ SOFTWARE.
 				
 				if( tmp )
 				{
-					/* Cleanup. */
+					/* The current node was replaced, so free the original. */
 					libandria4_commonio_eithgeneric freeres = ( name ## _shallowfree ) ( &tmp );
 						libandria4_commonio_succ childcount = a;
 						LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( freeres,  LIBANDRIA4_NULL_MACRO, LIBANDRIA4_OP_SETe );
