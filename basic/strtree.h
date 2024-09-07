@@ -50,10 +50,8 @@ SOFTWARE.
 		/* Finish up the "TODO: Search" entries further down. */
 		/* Add debugging hooks (need debugging system to be defined */
 		/*  elsewhere). */
+		/* Decide if the node-merging code needs to be seperated out. */
 	/* Needed functions: */
-		/* Delete. */
-			/* Verify the deletion algorithm before packing it up as a macro */
-			/*  (I never did seperate out the merge code...). */
 		/* Node count. */
 		/* Visit all. */
 			/* Should take a "base" pointer, so that it can be used along */
@@ -443,6 +441,146 @@ SOFTWARE.
 				/*  this return GUARANTEES the existence of an error. */ \
 			return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT, *base ) ); }
 	
+	#define LIBANDRIA4_STRTREE_BUILDDELETE( name,  pascalstrtype, elemtype ) \
+		( name ## _bitup ) ( name ## _delete )( ( name ## _root ) *base,  (pascalstrtype) *srch ) { \
+			if( !base || !srch ) { \
+				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+			return( ( name ## _innerdelete )( &( base->tree ),  srch ) ); }
+	#define LIBANDRIA4_STRTREE_BUILDINNERDELETE( name,  nodenum, pascalstrtype, elemtype ) \
+		( name ## _bitup ) ( name ## _innerdelete )( (name) **base,  (pascalstrtype) *srch ) { \
+			if( !base || !( *base ) || !n || !srch ) { \
+				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+			\
+				/* You know, normally 'a' would come first, but this DOES seem poetic... */ \
+			(pascalstrtype) *b = 0; (name) *ret = ((name) *)0; unsigned e = 0; \
+			\
+			/* Get the string of our current active node. */ \
+			fstr = ( name ## _fetchstrptr )( &( ( *base )->str ),  (lib4_memfuncs_t**)0 ); \
+				LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETb ); \
+				if( e ) { return( ( name ## _bitup_buildBoth )( e, *base ) ); } \
+			size_t strstart = ( *base )->strstart; if( strstart => srch->len ) \
+				{ return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_ABOVEBOUNDS, *base ) ); } \
+			\
+			/* Get the match length. */ size_t strmatch = 0; \
+			while ( strstart + strmatch < srch->len && strstart + strmatch < b->len && strmatch < ( *base )->excerptlen && \
+				srch->body[ strstart + strmatch ] == b->body[ strstart + strmatch ] ) { strmatch += 1; } \
+			if( strmatch < ( *base )->excerptlen ) { /* Incomplete match, the name just doesn't have a node. */ \
+				return( ( name ## _bitup_buildNone )() ); }\
+			\
+			/* Get the number of direct children. */ libandria4_commonio_succ a; \
+			libandria4_commonio_eithgeneric gen = ( name ## _shallowchildcount )( *base ); \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( gen,  LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe ); \
+				if( e ) { return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) ); } \
+			\
+			/* Get the hash value for a child. */ (elemtype) hash = 0; (name) *d = ((name)*)0; \
+			while( a && hash < (nodenum) && !d ) { d = ( *base )->children[ hash ]; ++hash; } \
+			if( a && !d ) { /* There's a child, but we didn't find it? Well THAT'S bad! */ \
+				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+			/* So that we don't need a lot of "hash - 1" all over the place. */ if( hash ) { --hash; } \
+			\
+			if( strstart + strmatch == srch->len ) { /* Found the node to delete. */ \
+				ret = *base; \
+				\
+				if( a < 1 ) { /* No children, direct replacement, even if peer is null. */ \
+					*base = ret->peer; \
+					/* Reset deleted node. */ ret->excerptlen += ret->strstart; ret->strstart = 0; \
+					/* Because perhaps there IS a peer. */ ret->peer = 0; \
+					return( ( name ## _bitup_buildNodeptr )( ret ) ); } \
+				else if( a == 1 && !( d->peer ) ) { /* One child, CHILD has no peer, direct replacement. */ \
+					*base = d; \
+					\
+					if( *base ) { \
+						/* Patch excerpt info. */ d->strstart = ret->strstart; \
+						d->excerptlen += ret->excerptlen; d->peer = ret->peer; \
+						\
+						/* Reset deleted node. */ ret->excerptlen += ret->strstart; \
+						ret->strstart = 0; ret->peer = 0; ret->children[ hash ] = 0; } \
+					return( ( name ## _bitup_buildNodeptr )( ret ) ); } \
+				\
+				/* Multiple direct children, AND/OR a "d" peer. */ \
+				\
+				void *c; ( name ## _eitherrptr ) mem = ( name ## _build )(); \
+					LIBANDRIA4_MONAD_EITHER_BODYMATCH( mem, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETc ); \
+					if( !c ) { return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_MEMORYFULL ) ); } \
+				\
+				(name) *res = ((name) *)c; \
+					/* Inject the new node. */ hash = 0; \
+					while( hash < (nodenum) ) { res->children[ hash ] = ret->children[ hash ]; ++hash; } \
+					res->peer = ret->peer; ( *base ) = res; \
+					/* Link the string used by the first-found child. */ \
+					res->strstart = ret->strstart; res->excerptlen = ret->excerptlen; \
+					LIBANDRIA4_MONAD_REFPOINTER_BARE_BODYSET( \
+						name ## _tracker, res->str, d->str.counted, memfuncs_ptr, LIBANDRIA4_NULL_MACRO, LIBANDRIA4_OP_SETeTO1, \
+						LIBANDRIA4_NULL_MACRO, LIBANDRIA4_NULL_MACRO, LIBANDRIA4_NULL_MACRO ); \
+						if( e ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_CORRUPTED, ret ) ); } \
+				\
+				/* Reset deleted node. */ hash = 0; \
+				while( hash < (nodenum) ) { ret->children[ hash ] = 0; ++hash; } \
+				ret->peer = 0; ret->excerptlen += ret->strstart; ret->strstart = 0; \
+				\
+				/* Deletion is done, just return the removed node. */ } \
+			else { /* We have NOT reached the node */ \
+				\
+				/* Let's get our recursion target. */ (name) **dblptr; { \
+					/* Let's not overwrite the base-string value we have. */ (pascalstrtype) *b = 0; \
+					\
+					dblptr = &( ( *base )->children[ hash ] ); \
+						if( !( *dblptr ) ) { \
+							return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS, ret ) ); } \
+					\
+					/* Get the string to check. */ \
+					fstr = ( name ## _fetchstrptr )( &( ( *dblptr )->str ),  (lib4_memfuncs_t**)0 ); \
+						LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETb ); \
+						if( e ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED, ret ) ); } \
+						if( !b ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED, ret ) ); } \
+					while( b->body[ strstart + strmatch ] != srch->body[ strstart + strmatch ] ) { \
+						dblptr = &( ( *dblptr )->peer ); \
+							if( !( *dblptr ) ) { \
+								return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS, ret ) ); } \
+						\
+							/* Get the next string to check. */ \
+						fstr = ( name ## _fetchstrptr )( &( ( *dblptr )->str ),  (lib4_memfuncs_t**)0 ); \
+							LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETb ); \
+							if( e ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED, ret ) ); } \
+							if( !b ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED, ret ) ); } } \
+				} \
+				\
+				/* Recurse. */ \
+				( name ## _bitup ) res = ( name ## _innerdelete )( dblptr,  srch ); \
+					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETret, LIBANDRIA4_OP_SETeTO1 ); \
+					if( e ) { /* There was NO return value, that's bad. */ \
+						/* Note that if an explicit error is returned, then the entire */ \
+						/*  bitup was already returned via the _RETres, so execution */ \
+						/*  would never even reach here. */ \
+						return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_BROKEN , ret ) ); } \
+				\
+				/* Recalculate the number of direct children, in case we dropped one. */ \
+				gen = ( name ## _shallowchildcount )( *base ); \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( gen,  LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe ); \
+					if( e ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN, ret ) ); } \
+				\
+				/* Try to replace this node with a peer or lone child, and if able then list it for freeing. */ \
+				(name) *tmp = ((name)*)0; if ( a == 1 && \
+						/* This is how we test to see if we're at a manually inserted */ \
+						/* node instead of an automatically generated node. */ \
+					b->len != ( *base )->strstart + ( *base )->excerptlen && \
+					( ( !d && !( ( *base )->peer ) ) || !( d->peer ) ) ) \
+				{ /* Replace this node with the solitary child node. */ \
+					\
+					/* Swap and restore consistency. */ tmp = *base; *base = d; \
+					if( d ) { d->strstart = tmp->strstart; d->excerptlen += tmp->excerptlen; d->peer = tmp->peer; } } \
+				else if( a == 0 && /* As above. */ b->len != ( *base )->strstart + ( *base )->excerptlen ) \
+				{ /* Replace this node with it's peer node, even if that doesn't exist. */ \
+					tmp = *base; *base = ( *base )->peer; } \
+				\
+				if( tmp ) { /* The current node was replaced, so free the original. */ \
+					libandria4_commonio_eithgeneric freeres = ( name ## _shallowfree ) ( &tmp ); \
+						libandria4_commonio_succ childcount = a; \
+						LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( freeres,  LIBANDRIA4_NULL_MACRO, LIBANDRIA4_OP_SETe ); \
+						if( e ) { /* Range error, because we only have the ability to return a single node pointer. */ \
+							return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_RANGE, ret ) ); } } } \
+			return( ( name ## _bitup_buildNodeptr )( ret ) ); }
+	
 		/* Use in headers. Use the *_DEFINE_* version DIRECTLY in .c files. */
 	#define LIBANDRIA4_STRTREE_DECLARE_nNODE( name,  nodenum, pascalstrtype, elemtype,  hashfunc,  memfuncs_ptr ) \
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREDECL( ( name ## _tracker ),  pascalstrtype ); \
@@ -531,7 +669,9 @@ SOFTWARE.
 		inline LIBANDRIA4_STRTREE_BUILDFULLSEARCH( name,  pascalstrtype, elemtype ); \
 		int ( name ## _split )( (name) **base,  size_t newstart ); \
 		( name ## _bitup ) ( name ## _innerinsert )( (name) **base,  (name) *n, (pascalstrtype) *srch ); \
-		inline LIBANDRIA4_STRTREE_BUILDINSERT( name,  pascalstrtype, elemtype,  hashfuncptr );
+		( name ## _bitup ) ( name ## _innerdelete )( (name) **base,  (pascalstrtype) *srch ); \
+		inline LIBANDRIA4_STRTREE_BUILDINSERT( name,  pascalstrtype, elemtype,  hashfuncptr ); \
+		inline LIBANDRIA4_STRTREE_BUILDDELETE( name,  pascalstrtype, elemtype );
 	
 		/* Use in a .c file, not in headers. */
 	#define LIBANDRIA4_STRTREE_DEFINE_nNODE( name,  nodenum, pascalstrtype, elemtype,  hashfunc,  memfuncs_ptr ) \
@@ -578,7 +718,9 @@ SOFTWARE.
 		LIBANDRIA4_STRTREE_BUILDFULLSEARCH( name,  pascalstrtype, elemtype ); \
 		LIBANDRIA4_STRTREE_BUILDSPLIT( name,  nodenum, pascalstrtype, elemtype,  hashfuncptr,  memfuncs_ptr ); \
 		LIBANDRIA4_STRTREE_BUILDINNERINSERT( name,  pascalstrtype, elemtype,  hashfuncptr ); \
-		LIBANDRIA4_STRTREE_BUILDINSERT( name,  pascalstrtype, elemtype,  hashfuncptr );
+		LIBANDRIA4_STRTREE_BUILDINSERT( name,  pascalstrtype, elemtype,  hashfuncptr ); \
+		LIBANDRIA4_STRTREE_BUILDINNERDELETE( name,  nodenum, pascalstrtype, elemtype ); \
+		LIBANDRIA4_STRTREE_BUILDDELETE( name,  pascalstrtype, elemtype );
 	
 	
 	#define LIBANDRIA4_STRTREE_DECLARE_8NODE( name,  pascalstrtype, elemtype,  memfuncs_ptr ) \
@@ -608,275 +750,6 @@ SOFTWARE.
 	
 	
 	
-	/* Walk through and verify this deletion code! */
-	#define LIBANDRIA4_STRTREE_BUILDDELETE( name,  pascalstrtype, elemtype )
-		( name ## _bitup ) ( name ## _delete )( ( name ## _root ) *base,  (pascalstrtype) *srch )
-		{
-			if( !base || !srch )
-			{
-				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) );
-			}
-			
-			return( ( name ## _innerdelete )( &( base->tree ),  srch ) );
-		}
-	#define LIBANDRIA4_STRTREE_BUILDINNERDELETE( name,  nodenum, pascalstrtype, elemtype )
-		( name ## _bitup ) ( name ## _innerdelete )( (name) **base,  (pascalstrtype) *srch )
-		{
-			if( !base || !( *base ) || !n || !srch )
-			{
-				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) );
-			}
-			
-				/* You know, normally 'a' would come first, but this DOES */
-				/*  seem poetic... */
-			(pascalstrtype) *b = 0;
-			(name) *ret = ((name) *)0;
-			unsigned e = 0;
-			
-			/* Get the string of our current active node. */
-			fstr = ( name ## _fetchstrptr )( &( ( *base )->str ),  (lib4_memfuncs_t**)0 );
-				LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETb );
-				if( e ) { return( ( name ## _bitup_buildBoth )( e, *base ) ); }
-			size_t strstart = ( *base )->strstart;
-			if( strstart => srch->len )
-			{
-				return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_ABOVEBOUNDS, *base ) );
-			}
-			
-			/* Get the match length. */
-			size_t strmatch = 0;
-			while (
-				strstart + strmatch < srch->len &&
-				strstart + strmatch < b->len &&
-				strmatch < ( *base )->excerptlen &&
-				srch->body[ strstart + strmatch ] == b->body[ strstart + strmatch ]
-			) { strmatch += 1; }
-			if( strmatch < ( *base )->excerptlen )
-			{
-				/* Incomplete match, the name just doesn't have a node. */
-				return( ( name ## _bitup_buildNone )() );
-			}
-			
-			/* Get the number of direct children. */
-			libandria4_commonio_succ a;
-			libandria4_commonio_eithgeneric gen = ( name ## _shallowchildcount )( *base );
-				LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( gen,  LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe );
-				if( e )
-				{
-					return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) );
-				}
-			
-			/* Get the hash value for a child. */
-			(elemtype) hash = 0;
-			(name) *d = ((name)*)0;
-			while( a && hash < (nodenum) && !d )
-			{
-				d = ( *base )->children[ hash ];
-				++hash;
-			}
-			if( a && !d )
-			{
-				/* There's a child, but we didn't find it? Well THAT'S bad! */
-				
-				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) );
-			}
-				/* So that we don't need a lot of "hash - 1" all over the place. */
-			if( hash ) { --hash; }
-			
-			if( strstart + strmatch == srch->len )
-			{
-				/* We have found the node to delete, and already tested that the match cover's it's whole length. */
-				ret = *base;
-				
-				if( a < 1 )
-				{
-					/* No children, direct replacement, even if peer is null. */
-					*base = ret->peer;
-					
-					/* Reset deleted node. */
-					ret->excerptlen += ret->strstart;
-					ret->strstart = 0;
-						/* Because perhaps there IS a peer. */
-					ret->peer = 0;
-					
-					return( ( name ## _bitup_buildNodeptr )( ret ) );
-					
-				} else if( a == 1 && !( d->peer ) )
-				{
-					/* One child, CHILD has no peer, direct replacement. */
-					*base = d;
-					
-					if( *base )
-					{
-						/* Patch excerpt info. */
-						d->strstart = ret->strstart;
-						d->excerptlen += ret->excerptlen;
-						d->peer = ret->peer;
-						
-						/* Reset deleted node. */
-						ret->excerptlen += ret->strstart;
-						ret->strstart = 0;
-						ret->peer = 0;
-						ret->children[ hash ] = 0;
-					}
-					
-					return( ( name ## _bitup_buildNodeptr )( ret ) );
-				}
-				
-				
-				/* Multiple direct children, AND/OR a "d" peer. */
-				
-				void *c;
-				( name ## _eitherrptr ) mem = ( name ## _build )();
-					LIBANDRIA4_MONAD_EITHER_BODYMATCH( mem, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETc );
-					if( !c ) { return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_MEMORYFULL ) ); }
-				
-				(name) *res = ((name) *)c;
-						/* Inject the new node. */
-					hash = 0;
-					while( hash < (nodenum) )
-					{
-						res->children[ hash ] = ret->children[ hash ];
-						++hash;
-					}
-					res->peer = ret->peer;
-					( *base ) = res;
-						/* Link the string used by the first-found child. */
-					res->strstart = ret->strstart;
-					res->excerptlen = ret->excerptlen;
-					LIBANDRIA4_MONAD_REFPOINTER_BARE_BODYSET(
-						name ## _tracker, res->str, d->str.counted, memfuncs_ptr,
-						LIBANDRIA4_NULL_MACRO, LIBANDRIA4_OP_SETeTO1,
-						LIBANDRIA4_NULL_MACRO, LIBANDRIA4_NULL_MACRO,
-						LIBANDRIA4_NULL_MACRO );
-						if( e ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_CORRUPTED, ret ) ); }
-				
-					/* Reset deleted node. */
-				hash = 0;
-				while( hash < (nodenum) )
-				{
-					ret->children[ hash ] = 0;
-					++hash;
-				}
-				ret->peer = 0;
-				ret->excerptlen += ret->strstart;
-				ret->strstart = 0;
-				
-				/* Deletion is done, just return the removed node. */
-				
-			} else {
-				
-				/* We have NOT reached the node */
-				
-				/* Let's get our recursion target. */
-				(name) **dblptr;
-				{
-						/* Let's not overwrite the base-string value we have. */
-					(pascalstrtype) *b = 0;
-					dblptr = &( ( *base )->children[ hash ] );
-						if( !( *dblptr ) )
-						{
-							return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS, ret ) );
-						}
-					
-						/* Get the string to check. */
-					fstr = ( name ## _fetchstrptr )( &( ( *dblptr )->str ),  (lib4_memfuncs_t**)0 );
-						LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETb );
-						if( e ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED, ret ) ); }
-						if( !b ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED, ret ) ); }
-					while( b->body[ strstart + strmatch ] != srch->body[ strstart + strmatch ] )
-					{
-						dblptr = &( ( *dblptr )->peer );
-							if( !( *dblptr ) )
-							{
-								return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS, ret ) );
-							}
-						
-							/* Get the next string to check. */
-						fstr = ( name ## _fetchstrptr )( &( ( *dblptr )->str ),  (lib4_memfuncs_t**)0 );
-							LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETb );
-							if( e ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED, ret ) ); }
-							if( !b ) { return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED, ret ) ); }
-					}
-				}
-				
-				/* Recurse. */
-				( name ## _bitup ) res = ( name ## _innerdelete )( dblptr,  srch );
-					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETret, LIBANDRIA4_OP_SETeTO1 );
-					if( e )
-					{
-						/* There was NO return value, that's bad. */
-						/* Note that if an explicit error is returned, then the entire */
-						/*  bitup was already returned via the _RETres, so execution */
-						/*  would never even reach here. */
-						
-						return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_BROKEN , ret ) );
-					}
-				
-				
-				/* Recalculate the number of direct children, in case we dropped one. */
-				gen = ( name ## _shallowchildcount )( *base );
-					LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( gen,  LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe );
-					if( e )
-					{
-						return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN, ret ) );
-					}
-				
-				/* Try to replace this node with a peer or lone child, and if able then list it for freeing. */
-				(name) *tmp = ((name)*)0;
-				if
-				(
-					a == 1 &&
-						/* This is how we test to see if we're at a manually inserted */
-						/* node instead of an automatically generated node. */
-					b->len != ( *base )->strstart + ( *base )->excerptlen &&
-					(
-						( !d && !( ( *base )->peer ) ) ||
-						!( d->peer )
-					)
-				)
-				{
-					/* Replace this node with the solitary child node. */ 
-					
-					/* Swap and restore consistency. */
-					tmp = *base;
-					*base = d;
-					if( d )
-					{
-						d->strstart = tmp->strstart;
-						d->excerptlen += tmp->excerptlen;
-						d->peer = tmp->peer;
-					}
-					
-				} else if
-				(
-					a == 0 &&
-						/* As above. */
-					b->len != ( *base )->strstart + ( *base )->excerptlen
-				)
-				{
-					/* Replace this node with it's peer node, even if that doesn't exist. */
-					
-					tmp = *base;
-					*base = ( *base )->peer;
-				}
-				
-				if( tmp )
-				{
-					/* The current node was replaced, so free the original. */
-					libandria4_commonio_eithgeneric freeres = ( name ## _shallowfree ) ( &tmp );
-						libandria4_commonio_succ childcount = a;
-						LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( freeres,  LIBANDRIA4_NULL_MACRO, LIBANDRIA4_OP_SETe );
-						if( e )
-						{
-								/* Range error, because we only have the ability to return a single node pointer. */
-							return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_RANGE, ret ) );
-						}
-				}
-			}
-			
-			return( ( name ## _bitup_buildNodeptr )( ret ) );
-		}
 	
 	
 #endif
