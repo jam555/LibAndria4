@@ -43,27 +43,14 @@ SOFTWARE.
 	
 	/* Note: rename to "prefix tree" or something similar, since I */
 	/*  apparently got the name screwed up... We want this to be some */
-	/*  radit-tree variant. */
+	/*  radix-tree variant. */
 	/* TODO: */
-		/* Updatre _parentsearch() to match the _root{} changes. */
+		/* Update _parentsearch() to match the _root{} changes. */
 		/* Build a parent-function for _hashsearch() taking _root{}*. */
 		/* Finish up the "TODO: Search" entries further down. */
 		/* Add debugging hooks (need debugging system to be defined */
 		/*  elsewhere). */
 		/* Decide if the node-merging code needs to be seperated out. */
-	/* Needed functions: */
-		/* Node count. */
-		/* Visit all. */
-			/* Should take a "base" pointer, so that it can be used along */
-			/*  with the "last" argument of inner-search to aid stuff like */
-			/*  tab-completion (search for your stub, maybe ignore a success */
-			/*  return, use visit() to list the remaining options). Use */
-				/* int ( name ## _isdatanode ) ( (name) *base ) */
-			/*  to detect when a visited node is a data node instead of a */
-			/*  management node. */
-		/* Height count. */
-			/* Note: return the highest number, the lowest will likely */
-			/*  always be 0. Use visit() to implement. */
 	
 	/* TODO: Search variants to build, in order of construction/complexity: */
 		/* Find all deep (all of the nodes, IN GENERAL) children. */
@@ -188,7 +175,7 @@ SOFTWARE.
 			( name ## _eitherrstrptr ) fstr = \
 				( name ## _fetchstrptr )( &( n->str ),  (lib4_memfuncs_t**)0 ); \
 			LIBANDRIA4_MONAD_EITHER_BODYMATCH( fstr, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa ); \
-			if( e ) { return( e ); } \
+			if( e ) { return( -e ); } \
 			\
 			size_t off = base->strstart + base->excerptlen; \
 			if( off > a->len ) { return( LIBANDRIA4_RESULT_FAILURE_OVERFLOW ); } \
@@ -368,6 +355,80 @@ SOFTWARE.
 				return( ( name ## _eitherrptr_buildNotInitedErr )( ) ); } \
 			return( \
 				( name ## _eitherrptr_ptr ) ( a ) ); }
+	#define LIBANDRIA4_STRTREE_BUILDVISIT( name,  nodenum ) \
+		( name ## _bitup ) ( name ## _visit ) ( \
+			( name ## _root ) *base,  void *data, void (*func)( void*,  (name)**, uintptr_t ) ) { \
+				if( !base || !func ) { \
+					return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_DOMAIN, *base ) ); } \
+				return( ( name ## _innervisit )( &( base->tree ), 0,  data, func ) ); }
+	#define LIBANDRIA4_STRTREE_BUILDINNERVISIT( name,  nodenum ) \
+		( name ## _bitup ) ( name ## _innervisit ) ( \
+			(name) **base, uintptr_t depth, \
+			void *data, void (*func)( void*,  (name)**, uintptr_t ) ) { \
+				if( !base || !func ) { \
+					return( ( name ## _bitup_buildBoth )( LIBANDRIA4_RESULT_FAILURE_DOMAIN, *base ) ); } \
+				\
+				( name ## _bitup ) res; size_t iter; \
+				while( *base ) { func( data,  base, depth ); \
+					\
+					iter = 0; while( iter < (nodenum) ) { \
+						if( ( *base )->children[ iter ] ) { \
+							res = ( name ## _innervisit )( &( ( *base )->children[ iter ] ), depth + 1,  data, func ); } \
+						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, \
+							LIBANDRIA4_OP_RETres, LIBANDRIA4_NULL_MACRO, LIBANDRIA4_NULL_MACRO ); \
+						iter += 1; } \
+					\
+					base = &( ( *base )->peer ); } \
+				\
+				return( ( name ## _bitup_buildNone )() ); }
+	#define LIBANDRIA4_STRTREE_BUILDNODECOUNT_VISITORFUNCS( name,  prefix ) \
+		prefix void ( name ## _totalnodecount_visitor )( void *dat_,  (name) **node, uintptr_t depth ) { \
+			long *data = (long*)dat_; ++( *data ); } \
+		prefix void ( name ## _datanodecount_visitor )( void *dat_,  (name) **node, uintptr_t depth ) { \
+			long *data = (long*)dat_; \
+			if( ( name ## _isdatanode )( *node ) == LIBANDRIA4_RESULT_GENERICTRUE ) { \
+				++( *data ); } } \
+		prefix void ( name ## _heightcount_visitor )( void *dat_,  (name) **node, uintptr_t depth ) { \
+			long *data = (long*)dat_; if( *data < depth ) { *data = depth; } }
+	#define LIBANDRIA4_STRTREE_BUILDTOTALNODECOUNT( name ) \
+		libandria4_commonio_eithlong ( name ## _totalnodecount )( ( name ## _root ) *base ) { \
+			if( !base ) { LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_RESULT_FAILURE_DOMAIN ); } \
+			\
+			long ret = 0; libandria4_commonio_err e = 0, a = 1; \
+			( name ## _bitup ) res = \
+				( name ## _innervisit ) \
+					( &( base->tree ), 0,  (void*)&ret, &( name ## _totalnodecount_visitor ) ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, \
+					LIBANDRIA4_OP_SETe, LIBANDRIA4_NULL_MACRO, LIBANDRIA4_OP_SETaTO1 ); \
+				if( e ) { LIBANDRIA4_COMMONIO_EITHLONG_RETERR( e ); } \
+				if( a ) { LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
+			LIBANDRIA4_COMMONIO_EITHLONG_RETLONG( ret ); }
+	#define LIBANDRIA4_STRTREE_BUILDDATANODECOUNT( name ) \
+		libandria4_commonio_eithlong ( name ## _datanodecount )( ( name ## _root ) *base ) { \
+			if( !base ) { LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_RESULT_FAILURE_DOMAIN ); } \
+			\
+			long ret = 0; libandria4_commonio_err e = 0, a = 1; \
+			( name ## _bitup ) res = \
+				( name ## _innervisit ) \
+					( &( base->tree ), 0,  (void*)&ret, &( name ## _datanodecount_visitor ) ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, \
+					LIBANDRIA4_OP_SETe, LIBANDRIA4_NULL_MACRO, LIBANDRIA4_OP_SETaTO1 ); \
+				if( e ) { LIBANDRIA4_COMMONIO_EITHLONG_RETERR( e ); } \
+				if( a ) { LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
+			LIBANDRIA4_COMMONIO_EITHLONG_RETLONG( ret ); }
+	#define LIBANDRIA4_STRTREE_BUILDHEIGHTCOUNT( name ) \
+		libandria4_commonio_eithlong ( name ## _heightcount )( ( name ## _root ) *base ) { \
+			if( !base ) { LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_RESULT_FAILURE_DOMAIN ); } \
+			\
+			long ret = 0; libandria4_commonio_err e = 0, a = 1; \
+			( name ## _bitup ) res = \
+				( name ## _innervisit ) \
+					( &( base->tree ), 1,  (void*)&ret, &( name ## _heightcount_visitor ) ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, \
+					LIBANDRIA4_OP_SETe, LIBANDRIA4_NULL_MACRO, LIBANDRIA4_OP_SETaTO1 ); \
+				if( e ) { LIBANDRIA4_COMMONIO_EITHLONG_RETERR( e ); } \
+				if( a ) { LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
+			LIBANDRIA4_COMMONIO_EITHLONG_RETLONG( ret ); }
 	
 	#define LIBANDRIA4_STRTREE_BUILDINSERT( name,  pascalstrtype, elemtype,  hashfuncptr ) \
 		( name ## _bitup ) ( name ## _insert )( ( name ## _root ) *base,  (name) *n ) { \
@@ -615,7 +676,7 @@ SOFTWARE.
 				LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( ( name ## _bitup ), \
 					libandria4_commonio_err, nodetype*,  err ); } \
 			inline ( name ## _bitup ) ( name ## _bitup_buildNodeptr )( (name) *ptr ) { \
-				LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( ( name ## _bitup ), \
+				LIBANDRIA4_MONAD_BITUPLIC_RETURRIGHT( ( name ## _bitup ), \
 					libandria4_commonio_err, (name)*,  ptr ); } \
 			inline ( name ## _bitup ) ( name ## _bitup_buildBoth )( libandria4_commonio_err err, (name) *ptr ) { \
 				LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( ( name ## _bitup ), \
@@ -671,7 +732,12 @@ SOFTWARE.
 		( name ## _bitup ) ( name ## _innerinsert )( (name) **base,  (name) *n, (pascalstrtype) *srch ); \
 		( name ## _bitup ) ( name ## _innerdelete )( (name) **base,  (pascalstrtype) *srch ); \
 		inline LIBANDRIA4_STRTREE_BUILDINSERT( name,  pascalstrtype, elemtype,  hashfuncptr ); \
-		inline LIBANDRIA4_STRTREE_BUILDDELETE( name,  pascalstrtype, elemtype );
+		inline LIBANDRIA4_STRTREE_BUILDDELETE( name,  pascalstrtype, elemtype ); \
+		( name ## _bitup ) ( name ## _innerinsert )( (name) **base,  (name) *n, (pascalstrtype) *srch ); \
+		inline LIBANDRIA4_STRTREE_BUILDVISIT( name,  nodenum ); \
+		inline LIBANDRIA4_STRTREE_BUILDTOTALNODECOUNT( name ); \
+		inline LIBANDRIA4_STRTREE_BUILDDATANODECOUNT( name ); \
+		inline LIBANDRIA4_STRTREE_BUILDHEIGHTCOUNT( name );
 	
 		/* Use in a .c file, not in headers. */
 	#define LIBANDRIA4_STRTREE_DEFINE_nNODE( name,  nodenum, pascalstrtype, elemtype,  hashfunc,  memfuncs_ptr ) \
@@ -720,7 +786,13 @@ SOFTWARE.
 		LIBANDRIA4_STRTREE_BUILDINNERINSERT( name,  pascalstrtype, elemtype,  hashfuncptr ); \
 		LIBANDRIA4_STRTREE_BUILDINSERT( name,  pascalstrtype, elemtype,  hashfuncptr ); \
 		LIBANDRIA4_STRTREE_BUILDINNERDELETE( name,  nodenum, pascalstrtype, elemtype ); \
-		LIBANDRIA4_STRTREE_BUILDDELETE( name,  pascalstrtype, elemtype );
+		LIBANDRIA4_STRTREE_BUILDDELETE( name,  pascalstrtype, elemtype ); \
+		LIBANDRIA4_STRTREE_BUILDINNERVISIT( name,  nodenum ); \
+		LIBANDRIA4_STRTREE_BUILDVISIT( name,  nodenum ); \
+		LIBANDRIA4_STRTREE_BUILDNODECOUNT_VISITORFUNCS( name,  ); \
+		LIBANDRIA4_STRTREE_BUILDTOTALNODECOUNT( name ); \
+		LIBANDRIA4_STRTREE_BUILDDATANODECOUNT( name ); \
+		LIBANDRIA4_STRTREE_BUILDHEIGHTCOUNT( name );
 	
 	
 	#define LIBANDRIA4_STRTREE_DECLARE_8NODE( name,  pascalstrtype, elemtype,  memfuncs_ptr ) \
