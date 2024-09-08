@@ -221,8 +221,12 @@ SOFTWARE.
 			libandria4_commonio_err
 	);
 	
-		/* These produce the actual values. */
+		/* *_BYTE() might be used somewhere, so it's being retained, but */
+		/*  bear in mind that it's the wrong name. */
 	#define LIBANDRIA4_COMMONIO_EITHLONG_BYTE( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonio_eithlong, long, val )
+			/* These produce the actual values. */
+	#define LIBANDRIA4_COMMONIO_EITHLONG_LONG( val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonio_eithlong, long, val )
 	#define LIBANDRIA4_COMMONIO_EITHLONG_ERR( val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_commonio_eithlong, libandria4_commonio_err, val )
@@ -250,9 +254,12 @@ SOFTWARE.
 				LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERR, \
 				LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
 	
-		/* Returns. */
+	/* Returns. */
+		/* This one is the wrong name, but maybe it's used, so it stays. */
 	#define LIBANDRIA4_COMMONIO_EITHLONG_RETBYTE( val ) \
-		return( LIBANDRIA4_COMMONIO_EITHLONG_BYTE( val ) )
+		return( LIBANDRIA4_COMMONIO_EITHLONG_LONG( val ) )
+	#define LIBANDRIA4_COMMONIO_EITHLONG_RETLONG( val ) \
+		return( LIBANDRIA4_COMMONIO_EITHLONG_LONG( val ) )
 	#define LIBANDRIA4_COMMONIO_EITHLONG_RETERR( val ) \
 		return( LIBANDRIA4_COMMONIO_EITHLONG_ERR( val ) )
 	
