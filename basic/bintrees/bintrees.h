@@ -144,6 +144,8 @@ SOFTWARE.
 						( name ## _bitup ), \
 							libandria4_commonio_err, nodetype* ); } \
 				return( ( name ## _bitup_buildDomainErr )() ); }
+		/* For all of these rotations, store the success-pointer back into the */
+		/*  variable that you got the initial value of the argument from. */
 	#define LIBANDRIA4_BINTREES_BUILDLEFTROT( name,  nodetype,  macroset ) \
 		( name ## _bitup ) \
 			name ## _rotateleft( nodetype *base ) { /* Move nodes toward the lower-valued (left) side of the tree. */ \
