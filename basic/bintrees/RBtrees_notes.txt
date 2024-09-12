@@ -1,3 +1,33 @@
+/*
+LibAndria version 4
+A C-based general purpose utility library.
+Copyright (c) 2024 Jared A. Maddox
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+This grant of rights is subject to two conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+And:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+
+
 Red-black trees:
 	Based on Eternally Confuzzled / Julienne Walker's code, search on the Wayback Machine around Feburary of 2018.
 	The red+black height can be unpredictable, but the black height is always the same between root and all leaves...
@@ -184,7 +214,112 @@ Red-black trees:
 			
 			( on_succ( (basedblptr), (dir) ) );
 		}
-			/* This code will test/verify the entire tree. Returns the black height on success, else returns a negative. */
+	#define LIBANDRIA4_RBTREES_BUILDBALANCE( name,  macroset ) \
+		( name ## _eitherrnodptr ) ( name ## _insertrebalance )( (name) *base, int dir ) { \
+			if( !base || ( dir != -1 && dir != 1 ) ) { \
+				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+			\
+			libandria4_commonio_err e = 0, d = 0; \
+			(name) *a; ( name ## _bitup ) res; \
+			libandria4_doubleint gcol; int ared, ired; \
+			\
+			/* Pathing. */ gcol = ( name ## _redchildren )( base ); \
+			if( dir == -1 ) { \
+				ared = gcol.left; ired = gcol.right; \
+				res = macroset ## _GETLEFT( base ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					res, \
+						LIBANDRIA4_OP_SETe, \
+						LIBANDRIA4_OP_SETa, \
+						LIBANDRIA4_OP_SETd ); \
+					if( e ) { return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
+					if( d ) { return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_BROKEN ) ); } } \
+			else { \
+				ared = gcol.right; ired = gcol.left; \
+				res = macroset ## _GETRIGHT( base ); \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					res, \
+						LIBANDRIA4_OP_SETe, \
+						LIBANDRIA4_OP_SETa, \
+						LIBANDRIA4_OP_SETd ); \
+					if( e ) { \
+						return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
+					if( d ) { \
+						return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_BROKEN ) ); } } \
+			\
+			gcol = ( name ## _redchildren )( a ); \
+			if( ared && ired ) { /* Red-red case 1: both children red, any grandchild red. */ \
+				if( gcol.left || gcol.right ) { \
+					LIBANDRIA4_RBTREES_SETRED( macroset,  base ); \
+					LIBANDRIA4_RBTREES_SETBLACK( macroset,  left ); \
+					LIBANDRIA4_RBTREES_SETBLACK( macroset,  right ); } } \
+			else if( ared && !ired ) { /* Red-red case 2 & 3: active child & grandchild red, inactive child black. */ \
+				if( dir == -1 ? gcol.left : gcol.right ) { /* Red-red case 2: OUTER grandchild red. */ \
+					LIBANDRIA4_RBTREES_SINGLEROT( name,  &base, ( dir ? 0 : 1 ), on_negdir, on_null, on_succ ); } \
+				else if( dir != -1 ? gcol.left : gcol.right ) { /* Red-red case 3: INNER grandchild red. */ \
+					LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  &base, ( dir ? 0 : 1 ), on_negdir, on_null, on_succ ); } } \
+			\
+			return( return( ( name ## _eitherrnodptr_nodeptr )( base ) ); ); }
+	#define LIBANDRIA4_RBTREES_BUILDINNERINSERT( name,  macroset ) \
+			/* addition must be set to red ahead of time! Not optional! Also, it's key MUST be set. */ \
+		( name ## _eitherrnodptr ) ( name ## _innerinsert )( (name) *base,  (name) *addition ) { \
+			if( !addition ) { \
+				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+			if( !ret ) { return( ( name ## _eitherrnodptr_nodeptr )( addition ) ); } \
+			\
+				/* -1 if ret>addition, 0 if ret==addition, else 1. */ \
+			int test = macroset ## _COMPAREn( base, addition ); (name) *tmp = 0; ( name ## _bitup ) res; \
+			switch( test ) { \
+				case -1: /* ( base>addition ) == ( addition<base ), so left case. */ \
+					res = macroset ## _GETLEFT( base ); break; \
+				case 1: /* Right case. */ res = macroset ## _GETRIGHT( base ); break; \
+				case 0: return( ( name ## _eitherrnodptr_nodeptr )( base ) ); \
+				default: return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) ); } \
+			libandria4_commonio_err e = 0, d = 0; \
+			LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+				res, \
+					LIBANDRIA4_OP_SETe, \
+					LIBANDRIA4_OP_SETtmp, \
+					LIBANDRIA4_OP_SETd ); \
+				if( e ) { return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
+				if( d ) { return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_BROKEN ) ); } \
+			\
+			( name ## _eitherrnodptr ) res = ( name ## _innerinsert )( tmp,  addition ); \
+				LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETtmp ); \
+				if( e ) { return( ( name ## _eitherrnodptr_err )( e ) ); } \
+			\
+			switch( test ) { \
+				case -1: res = macroset ## _SETLEFT( base, tmp ); break; \
+				case 1: res = macroset ## _SETRIGHT( base, tmp ); break; \
+				default: /* Should never be reached. */ \
+					return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+				/* Warning! As of this point, the 'ret' var itself should be absolutely unmodified! */\
+			LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+				res, \
+					LIBANDRIA4_OP_SETe, \
+					LIBANDRIA4_NULL_MACRO, \
+					LIBANDRIA4_OP_SETd ); \
+				if( e ) { return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
+				if( d ) { return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_BROKEN ) ); } \
+			\
+			return( ( name ## _insertrebalance )( base, test ) ); }
+	#define LIBANDRIA4_RBTREES_BUILDINSERT( name,  macroset ) \
+			/* Will itself set addition to red. */ \
+		( name ## _eitherrnodptr ) ( name ## _insert )( (name) **base,  (name) *addition ) { \
+			if( !base || !addition ) { \
+				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+			\
+			LIBANDRIA4_RBTREES_SETRED( macroset,  addition ); \
+			\
+			(name) *tmp = 0; libandria4_commonio_err e = 0; \
+			( name ## _eitherrnodptr ) res = ( name ## _innerinsert )( *base,  addition ); \
+				LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETtmp ); \
+				if( e ) { return( ( name ## _eitherrnodptr_err )( e ) ); } \
+				*base = tmp; \
+			LIBANDRIA4_RBTREES_SETBLACK( macroset,  *base ); \
+			\
+			return( ( name ## _eitherrnodptr_nodeptr )( *base ) ); }
+		/* This code will test/verify the entire tree. Returns the black height on success, else returns a negative. */
 	#define LIBANDRIA4_RBTREES_ASSERT( name,  macroset ) \
 		int ( name ## _rbassert )( (name) *base ) { \
 			if( !base ) { /* Null ptr */ ; } \
@@ -232,192 +367,33 @@ Red-black trees:
 	
 	
 	
-	rebalance( (name) *base, int dir )
-	{
-		if( !base || ( dir != -1 && dir != 1 ) )
-		{
-			??? ;
-		}
-		
-		libandria4_doubleint gcol;
-		(name) *a;
-		( name ## _bitup ) res;
-		libandria4_commonio_err e = 0, d = 0;
-		int ared, ired;
-		
-			/* Pathing. */
-		gcol = ( name ## _redchildren )( base );
-		if( dir == -1 )
-		{
-			ared = gcol.left;
-			ired = gcol.right;
-			
-			res = macroset ## _GETLEFT( base );
-			LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-				res, \
-					LIBANDRIA4_OP_SETe, \
-					LIBANDRIA4_OP_SETa, \
-					LIBANDRIA4_OP_SETd );
-				if( e )
-				{
-					return( ( name ## _eitherrnodptr_err )( ??? ) );
-				}
-				if( d )
-				{
-					return( ( name ## _eitherrnodptr_err )( ??? ) );
-				}
-			
-		} else {
-			
-			ared = gcol.right;
-			ired = gcol.left;
-			
-			res = macroset ## _GETRIGHT( base );
-			LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-				res, \
-					LIBANDRIA4_OP_SETe, \
-					LIBANDRIA4_OP_SETa, \
-					LIBANDRIA4_OP_SETd );
-				if( e )
-				{
-					return( ( name ## _eitherrnodptr_err )( ??? ) );
-				}
-				if( d )
-				{
-					return( ( name ## _eitherrnodptr_err )( ??? ) );
-				}
-		}
-		
-		gcol = ( name ## _redchildren )( a );
-		if( ared && ired )
-		{
-			/* Red-red case 1: both children red, any grandchild red. */
-			
-			if( gcol.left || gcol.right )
-			{
-				LIBANDRIA4_RBTREES_SETRED( macroset,  base );
-				LIBANDRIA4_RBTREES_SETBLACK( macroset,  left );
-				LIBANDRIA4_RBTREES_SETBLACK( macroset,  right );
-				
-				return( ??? );
-			}
-			
-			??? ;
-			
-		} else if( ared && !ired )
-		{
-			/* Red-red case 2 & 3: active child & grandchild red, inactive child black. */
-			
-			if( dir == -1 ? gcol.left : gcol.right )
-			{
-				/* Red-red case 2: OUTER grandchild red. */
-				
-				LIBANDRIA4_RBTREES_SINGLEROT( name,  &base, ( dir ? 0 : 1 ), on_negdir, on_null, on_succ );
-				
-			} else if( dir != -1 ? gcol.left : gcol.right )
-			{
-				/* Red-red case 3: INNER grandchild red. */
-				
-				LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  &base, ( dir ? 0 : 1 ), on_negdir, on_null, on_succ );
-			}
-		}
-		
-		return( base );
-	}
 	
-		/* addition must be set to red ahead of time! Not optional! Also, it's key MUST be set. */
-	( name ## _eitherrnodptr ) inner_insert( (name) *ret,  (name) *addition ) {
-		if( !addition ) {
-			return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); }
-		if( !ret ) {
-			return( ( name ## _eitherrnodptr_nodeptr )( addition ) ); }
-		
-			/* -1 if ret>addition, 0 if ret==addition, else 1. */
-		int test = macroset ## _COMPAREn( ret, addition );
-		(name) *tmp = 0;
-		( name ## _bitup ) res;
-		switch( test )
-		{
-			case -1: /* ( ret>addition ) == ( addition<ret ), so left case. */
-				res = macroset ## _GETLEFT( ret );
-				break;
-			case 1: /* Right case. */
-				res = macroset ## _GETRIGHT( ret );
-				break;
-			case 0:
-				return( ( name ## _eitherrnodptr_nodeptr )( ret ) );
-			default:
-				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) );;
-		}
-		libandria4_commonio_err e = 0, d = 0;
-		LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-			res, \
-				LIBANDRIA4_OP_SETe, \
-				LIBANDRIA4_OP_SETtmp, \
-				LIBANDRIA4_OP_SETd );
-			if( e )
-			{
-				return( ( name ## _eitherrnodptr_err )( e ) );
-			}
-			if( d )
-			{
-				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) );
-			}
-		
-		( name ## _eitherrnodptr ) res = inner_insert( tmp,  addition );
-			LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, matcha, LIBANDRIA4_OP_SETtmp );
-		
-		switch( test )
-		{
-			case -1:
-				res = macroset ## _SETLEFT( ret, tmp );
-				break;
-			case 1:
-				res = macroset ## _SETRIGHT( ret, tmp );
-				break;
-			default:
-					/* Should never be reached. */
-				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) );
-		}
-			/* Warning! As of this point, the 'ret' var itself should be absolutely unmodified! */
-		LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-			res, \
-				LIBANDRIA4_OP_SETe, \
-				LIBANDRIA4_NULL_MACRO, \
-				LIBANDRIA4_OP_SETd ); \
-			if( e )
-			{
-				return( ( name ## _eitherrnodptr_err )( e ) );
-			}
-			if( d )
-			{
-				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) );
-			}
-		
-			/* rebalance() has not yet been completed! It has no return types/wrappings! */
-		ret = rebalance( ret, test );
-			??? ;
-		
-		return( ( name ## _eitherrnodptr_nodeptr )( ret ) );
-	}
-			LIBANDRIA4_RBTREES_SETRED( macroset,  old );
-			LIBANDRIA4_RBTREES_SETBLACK( macroset,  *(basedblptr) );
+	
+	
+	
+	
+	
+	
+	
+	;
+	
+	
+	
 		/* Will itself set addition to red. */
-	insert( (name) **base,  (name) *addition )
+	( name ## _eitherrnodptr ) ( name ## _delete )( (name) **base,  (keytype) *targkey )
 	{
-		if( !base || !addition )
-		{
-			???
-		}
+		if( !base || !targkey ) {
+			return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); }
 		
-		LIBANDRIA4_RBTREES_SETRED( macroset,  addition );
+		(name) *tmp = 0;
+		libandria4_commonio_err e = 0;
+		( name ## _eitherrnodptr ) res = ( name ## _innerdelete )( *base,  targkey );
+			LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETtmp );
+			if( e ) { return( ( name ## _eitherrnodptr_err )( e ) ); }
+			*base = tmp;
+		LIBANDRIA4_RBTREES_SETBLACK( macroset,  *base );
 		
-		( name ## _eitherrnodptr ) res = inner_insert( *base,  addition );
-			*base = ??? ( res );
-		
-		LIBANDRIA4_RBTREES_SETBLACK( macroset,  *base ); \
-		
-		return( ??? );
+		return( ( name ## _eitherrnodptr_nodeptr )( *base ) );
 	}
 	
 	
