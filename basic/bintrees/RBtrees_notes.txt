@@ -255,7 +255,7 @@ Red-black trees:
 					LIBANDRIA4_RBTREES_SETBLACK( macroset,  right ); } } \
 			else if( ared && !ired ) { /* Red-red case 2 & 3: active child & grandchild red, inactive child black. */ \
 				if( dir == -1 ? gcol.left : gcol.right ) { /* Red-red case 2: OUTER grandchild red. */ \
-					LIBANDRIA4_RBTREES_SINGLEROT( name,  &base, ( dir ? 0 : 1 ), on_negdir, on_null, on_succ ); } \
+					LIBANDRIA4_RBTREES_SINGLEROT( name,  &base, ( dir ? 0 : 1 ), ??? on_negdir, on_null, on_succ ); } \
 				else if( dir != -1 ? gcol.left : gcol.right ) { /* Red-red case 3: INNER grandchild red. */ \
 					LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  &base, ( dir ? 0 : 1 ), on_negdir, on_null, on_succ ); } } \
 			\
@@ -372,14 +372,7 @@ Red-black trees:
 	
 	
 	
-	
-	
-	
 	;
-	
-	
-	
-		/* Will itself set addition to red. */
 	( name ## _eitherrnodptr ) ( name ## _delete )( (name) **base,  (keytype) *targkey )
 	{
 		if( !base || !targkey ) {
@@ -395,6 +388,152 @@ Red-black trees:
 		
 		return( ( name ## _eitherrnodptr_nodeptr )( *base ) );
 	}
+	
+		/* This is effectively &( ->host->link[ ->dir ] )... or something along those lines. */
+	typedef struct ( name ## _treeptr )
+	{
+		(name) *host;
+		int dir;
+		
+	} ( name ## _treeptr ) ;
+	( name ## _eitherrnodptr ) ( name ## _innerdelete )( (name) **base,  (keytype) *targkey )
+	{
+		(name) prehead = { 0 }, head = { 0 }, *tmp = 0, *ret = 0;
+		prehead.link[ 1 ] = &head;
+		
+			/* These two in the original would be name* type. */
+		( name ## _treeptr ) focus, parent, grand;
+		( name ## _treeptr ) found = { 0 };
+		
+		int dir = 1, dir2, dir3;
+		
+		/* Setup helpers. */
+		focus = { &prehead, 1 }; /* focus = &head; */
+		grand = parent = { 0 };
+		head.link[ dir ] = *base;
+		
+			/* Search for, and push down, a red color. */
+		while( focus.host && focus.host && focus.host->link[ focus.dir ] && focus.host->link[ focus.dir ]->link[ dir ] )
+		{
+			int last = dir;
+			
+			/* Update helpers. */
+			grand = parent;
+			parent = focus;
+			focus = { focus.host->link[ focus.dir ], dir };
+			dir = focus.host->link[ focus.dir ]->key < *targkey;
+			
+			/* Save found node. */
+			if( focus.host->link[ focus.dir ]->key == *targkey )
+			{
+				found = focus;
+			}
+			
+			/* Push the red node down. */
+			if
+			(
+				!LIBANDRIA4_RBTREES_ISRED( macroset,  focus.host->link[ focus.dir ] ) &&
+				LIBANDRIA4_RBTREES_ISRED( macroset,  focus.host->link[ focus.dir ]->link[ dir ] )
+			)
+			{
+				if( LIBANDRIA4_RBTREES_ISRED( macroset,  focus.host->link[ focus.dir ]->link[ !dir ] ) )
+				{
+					tmp = focus.host->link[ focus.dir ];
+						LIBANDRIA4_RBTREES_SINGLEROT( name,  &tmp, dir, ??? on_negdir, on_null, on_succ );
+						parent.host->link[ parent.dir ]->link[ last ] = tmp;
+					parent.host = parent.host->link[ parent.dir ]->link[ last ];
+					parent.dir = last;
+				}
+				else if( !LIBANDRIA4_RBTREES_ISRED( macroset,  focus.host->link[ focus.dir ]->link[ !dir ] ) )
+				{
+					( name ## _treeptr ) sibling = { parent.host->link[ parent.dir ], !last };
+					
+					if( sibling.host->link[ sibling.dir ] )
+					{
+						if
+						(
+							!LIBANDRIA4_RBTREES_ISRED( macroset,  sibling.host->link[ sibling.dir ]->link[ !last ] ) &&
+							!LIBANDRIA4_RBTREES_ISRED( macroset,  sibling.host->link[ sibling.dir ]->link[ last ] )
+						)
+						{
+							/* Color flip. */
+							LIBANDRIA4_RBTREES_SETBLACK( macroset,  parent.host->link[ parent.dir ] );
+							LIBANDRIA4_RBTREES_SETRED( macroset,  sibling.host->link[ sibling.dir ] );
+							LIBANDRIA4_RBTREES_SETRED( macroset,  focus.host->link[ focus.dir ] );
+							
+						} else {
+							
+							dir2 = ( grand.host->link[ grand.dir ]->link[ 1 ] == parent.host->link[ parent.dir ] );
+							
+							tmp = parent.host->link[ parent.dir ];
+							if( LIBANDRIA4_RBTREES_ISRED( macroset,  sibling.host->link[ sibling.dir ]->link[ last ] ) )
+							{
+								LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  &tmp, last, ??? on_negdir, on_null, on_succ );
+								grand.host->link[ grand.dir ]->link[ dir2 ] = tmp;
+								
+							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  sibling.host->link[ sibling.dir ]->link[ !last ] ) )
+							{
+								LIBANDRIA4_RBTREES_SINGLEROT( name,  &tmp, last, ??? on_negdir, on_null, on_succ );
+								grand.host->link[ grand.dir ]->link[ dir2 ] = tmp;
+							}
+							
+							/* Ensure correct coloring. */
+							LIBANDRIA4_RBTREES_SETRED( macroset,  focus.host->link[ focus.dir ] );
+							LIBANDRIA4_RBTREES_SETRED( macroset,  grand.host->link[ grand.dir ]->link[ dir2 ] );
+							LIBANDRIA4_RBTREES_SETBLACK( macroset,  grand.host->link[ grand.dir ]->link[ dir2 ]->link[ 0 ] );
+							LIBANDRIA4_RBTREES_SETBLACK( macroset,  grand.host->link[ grand.dir ]->link[ dir2 ]->link[ 1 ] );
+						}
+					}
+				}
+			}
+		}
+		
+		if( found.host && found.host->link[ found.dir ] )
+		{
+			/* Unlike the EternallyConfuzzled version, we really ARE swapping the nodes. */
+			ret = found.host->link[ found.dir ];
+			(name) *t2 = ret->link[ 0 ], *t3 = ret->link[ 1 ];
+			
+			/* Calculate directions. */
+			dir2 = !( focus.host->link[ focus.dir ]->link[ 0 ] );
+			
+			/* Relink, the found node will have been replaced by the leaf-ish node, and */
+			/*  the leaf-ish node will have been replaced by it's (possible) solitary child. */
+			tmp = focus.host->link[ focus.dir ];
+			found.host->link[ found.dir ] = tmp;
+			focus.host->link[ focus.dir ] = focus.host->link[ focus.dir ]->link[ dir2 ];
+			tmp->link[ 0 ] = t2;
+			tmp->link[ 1 ] = t3;
+			
+			/* Recolor, since we swapped node locations instead of just data. */
+			if( LIBANDRIA4_RBTREES_ISRED( macroset,  ret ) )
+			{
+				LIBANDRIA4_RBTREES_SETRED( macroset,  tmp );
+				
+			} else {
+				
+				LIBANDRIA4_RBTREES_SETBLACK( macroset,  tmp );
+			}
+			
+			/* Instead of free()ing like Eternally Confuzzled, we'll be returning the node for external disposal. */
+		}
+		
+		/* Update root & color black. */
+		*base = head.link[ 1 ];
+		if( *base )
+		{
+			LIBANDRIA4_RBTREES_SETBLACK( macroset,  *base );
+		}
+		
+			/* Note: *ret has been removed from the tree hierarchy, so it MUST be somehow returned. */
+		return( ret );
+	}
+	/* jsw_single(focus, dir): the dir side (0==left,1==right) becomes taller */
+	/* jsw_double(parent, last): same dir/height rule as single() */
+	;
+	
+	
+	
 	
 	
 	
