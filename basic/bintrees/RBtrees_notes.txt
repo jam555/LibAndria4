@@ -111,11 +111,11 @@ Red-black trees:
 	#define LIBANDRIA4_RBTREES_SETBLACK( macroset,  nodeptr ) ( ( !!(nodeptr) ) ? ( (nodeptr)->is_red = 0, 1 ) : 0 )
 		/* Note that this should return a double-pointer, not a normal single-pointer. */
 		/* Styled after eternally-confuzzled's (Julienne Walker's) approach. */
-	#define LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  nodeptr, key, on_badrange, on_null ) \
+	#define LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  nodeptr, dir, on_badrange, on_null ) \
 		( ( !!(nodeptr) ) ? \
-			( (key) == 0 ? \
+			( (dir) == 0 ? \
 				&( macroset ## GETLEFT( nodeptr ) ) : \
-				( (key) > 0 ? &( macroset ## GETRIGHT( nodeptr ) ) : (on_badrange( (nodeptr), (key) )) ) ) : \
+				( (dir) > 0 ? &( macroset ## GETRIGHT( nodeptr ) ) : (on_badrange( (nodeptr), (dir) )) ) ) : \
 			(on_null( (nodeptr) )) )
 		/* dir==0 raises the left size, dir==1 raises the right side. */
 	#define LIBANDRIA4_RBTREES_SINGLEROT( name,  basedblptr, dir, on_negdir, on_null, on_succ ) { \
@@ -391,24 +391,25 @@ Red-black trees:
 	
 	/* Try to move more to e.g. double-pointers or something similar. */
 		/* This is effectively &( ->host->link[ ->dir ] )... or something along those lines. */
-	typedef struct ( name ## _treeptr )
-	{
-		(name) *host;
-		int dir;
-		
-	} ( name ## _treeptr ) ;
-	#define PTRVAL( ref ) (ref).host->link[ (ref).dir ]
-	#define BUILDPTR( hostptr, dir ) ( name ## _treeptr ){ (hostptr), (dir) }
+	typedef ((name) **) ( name ## _treeptr );
+	#define PTRVAL( ref ) ( *(ref) )
+		/* Note: pretty sure it returns a monad, but lets ignore that for now. */
+	#define BUILDPTR( hostptr, dir ) LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  hostptr, dir, on_badrange, on_null )
 	( name ## _eitherrnodptr ) ( name ## _innerdelete )( (name) **base,  (keytype) *targkey )
 	{
+			/* So the while can become a do-while. */
+		if( !base || !targkey )
+		{
+			???
+		}
+		
 		(name) prehead = { 0 }, head = { 0 }, *tmp = 0, *ret = 0;
 		prehead.link[ 1 ] = &head;
 		
-			/* These two in the original would be name* type. */
-		( name ## _treeptr ) focus, parent, grand;
-		( name ## _treeptr ) found = BUILDPTR( 0, 0 );
+		( name ## _treeptr ) focus = 0, parent, grand;
+		( name ## _treeptr ) found = 0;
 		
-		int dir = 1, dir2, dir3;
+		int dir = 1, dir2, dir3, last;
 		
 		/* Setup helpers. */
 		grand = parent = found;
@@ -416,18 +417,28 @@ Red-black trees:
 		head.link[ dir ] = *base;
 		
 			/* Search for, and push down, a red color. */
-		while( focus.host && focus.host && PTRVAL( focus ) && PTRVAL( focus )->link[ dir ] )
+		do
 		{
-			int last = dir;
-			
-			/* Update helpers. */
-			grand = parent;
-			parent = focus;
-			focus = BUILDPTR( PTRVAL( focus ), dir );
-			dir = PTRVAL( focus )->key < *targkey;
+			if( !focus )
+			{
+				focus = &&head;
+				focus = &( ( *focus )->link[ dir ] );
+				parent = &&head;
+				dir = ( macroset ## _COMPAREk( PTRVAL( focus ), *targkey ) ? 1 : 0 );
+				
+			} else {
+				
+				last = dir;
+				
+				/* Update helpers. */
+				grand = parent;
+				parent = focus;
+				focus = BUILDPTR( PTRVAL( focus ), dir );
+				dir = ( macroset ## _COMPAREk( PTRVAL( focus ), *targkey ) ? 1 : 0 );
+			}
 			
 			/* Save found node. */
-			if( PTRVAL( focus )->key == *targkey )
+			if( dir = macroset ## _COMPAREk( PTRVAL( focus ), *targkey ) == 0 )
 			{
 				found = focus;
 			}
@@ -444,11 +455,32 @@ Red-black trees:
 					tmp = PTRVAL( focus );
 						LIBANDRIA4_RBTREES_SINGLEROT( name,  &tmp, dir, ??? on_negdir, on_null, on_succ );
 						PTRVAL( parent )->link[ last ] = tmp;
-					parent.host = PTRVAL( parent )->link[ last ];
-					parent.dir = last;
+					parent = BUILDPTR( PTRVAL( parent )->link[ last ], last );
+					/*
+						p = p->link[last] = jsw_single(q, dir);
+					*/
+					/*
+						LIBANDRIA4_RBTREES_SINGLEROT( name,  focus, dir, ??? on_negdir, on_null, on_succ );
+						if( parent )
+						{
+								/ * This should already be like this. * /
+							parent->link[ last ] = focus;
+						}
+							/ * This adjusts the parent, but I'm pretty sure * /
+							/ * that in my double-pointer system we ALSO need * /
+							/ * to adjust focus, BECAUSE the original would * /
+							/ * automatically continue pointing at the old focus, * /
+							/ * while this version will instead have focus * /
+							/ * automatically pointing at the old focus's NEW * /
+							/ * PARENT. So, we need to adjust focus as well. * /
+						parent = &( parent->link[ last ] );
+						focus = &( focus->link[ dir ] );
+					*/
 				}
-				else if( !LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( focus )->link[ !dir ] ) )
+				else if( parent && !LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( focus )->link[ !dir ] ) )
 				{
+					/* The nested if() would fail without a parent either, so checking parent against null is fine. */
+					
 					( name ## _treeptr ) sibling = BUILDPTR( PTRVAL( parent ), !last );
 					
 					if( PTRVAL( sibling ) )
@@ -489,9 +521,10 @@ Red-black trees:
 					}
 				}
 			}
-		}
+			
+		} while( PTRVAL( focus ) && PTRVAL( focus )->link[ dir ] );
 		
-		if( found.host && PTRVAL( found ) )
+		if( found && PTRVAL( found ) )
 		{
 			/* Unlike the EternallyConfuzzled version, we really ARE swapping the nodes. */
 			ret = PTRVAL( found );
