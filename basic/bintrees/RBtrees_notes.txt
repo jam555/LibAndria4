@@ -161,7 +161,7 @@ Red-black trees:
 			{
 				/* Left */
 				
-				res = macroset ## _GETRIGHT( base );
+				res = macroset ## _GETRIGHT( *(basedblptr) );
 				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 					res, \
 						LIBANDRIA4_OP_SETe, \
@@ -179,7 +179,7 @@ Red-black trees:
 				
 				/* Right */
 				
-				res = macroset ## _GETLEFT( base );
+				res = macroset ## _GETLEFT( *(basedblptr) );
 				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 					res, \
 						LIBANDRIA4_OP_SETe, \
@@ -452,34 +452,25 @@ Red-black trees:
 			{
 				if( LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( focus )->link[ !dir ] ) )
 				{
-					tmp = PTRVAL( focus );
-						LIBANDRIA4_RBTREES_SINGLEROT( name,  &tmp, dir, ??? on_negdir, on_null, on_succ );
-						PTRVAL( parent )->link[ last ] = tmp;
-					parent = BUILDPTR( PTRVAL( parent )->link[ last ], last );
-					/*
-						p = p->link[last] = jsw_single(q, dir);
-					*/
-					/*
-						LIBANDRIA4_RBTREES_SINGLEROT( name,  focus, dir, ??? on_negdir, on_null, on_succ );
-						if( parent )
-						{
-								/ * This should already be like this. * /
-							parent->link[ last ] = focus;
-						}
-							/ * This adjusts the parent, but I'm pretty sure * /
-							/ * that in my double-pointer system we ALSO need * /
-							/ * to adjust focus, BECAUSE the original would * /
-							/ * automatically continue pointing at the old focus, * /
-							/ * while this version will instead have focus * /
-							/ * automatically pointing at the old focus's NEW * /
-							/ * PARENT. So, we need to adjust focus as well. * /
-						parent = &( parent->link[ last ] );
-						focus = &( focus->link[ dir ] );
-					*/
+					LIBANDRIA4_RBTREES_SINGLEROT( name,  focus, dir, ??? on_negdir, on_null, on_succ );
+					if( parent )
+					{
+							/ * This should already be like this. * /
+						PTRVAL( parent )->link[ last ] = focus;
+					}
+						/ * This adjusts the parent, but I'm pretty sure * /
+						/ * that in my double-pointer system we ALSO need * /
+						/ * to adjust focus, BECAUSE the original would * /
+						/ * automatically continue pointing at the old focus, * /
+						/ * while this version will instead have focus * /
+						/ * automatically pointing at the old focus's NEW * /
+						/ * PARENT. So, we need to adjust focus as well. * /
+					parent = focus;
+					focus = &( PTRVAL( focus )->link[ dir ] );
 				}
 				else if( parent && !LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( focus )->link[ !dir ] ) )
 				{
-					/* The nested if() would fail without a parent either, so checking parent against null is fine. */
+					/* The nested if() would fail without a parent either way, so checking parent against null is fine. */
 					
 					( name ## _treeptr ) sibling = BUILDPTR( PTRVAL( parent ), !last );
 					
@@ -503,16 +494,23 @@ Red-black trees:
 							tmp = PTRVAL( parent );
 							if( LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( sibling )->link[ last ] ) )
 							{
-								LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  &tmp, last, ??? on_negdir, on_null, on_succ );
-								PTRVAL( grand )->link[ dir2 ] = tmp;
+								LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  parent, last, ??? on_negdir, on_null, on_succ );
 								
 							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( sibling )->link[ !last ] ) )
 							{
-								LIBANDRIA4_RBTREES_SINGLEROT( name,  &tmp, last, ??? on_negdir, on_null, on_succ );
-								PTRVAL( grand )->link[ dir2 ] = tmp;
+								LIBANDRIA4_RBTREES_SINGLEROT( name,  PTRVAL( parent ), last, ??? on_negdir, on_null, on_succ );
 							}
+							/* Correct the parent pointer: the focus pointer */
+							/*  actually SHOULD still match the original */
+							/*  algorithm, because it's side of the tree */
+							/*  won't have been touched, so leave it as-is. */
+							/*  The correction is identical for both cases. */
+							parent = &( PTRVAL( parent )->link[ last ] );
 							
-							/* Ensure correct coloring. */
+							/* Ensure correct coloring. The grandparent will */
+							/*  be fine without correction, and it's value */
+							/*  will be just discarded on the next */
+							/*  iteration. */
 							LIBANDRIA4_RBTREES_SETRED( macroset,  PTRVAL( focus ) );
 							LIBANDRIA4_RBTREES_SETRED( macroset,  PTRVAL( grand )->link[ dir2 ] );
 							LIBANDRIA4_RBTREES_SETBLACK( macroset,  PTRVAL( grand )->link[ dir2 ]->link[ 0 ] );
@@ -537,7 +535,7 @@ Red-black trees:
 			/*  the leaf-ish node will have been replaced by it's (possible) solitary child. */
 			tmp = PTRVAL( focus );
 			PTRVAL( found ) = tmp;
-			PTRVAL( focus ) = PTRVAL( focus )->link[ dir2 ];
+			PTRVAL( focus ) = tmp->link[ dir2 ];
 			tmp->link[ 0 ] = t2;
 			tmp->link[ 1 ] = t3;
 			
@@ -553,6 +551,7 @@ Red-black trees:
 			
 			/* Instead of free()ing like Eternally Confuzzled, we'll be returning the node for external disposal. */
 		}
+		/* ??? Continue modifications here. ??? */
 		
 		/* Update root & color black. */
 		*base = head.link[ 1 ];
