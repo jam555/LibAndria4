@@ -391,7 +391,6 @@ Red-black trees:
 	
 	/* Try to move more to e.g. double-pointers or something similar. */
 		/* This is effectively &( ->host->link[ ->dir ] )... or something along those lines. */
-	typedef ((name) **) ( name ## _treeptr );
 	#define PTRVAL( ref ) ( *(ref) )
 		/* Note: pretty sure it returns a monad, but lets ignore that for now. */
 	#define BUILDPTR( hostptr, dir ) LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  hostptr, dir, on_badrange, on_null )
@@ -403,27 +402,24 @@ Red-black trees:
 			???
 		}
 		
-		(name) prehead = { 0 }, head = { 0 }, *tmp = 0, *ret = 0;
-		prehead.link[ 1 ] = &head;
+		(name) *tmp = 0, *ret = 0;
 		
-		( name ## _treeptr ) focus = 0, parent, grand;
-		( name ## _treeptr ) found = 0;
+		((name) **) focus = 0, parent, grand;
+		((name) **) found = 0;
 		
 		int dir = 1, dir2, dir3, last;
 		
 		/* Setup helpers. */
 		grand = parent = found;
-		focus = BUILDPTR( &prehead, 1 ); /* focus = &head; */
-		head.link[ dir ] = *base;
+		focus = 0;
 		
 			/* Search for, and push down, a red color. */
 		do
 		{
 			if( !focus )
 			{
-					/* focus == &&head, and head.link[ dir ] == *base, so --> focus =~= base. */
-				focus = &( ( *focus )->link[ dir ] );
-				parent = &&head;
+				focus = base;
+				parent = 0;
 				dir = ( macroset ## _COMPAREk( PTRVAL( focus ), *targkey ) ? 1 : 0 );
 				
 			} else {
@@ -472,7 +468,7 @@ Red-black trees:
 				{
 					/* The nested if() would fail without a parent either way, so checking parent against null is fine. */
 					
-					( name ## _treeptr ) sibling = BUILDPTR( PTRVAL( parent ), !last );
+					((name) **) sibling = BUILDPTR( PTRVAL( parent ), !last );
 					
 					if( PTRVAL( sibling ) )
 					{
@@ -551,10 +547,8 @@ Red-black trees:
 			
 			/* Instead of free()ing like Eternally Confuzzled, we'll be returning the node for external disposal. */
 		}
-		/* ??? Continue modifications here. ??? */
 		
-		/* Update root & color black. */
-		*base = head.link[ 1 ];
+		/* Root has intrinsicly been updated, so now color black. */
 		if( *base )
 		{
 			LIBANDRIA4_RBTREES_SETBLACK( macroset,  *base );
