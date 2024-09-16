@@ -421,7 +421,7 @@ Red-black trees:
 		{
 			if( !focus )
 			{
-				focus = &&head;
+					/* focus == &&head, and head.link[ dir ] == *base, so --> focus =~= base. */
 				focus = &( ( *focus )->link[ dir ] );
 				parent = &&head;
 				dir = ( macroset ## _COMPAREk( PTRVAL( focus ), *targkey ) ? 1 : 0 );
