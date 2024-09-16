@@ -389,15 +389,14 @@ Red-black trees:
 		return( ( name ## _eitherrnodptr_nodeptr )( *base ) );
 	}
 	
-	/* Try to move more to e.g. double-pointers or something similar. */
-		/* Note: pretty sure it returns a monad, but lets ignore that for now. */
-	#define BUILDPTR( hostptr, dir ) LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  hostptr, dir, on_badrange, on_null )
 	( name ## _eitherrnodptr ) ( name ## _innerdelete )( (name) **base,  (keytype) *targkey )
 	{
+		/* Note: pretty sure _FETCHCHILD() returns a monad, but lets ignore that for now. */
+		
 			/* So the while can become a do-while. */
 		if( !base || !targkey )
 		{
-			???
+			return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) );
 		}
 		
 		(name) *tmp = 0, *ret = 0;
@@ -427,7 +426,7 @@ Red-black trees:
 				/* Update helpers. */
 				grand = parent;
 				parent = focus;
-				focus = BUILDPTR( *focus, dir );
+				focus = LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  *focus, dir, on_badrange, on_null );
 				dir = ( macroset ## _COMPAREk( *focus, *targkey ) ? 1 : 0 );
 			}
 			
@@ -466,7 +465,7 @@ Red-black trees:
 				{
 					/* The nested if() would fail without a parent either way, so checking parent against null is fine. */
 					
-					(name) **sibling = BUILDPTR( *parent, !last );
+					(name) **sibling = LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  *parent, !last, on_badrange, on_null );
 					
 					if( *sibling )
 					{
@@ -553,7 +552,7 @@ Red-black trees:
 		}
 		
 			/* Note: *ret has been removed from the tree hierarchy, so it MUST be somehow returned. */
-		return( ret );
+		return( ( name ## _eitherrnodptr_nodeptr )( ret ) );
 	}
 	/* jsw_single(focus, dir): the dir side (0==left,1==right) becomes taller */
 	/* jsw_double(parent, last): same dir/height rule as single() */
