@@ -111,11 +111,12 @@ Red-black trees:
 	#define LIBANDRIA4_RBTREES_SETBLACK( macroset,  nodeptr ) ( ( !!(nodeptr) ) ? ( (nodeptr)->is_red = 0, 1 ) : 0 )
 		/* Note that this should return a double-pointer, not a normal single-pointer. */
 		/* Styled after eternally-confuzzled's (Julienne Walker's) approach. */
-	#define LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  nodeptr, dir, on_badrange, on_null ) \
+		/* Actually, this returns a bi-tuplic. So, the bi-tuplic needs to provide a double-pointer. */
+	#define LIBANDRIA4_RBTREES_FETCHCHILD( head, nodetype, macroset,  nodeptr, dir, on_badrange, on_null ) \
 		( ( !!(nodeptr) ) ? \
 			( (dir) == 0 ? \
-				&( macroset ## GETLEFT( nodeptr ) ) : \
-				( (dir) > 0 ? &( macroset ## GETRIGHT( nodeptr ) ) : (on_badrange( (nodeptr), (dir) )) ) ) : \
+				( macroset ## GETLEFT( head, nodetype, nodeptr ) ) : \
+				( (dir) > 0 ? ( macroset ## GETRIGHT( head, nodetype, nodeptr ) ) : (on_badrange( (nodeptr), (dir) )) ) ) : \
 			(on_null( (nodeptr) )) )
 		/* dir==0 raises the left size, dir==1 raises the right side. */
 	#define LIBANDRIA4_RBTREES_SINGLEROT( name,  basedblptr, dir, on_negdir, on_null, on_succ ) { \
@@ -161,7 +162,7 @@ Red-black trees:
 			{
 				/* Left */
 				
-				res = macroset ## _GETRIGHT( *(basedblptr) );
+				res = macroset ## _GETRIGHT( head, nodetype, *(basedblptr) );
 				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 					res, \
 						LIBANDRIA4_OP_SETe, \
@@ -179,7 +180,7 @@ Red-black trees:
 				
 				/* Right */
 				
-				res = macroset ## _GETLEFT( *(basedblptr) );
+				res = macroset ## _GETLEFT( head, nodetype, *(basedblptr) );
 				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 					res, \
 						LIBANDRIA4_OP_SETe, \
@@ -226,7 +227,7 @@ Red-black trees:
 			/* Pathing. */ gcol = ( name ## _redchildren )( base ); \
 			if( dir == -1 ) { \
 				ared = gcol.left; ired = gcol.right; \
-				res = macroset ## _GETLEFT( base ); \
+				res = macroset ## _GETLEFT( head, nodetype, base ); \
 				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 					res, \
 						LIBANDRIA4_OP_SETe, \
@@ -236,7 +237,7 @@ Red-black trees:
 					if( d ) { return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_BROKEN ) ); } } \
 			else { \
 				ared = gcol.right; ired = gcol.left; \
-				res = macroset ## _GETRIGHT( base ); \
+				res = macroset ## _GETRIGHT( head, nodetype, base ); \
 				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 					res, \
 						LIBANDRIA4_OP_SETe, \
@@ -271,8 +272,8 @@ Red-black trees:
 			int test = macroset ## _COMPAREn( base, addition ); (name) *tmp = 0; ( name ## _bitup ) res; \
 			switch( test ) { \
 				case -1: /* ( base>addition ) == ( addition<base ), so left case. */ \
-					res = macroset ## _GETLEFT( base ); break; \
-				case 1: /* Right case. */ res = macroset ## _GETRIGHT( base ); break; \
+					res = macroset ## _GETLEFT( head, nodetype, base ); break; \
+				case 1: /* Right case. */ res = macroset ## _GETRIGHT( head, nodetype, base ); break; \
 				case 0: return( ( name ## _eitherrnodptr_nodeptr )( base ) ); \
 				default: return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) ); } \
 			libandria4_commonio_err e = 0, d = 0; \
@@ -328,7 +329,7 @@ Red-black trees:
 			( name ## _bitup ) res; \
 			libandria4_commonio_err e = 0; \
 			/* Fetch branches. */
-			res = macroset ## _GETLEFT( base ); \
+			res = macroset ## _GETLEFT( head, nodetype, base ); \
 			LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 				res, \
 					LIBANDRIA4_OP_SETe, \
@@ -336,7 +337,7 @@ Red-black trees:
 					??? ); \
 				if( e ) { ??? } \
 				left = a; \
-			res = macroset ## _GETRIGHT( base ); \
+			res = macroset ## _GETRIGHT( head, nodetype, base ); \
 			LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 				res, \
 					LIBANDRIA4_OP_SETe, \
@@ -391,7 +392,7 @@ Red-black trees:
 	
 	( name ## _eitherrnodptr ) ( name ## _innerdelete )( (name) **base,  (keytype) *targkey )
 	{
-		/* Note: pretty sure _FETCHCHILD() returns a monad, but lets ignore that for now. */
+		/* Note: _FETCHCHILD() returns a bi-tuplic, but lets ignore that for now. */
 		
 			/* So the while can become a do-while. */
 		if( !base || !targkey )
@@ -426,7 +427,7 @@ Red-black trees:
 				/* Update helpers. */
 				grand = parent;
 				parent = focus;
-				focus = LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  *focus, dir, on_badrange, on_null );
+				focus = LIBANDRIA4_RBTREES_FETCHCHILD( head, nodetype, macroset,  *focus, dir, on_badrange, on_null );
 				dir = ( macroset ## _COMPAREk( *focus, *targkey ) ? 1 : 0 );
 			}
 			
@@ -465,7 +466,7 @@ Red-black trees:
 				{
 					/* The nested if() would fail without a parent either way, so checking parent against null is fine. */
 					
-					(name) **sibling = LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  *parent, !last, on_badrange, on_null );
+					(name) **sibling = LIBANDRIA4_RBTREES_FETCHCHILD( head, nodetype, macroset,  *parent, !last, on_badrange, on_null );
 					
 					if( *sibling )
 					{

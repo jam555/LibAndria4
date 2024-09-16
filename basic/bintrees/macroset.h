@@ -35,7 +35,13 @@ SOFTWARE.
 	
 	/* This system is built around a requirmnent for several macros that */
 	/*  follow the naming pattern of a shared prefix followed by an */
-	/*  identifying function name. The names are as follows: */
+	/*  identifying function name. */
+	/*
+		Expected types:
+		LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE_DEFINITION( ( name ## _bitup ), libandria4_commonio_err, nodetype* );
+		??? ;
+	*/
+	/* The names are as follows: */
 		/* _STARTTRANSACTION */ /* Mark the start of a transaction. Will */
 				/*  often need to be used by the caller instead of the */
 				/*  builder macros. Must be nesting-safe. Things like */
