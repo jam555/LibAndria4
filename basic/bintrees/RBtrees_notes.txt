@@ -390,8 +390,6 @@ Red-black trees:
 	}
 	
 	/* Try to move more to e.g. double-pointers or something similar. */
-		/* This is effectively &( ->host->link[ ->dir ] )... or something along those lines. */
-	#define PTRVAL( ref ) ( *(ref) )
 		/* Note: pretty sure it returns a monad, but lets ignore that for now. */
 	#define BUILDPTR( hostptr, dir ) LIBANDRIA4_RBTREES_FETCHCHILD( macroset,  hostptr, dir, on_badrange, on_null )
 	( name ## _eitherrnodptr ) ( name ## _innerdelete )( (name) **base,  (keytype) *targkey )
@@ -404,8 +402,8 @@ Red-black trees:
 		
 		(name) *tmp = 0, *ret = 0;
 		
-		((name) **) focus = 0, parent, grand;
-		((name) **) found = 0;
+		(name) **focus = 0, **parent, **grand;
+		(name) **found = 0;
 		
 		int dir = 1, dir2, dir3, last;
 		
@@ -420,7 +418,7 @@ Red-black trees:
 			{
 				focus = base;
 				parent = 0;
-				dir = ( macroset ## _COMPAREk( PTRVAL( focus ), *targkey ) ? 1 : 0 );
+				dir = ( macroset ## _COMPAREk( *focus, *targkey ) ? 1 : 0 );
 				
 			} else {
 				
@@ -429,12 +427,12 @@ Red-black trees:
 				/* Update helpers. */
 				grand = parent;
 				parent = focus;
-				focus = BUILDPTR( PTRVAL( focus ), dir );
-				dir = ( macroset ## _COMPAREk( PTRVAL( focus ), *targkey ) ? 1 : 0 );
+				focus = BUILDPTR( *focus, dir );
+				dir = ( macroset ## _COMPAREk( *focus, *targkey ) ? 1 : 0 );
 			}
 			
 			/* Save found node. */
-			if( dir = macroset ## _COMPAREk( PTRVAL( focus ), *targkey ) == 0 )
+			if( dir = macroset ## _COMPAREk( *focus, *targkey ) == 0 )
 			{
 				found = focus;
 			}
@@ -442,17 +440,17 @@ Red-black trees:
 			/* Push the red node down. */
 			if
 			(
-				!LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( focus ) ) &&
-				LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( focus )->link[ dir ] )
+				!LIBANDRIA4_RBTREES_ISRED( macroset,  *focus ) &&
+				LIBANDRIA4_RBTREES_ISRED( macroset,  ( *focus )->link[ dir ] )
 			)
 			{
-				if( LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( focus )->link[ !dir ] ) )
+				if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *focus )->link[ !dir ] ) )
 				{
 					LIBANDRIA4_RBTREES_SINGLEROT( name,  focus, dir, ??? on_negdir, on_null, on_succ );
 					if( parent )
 					{
 							/ * This should already be like this. * /
-						PTRVAL( parent )->link[ last ] = focus;
+						( *parent )->link[ last ] = focus;
 					}
 						/ * This adjusts the parent, but I'm pretty sure * /
 						/ * that in my double-pointer system we ALSO need * /
@@ -462,76 +460,76 @@ Red-black trees:
 						/ * automatically pointing at the old focus's NEW * /
 						/ * PARENT. So, we need to adjust focus as well. * /
 					parent = focus;
-					focus = &( PTRVAL( focus )->link[ dir ] );
+					focus = &( ( *focus )->link[ dir ] );
 				}
-				else if( parent && !LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( focus )->link[ !dir ] ) )
+				else if( parent && !LIBANDRIA4_RBTREES_ISRED( macroset,  ( *focus )->link[ !dir ] ) )
 				{
 					/* The nested if() would fail without a parent either way, so checking parent against null is fine. */
 					
-					((name) **) sibling = BUILDPTR( PTRVAL( parent ), !last );
+					(name) **sibling = BUILDPTR( *parent, !last );
 					
-					if( PTRVAL( sibling ) )
+					if( *sibling )
 					{
 						if
 						(
-							!LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( sibling )->link[ !last ] ) &&
-							!LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( sibling )->link[ last ] )
+							!LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ !last ] ) &&
+							!LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ last ] )
 						)
 						{
 							/* Color flip. */
-							LIBANDRIA4_RBTREES_SETBLACK( macroset,  PTRVAL( parent ) );
-							LIBANDRIA4_RBTREES_SETRED( macroset,  PTRVAL( sibling ) );
-							LIBANDRIA4_RBTREES_SETRED( macroset,  PTRVAL( focus ) );
+							LIBANDRIA4_RBTREES_SETBLACK( macroset,  *parent );
+							LIBANDRIA4_RBTREES_SETRED( macroset,  *sibling );
+							LIBANDRIA4_RBTREES_SETRED( macroset,  *focus );
 							
 						} else {
 							
-							dir2 = ( PTRVAL( grand )->link[ 1 ] == PTRVAL( parent ) );
+							dir2 = ( ( *grand )->link[ 1 ] == *parent );
 							
-							tmp = PTRVAL( parent );
-							if( LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( sibling )->link[ last ] ) )
+							tmp = *parent;
+							if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ last ] ) )
 							{
 								LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  parent, last, ??? on_negdir, on_null, on_succ );
 								
-							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  PTRVAL( sibling )->link[ !last ] ) )
+							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ !last ] ) )
 							{
-								LIBANDRIA4_RBTREES_SINGLEROT( name,  PTRVAL( parent ), last, ??? on_negdir, on_null, on_succ );
+								LIBANDRIA4_RBTREES_SINGLEROT( name,  parent, last, ??? on_negdir, on_null, on_succ );
 							}
 							/* Correct the parent pointer: the focus pointer */
 							/*  actually SHOULD still match the original */
 							/*  algorithm, because it's side of the tree */
 							/*  won't have been touched, so leave it as-is. */
 							/*  The correction is identical for both cases. */
-							parent = &( PTRVAL( parent )->link[ last ] );
+							parent = &( ( *parent )->link[ last ] );
 							
 							/* Ensure correct coloring. The grandparent will */
 							/*  be fine without correction, and it's value */
 							/*  will be just discarded on the next */
 							/*  iteration. */
-							LIBANDRIA4_RBTREES_SETRED( macroset,  PTRVAL( focus ) );
-							LIBANDRIA4_RBTREES_SETRED( macroset,  PTRVAL( grand )->link[ dir2 ] );
-							LIBANDRIA4_RBTREES_SETBLACK( macroset,  PTRVAL( grand )->link[ dir2 ]->link[ 0 ] );
-							LIBANDRIA4_RBTREES_SETBLACK( macroset,  PTRVAL( grand )->link[ dir2 ]->link[ 1 ] );
+							LIBANDRIA4_RBTREES_SETRED( macroset,  *focus );
+							LIBANDRIA4_RBTREES_SETRED( macroset,  ( *grand )->link[ dir2 ] );
+							LIBANDRIA4_RBTREES_SETBLACK( macroset,  ( *grand )->link[ dir2 ]->link[ 0 ] );
+							LIBANDRIA4_RBTREES_SETBLACK( macroset,  ( *grand )->link[ dir2 ]->link[ 1 ] );
 						}
 					}
 				}
 			}
 			
-		} while( PTRVAL( focus ) && PTRVAL( focus )->link[ dir ] );
+		} while( *focus && ( *focus )->link[ dir ] );
 		
-		if( found && PTRVAL( found ) )
+		if( found && *found )
 		{
 			/* Unlike the EternallyConfuzzled version, we really ARE swapping the nodes. */
-			ret = PTRVAL( found );
+			ret = *found;
 			(name) *t2 = ret->link[ 0 ], *t3 = ret->link[ 1 ];
 			
 			/* Calculate directions. */
-			dir2 = !( PTRVAL( focus )->link[ 0 ] );
+			dir2 = !( ( *focus )->link[ 0 ] );
 			
 			/* Relink, the found node will have been replaced by the leaf-ish node, and */
 			/*  the leaf-ish node will have been replaced by it's (possible) solitary child. */
-			tmp = PTRVAL( focus );
-			PTRVAL( found ) = tmp;
-			PTRVAL( focus ) = tmp->link[ dir2 ];
+			tmp = *focus;
+			*found = tmp;
+			*focus = tmp->link[ dir2 ];
 			tmp->link[ 0 ] = t2;
 			tmp->link[ 1 ] = t3;
 			
