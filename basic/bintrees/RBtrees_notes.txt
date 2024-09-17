@@ -110,30 +110,27 @@ Red-black trees:
 				( (dir) > 0 ? ( macroset ## GETRIGHT( head, nodetype, nodeptr ) ) : (on_badrange( (nodeptr), (dir) )) ) ) : \
 			(on_null( (nodeptr) )) )
 		/* dir==0 raises the left size, dir==1 raises the right side. */
-	#define LIBANDRIA4_RBTREES_SINGLEROT( name,  basedblptr, dir, on_negdir, on_null, on_succ ) { \
-			if( (dir) < 0 ) { ( on_negdir( (basedblptr), (dir) ) ); } \
-			if( !( !(basedblptr) || !*(basedblptr) ) ) { ( on_null( (basedblptr), (dir) ) ); } \
+	#define LIBANDRIA4_RBTREES_BUILDSINGLEROT( name,  basedblptr, dir, on_negdir, on_null, on_succ ) { \
+		( name ## _bitup ) ( name ## _singlerotate )( (name) *base, int dir ) { \
+			if( dir < 0 || dir > 1 ) { \
+				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
 			\
-				/* Left is lower-keyed, right is higher-keyed, a rotation makes it's namesake taller. */ \
 			( name ## _bitup ) res; \
-			if( (dir) == 0 ) { /* Left */ \
-				res = name ## _rotateleft( *(basedblptr) ); } \
-			else { /* Right */ \
-				res = name ## _rotateright( *(basedblptr) ); } \
-			(name) *old = *(basedblptr), *a = 0; \
-			libandria4_commonio_err e = 0; \
-			LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-				res, \
-					LIBANDRIA4_OP_SETe, \
-					LIBANDRIA4_OP_SETa, \
-					??? ); \
-				if( e ) { ??? } \
-				*(basedblptr) = a; \
+			if( !dir ) { res = name ## _rotateleft( base ); } \
+			else { res = name ## _rotateright( base ); } \
+			(name) *a; libandria4_commonio_err e = 0; \
+				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+					res, \
+						LIBANDRIA4_OP_RETres, \
+						LIBANDRIA4_OP_SETa, \
+						LIBANDRIA4_OP_SETeTO1 ); \
+					if( e ) { \
+						return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+			LIBANDRIA4_RBTREES_SETRED( macroset,  base ); \
+			LIBANDRIA4_RBTREES_SETBLACK( macroset,  a ); \
 			\
-			LIBANDRIA4_RBTREES_SETRED( macroset,  old ); \
-			LIBANDRIA4_RBTREES_SETBLACK( macroset,  *(basedblptr) ); \
-			\
-			( on_succ( (basedblptr), (dir) ) ); }
+			return( res ); }
+	
 	#define LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  basedblptr, dir, on_negdir, on_null, on_succ )
 		{
 			if( (dir) < 0 )
@@ -247,7 +244,15 @@ Red-black trees:
 					LIBANDRIA4_RBTREES_SETBLACK( macroset,  right ); } } \
 			else if( ared && !ired ) { /* Red-red case 2 & 3: active child & grandchild red, inactive child black. */ \
 				if( dir == -1 ? gcol.left : gcol.right ) { /* Red-red case 2: OUTER grandchild red. */ \
-					LIBANDRIA4_RBTREES_SINGLEROT( name,  &base, ( dir ? 0 : 1 ), ??? on_negdir, on_null, on_succ ); } \
+					res = ( name ## _singlerotate )( base, ( dir ? 0 : 1 ) ); \
+						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+							res, \
+								LIBANDRIA4_OP_RETres, \
+								LIBANDRIA4_OP_SETa, \
+								LIBANDRIA4_OP_SETeTO1 ); \
+							if( e ) { \
+								return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+						base = a; } \
 				else if( dir != -1 ? gcol.left : gcol.right ) { /* Red-red case 3: INNER grandchild red. */ \
 					LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  &base, ( dir ? 0 : 1 ), on_negdir, on_null, on_succ ); } } \
 			\
@@ -395,8 +400,10 @@ Red-black trees:
 		
 		(name) **focus = 0, **parent, **grand;
 		(name) **found = 0;
+		( name ## _bitup ) res;
 		
 		int dir = 1, dir2, dir3, last;
+		libandria4_commonio_err e = 0;
 		
 		/* Setup helpers. */
 		grand = parent = found;
@@ -437,7 +444,15 @@ Red-black trees:
 			{
 				if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *focus )->link[ !dir ] ) )
 				{
-					LIBANDRIA4_RBTREES_SINGLEROT( name,  focus, dir, ??? on_negdir, on_null, on_succ );
+					res = ( name ## _singlerotate )( *focus, dir );
+						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+							res, \
+								LIBANDRIA4_OP_RETres, \
+								LIBANDRIA4_OP_SETtmp, \
+								LIBANDRIA4_OP_SETeTO1 ); \
+							if( e ) { \
+								return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+						*focus = tmp;
 					if( parent )
 					{
 							/ * This should already be like this. * /
@@ -476,14 +491,21 @@ Red-black trees:
 							
 							dir2 = ( ( *grand )->link[ 1 ] == *parent );
 							
-							tmp = *parent;
 							if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ last ] ) )
 							{
 								LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  parent, last, ??? on_negdir, on_null, on_succ );
 								
 							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ !last ] ) )
 							{
-								LIBANDRIA4_RBTREES_SINGLEROT( name,  parent, last, ??? on_negdir, on_null, on_succ );
+								res = ( name ## _singlerotate )( *parent, last );
+									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+										res, \
+											LIBANDRIA4_OP_RETres, \
+											LIBANDRIA4_OP_SETtmp, \
+											LIBANDRIA4_OP_SETeTO1 ); \
+										if( e ) { \
+											return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+									*parent = tmp;
 							}
 							/* Correct the parent pointer: the focus pointer */
 							/*  actually SHOULD still match the original */
