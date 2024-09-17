@@ -43,6 +43,7 @@ Red-black trees:
 	Non-black root:
 		Color root black.
 	;
+	ERROR!!! "name" is treated as both the head of all func/type/etc. identifiers, AND the node-type: THIS SHOULD NOT BE!
 	
 	
 	
@@ -110,9 +111,9 @@ Red-black trees:
 				( (dir) > 0 ? ( macroset ## GETRIGHT( head, nodetype, nodeptr ) ) : (on_badrange( (nodeptr), (dir) )) ) ) : \
 			(on_null( (nodeptr) )) )
 		/* dir==0 raises the left size, dir==1 raises the right side. */
-	#define LIBANDRIA4_RBTREES_BUILDSINGLEROT( name,  basedblptr, dir, on_negdir, on_null, on_succ ) { \
+	#define LIBANDRIA4_RBTREES_BUILDSINGLEROT( name,  macroset ) { \
 		( name ## _bitup ) ( name ## _singlerotate )( (name) *base, int dir ) { \
-			if( dir < 0 || dir > 1 ) { \
+			if( dir < 0 || dir > 1 || !base ) { \
 				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
 			\
 			( name ## _bitup ) res; \
@@ -131,78 +132,41 @@ Red-black trees:
 			\
 			return( res ); }
 	
-	#define LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  basedblptr, dir, on_negdir, on_null, on_succ )
-		{
-			if( (dir) < 0 )
-			{
-				( on_negdir( (basedblptr), (dir) ) );
-			}
-			if( !( !(basedblptr) || !*(basedblptr) ) )
-			{
-				( on_null( (basedblptr), (dir) ) );
-			}
-			
-				/* Left is lower-keyed, right is higher-keyed, a rotation makes it's namesake taller. */
-			(name) *old = *(basedblptr), *a = 0, *mid;
-			( name ## _bitup ) res;
-			libandria4_commonio_err e = 0;
-			if( (dir) == 0 )
-			{
-				/* Left */
-				
-				res = macroset ## _GETRIGHT( head, nodetype, *(basedblptr) );
-				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-					res, \
-						LIBANDRIA4_OP_SETe, \
-						LIBANDRIA4_OP_SETa, \
-						??? );
-					if( e )
-					{
-						???
-					}
-					mid = a;
-				
-				res = name ## _doublerotateleft( *(basedblptr) );
-				
-			} else {
-				
-				/* Right */
-				
-				res = macroset ## _GETLEFT( head, nodetype, *(basedblptr) );
-				LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-					res, \
-						LIBANDRIA4_OP_SETe, \
-						LIBANDRIA4_OP_SETa, \
-						??? );
-					if( e )
-					{
-						???
-					}
-					mid = a;
-				
-				res = name ## _doublerotateright( *(basedblptr) );
-			}
-			LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-				res, \
-					LIBANDRIA4_OP_SETe, \
-					LIBANDRIA4_OP_SETa, \
-					??? );
-				if( e )
-				{
-					???
-				}
-				*(basedblptr) = a;
-			
+		/* dir==0 raises the left size, dir==1 raises the right side. */
+	#define LIBANDRIA4_RBTREES_BUILDDOUBLEROT( name,  macroset )
+		( name ## _bitup ) ( name ## _doublerotate )( (name) *base, int dir ) { \
+			if( dir < 0 || dir > 1 || !base ) { \
+				return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
+			\
+			( name ## _bitup ) res; \
+			(name) *a = 0, *mid; libandria4_commonio_err e = 0; \
+			\
+			if( !dir ) { \
+				res = macroset ## _GETRIGHT( head, nodetype, base ); \
+					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, \
+							LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETeTO1 ); \
+						if( e ) { \
+							return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+						mid = a; \
+				res = name ## _doublerotateleft( base ); } \
+			else { \
+				res = macroset ## _GETLEFT( head, nodetype, base ); \
+					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, \
+							LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETeTO1 ); \
+						if( e ) { \
+							return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+						mid = a; \
+				res = name ## _doublerotateright( base ); } \
+			LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( res, \
+					LIBANDRIA4_OP_RETres, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETeTO1 ); \
+				if( e ) { \
+					return( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+			\
 			LIBANDRIA4_RBTREES_SETRED( macroset,  mid ); \
-			LIBANDRIA4_RBTREES_SETRED( macroset,  old ); \
-				/* The node that was furthest from *basedblptr is now IN basedblptr, */
-				/*  and DIRECTLY the parent of both old & mid. Thus, setting those */
-				/*  two to red DOES NOT produce a red violation, despite my initial */
-				/*  concerns. */
-			LIBANDRIA4_RBTREES_SETBLACK( macroset,  *(basedblptr) ); \
-			
-			( on_succ( (basedblptr), (dir) ) );
-		}
+			LIBANDRIA4_RBTREES_SETRED( macroset,  base ); \
+			LIBANDRIA4_RBTREES_SETBLACK( macroset,  a ); \
+			\
+			return( res ); }
 	#define LIBANDRIA4_RBTREES_BUILDBALANCE( name,  macroset ) \
 		( name ## _eitherrnodptr ) ( name ## _insertrebalance )( (name) *base, int dir ) { \
 			if( !base || ( dir != -1 && dir != 1 ) ) { \
@@ -247,14 +211,22 @@ Red-black trees:
 					res = ( name ## _singlerotate )( base, ( dir ? 0 : 1 ) ); \
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
-								LIBANDRIA4_OP_RETres, \
+								??? LIBANDRIA4_OP_RETres, \
 								LIBANDRIA4_OP_SETa, \
 								LIBANDRIA4_OP_SETeTO1 ); \
 							if( e ) { \
 								return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
 						base = a; } \
 				else if( dir != -1 ? gcol.left : gcol.right ) { /* Red-red case 3: INNER grandchild red. */ \
-					LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  &base, ( dir ? 0 : 1 ), on_negdir, on_null, on_succ ); } } \
+					res = ( name ## _doublerotate )( base, ( dir ? 0 : 1 ) ); \
+						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+							res, \
+								??? LIBANDRIA4_OP_RETres, \
+								LIBANDRIA4_OP_SETa, \
+								LIBANDRIA4_OP_SETeTO1 ); \
+							if( e ) { \
+								return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+						base = a; } } \
 			\
 			return( return( ( name ## _eitherrnodptr_nodeptr )( base ) ); ); }
 	#define LIBANDRIA4_RBTREES_BUILDINNERINSERT( name,  macroset ) \
@@ -447,7 +419,7 @@ Red-black trees:
 					res = ( name ## _singlerotate )( *focus, dir );
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
-								LIBANDRIA4_OP_RETres, \
+								??? LIBANDRIA4_OP_RETres, \
 								LIBANDRIA4_OP_SETtmp, \
 								LIBANDRIA4_OP_SETeTO1 ); \
 							if( e ) { \
@@ -493,14 +465,22 @@ Red-black trees:
 							
 							if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ last ] ) )
 							{
-								LIBANDRIA4_RBTREES_DOUBLEROT( name,  macroset,  parent, last, ??? on_negdir, on_null, on_succ );
+								res = ( name ## _doublerotate )( *parent, last );
+									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+										res, \
+											??? LIBANDRIA4_OP_RETres, \
+											LIBANDRIA4_OP_SETtmp, \
+											LIBANDRIA4_OP_SETeTO1 ); \
+										if( e ) { \
+											return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+									*parent = tmp;
 								
 							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ !last ] ) )
 							{
 								res = ( name ## _singlerotate )( *parent, last );
 									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 										res, \
-											LIBANDRIA4_OP_RETres, \
+											??? LIBANDRIA4_OP_RETres, \
 											LIBANDRIA4_OP_SETtmp, \
 											LIBANDRIA4_OP_SETeTO1 ); \
 										if( e ) { \
