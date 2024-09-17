@@ -211,22 +211,26 @@ Red-black trees:
 					res = ( name ## _singlerotate )( base, ( dir ? 0 : 1 ) ); \
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
-								??? LIBANDRIA4_OP_RETres, \
+								LIBANDRIA4_OP_SETe, \
 								LIBANDRIA4_OP_SETa, \
-								LIBANDRIA4_OP_SETeTO1 ); \
+								LIBANDRIA4_OP_SETdTO1 ); \
+							if( d ) { \
+								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_BROKEN ) ); } \
+						base = a; \
 							if( e ) { \
-								return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-						base = a; } \
+								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } } \
 				else if( dir != -1 ? gcol.left : gcol.right ) { /* Red-red case 3: INNER grandchild red. */ \
 					res = ( name ## _doublerotate )( base, ( dir ? 0 : 1 ) ); \
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
-								??? LIBANDRIA4_OP_RETres, \
+								LIBANDRIA4_OP_SETe, \
 								LIBANDRIA4_OP_SETa, \
-								LIBANDRIA4_OP_SETeTO1 ); \
+								LIBANDRIA4_OP_SETdTO1 ); \
+							if( d ) { \
+								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_BROKEN ) ); } \
+						base = a; \
 							if( e ) { \
-								return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-						base = a; } } \
+								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } } } \
 			\
 			return( return( ( name ## _eitherrnodptr_nodeptr )( base ) ); ); }
 	#define LIBANDRIA4_RBTREES_BUILDINNERINSERT( name,  macroset ) \
@@ -375,7 +379,7 @@ Red-black trees:
 		( name ## _bitup ) res;
 		
 		int dir = 1, dir2, dir3, last;
-		libandria4_commonio_err e = 0;
+		libandria4_commonio_err d = 0, e = 0;
 		
 		/* Setup helpers. */
 		grand = parent = found;
@@ -419,12 +423,14 @@ Red-black trees:
 					res = ( name ## _singlerotate )( *focus, dir );
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
-								??? LIBANDRIA4_OP_RETres, \
+								LIBANDRIA4_OP_SETd, \
 								LIBANDRIA4_OP_SETtmp, \
 								LIBANDRIA4_OP_SETeTO1 ); \
 							if( e ) { \
-								return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-						*focus = tmp;
+								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+						*focus = tmp; \
+							if( d ) { \
+								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
 					if( parent )
 					{
 							/ * This should already be like this. * /
@@ -468,24 +474,28 @@ Red-black trees:
 								res = ( name ## _doublerotate )( *parent, last );
 									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 										res, \
-											??? LIBANDRIA4_OP_RETres, \
+											LIBANDRIA4_OP_SETd, \
 											LIBANDRIA4_OP_SETtmp, \
 											LIBANDRIA4_OP_SETeTO1 ); \
 										if( e ) { \
-											return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-									*parent = tmp;
+											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+									*parent = tmp; \
+										if( d ) { \
+											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
 								
 							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ !last ] ) )
 							{
 								res = ( name ## _singlerotate )( *parent, last );
 									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 										res, \
-											??? LIBANDRIA4_OP_RETres, \
+											LIBANDRIA4_OP_SETd, \
 											LIBANDRIA4_OP_SETtmp, \
 											LIBANDRIA4_OP_SETeTO1 ); \
 										if( e ) { \
-											return( ( name ## ??? )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-									*parent = tmp;
+											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+									*parent = tmp; \
+										if( d ) { \
+											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
 							}
 							/* Correct the parent pointer: the focus pointer */
 							/*  actually SHOULD still match the original */
