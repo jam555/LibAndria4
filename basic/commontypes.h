@@ -39,6 +39,26 @@ SOFTWARE.
 	
 	
 	
+	#define LIBANDRIA4_DOUBLEELEMENT_DECLARE( newname, type ) \
+		typedef struct ( newname ) { (type) left; (type) right; } ( newname ); \
+		inline ( newname ) ( newname ## _build )( (type) l, (type) r ) { return( (newname){ l, r } ); }
+	#define LIBANDRIA4_DOUBLEELEMENT_DEFINE( newname, type ) \
+		( newname ) ( newname ## _build )( (type) l, (type) r ) { return( (newname){ l, r } ); }
+	
+	/* All of these following declares should have a corresponding define in a .c file. */
+	LIBANDRIA4_DOUBLEELEMENT_DECLARE( libandria4_doublechar, char );
+	LIBANDRIA4_DOUBLEELEMENT_DECLARE( libandria4_doubleshort, short );
+	LIBANDRIA4_DOUBLEELEMENT_DECLARE( libandria4_doubleint, int );
+	LIBANDRIA4_DOUBLEELEMENT_DECLARE( libandria4_doublelong, long );
+	
+	LIBANDRIA4_DOUBLEELEMENT_DECLARE( libandria4_doublesize, size_t );
+	LIBANDRIA4_DOUBLEELEMENT_DECLARE( libandria4_doubleintptr, intptr_t );
+	LIBANDRIA4_DOUBLEELEMENT_DECLARE( libandria4_doubleuintptr, uintptr_t );
+	
+	LIBANDRIA4_DOUBLEELEMENT_DECLARE( libandria4_doublevoidp, void* );
+	
+	
+	
 	#include "../basic/monads.h"
 	
 	/* Positive errors are always untranslatable characters, negative are */

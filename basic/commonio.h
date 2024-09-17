@@ -34,6 +34,7 @@ SOFTWARE.
 	#include "simpleops.h"
 	
 	/* Note that streams.h is included at the end of this file. */
+	/* If you're looking for the "two elements" types, look in commontypes.h */
 	
 	
 	

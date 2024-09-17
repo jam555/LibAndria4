@@ -59,17 +59,8 @@ Red-black trees:
 	
 	
 	
-	/* See if the code below already has equivalents. */
+	/* The libandria4_doubleint{} type is from commontypes.h . */
 	
-	typedef struct libandria4_doubleint
-	{
-		int left, right;
-		
-	} libandria4_doubleint;
-	libandria4_doubleint libandria4_doubleint_build( int l, int r )
-	{
-		return( (libandria4_doubleint){ l, r } );
-	}
 	#define LIBANDRIA4_RBTREES_REDCHILDREN( name,  macroset ) \
 		libandria4_doubleint ( name ## _redchildren )( (name) *parent ) { \
 			if( !parent ) { return( libandria4_doubleint_build( -1, -1 ) ); } \
