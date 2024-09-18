@@ -108,8 +108,16 @@ Red-black trees:
 		( ( !!(nodeptr) ) ? \
 			( (dir) == 0 ? \
 				( macroset ## GETLEFT( head, nodetype, nodeptr ) ) : \
-				( (dir) > 0 ? ( macroset ## GETRIGHT( head, nodetype, nodeptr ) ) : (on_badrange( (nodeptr), (dir) )) ) ) : \
+				( (dir) > 0 ? ( macroset ## GETRIGHT( head, nodetype, nodeptr ) ) : \
+					(on_badrange( (nodeptr), (dir) )) ) ) : \
 			(on_null( (nodeptr) )) )
+	#define LIBANDRIA4_RBTREES_SETCHILD( baseptr, dir,  valvar,  on_badrange, on_null ) \
+		( ( !!(baseptr) ) ? \
+			( (dir) == 0 ? \
+				( macroset ## SETLEFT( (baseptr), (valvar) ) ) : \
+				( (dir) > 0 ? ( macroset ## SETRIGHT( (baseptr), (valvar) ) ) : \
+					(on_badrange( (baseptr), (dir) )) ) ) : \
+			(on_null( (baseptr) )) )
 		/* dir==0 raises the left size, dir==1 raises the right side. */
 	#define LIBANDRIA4_RBTREES_BUILDSINGLEROT( name,  macroset ) { \
 		( name ## _bitup ) ( name ## _singlerotate )( (name) *base, int dir ) { \
@@ -411,10 +419,10 @@ Red-black trees:
 		(name) *tmp = 0, *ret = 0, *active, *inactive;
 		
 		(name) **focus = 0, *foc, **parent, *par = 0, **grand, *gran = 0;
-		(name) **found = 0;
+		(name) **found = 0, *pfod;
 		( name ## _bitup ) res;
 		
-		int dir = 1, dir2, dir3, prev = 1, last = 1;
+		int dir = 1, dir2, dir3, prev = 1, last = 1, pdir;
 		libandria4_commonio_err d = 0, e = 0;
 		
 		/* Setup helpers. */
@@ -449,6 +457,8 @@ Red-black trees:
 			if( dir = macroset ## _COMPAREk( foc, *targkey ) == 0 )
 			{
 				found = focus;
+				pfod = par;
+				pdir = prev;
 			}
 			
 			
@@ -477,16 +487,15 @@ Red-black trees:
 								LIBANDRIA4_OP_SETeTO1 ); \
 							if( e ) { \
 								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-						*focus = tmp; \
 						foc = tmp; \
 							/* This will replace " *focus = tmp; " */
 						if( parent )
 						{
-							par->link[ prev ] = foc;
+							??? LIBANDRIA4_RBTREES_SETCHILD( par, prev,  foc,  on_badrange, on_null );
 							
 						} else {
 							
-							*base = foc;
+							*base = foc; /* Special-casing. */
 						}
 							if( d ) { \
 								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
@@ -499,7 +508,7 @@ Red-black trees:
 						/ * PARENT. So, we need to adjust focus as well. * /
 					parent = focus;
 					par = *parent;
-					focus = &( foc->link[ dir ] /* == active, but wrong double-pointer... */ );
+					??? focus = &( foc->link[ dir ] /* == active, but wrong double-pointer... */ );
 					foc = *focus;
 				}
 				else if( parent && !LIBANDRIA4_RBTREES_ISRED( macroset,  inactive ) )
@@ -507,13 +516,20 @@ Red-black trees:
 					/* The nested if() would fail without a parent either way, so checking parent against null is fine. */
 					
 					(name) **sibling = LIBANDRIA4_RBTREES_FETCHCHILD( head, nodetype, macroset,  par, !prev, on_badrange, on_null );
+					(name) *nephew, *neice;
+						/* nephew = ( *sibling )->link[ !prev ] */
+					di = doublefetch( *sibling, prev,  &nephew, &neice );
+						if( di.left != LIBANDRIA4_RESULT_GENERICTRUE || di.right != LIBANDRIA4_RESULT_GENERICTRUE )
+						{
+							return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) );
+						}
 					
 					if( *sibling )
 					{
 						if
 						(
-							!LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ !prev ] ) &&
-							!LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ prev ] )
+							!LIBANDRIA4_RBTREES_ISRED( macroset,  nephew ) &&
+							!LIBANDRIA4_RBTREES_ISRED( macroset,  neice )
 						)
 						{
 							/* Color flip. */
@@ -523,9 +539,9 @@ Red-black trees:
 							
 						} else {
 							
-							dir2 = ( gran->link[ 1 ] == par );
+							dir2 = last /* ( gran->link[ 1 ] == par ) */;
 							
-							if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ prev ] ) )
+							if( LIBANDRIA4_RBTREES_ISRED( macroset,  neice ) )
 							{
 								res = ( name ## _doublerotate )( par, prev );
 									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
@@ -535,11 +551,12 @@ Red-black trees:
 											LIBANDRIA4_OP_SETeTO1 ); \
 										if( e ) { \
 											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+									LIBANDRIA4_RBTREES_SETCHILD( gran, last,  tmp,  on_badrange, on_null ); \
 									*parent = tmp; \
 										if( d ) { \
 											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
 								
-							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  ( *sibling )->link[ !prev ] ) )
+							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  nephew ) )
 							{
 								res = ( name ## _singlerotate )( par, prev );
 									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
@@ -549,8 +566,9 @@ Red-black trees:
 											LIBANDRIA4_OP_SETeTO1 ); \
 										if( e ) { \
 											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+									LIBANDRIA4_RBTREES_SETCHILD( gran, last,  tmp,  on_badrange, on_null ); \
 									*parent = tmp; \
-									par = ( parent ? *parent : 0 );\
+									par = tmp;\
 										if( d ) { \
 											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
 							}
@@ -589,11 +607,26 @@ Red-black trees:
 			/* Relink, the found node will have been replaced by the leaf-ish node, and */
 			/*  the leaf-ish node will have been replaced by it's (possible) solitary child. */
 			tmp = foc;
-			*found = tmp;
-			*focus = tmp->link[ dir2 ];
-			foc = *focus;
-			tmp->link[ 0 ] = t2;
-			tmp->link[ 1 ] = t3;
+			if( pfod )
+			{
+				LIBANDRIA4_RBTREES_SETCHILD( pfod, pdir,  tmp,  on_badrange, on_null );
+				
+			} else {
+				
+				*base = tmp;
+			}
+			??? /* LIBANDRIA4_RBTREES_SETCHILD( baseptr, dir,  valvar,  on_badrange, on_null ) */
+			if( par )
+			{
+				LIBANDRIA4_RBTREES_SETCHILD( par, prev,  tmp->link[ dir2 ],  on_badrange, on_null );
+				foc = tmp->link[ dir2 ];
+				
+			} else {
+				
+				??? ;
+			}
+			LIBANDRIA4_RBTREES_SETCHILD( tmp, 0,  t2,  on_badrange, on_null );
+			LIBANDRIA4_RBTREES_SETCHILD( tmp, 1,  t3,  on_badrange, on_null );
 			
 			/* Recolor, since we swapped node locations instead of just data. */
 			if( LIBANDRIA4_RBTREES_ISRED( macroset,  ret ) )
