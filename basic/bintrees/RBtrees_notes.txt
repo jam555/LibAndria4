@@ -416,11 +416,13 @@ Red-black trees:
 			return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) );
 		}
 		
+		( name ## _bitup ) res;
+		libandria4_doubleint di;
+		
 		(name) *tmp = 0, *ret = 0, *active, *inactive;
 		
 		(name) **focus = 0, *foc, **parent, *par = 0, **grand, *gran = 0;
 		(name) **found = 0, *pfod;
-		( name ## _bitup ) res;
 		
 		int dir = 1, dir2, dir3, prev = 1, last = 1, pdir;
 		libandria4_commonio_err d = 0, e = 0;
@@ -463,7 +465,7 @@ Red-black trees:
 			
 			
 				/* active = foc->link[ dir ]; */
-			libandria4_doubleint di = doublefetch( foc, dir,  &active, &inactive );
+			di = doublefetch( foc, dir,  &active, &inactive );
 			if( di.left != LIBANDRIA4_RESULT_GENERICTRUE || di.right != LIBANDRIA4_RESULT_GENERICTRUE )
 			{
 				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) );
@@ -599,43 +601,64 @@ Red-black trees:
 		{
 			/* Unlike the EternallyConfuzzled version, we really ARE swapping the nodes. */
 			ret = *found;
-			(name) *t2 = ret->link[ 0 ], *t3 = ret->link[ 1 ];
+			(name) *t2 = 0, *t3 = 0;
+			
+				/* t2 = ret->link[ 0 ]; */
+			di = doublefetch( ret, 0,  &t2, &t3 );
+			if( di.left != LIBANDRIA4_RESULT_GENERICTRUE || di.right != LIBANDRIA4_RESULT_GENERICTRUE )
+			{
+				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) );
+			}
 			
 			/* Calculate directions. */
-			dir2 = !( foc->link[ 0 ] );
+			(name) *fclink[ 2 ];
+				/* fclink[ 0 ] = foc->link[ 0 ]; */
+			di = doublefetch( foc, 0,  &( fclink[ 0 ] ), &( fclink[ 1 ] ) );
+			if( di.left != LIBANDRIA4_RESULT_GENERICTRUE || di.right != LIBANDRIA4_RESULT_GENERICTRUE )
+			{
+				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ) );
+			}
+			if( fclink[ 0 ] && fclink[ 1 ] )
+			{
+				return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_OVERFLOW ) );
+			}
+			dir2 = !( fclink[ 0 ] );
 			
 			/* Relink, the found node will have been replaced by the leaf-ish node, and */
 			/*  the leaf-ish node will have been replaced by it's (possible) solitary child. */
 			tmp = foc;
 			if( pfod )
 			{
-				LIBANDRIA4_RBTREES_SETCHILD( pfod, pdir,  tmp,  on_badrange, on_null );
+				LIBANDRIA4_RBTREES_SETCHILD( pfod, pdir,  foc,  ??? on_badrange, ??? on_null );
 				
 			} else {
 				
-				*base = tmp;
+				*base = foc;
 			}
-			??? /* LIBANDRIA4_RBTREES_SETCHILD( baseptr, dir,  valvar,  on_badrange, on_null ) */
 			if( par )
 			{
-				LIBANDRIA4_RBTREES_SETCHILD( par, prev,  tmp->link[ dir2 ],  on_badrange, on_null );
-				foc = tmp->link[ dir2 ];
+				LIBANDRIA4_RBTREES_SETCHILD( par, prev,  fclink[ dir2 ],  ??? on_badrange, ??? on_null );
 				
 			} else {
 				
-				??? ;
+				*base = fclink[ dir2 ];
 			}
-			LIBANDRIA4_RBTREES_SETCHILD( tmp, 0,  t2,  on_badrange, on_null );
-			LIBANDRIA4_RBTREES_SETCHILD( tmp, 1,  t3,  on_badrange, on_null );
+				/* If "focus" was a child of "found", then preserve the child of focus and avoid an infinite loop via the same action. */
+				t2 = ( t2 == foc ? fclink[ dir2 ] : t2 );
+				t3 = ( t3 == foc ? fclink[ dir2 ] : t3 );
+			??? /* Continue swapping "focus" & "found"... should we be directing to a new "focus" though? */
+			foc = fclink[ dir2 ];
+			LIBANDRIA4_RBTREES_SETCHILD( foc, 0,  t2,  ??? on_badrange, ??? on_null );
+			LIBANDRIA4_RBTREES_SETCHILD( foc, 1,  t3,  ??? on_badrange, ??? on_null );
 			
 			/* Recolor, since we swapped node locations instead of just data. */
 			if( LIBANDRIA4_RBTREES_ISRED( macroset,  ret ) )
 			{
-				LIBANDRIA4_RBTREES_SETRED( macroset,  tmp );
+				LIBANDRIA4_RBTREES_SETRED( macroset,  foc );
 				
 			} else {
 				
-				LIBANDRIA4_RBTREES_SETBLACK( macroset,  tmp );
+				LIBANDRIA4_RBTREES_SETBLACK( macroset,  foc );
 			}
 			
 			/* Instead of free()ing like Eternally Confuzzled, we'll be returning the node for external disposal. */
