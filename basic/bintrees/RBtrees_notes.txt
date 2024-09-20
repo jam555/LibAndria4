@@ -624,8 +624,9 @@ Red-black trees:
 			}
 			dir2 = !( fclink[ 0 ] );
 			
-			/* Relink, the found node will have been replaced by the leaf-ish node, and */
-			/*  the leaf-ish node will have been replaced by it's (possible) solitary child. */
+			/* Relink, the found node will be replaced by the focus node, and the focus node */
+			/*  will be replaced by it's (possible) solitary child. The focus node will */
+			/*  adopt the children of the found node.*/
 			tmp = foc;
 			if( pfod )
 			{
@@ -635,6 +636,7 @@ Red-black trees:
 				
 				*base = foc;
 			}
+				/* Note that par might == pfod, or be a child of pfod. */
 			if( par )
 			{
 				LIBANDRIA4_RBTREES_SETCHILD( par, prev,  fclink[ dir2 ],  ??? on_badrange, ??? on_null );
@@ -643,7 +645,161 @@ Red-black trees:
 				
 				*base = fclink[ dir2 ];
 			}
-				/* If "focus" was a child of "found", then preserve the child of focus and avoid an infinite loop via the same action. */
+			??? /* How are we doing now? Does the below properly handle all three pfod vs */
+			/*  par cases (pfod == par, pfod parents par, pfod has 1+ descendant seperating */
+			/*  it from par)? */
+			/*
+				pfod == par case:
+					starting state:
+						pfod==par
+							found==focus
+								t2==fclink[0]
+								t3==fclink[1]
+					first if:
+						no change
+					second if:
+						pfod==par
+							t?==fclink[?]
+						found==focus
+							t2==fclink[0]
+							t3==fclink[1]
+					ternaries:
+						no change
+					foc reset:
+						pfod==par
+							focus==t?==fclink[?]
+						found
+							t2==fclink[0]
+							t3==fclink[1]
+					foc child set:
+						pfod==par
+							focus==t?==fclink[?]
+								t2==fclink[0]
+								t3==fclink[1]
+						found
+							irrelevant
+					conclusion:
+						infinite loop, perhaps do ternaries AFTER foc reset? But then need different alt values.
+			*/
+			/*
+				pfod->link[ x ] == par case:
+					starting state:
+						pfod
+							par==found
+								t?a
+								focus==t?b
+									fclink[0]
+									fclink[1]
+					first if:
+						pfod
+							focus==t?b
+								fclink[0]
+								fclink]1]
+						par==found
+							t?a
+							focus==t?b
+								fclink[0]
+								fclink]1]
+					second if:
+						pfod
+							focus==t?b
+								fclink[0]
+								fclink]1]
+						par==found
+							t?a
+							fclink[dir2]
+						focus==t?b
+							fclink[0]
+							fclink]1]
+					ternaries:
+						pfod
+							focus
+								fclink[0]
+								fclink]1]
+						par==found
+							t?a
+							fclink[dir2]
+						t?b==fclink[dir2]
+					foc reset:
+						pfod
+							old focus
+								fclink[0]
+								fclink]1]
+						par==found
+							t?a
+							fclink[dir2]
+						focus==t?b==fclink[dir2]
+					foc child set:
+						pfod
+							old focus
+								fclink[!dir2]
+								focus==t?b==fclink]dir2]
+									t?a
+									t?b
+					conclusion:
+						infinite loop.
+			*/
+			/*
+				pfod grand+child == par case:
+					starting state:
+						pfod
+							found
+								t?a
+								t?b
+						par
+							focus
+								fclink[0]
+								fclink[1]
+					first if:
+						pfod
+							focus
+								fclink[0]
+								fclink[1]
+						par
+							focus==t?b
+								fclink[0]
+								fclink[1]
+						found
+							t?a
+							t?b
+					second if:
+						pfod
+							focus
+								fclink[0]
+								fclink[1]
+						par
+							fclink[dir2]
+						found
+							t?a
+							t?b
+					ternaries:
+						no change
+					foc reset:
+						pfod
+							old focus
+								fclink[0]
+								fclink[1]
+						par
+							focus==fclink[dir2]
+						found
+							t?a
+							t?b
+					foc child set:
+						pfod
+							old focus
+								fclink[0]
+								fclink[1]
+						par
+							focus==fclink[dir2]
+								t?a
+								t?b
+						found
+							irrelevant
+					conclusion:
+						no loop, but duplication and orphaning.
+			*/
+				/* If "focus" was a child of "found", then preserve the child of focus and */
+				/*  avoid an infinite loop via the same action. */
 				t2 = ( t2 == foc ? fclink[ dir2 ] : t2 );
 				t3 = ( t3 == foc ? fclink[ dir2 ] : t3 );
 			??? /* Continue swapping "focus" & "found"... should we be directing to a new "focus" though? */
