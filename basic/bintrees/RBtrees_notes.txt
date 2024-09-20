@@ -645,9 +645,8 @@ Red-black trees:
 				
 				*base = fclink[ dir2 ];
 			}
-			??? /* How are we doing now? Does the below properly handle all three pfod vs */
-			/*  par cases (pfod == par, pfod parents par, pfod has 1+ descendant seperating */
-			/*  it from par)? */
+			
+			/* We aren't relinking correctly. The three comment blocks below are a diagnosis for each of the three cases. */
 			/*
 				pfod == par case:
 					starting state:
@@ -659,7 +658,7 @@ Red-black trees:
 						no change
 					second if:
 						pfod==par
-							t?==fclink[?]
+							t?==fclink[dir2]
 						found==focus
 							t2==fclink[0]
 							t3==fclink[1]
@@ -667,19 +666,28 @@ Red-black trees:
 						no change
 					foc reset:
 						pfod==par
-							focus==t?==fclink[?]
-						found
+							focus==t?==fclink[dir2]
+						found==old focus
 							t2==fclink[0]
 							t3==fclink[1]
 					foc child set:
 						pfod==par
-							focus==t?==fclink[?]
+							focus==t?==fclink[dir2]
 								t2==fclink[0]
 								t3==fclink[1]
-						found
+						found==old focus
 							irrelevant
 					conclusion:
 						infinite loop, perhaps do ternaries AFTER foc reset? But then need different alt values.
+					defects:
+						infinite loop.
+					goal:
+						pfod==par
+							t?==fclink[dir2]
+								untouched
+						found==old focus
+							irrelevant
+						note: fclink[!dir2]==0
 			*/
 			/*
 				pfod->link[ x ] == par case:
@@ -713,7 +721,7 @@ Red-black trees:
 							fclink]1]
 					ternaries:
 						pfod
-							focus
+							focus==old t?b
 								fclink[0]
 								fclink]1]
 						par==found
@@ -722,7 +730,7 @@ Red-black trees:
 						t?b==fclink[dir2]
 					foc reset:
 						pfod
-							old focus
+							old focus==old t?b
 								fclink[0]
 								fclink]1]
 						par==found
@@ -731,13 +739,25 @@ Red-black trees:
 						focus==t?b==fclink[dir2]
 					foc child set:
 						pfod
-							old focus
+							old focus==old t?b
 								fclink[!dir2]
-								focus==t?b==fclink]dir2]
+								focus==t?b==fclink[dir2]
 									t?a
 									t?b
+						par==found
+							irrelevant
 					conclusion:
 						infinite loop.
+					defects:
+						infinite loop, t?a and t?b should be children of old focus, not fclink[dir2].
+					goal:
+						pfod
+							old focus==old t?b
+								t?a
+								t2b==fclink[dir2]
+						par==found
+							irrelevant
+						note: fclink[!dir2]==0
 			*/
 			/*
 				pfod grand+child == par case:
@@ -796,8 +816,160 @@ Red-black trees:
 						found
 							irrelevant
 					conclusion:
-						no loop, but duplication and orphaning.
+						orphaned infinite loop.
+					defects:
+						orphaning par, t?a & t?b should be children of old focus not fclink[dir2], par -> t?a/b forms an infinite loop.
+					goal:
+						pfod
+							old focus
+								t?a
+								t?b
+						par
+							fclink[dir2]
+								untouched
+						found
+							irrelevant
+						note: fclink[!dir2]==0
 			*/
+			
+			/* The three comment blocks below are a series of changes for each of the three possible cases. */
+			/*
+				pfod == par case:
+					starting state:
+						pfod==par
+							found==focus
+								t2==fclink[0]
+								t3==fclink[1]
+					first if ( pfod->link[pdir] = focus ):
+						no change
+					second if ( par->link[ prev ] = fclink[ dir2 ] ):
+						pfod==par
+							fclink[dir2]
+						found==focus
+							t2==fclink[0]
+							t3==fclink[1]
+					ternary ( t?a/b = ( t?a/b == focus ? fclink[dir2] : t?a/b ) ):
+						no change
+					child set ( focus->link = t? pair ):
+						no change
+					goal:
+						pfod==par
+							t?==fclink[dir2]
+								untouched
+						found==old focus
+							irrelevant
+						note: fclink[!dir2]==0
+			*/
+			/*
+				pfod->link[ x ] == par case:
+					starting state:
+						pfod
+							par==found
+								t?a
+								focus==t?b
+									fclink[0]
+									fclink[1]
+					first if ( pfod->link[pdir] = focus ):
+						pfod
+							focus==t?b
+								fclink[0]
+								fclink[1]
+						par==found
+							t?a
+							focus==t?b
+								fclink[0]
+								fclink[1]
+					second if ( par->link[ prev ] = fclink[ dir2 ] ):
+						pfod
+							focus==t?b
+								fclink[0]
+								fclink[1]
+						par==found
+							t?a
+							fclink[dir2]
+					ternary ( t?a/b = ( t?a/b == focus ? fclink[dir2] : t?a/b ) ):
+						pfod
+							focus==old t?b
+								fclink[!dir2]
+								t?b==fclink[dir2]
+						par==found
+							t?a
+							t?b==fclink[dir2]
+					child set ( focus->link = t? pair ):
+						pfod
+							focus==old t?b
+								t?a
+								t?b==fclink[dir2]
+						par==found
+							t?a
+							t?b==fclink[dir2]
+						note: fclink[!dir2] == 0
+					goal:
+						pfod
+							old focus==old t?b
+								t?a
+								t2b==fclink[dir2]
+						par==found
+							irrelevant
+						note: fclink[!dir2] == 0
+			*/
+			/*
+				pfod grand+child == par case:
+					starting state:
+						pfod
+							found
+								t?a
+								t?b
+						par
+							focus
+								fclink[0]
+								fclink[1]
+					first if ( pfod->link[pdir] = focus ):
+						pfod
+							focus
+								fclink[0]
+								fclink[1]
+						par
+							focus
+								fclink[0]
+								fclink[1]
+						found
+							t?a
+							t?b
+					second if ( par->link[ prev ] = fclink[ dir2 ] ):
+						pfod
+							focus
+								fclink[0]
+								fclink[1]
+						par
+							fclink[dir2]
+						found
+							t?a
+							t?b
+					child set ( focus->link = t? pair ):
+						pfod
+							focus
+								t?a
+								t?b
+						par
+							fclink[dir2]
+						found
+							t?a
+							t?b
+						note: fclink[!dir2] == 0, so no orphaning.
+					goal:
+						pfod
+							old focus
+								t?a
+								t?b
+						par
+							fclink[dir2]
+								untouched
+						found
+							irrelevant
+						note: fclink[!dir2]==0
+			*/
+			
 				/* If "focus" was a child of "found", then preserve the child of focus and */
 				/*  avoid an infinite loop via the same action. */
 				t2 = ( t2 == foc ? fclink[ dir2 ] : t2 );
