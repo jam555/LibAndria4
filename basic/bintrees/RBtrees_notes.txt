@@ -854,7 +854,7 @@ Red-black trees:
 						no change
 					goal:
 						pfod==par
-							t?==fclink[dir2]
+							fclink[dir2]
 								untouched
 						found==old focus
 							irrelevant
@@ -906,7 +906,7 @@ Red-black trees:
 						note: fclink[!dir2] == 0
 					goal:
 						pfod
-							old focus==old t?b
+							focus==old t?b
 								t?a
 								t2b==fclink[dir2]
 						par==found
@@ -946,6 +946,8 @@ Red-black trees:
 						found
 							t?a
 							t?b
+					ternary ( t?a/b = ( t?a/b == focus ? fclink[dir2] : t?a/b ) ):
+						no change
 					child set ( focus->link = t? pair ):
 						pfod
 							focus
@@ -959,7 +961,57 @@ Red-black trees:
 						note: fclink[!dir2] == 0, so no orphaning.
 					goal:
 						pfod
-							old focus
+							focus
+								t?a
+								t?b
+						par
+							fclink[dir2]
+								untouched
+						found
+							irrelevant
+						note: fclink[!dir2]==0
+			*/
+			/*
+				Algorithm:
+				
+				pfod == par case: A
+				pfod->link[ x ] == par case: B
+				pfod grand+child == par case: C
+				
+				a:	first if ( pfod->link[pdir] = focus ):
+				b:	first if ( pfod->link[pdir] = focus ):
+				c:	first if ( pfod->link[pdir] = focus ):
+				
+				a:	second if ( par->link[ prev ] = fclink[ dir2 ] ):
+				b:	second if ( par->link[ prev ] = fclink[ dir2 ] ):
+				c:	second if ( par->link[ prev ] = fclink[ dir2 ] ):
+				
+				a:	ternary ( t?a/b = ( t?a/b == focus ? fclink[dir2] : t?a/b ) ):
+				b:	ternary ( t?a/b = ( t?a/b == focus ? fclink[dir2] : t?a/b ) ):
+				c:	ternary ( t?a/b = ( t?a/b == focus ? fclink[dir2] : t?a/b ) ):
+				
+				a:	child set ( focus->link = t? pair ):
+				b:	child set ( focus->link = t? pair ):
+				c:	child set ( focus->link = t? pair ):
+				
+				a:	goal:
+						pfod==par
+							fclink[dir2]
+								untouched
+						found==old focus
+							irrelevant
+						note: fclink[!dir2]==0
+				b:	goal:
+						pfod
+							focus==old t?b
+								t?a
+								t2b==fclink[dir2]
+						par==found
+							irrelevant
+						note: fclink[!dir2] == 0
+				c:	goal:
+						pfod
+							focus
 								t?a
 								t?b
 						par
