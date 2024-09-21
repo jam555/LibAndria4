@@ -627,49 +627,33 @@ Red-black trees:
 			/* Relink, the found node will be replaced by the focus node, and the focus node */
 			/*  will be replaced by it's (possible) solitary child. The focus node will */
 			/*  adopt the children of the found node.*/
-			tmp = foc;
-			if( pfod )
-			{
-				LIBANDRIA4_RBTREES_SETCHILD( pfod, pdir,  foc,  ??? on_badrange, ??? on_null );
-				
-			} else {
-				
-				*base = foc;
-			}
-				/* Note that par might == pfod, or be a child of pfod. */
-			if( par )
-			{
-				LIBANDRIA4_RBTREES_SETCHILD( par, prev,  fclink[ dir2 ],  ??? on_badrange, ??? on_null );
-				
-			} else {
-				
-				*base = fclink[ dir2 ];
-			}
+				tmp = foc;
+				if( pfod )
+				{
+					LIBANDRIA4_RBTREES_SETCHILD( pfod, pdir,  foc,  ??? on_badrange, ??? on_null );
+					
+				} else {
+					
+					*base = foc;
+				}
+					/* Note that par might == pfod, or be a child of pfod. */
+				if( par )
+				{
+					LIBANDRIA4_RBTREES_SETCHILD( par, prev,  fclink[ dir2 ],  ??? on_badrange, ??? on_null );
+					
+				} else {
+					
+					*base = fclink[ dir2 ];
+				}
+				/* If "focus" was a child of "found", then preserve the child of focus and */
+				/*  avoid an infinite loop via the same action. */
+					t2 = ( t2 == foc ? fclink[ dir2 ] : t2 );
+					t3 = ( t3 == foc ? fclink[ dir2 ] : t3 );
+				/* Set focus's children. */
+					LIBANDRIA4_RBTREES_SETCHILD( foc, 0,  t2,  ??? on_badrange, ??? on_null );
+					LIBANDRIA4_RBTREES_SETCHILD( foc, 1,  t3,  ??? on_badrange, ??? on_null );
 			
-			/* Fix our relinking. */
-			/*
-				Algorithm:
-				
-				pfod == par case: A
-				pfod->link[ x ] == par case: B
-				pfod grand+child == par case: C
-				
-					first if ( pfod->link[pdir] = focus ):							done
-					second if ( par->link[ prev ] = fclink[ dir2 ] ):				done
-					ternary ( t?a/b = ( t?a/b == focus ? fclink[dir2] : t?a/b ) ):	done
-					child set ( focus->link = t? pair ):							;
-						found: the return value
-						note: fclink[!dir2]==0
-			*/
-			
-			/* If "focus" was a child of "found", then preserve the child of focus and */
-			/*  avoid an infinite loop via the same action. */
-				t2 = ( t2 == foc ? fclink[ dir2 ] : t2 );
-				t3 = ( t3 == foc ? fclink[ dir2 ] : t3 );
-			/* Set focus's children. */
-				LIBANDRIA4_RBTREES_SETCHILD( foc, 0,  t2,  ??? on_badrange, ??? on_null );
-				LIBANDRIA4_RBTREES_SETCHILD( foc, 1,  t3,  ??? on_badrange, ??? on_null );
-			
+			/* Preserve coloring. */
 			if( pfod != par )
 			{
 				/* Recolor, since we swapped node locations instead of just data. */
