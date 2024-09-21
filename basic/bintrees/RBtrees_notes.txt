@@ -481,7 +481,6 @@ Red-black trees:
 			/* Push the red node down. */
 			if
 			(
-					??? /* Make certain that focus is the right reference. */
 				!LIBANDRIA4_RBTREES_ISRED( macroset,  foc ) &&
 				!LIBANDRIA4_RBTREES_ISRED( macroset,  active )
 			)
@@ -493,10 +492,10 @@ Red-black trees:
 					res = ( name ## _singlerotate )( foc, dir );
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
-								LIBANDRIA4_OP_SETd, \
+								LIBANDRIA4_OP_SETdTO1, \
 								LIBANDRIA4_OP_SETtmp, \
-								LIBANDRIA4_OP_SETeTO1 ); \
-							if( e ) { \
+								LIBANDRIA4_OP_SETdTO2 ); \
+							if( d == 2 ) { \
 								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
 							/* This will replace " *focus = tmp; " */
 						if( par )
@@ -504,27 +503,28 @@ Red-black trees:
 							res = LIBANDRIA4_RBTREES_SETCHILD( par, prev,  tmp,  ??? on_badrange, ??? on_null );
 								LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 									res, \
-										LIBANDRIA4_OP_SETd, \
+										LIBANDRIA4_OP_SETeTO1, \
 										??? ignore , \
-										LIBANDRIA4_OP_SETeTO1 ); \
-									if( e ) { \
+										LIBANDRIA4_OP_SETeTO2 ); \
+									if( e == 2 ) { \
 										return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-									if( d ) { \
+									if( e == 1 ) { \
 										return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); }
 							
 						} else {
 							
-							*base = foc; /* Special-casing. */
+							*base = tmp; /* Special-casing. */
 						}
+							/* Redirect parent, so that grandparent stays in-sync. */
 						par = tmp; \
-							if( d ) { \
+							if( d == 1 ) { \
 								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); }
 				}
 				else if( par && !LIBANDRIA4_RBTREES_ISRED( macroset,  inactive ) )
 				{
 					/* The nested if() would fail without a parent either way, so checking parent against null is fine. */
 					
-					(name) **sibling = ??? , *sib;
+					(name) *sib;
 					res = LIBANDRIA4_RBTREES_FETCHCHILD( head, nodetype, macroset,  par, !prev, ??? on_badrange, ??? on_null );
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
@@ -564,56 +564,33 @@ Red-black trees:
 							if( LIBANDRIA4_RBTREES_ISRED( macroset,  neice ) )
 							{
 								res = ( name ## _doublerotate )( par, prev );
-									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-										res, \
-											LIBANDRIA4_OP_SETd, \
-											LIBANDRIA4_OP_SETtmp, \
-											LIBANDRIA4_OP_SETeTO1 ); \
-										if( e ) { \
-											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-										/* *parent = tmp; */
-									res = LIBANDRIA4_RBTREES_SETCHILD( gran, last,  tmp,  on_badrange, on_null ); \
-											LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-												res, \
-													LIBANDRIA4_OP_SETeTO2, \
-													??? ignore , \
-													LIBANDRIA4_OP_SETeTO1 ); \
-												if( e == 1 ) { \
-													return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-												else if( e == 2 ) { \
-													return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); }
-										if( d ) { \
-											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
 								
 							} else if( LIBANDRIA4_RBTREES_ISRED( macroset,  nephew ) )
 							{
 								res = ( name ## _singlerotate )( par, prev );
+							}
+							LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
+								res, \
+									LIBANDRIA4_OP_SETdTO2, \
+									LIBANDRIA4_OP_SETtmp, \
+									LIBANDRIA4_OP_SETdTO1 ); \
+								if( d == 1 ) { \
+									return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
+								/* &( gran->link[dir2] ) == parent; *parent = tmp; */
+							res = LIBANDRIA4_RBTREES_SETCHILD( gran, last,  tmp,  ??? on_badrange, ??? on_null ); \
 									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 										res, \
-											LIBANDRIA4_OP_SETd, \
-											LIBANDRIA4_OP_SETtmp, \
+											LIBANDRIA4_OP_SETeTO2, \
+											??? ignore , \
 											LIBANDRIA4_OP_SETeTO1 ); \
-										if( e ) { \
+										if( e == 1 ) { \
 											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-										/* *parent = tmp; */
-									res = LIBANDRIA4_RBTREES_SETCHILD( gran, last,  tmp,  on_badrange, on_null ); \
-											LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
-												res, \
-													LIBANDRIA4_OP_SETeTO2, \
-													??? ignore , \
-													LIBANDRIA4_OP_SETeTO1 ); \
-												if( e == 1 ) { \
-													return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-												else if( e == 2 ) { \
-													return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); }
-										if( d ) { \
-											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
-							}
-							/* Correct the parent pointer: the focus pointer */
-							/*  actually SHOULD still match the original */
-							/*  algorithm, because it's side of the tree */
-							/*  won't have been touched, so leave it as-is. */
-							/*  The correction is identical for both cases. */
+										else if( e == 2 ) { \
+											return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); }
+								if( d == 2 ) { \
+									return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); } \
+							
+							/* Get pointers for both children of the new *parent. */
 							di = doublefetch( tmp, prev,  &nephew, &neice );
 								if( di.left != LIBANDRIA4_RESULT_GENERICTRUE || di.right != LIBANDRIA4_RESULT_GENERICTRUE )
 								{
