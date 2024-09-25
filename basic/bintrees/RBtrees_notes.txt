@@ -28,6 +28,15 @@ SOFTWARE.
 
 
 
+About:
+	This file should be mostly done. It deeply needs to be tested, especially
+the deletion code. I worry that the double-rotate in particular may cause
+problems by breaking the tracking of the parent->grandparent transition, but I
+just don't know. Fortunately, there is a verify function, so all that's really
+needed is some code that uses it all.
+
+
+
 Red-black trees:
 	Based on Eternally Confuzzled / Julienne Walker's code, search on the Wayback Machine around Feburary of 2018.
 	The red+black height can be unpredictable, but the black height is always the same between root and all leaves...
@@ -447,7 +456,7 @@ Red-black trees:
 				/* Update helpers. */
 				gran = par;
 				par = foc;
-				res = LIBANDRIA4_RBTREES_FETCHCHILD( head, nodetype, macroset,  foc, dir, ??? on_badrange, ??? on_null );
+				res = LIBANDRIA4_RBTREES_FETCHCHILD( head, nodetype, macroset,  foc, dir, ??? on_badrange, LIBANDRIA4_NULL_MACRO );
 					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 						res, \
 							LIBANDRIA4_OP_SETd, \
@@ -500,7 +509,7 @@ Red-black trees:
 							/* This will replace " *focus = tmp; " */
 						if( par )
 						{
-							res = LIBANDRIA4_RBTREES_SETCHILD( par, prev,  tmp,  ??? on_badrange, ??? on_null );
+							res = LIBANDRIA4_RBTREES_SETCHILD( par, prev,  tmp,  ??? on_badrange, LIBANDRIA4_NULL_MACRO );
 								LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 									res, \
 										LIBANDRIA4_OP_SETeTO1, \
@@ -525,7 +534,7 @@ Red-black trees:
 					/* The nested if() would fail without a parent either way, so checking parent against null is fine. */
 					
 					(name) *sib;
-					res = LIBANDRIA4_RBTREES_FETCHCHILD( head, nodetype, macroset,  par, !prev, ??? on_badrange, ??? on_null );
+					res = LIBANDRIA4_RBTREES_FETCHCHILD( head, nodetype, macroset,  par, !prev, ??? on_badrange, LIBANDRIA4_NULL_MACRO );
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
 								LIBANDRIA4_OP_SETd, \
@@ -576,8 +585,8 @@ Red-black trees:
 									LIBANDRIA4_OP_SETdTO1 ); \
 								if( d == 1 ) { \
 									return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
-								/* &( gran->link[dir2] ) == parent; *parent = tmp; */
-							res = LIBANDRIA4_RBTREES_SETCHILD( gran, last,  tmp,  ??? on_badrange, ??? on_null ); \
+								/* &( gran->link[last] ) == parent; *parent = tmp; */
+							res = LIBANDRIA4_RBTREES_SETCHILD( gran, last,  tmp,  ??? on_badrange, LIBANDRIA4_NULL_MACRO ); \
 									LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 										res, \
 											LIBANDRIA4_OP_SETeTO2, \
@@ -605,6 +614,8 @@ Red-black trees:
 							LIBANDRIA4_RBTREES_SETRED( macroset,  tmp );
 							LIBANDRIA4_RBTREES_SETBLACK( macroset,  nephew );
 							LIBANDRIA4_RBTREES_SETBLACK( macroset,  neice );
+							
+							/* ??? Do we have a valid set of helper values? Do par and prev need new values? */
 						}
 					}
 				}
@@ -645,11 +656,11 @@ Red-black trees:
 				tmp = foc;
 				if( pfod )
 				{
-					res = LIBANDRIA4_RBTREES_SETCHILD( pfod, pdir,  foc,  ??? on_badrange, ??? on_null );
+					res = LIBANDRIA4_RBTREES_SETCHILD( pfod, pdir,  foc,  ??? on_badrange, LIBANDRIA4_NULL_MACRO );
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
 								LIBANDRIA4_OP_SETeTO2, \
-								??? ignore , \
+								LIBANDRIA4_NULL_MACRO, \
 								LIBANDRIA4_OP_SETeTO1 ); \
 							if( e == 1 ) { \
 								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
@@ -663,11 +674,11 @@ Red-black trees:
 					/* Note that par might == pfod, or be a child of pfod. */
 				if( par )
 				{
-					res = LIBANDRIA4_RBTREES_SETCHILD( par, prev,  fclink[ dir2 ],  ??? on_badrange, ??? on_null );
+					res = LIBANDRIA4_RBTREES_SETCHILD( par, prev,  fclink[ dir2 ],  ??? on_badrange, LIBANDRIA4_NULL_MACRO );
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
 								LIBANDRIA4_OP_SETeTO2, \
-								??? ignore , \
+								LIBANDRIA4_NULL_MACRO, \
 								LIBANDRIA4_OP_SETeTO1 ); \
 							if( e == 1 ) { \
 								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
@@ -683,17 +694,17 @@ Red-black trees:
 					t2 = ( t2 == foc ? fclink[ dir2 ] : t2 );
 					t3 = ( t3 == foc ? fclink[ dir2 ] : t3 );
 				/* Set focus's children. */
-					res = LIBANDRIA4_RBTREES_SETCHILD( foc, 0,  t2,  ??? on_badrange, ??? on_null );
+					res = LIBANDRIA4_RBTREES_SETCHILD( foc, 0,  t2,  ??? on_badrange, LIBANDRIA4_NULL_MACRO );
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
 								LIBANDRIA4_OP_SETeTO2, \
-								??? ignore , \
+								LIBANDRIA4_NULL_MACRO, \
 								LIBANDRIA4_OP_SETeTO1 ); \
 							if( e == 1 ) { \
 								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ) ); } \
 							else if( e == 2 ) { \
 								return( ( name ## _eitherrnodptr_err )( LIBANDRIA4_RESULT_FAILURE_RANGE ) ); }
-					res = LIBANDRIA4_RBTREES_SETCHILD( foc, 1,  t3,  ??? on_badrange, ??? on_null );
+					res = LIBANDRIA4_RBTREES_SETCHILD( foc, 1,  t3,  ??? on_badrange, LIBANDRIA4_NULL_MACRO );
 						LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( \
 							res, \
 								LIBANDRIA4_OP_SETeTO2, \
