@@ -7,6 +7,9 @@ TODO:
 		libandria4_commonio_err to the new definition of
 		libandria4_failure_result (since libandria4_commonio_err will be
 		superfluous).
+	At some point, add Google Varints: an arbitrary-length integer where
+		the highest bit of each byte indicates if the number continues with
+		the next byte.
 	Build an actual initial release. It should:
 		Be enough for a reasonable non-GUI program, or the backend of a
 			GUI application that's intended to be easy to port from toolkit

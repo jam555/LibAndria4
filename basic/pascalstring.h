@@ -1,5 +1,40 @@
+/*
+LibAndria version 4
+A C-based general purpose utility library.
+Copyright (c) 2024 Jared A. Maddox
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+This grant of rights is subject to two conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+And:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 #ifndef LIBANDRIA4_BASIC_PASCALSTRING_H
 # define LIBANDRIA4_BASIC_PASCALSTRING_H
+	
+	/* TODO: */
+		/* Add wide-character support. UTF-16 MAYBE shouldn't be supported */
+		/*  here, but UTF-32 absolutely should. */
+		/* wchar_t should be mapped to whatever type is appropriate to the */
+		/*  scenario (e.g. MSWindows vs common Linux), and thus probably */
+		/*  belongs in a DIFFERENT file-pair. */
 	
 	#include <ctype.h>
 	#include <string.h>
@@ -213,12 +248,31 @@
 	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_char_, char );
 	
 	
+	/* These use standard language tools: change that. */
 	int libandria4_ascii_isnewline( char c );
 	int libandria4_ascii_tonum( char var );
 	
+	#include <stdint.h>
+	int libandria4_utf32_isnewline( uint32_t c );
+	int libandria4_utf32_halfnewline( uint32_t c );
+	int libandria4_utf32_diversenewline( uint32_t c );
+	
+	int libandria4_char_isnewline( char c );
+	int libandria4_char_tonum( char var );
+	int libandria4_char_stringops_ringincr( char* );
+	
+	#include <wchar.h>
+	int libandria4_wchar_isnewline( wchar_t c );
+	int libandria4_wchar_tonum( wchar_t var );
+	int libandria4_wchar_stringops_ringincr( wchar_t *var );
 	
 	
-		/* These macros provide the functionality required for the "operhead" macro arguments. */
+	
+	/* These macros provide the functionality required for the "operhead" macro arguments. */
+	
+	/* The common C char set. */
+	#include <ctype.h>
+	#include <string.h>
 	#define LIBANDRIA4_CHAR_STRINGOPS_set( dest, src ) ( ( dest ) = ( src ) )
 	#define LIBANDRIA4_CHAR_STRINGOPS_isnum( val ) ( isdigit( val ) )
 	#define LIBANDRIA4_CHAR_STRINGOPS_isultidigit( val ) ( ( val ) == '9' ? 1 : 0 )
@@ -227,7 +281,16 @@
 	#define LIBANDRIA4_CHAR_STRINGOPS_strlen( str ) ( strlen( str ) )
 	#define LIBANDRIA4_CHAR_STRINGOPS_nullval() ( '\0' )
 	
-	int libandria4_char_stringops_ringincr( char* );
+	/* The common C wide-char set. */
+	#include <wctype.h>
+	#define LIBANDRIA4_CHAR_STRINGOPS_set( dest, src ) ( ( dest ) = ( src ) )
+	#define LIBANDRIA4_CHAR_STRINGOPS_isnum( val ) ( iswdigit( val ) )
+	#define LIBANDRIA4_CHAR_STRINGOPS_isultidigit( val ) ( ( val ) == L'9' ? 1 : 0 )
+	#define LIBANDRIA4_CHAR_STRINGOPS_ringincr( var ) ( libandria4_wchar_stringops_ringincr( &( var ) ) )
+	#define LIBANDRIA4_CHAR_STRINGOPS_zeroval() ( 0 )
+		/* The header for wcslen() is wchar.h, and that's ALREADY included. */
+	#define LIBANDRIA4_CHAR_STRINGOPS_strlen( str ) ( wcslen( str ) )
+	#define LIBANDRIA4_CHAR_STRINGOPS_nullval() ( L'\0' )
 	
 #endif
 /* End libandria4 basic text_pascalstring.h */

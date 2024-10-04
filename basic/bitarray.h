@@ -29,7 +29,7 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_BITARRAY_H
 # define LIBANDRIA4_BASIC_BITARRAY_H
 	
-	#include "../../basic/pascalarray.h"
+	#include "pascalarray.h"
 	
 	
 	LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( libandria4_bitarray_, uint8_t );
