@@ -1,0 +1,117 @@
+/*
+LibAndria version 4
+A C-based general purpose utility library.
+Copyright (c) 2019 Jared A. Maddox
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+This grant of rights is subject to two conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+And:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+
+
+
+Components:
+	Input -> Extended characters
+	
+	
+	
+	
+	LineEdit
+		(
+			row number, column number,
+			string to edit, display length (the size actually shown),
+			virtual window (if smaller than display length ignored, else ALLOWED string length is this size & autoscrolls),
+			seperators (the characters to treat as word separators for word-jump commands (control-arrow combos)),
+			terminators (as seperators, but the things that should exit the line editor; should usually include vertical movements),
+			edit masks (the pattern to FORCE the characters to, should probably be a regex),
+			cursor position (the column to start the cursor in), cursor result (the cursor column when the editor exited),
+			terminator (the key sequence that actually caused the editor to exit)
+		)
+
+
+
+#include "ctsengine.h"
+
+
+typedef struct libandria4_lineeditor libandria4_lineeditor;
+struct libandria4_lineeditor
+{
+	uintptr_t nextstep;
+	
+	??? stream;
+	
+	??? ;
+};
+/*
+The built-ins for Larry Stone's Linetastic for QBasic
+              Backspace       Deletes character to left of cursor
+              Delete          Deletes character under cursor
+              Ctrl + Home     Deletes from cursor to beginning of line
+              Ctrl + End      Deletes from cursor to end of line
+              Ctrl + Right    Move to word on right (skips separaters)
+              Ctrl + Left     Move to word on left (skips separaters)
+              Home            Move to beginning of string
+              End             Move to space after last char of string
+              Right           Move cursor one character to right
+*/
+libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *ctx, void *le_ )
+{
+	???
+	
+	libandria4_lineeditor *le = (libandria4_lineeditor*)le_;
+	
+	
+	switch( le->nextstep )
+	{
+		/* Note: should do setup steps somewhere. */
+		
+		case fetch character :
+			break;
+		case dispatch per character (handle exit directly) :
+			break;
+			case sub-case edit-mask chara :
+				break;
+				case sub-sub-case set chara :
+					break;
+			case sub-case horizontal :
+				break;
+				case sub-sub-case word-jumps :
+					break;
+			case sub-case backspace/delete :
+				break;
+			case sub-case selector :
+				break;
+				case sub-sub-case word-selector :
+					break;
+			case sub-case clipboard :
+				break;
+			case sub-case IME :
+				break;
+		case line-scroll :
+			break;
+		case terminate :
+			break;
+		
+		default:
+			return( error_continuation( "Bad step", le->nextstep ) );
+	}
+}
