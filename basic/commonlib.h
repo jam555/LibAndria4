@@ -54,7 +54,7 @@ SOFTWARE.
 		/* Reverses the order of the elements in the memory buffer. "size" */
 		/*  is the size of the elements, while "count" is how many of them */
 		/*  exist. */
-	int memreverse( void *base_, size_t count, size_t size );
+	int libandria4_memreverse( void *base_, size_t count, size_t size );
 	
 #endif
 /* End libandria4 basic commonlib.h */

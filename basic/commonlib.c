@@ -93,7 +93,7 @@ libandria4_ptrresult libandria4_memmem
 }
 
 	/* Reverses the order of the elements in the memory buffer. */
-int memreverse( void *base_, size_t count, size_t size )
+int libandria4_memreverse( void *base_, size_t count, size_t size )
 {
 	if( base_ && count && size )
 	{
