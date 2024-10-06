@@ -116,4 +116,4 @@ SOFTWARE.
 	);
 	
 #endif
-/* End libandria4 parsers vt100net terminal.h */
+/* End libandria4 basic bitarray.h */
