@@ -36,7 +36,7 @@ SOFTWARE.
 		/*  sets in and out. These sets ARE NOT fonts, but instead logically distinct */
 		/*  CHARACTERS. They can be either 94 or 96 -character sets. These sets can */
 		/*  themselves be allocated to a selectable character set, those being G0, */
-		/*  G1, G2, and G3. G0 ONLY accepots 94-character sets, while the other three */
+		/*  G1, G2, and G3. G0 ONLY accepts 94-character sets, while the other three */
 		/*  can accept 94 or 96 -character sets. Those numbered sets can then be */
 		/*  assigned to either the GL or GR ranges: GL corresponds to part of the */
 		/*  ASCII set of numbers, while GR corresponds to part of the 128-255 numeric */

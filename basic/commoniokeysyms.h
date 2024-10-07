@@ -753,7 +753,7 @@ SOFTWARE.
 	/*  multiple sets of transforms be defined in one file, and then another file */
 	/*  can describe per-keyboard (or other) ways to indicate which set of */
 	/*  transforms should currently be active. X11 apparently has 4, so that's */
-	/*  what'll initially be defined here, morfe can be added later if needed. */
+	/*  what'll initially be defined here, more can be added later if needed. */
 			/* XK_ISO_Lock */
 	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_GenMod1 \
 		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Modifiers_action( 8 )
@@ -989,7 +989,7 @@ SOFTWARE.
 	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete \
 		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Actions( 46 )
 			/* Erase all input fields or other on the screen, move cursor to */
-			/*  first wratable position on screen. XK_3270_EraseInput */
+			/*  first writable position on screen. XK_3270_EraseInput */
 	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScreenErase \
 		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Actions( 47 )
 			/* XK_3270_CursorBlink */
@@ -1287,7 +1287,7 @@ SOFTWARE.
 	/*  when it isn't certain what is what. X11 has it as XK_Thai_maihanakat_maitho. */
 	/* See also LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clarity_*. */
 	#define LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_MissingCharas_Thai_maihanakat_maitho \
-		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_MissingCharas( 42 )
+		LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_MissingCharas( 43 )
 	
 	
 	
