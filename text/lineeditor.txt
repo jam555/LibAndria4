@@ -263,14 +263,17 @@ libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *
 					}
 					break;
 					
-						/* Deletions */
+					/* Deletions */
+						/* These delete selections if existent, else their named function. */
 					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Backerase /* backspace */
 					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Forwarderase /* delete */
+					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord
+						/* As above, but clear to end of line as non-select action. */
+					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete
+						/* As above, but clear everything as the non-select action. */
 					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clear
 					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Reset
-					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete
 					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScreenErase
-					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord
 					
 						/* Movement */
 				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Begin:
