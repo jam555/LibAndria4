@@ -27,6 +27,15 @@ SOFTWARE.
 */
 
 
+libandria4_uipresult pass_separator( ??? *A, ??? *separators, size_t curPos, int stepForward );
+
+int libandria4_lineeditor_iteration_togglelock( libandria4_lineeditor *le,  uint8_t *epilog_toggler, uint8_t modifier );
+int libandria4_lineeditor_iteration_shift( libandria4_lineeditor *le,  uint8_t *epilog_toggler, uint8_t modifier );
+
+int libandria4_lineeditor_iteration_extent( libandria4_lineeditor *le, size_t extent );
+int libandria4_lineeditor_iteration_horizontal( libandria4_lineeditor *le, int rightward, int selmod );
+
+
 
 
 Components:
@@ -50,14 +59,44 @@ Components:
 
 
 #include "ctsengine.h"
+#include "commoniokeysyms.h"
 
 
+enum
+{
+	libandria4_lineeditor_mods_nomods = 0,
+	
+	libandria4_lineeditor_mods_release = 1,
+	
+	libandria4_lineeditor_mods_chara1 = 2, /* Standard shift. */
+	libandria4_lineeditor_mods_chara2 = 4, /* Alt-graphic, probably just ignore this. */
+	libandria4_lineeditor_mods_command = 8, /* Currently control, maybe configurable in the future. */
+	libandria4_lineeditor_mods_select = 16,
+	libandria4_lineeditor_mods_scroll = 32,
+	
+	libandria4_lineeditor_mods_last = 64
+};
+enum
+{
+	libandria4_lineeditor_oper_init = 0,
+	
+	libandria4_lineeditor_oper_fetch,
+	libandria4_lineeditor_oper_dispatch,
+	libandria4_lineeditor_oper_
+};
 typedef struct libandria4_lineeditor libandria4_lineeditor;
 struct libandria4_lineeditor
 {
-	uintptr_t nextstep;
+	libandria4_cts_closure delegate, fetcher, ???;
+	
+	uintptr_t operation;
+	libandria4_commoniokeys_simplekeycode key;
 	
 	??? stream;
+	
+	uint8_t modifiers;
+		/* For both: 0 is BEFORE the first character, 1 is AFTER the first character, etc. */
+	size_t cursor, select;
 	
 	??? ;
 };
@@ -75,18 +114,244 @@ The built-ins for Larry Stone's Linetastic for QBasic
 */
 libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *ctx, void *le_ )
 {
-	???
+	libandria4_cts_closure ret =
+		LIBANDRIA4_CTS_BUILDCLOSURE( &libandria4_lineeditor_iteration, le );
+	int retroute = 0;
+	int resi;
 	
 	libandria4_lineeditor *le = (libandria4_lineeditor*)le_;
 	
+	uint8_t mod_xor = 0;
 	
-	switch( le->nextstep )
+	switch( le->operation )
 	{
 		/* Note: should do setup steps somewhere. */
 		
-		case fetch character :
+		case libandria4_lineeditor_oper_init:
+			le->operation = libandria4_lineeditor_oper_fetch;
+			le->key = 0;
+			le->modifiers = 0;
+			
+			/* Leave the return as-is. */
+			
 			break;
-		case dispatch per character (handle exit directly) :
+		case libandria4_lineeditor_oper_fetch:
+			le->operation = libandria4_lineeditor_oper_dispatch;
+			
+			resi = libandria4_cts_push_ctsclsr( ctx, 0,  &ret );
+			if( !resi )
+			{
+				??? ;
+			}
+			ret = le->fetcher;
+			
+			break;
+		case libandria4_lineeditor_oper_dispatch:
+			le->operation = libandria4_lineeditor_oper_fetch;
+			mod_xor |= ( le->modifiers & libandria4_lineeditor_mods_release ) ?
+				libandria4_lineeditor_mods_release : 0;
+			switch( le->key )
+			{
+					/* Implicit exits */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUp:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDown:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageUp:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageDown:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUp:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDown:
+					retroute += 1;
+					/* Half-effective exits */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpRight:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownRight:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownLeft:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpLeft:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpRight:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownRight:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownLeft:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpLeft:
+					retroute += 1;
+					/* Explicit exits */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Escape:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Return:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Execute:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Cancel:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Break:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Quit:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Commit:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Finish:
+					retroute += 1;
+						/* Move the original caller into ret. */
+					resi = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
+					if( !resi )
+					{
+						switch( retroute )
+						{
+							case 1:
+							case 2:
+							case 3:
+							default:
+								??? ;
+						}
+						
+						???
+					}
+					break;
+					
+						/* Explicit selection. */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_SelectLock:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ShiftLock:
+					resi =
+						libandria4_lineeditor_iteration_togglelock
+						( le,  &mod_xor, libandria4_lineeditor_mods_select );
+					if( !resi )
+					{
+						???
+					}
+					if
+					(
+						( le->modifiers & libandria4_lineeditor_mods_select ) &&
+						( le->modifiers & libandria4_lineeditor_mods_scroll )
+					)
+					{
+						mod_xor |= libandria4_lineeditor_mods_scroll;
+					}
+					break;
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ExtendSelection:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Shift:
+					resi =
+						libandria4_lineeditor_iteration_shift
+						( le,  &mod_xor, libandria4_lineeditor_mods_select );
+					if( !resi )
+					{
+						???
+					}
+					if
+					(
+						( le->modifiers & libandria4_lineeditor_mods_select ) &&
+						( le->modifiers & libandria4_lineeditor_mods_scroll )
+					)
+					{
+						mod_xor |= libandria4_lineeditor_mods_scroll;
+					}
+					break;
+						/* Explicit scrolling. */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScrollLock:
+					resi =
+						libandria4_lineeditor_iteration_togglelock
+						( le,  &mod_xor, libandria4_lineeditor_mods_scroll );
+					if( !resi )
+					{
+						???
+					}
+					if
+					(
+						( le->modifiers & libandria4_lineeditor_mods_select ) &&
+						( le->modifiers & libandria4_lineeditor_mods_scroll )
+					)
+					{
+						mod_xor |= libandria4_lineeditor_mods_select;
+					}
+					break;
+						/* Common modifiers */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Ctrl:
+					resi =
+						libandria4_lineeditor_iteration_shift
+						( le,  &mod_xor, libandria4_lineeditor_mods_command );
+					if( !resi )
+					{
+						???
+					}
+					break;
+					
+						/* Deletions */
+					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Backerase /* backspace */
+					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Forwarderase /* delete */
+					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clear
+					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Reset
+					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete
+					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScreenErase
+					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord
+					
+						/* Movement */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Begin:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Home:
+					resi = libandria4_lineeditor_iteration_extent( le, 0 );
+					if( !resi )
+					{
+						??? ;
+					}
+					break;
+						/* End key. */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_End:
+					resi = libandria4_lineeditor_iteration_extent( le, ??? /* End of line. */ );
+					if( !resi )
+					{
+						??? ;
+					}
+					break;
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurRight:
+					resi = libandria4_lineeditor_iteration_horizontal( le, 1, 0 );
+					if( !resi )
+					{
+						??? ;
+					}
+					break;
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurLeft:
+					resi = libandria4_lineeditor_iteration_horizontal( le, -1, 0 );
+					if( !resi )
+					{
+						??? ;
+					}
+					break;
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerRight:
+					resi = libandria4_lineeditor_iteration_horizontal( le, 1, 1 );
+					if( !resi )
+					{
+						??? ;
+					}
+					break;
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerLeft:
+					resi = libandria4_lineeditor_iteration_horizontal( le, -1, 1 );
+					if( !resi )
+					{
+						??? ;
+					}
+					break;
+					
+						/* Exterior actions */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Menu:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Print:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Find:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Help:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Copy:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Delegate:
+					resi = libandria4_cts_push_ctsclsr( ctx, 0,  &ret );
+					if( !resi )
+					{
+						??? ;
+					}
+					ret = le->delegate;
+					break;
+				default:
+					if( !( le->key & LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_illegal_mask ) )
+					{
+						/* Add character. */
+						??? ;
+						
+						break;
+					}
+					/* Fall through. */
+						/* Unused modifiers */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_InsertLock:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_MouseKeysLock:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DragLock:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CapsLock:
+					/* Note: Meta == the Win and Mac-command key per Mozilla. */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Meta:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Alt:
+					break;
+			}
+			le->modifiers ^= mod_xor;
 			break;
 			case sub-case edit-mask chara :
 				break;
@@ -112,6 +377,212 @@ libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *
 			break;
 		
 		default:
-			return( error_continuation( "Bad step", le->nextstep ) );
+			return( ??? error_continuation ??? ( "Bad step", le->operation ) );
 	}
+	
+	return( ret );
+}
+
+
+
+
+
+
+
+
+
+
+
+#include "commonlib.h"
+
+	/* stepForward is STEREOTYPICALLY positive when a user presses */
+	/*  control-right, and stereotypically not positive when the user */
+	/*  presses control-left. */
+libandria4_uipresult pass_separator( ??? *A, ??? *separators, size_t curPos, int stepForward )
+{
+	stepForward = ( stepForward ? 1 : -1 );
+	intmax_t bounds = ( !stepForward ? -1 : A->len );
+	size_t curOff = 0;
+	uintptr_t sepOff = 0, found;
+	
+		/* Search for a separator. */
+	while( curPos + curOff != bounds )
+	{
+		void *a;
+		libandria4_failure_uipresult e = { 0 };
+		
+		libandria4_ptrresult res =
+			libandria4_memmem
+			(
+				(void*)( separators->body ), separators->len,
+					/* We only check the CURRENT string character, not all of them. */
+				(void*)&( A->body[ curPos + curOff ] ), sizeof( char ), sizeof( char )
+			);
+		LIBANDRIA4_PTRRESULT_BODYMATCH( res, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe );
+		if( e.val == LIBANDRIA4_RESULT_FAILURE_DOMAIN )
+		{
+			/* The last argument wasn't an integer multiple of the */
+			/*  next-to-last, which obviously shouldn't be possible, */
+			/*  so logic fault. */
+			LIBANDRIA4_UIPRESULT_RETURNFAILURE(
+				LIBANDRIA4_RESULT_FAILURE_LOGICFAULT );
+		}
+		sepOff = (uintptr_t)a;
+		
+		if( sepOff )
+		{
+			found = sepOff;
+			curPos += curOff;
+			curOff = 0;
+			
+				/* Exit the while loop. */
+			break;
+		}
+		
+		curOff += stepForward;
+	}
+	if( !sepOff )
+	{
+			/* No match, lets return. */
+		LIBANDRIA4_UIPRESULT_RETURNFAILURE(
+			LIBANDRIA4_RESULT_FAILURE_EOF );
+	}
+	
+		/* Move past all adjacent duplicate separators. */
+	while( sepOff )
+	{
+		curOff += stepForward;
+		if( !( curPos + curOff ) || curPos + curOff >= bounds )
+		{
+			break;
+		}
+		
+			/* Note: 1 indexed. */
+		sepOff = ( ( separators->body[ found ] == A->body[ curPos + curOff ] ) ? 1 : 0 );
+		if( !sepOff )
+		{
+			/* Should curPos be something else here? */
+			curOff = 0;
+		}
+	}
+	curPos += curOff;
+	
+	LIBANDRIA4_UIPRESULT_RETURNSUCCESS( curPos );
+}
+
+int libandria4_lineeditor_iteration_togglelock( libandria4_lineeditor *le,  uint8_t *epilog_toggler, uint8_t modifier )
+{
+	if( le && epilog_toggler )
+	{
+		if( !modifier )
+		{
+			return( 0 );
+		}
+		
+		if( !( le->modifiers & libandria4_lineeditor_mods_release ) )
+		{
+			le->modifiers ^= modifier;
+			if( ( *epilog_toggler ) & modifier )
+			{
+				( *epilog_toggler ) ^= modifier;
+			}
+		}
+		/* We just ignore the release case. */
+		
+		return( 1 );
+	}
+	
+	return( -1 );
+}
+int libandria4_lineeditor_iteration_shift( libandria4_lineeditor *le,  uint8_t *epilog_toggler, uint8_t modifier )
+{
+	if( le && epilog_toggler )
+	{
+		if( !modifier )
+		{
+			return( 0 );
+		}
+		
+		if( !( le->modifiers & libandria4_lineeditor_mods_release ) )
+		{
+			le->modifiers |= modifier;
+			if( ( *epilog_toggler ) & modifier )
+			{
+				( *epilog_toggler ) ^= modifier;
+			}
+			
+		} else {
+			
+			le->modifiers &= ~( modifier );
+			if( ( *epilog_toggler ) & modifier )
+			{
+				( *epilog_toggler ) ^= modifier;
+			}
+		}
+		
+		return( 1 );
+	}
+	
+	return( -1 );
+}
+
+int libandria4_lineeditor_iteration_extent( libandria4_lineeditor *le, size_t extent )
+{
+	if( le )
+	{
+		if( le->modifiers & libandria4_lineeditor_mods_command )
+		{
+			/* Delete to start or end of line. */
+			
+			??? ;
+			
+		} else if( le->modifiers & libandria4_lineeditor_mods_select )
+		{
+			le->select = extent;
+			
+		} else {
+			
+			le->cursor = extent;
+			le->select = le->cursor;
+		}
+		
+		return( 1 );
+	}
+	
+	return( -1 );
+}
+int libandria4_lineeditor_iteration_horizontal( libandria4_lineeditor *le, int rightward, int selmod )
+{
+	rightward = ( rightward ? 1 : -1 );
+	selmod = ( selmod ? 1 : 0 );
+	if( le )
+	{
+		if( le->modifiers & libandria4_lineeditor_mods_command )
+		{
+			/* Move by a word. Note that select still affects what EXACTLY happens. */
+			??? libandria4_uipresult pass_separator( ??? *A, ??? *separators, size_t curPos, int stepForward ); ???
+			
+			if( !( le->modifiers & libandria4_lineeditor_mods_select ) == selmod )
+			{
+				le->select += ??? * rightward;
+				
+			} else {
+				le->cursor += ??? * rightward;
+				le->select = le->cursor;
+			}
+			
+		} else if( !( le->modifiers & libandria4_lineeditor_mods_select ) == selmod )
+		{
+			le->select += 1 * rightward;
+			
+		} else {
+			
+			le->cursor += 1 * rightward;
+			le->select = le->cursor;
+		}
+		
+		return( 1 );
+	}
+	
+	return( -1 );
 }
