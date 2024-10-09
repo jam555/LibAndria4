@@ -246,13 +246,16 @@ SOFTWARE.
 	
 	
 	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_char_, char );
+	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_wchar_, wchar_t );
+	
+	#include <stdint.h>
+	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_utf32_, uint32_t );
 	
 	
 	/* These use standard language tools: change that. */
 	int libandria4_ascii_isnewline( char c );
 	int libandria4_ascii_tonum( char var );
 	
-	#include <stdint.h>
 	int libandria4_utf32_isnewline( uint32_t c );
 	int libandria4_utf32_halfnewline( uint32_t c );
 	int libandria4_utf32_diversenewline( uint32_t c );
@@ -268,7 +271,9 @@ SOFTWARE.
 	
 	
 	
-	/* These macros provide the functionality required for the "operhead" macro arguments. */
+	/* These macros provide the functionality required for the "operhead" */
+	/*  macro arguments. Various bits of support stuff should be moved to */
+	/*  somewhere in the text/ directory eventually. */
 	
 	/* The common C char set. */
 	#include <ctype.h>
@@ -283,14 +288,23 @@ SOFTWARE.
 	
 	/* The common C wide-char set. */
 	#include <wctype.h>
-	#define LIBANDRIA4_CHAR_STRINGOPS_set( dest, src ) ( ( dest ) = ( src ) )
-	#define LIBANDRIA4_CHAR_STRINGOPS_isnum( val ) ( iswdigit( val ) )
-	#define LIBANDRIA4_CHAR_STRINGOPS_isultidigit( val ) ( ( val ) == L'9' ? 1 : 0 )
-	#define LIBANDRIA4_CHAR_STRINGOPS_ringincr( var ) ( libandria4_wchar_stringops_ringincr( &( var ) ) )
-	#define LIBANDRIA4_CHAR_STRINGOPS_zeroval() ( 0 )
+	#define LIBANDRIA4_WCHAR_STRINGOPS_set( dest, src ) ( ( dest ) = ( src ) )
+	#define LIBANDRIA4_WCHAR_STRINGOPS_isnum( val ) ( iswdigit( val ) )
+	#define LIBANDRIA4_WCHAR_STRINGOPS_isultidigit( val ) ( ( val ) == L'9' ? 1 : 0 )
+	#define LIBANDRIA4_WCHAR_STRINGOPS_ringincr( var ) ( libandria4_wchar_stringops_ringincr( &( var ) ) )
+	#define LIBANDRIA4_WCHAR_STRINGOPS_zeroval() ( 0 )
 		/* The header for wcslen() is wchar.h, and that's ALREADY included. */
-	#define LIBANDRIA4_CHAR_STRINGOPS_strlen( str ) ( wcslen( str ) )
-	#define LIBANDRIA4_CHAR_STRINGOPS_nullval() ( L'\0' )
+	#define LIBANDRIA4_WCHAR_STRINGOPS_strlen( str ) ( wcslen( str ) )
+	#define LIBANDRIA4_WCHAR_STRINGOPS_nullval() ( L'\0' )
+	
+	/* The UTF32 character set. */
+	#define LIBANDRIA4_UTF32_STRINGOPS_set( dest, src ) ( ( dest ) = ( src ) )
+	#define LIBANDRIA4_UTF32_STRINGOPS_isnum( val ) ( libandria4_utf32_isdigit( val ) )
+	#define LIBANDRIA4_UTF32_STRINGOPS_isultidigit( val ) ( ( val ) == 57 ? 1 : 0 )
+	#define LIBANDRIA4_UTF32_STRINGOPS_ringincr( var ) ( libandria4_utf32_stringops_ringincr( &( var ) ) )
+	#define LIBANDRIA4_UTF32_STRINGOPS_zeroval() ( 0 )
+	#define LIBANDRIA4_UTF32_STRINGOPS_strlen( str ) ( libandria4_utf32_strlen( str ) )
+	#define LIBANDRIA4_UTF32_STRINGOPS_nullval() ( 48 )
 	
 #endif
 /* End libandria4 basic text_pascalstring.h */
