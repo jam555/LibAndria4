@@ -27,7 +27,16 @@ SOFTWARE.
 */
 
 
-libandria4_uipresult pass_separator( ??? *A, ??? *separators, size_t curPos, int stepForward );
+	/* Success values are the updated value of curPos. */
+	/* Failure values are failures. */
+libandria4_uipresult pass_separator
+(
+	libandria4_utf32_pascalarray *str,
+	libandria4_utf32_pascalarray *separators,
+	
+	size_t curPos,
+	int stepForward
+);
 
 int libandria4_lineeditor_iteration_togglelock( libandria4_lineeditor *le,  uint8_t *epilog_toggler, uint8_t modifier );
 int libandria4_lineeditor_iteration_shift( libandria4_lineeditor *le,  uint8_t *epilog_toggler, uint8_t modifier );
@@ -93,6 +102,11 @@ struct libandria4_lineeditor
 	libandria4_commoniokeys_simplekeycode key;
 	
 	??? stream;
+	
+		/* The string to edit. */
+	libandria4_utf32_pascalarray *str;
+		/* The recognized separator characters. */
+	libandria4_utf32_pascalarray *sep;
 	
 	uint8_t modifiers;
 		/* For both: 0 is BEFORE the first character, 1 is AFTER the first character, etc. */
@@ -401,7 +415,14 @@ libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *
 	/* stepForward is STEREOTYPICALLY positive when a user presses */
 	/*  control-right, and stereotypically not positive when the user */
 	/*  presses control-left. */
-libandria4_uipresult pass_separator( ??? *A, ??? *separators, size_t curPos, int stepForward )
+libandria4_uipresult pass_separator
+(
+	libandria4_utf32_pascalarray *str,
+	libandria4_utf32_pascalarray *separators,
+	
+	size_t curPos,
+	int stepForward
+)
 {
 	stepForward = ( stepForward ? 1 : -1 );
 	intmax_t bounds = ( !stepForward ? -1 : A->len );
@@ -419,7 +440,7 @@ libandria4_uipresult pass_separator( ??? *A, ??? *separators, size_t curPos, int
 			(
 				(void*)( separators->body ), separators->len,
 					/* We only check the CURRENT string character, not all of them. */
-				(void*)&( A->body[ curPos + curOff ] ), sizeof( char ), sizeof( char )
+				(void*)&( str->body[ curPos + curOff ] ), sizeof( char ), sizeof( char )
 			);
 		LIBANDRIA4_PTRRESULT_BODYMATCH( res, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe );
 		if( e.val == LIBANDRIA4_RESULT_FAILURE_DOMAIN )
@@ -461,7 +482,7 @@ libandria4_uipresult pass_separator( ??? *A, ??? *separators, size_t curPos, int
 		}
 		
 			/* Note: 1 indexed. */
-		sepOff = ( ( separators->body[ found ] == A->body[ curPos + curOff ] ) ? 1 : 0 );
+		sepOff = ( ( separators->body[ found ] == str->body[ curPos + curOff ] ) ? 1 : 0 );
 		if( !sepOff )
 		{
 			/* Should curPos be something else here? */
@@ -558,23 +579,32 @@ int libandria4_lineeditor_iteration_horizontal( libandria4_lineeditor *le, int r
 {
 	rightward = ( rightward ? 1 : -1 );
 	selmod = ( selmod ? 1 : 0 );
+	int usesel = ( ( !( le->modifiers & libandria4_lineeditor_mods_select ) == selmod ) ? 1 : 0 );
 	if( le )
 	{
 		if( le->modifiers & libandria4_lineeditor_mods_command )
 		{
 			/* Move by a word. Note that select still affects what EXACTLY happens. */
-			??? libandria4_uipresult pass_separator( ??? *A, ??? *separators, size_t curPos, int stepForward ); ???
-			
-			if( !( le->modifiers & libandria4_lineeditor_mods_select ) == selmod )
+			libandria4_uipresult res =
+				pass_separator( le->str, le->sep,  ( usesel ? le->select : le->cursor ), rightward );
+			libandria4_success_uipresult step;
+			libandria4_failure_uipresult fail = { 0 };
+			LIBANDRIA4_UIPRESULT_BODYMATCH( var, matcha, matchb )
+			if( fail.val )
 			{
-				le->select += ??? * rightward;
+				return( -( fail.val ) );
+			}
+			
+			if( usesel )
+			{
+				le->select += step.val * rightward;
 				
 			} else {
-				le->cursor += ??? * rightward;
+				le->cursor += step.val * rightward;
 				le->select = le->cursor;
 			}
 			
-		} else if( !( le->modifiers & libandria4_lineeditor_mods_select ) == selmod )
+		} else if( usesel )
 		{
 			le->select += 1 * rightward;
 			
