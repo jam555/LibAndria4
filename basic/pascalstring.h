@@ -198,6 +198,20 @@ SOFTWARE.
 						++len; ++targ; } \
 					operhead##set( c->body[ targ ], operhead##nullval() ); } } \
 			return( ret ); }
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head, type, operhead ) \
+		int head##mutatingdelete( \
+			(type) *str, size_t strlen, size_t delstart, size_t dellen, (type) fill ) \
+		{ \
+			if( str && delstart + dellen <= strlen ) { \
+				size_t iter = 0; \
+				while( iter < dellen && delstart + dellen + iter < strlen ) { \
+					operhead##set( \
+						str[ delstart + iter ], str[ delstart + dellen + iter ] ); \
+					++iter; } \
+				while( delstart + iter < strlen ) { \
+					operhead##set( str[ delstart + iter ], fill ); ++iter; } \
+				return( 1 ); } \
+			return( -1 ); }
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREDECLARE( head, type ) \
@@ -207,14 +221,19 @@ SOFTWARE.
 		int head##parr_decimalincr( head##parr *parr ); \
 		head##parrres head##parr_strbuild( libandria4_memfuncs_t *mf, type *str ); \
 		head##parrres head##parr_strbuildmerge( libandria4_memfuncs_t *mf, type *a, type *b ); \
-		head##parrres head##parr_merge( libandria4_memfuncs_t *mf, head##parr *a, head##parr *b );
+		head##parrres head##parr_merge( libandria4_memfuncs_t *mf, head##parr *a, head##parr *b ); \
+		\
+		int head##stringops_mutatingdelete( (type) *str, size_t strlen, \
+			size_t delstart, size_t dellen, (type) fill );
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREFINE( head, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_DECIMALINCR( head, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILD( head, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( head, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_MERGE( head, type, operhead )
+		LIBANDRIA4_DEFINE_PASCALSTRING_MERGE( head, type, operhead ) \
+		\
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead )
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( head, type ) \
@@ -224,7 +243,10 @@ SOFTWARE.
 		int head##parr_decimalincr( head##parr *parr ); \
 		head##parrres head##parr_strbuild( type *str ); \
 		head##parrres head##parr_strbuildmerge( type *a, type *b ); \
-		head##parrres head##parr_merge( head##parr *a, head##parr *b );
+		head##parrres head##parr_merge( head##parr *a, head##parr *b ); \
+		\
+		int head##stringops_mutatingdelete( (type) *str, size_t strlen, \
+			size_t delstart, size_t dellen, (type) fill );
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
@@ -237,7 +259,9 @@ SOFTWARE.
 		head##parrres head##parr_strbuildmerge( type *a, type *b ) \
 			{ return( libandria4_definer_##head##parr_strbuildmerge( ( memfuncs_ptr ), a, b ) ); } \
 		head##parrres head##parr_merge( head##parr *a, head##parr *b ) \
-			{ return( libandria4_definer_##head##parr_merge( ( memfuncs_ptr ), a, b ) ); }
+			{ return( libandria4_definer_##head##parr_merge( ( memfuncs_ptr ), a, b ) ); } \
+		\
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead )
 		
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_STDDEFINE( head, type, operhead ) \

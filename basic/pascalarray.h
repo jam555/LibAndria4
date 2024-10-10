@@ -54,7 +54,10 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( \
 			head##pascalarray_result, \
 			head##pascalarray*, libandria4_failure_uipresult \
-		)
+		) \
+		typedef struct head##pascalarray_excerpt { \
+			head##pascalarray *arr; size_t start, len; \
+		} head##pascalarray_excerpt;
 	
 	/* Both LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL() and */
 	/*  LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL2() used to be here. They */
@@ -109,8 +112,8 @@ SOFTWARE.
 		/*  end of the array. */
 		/* Note that if len is 0, then NO allocation will be performed. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_BUILD( head, parrtype, type ) \
-		parrtype##_result head##pascalarray_build \
-		( libandria4_memfuncs_t *mf,  size_t len ) \
+		parrtype##_result head##pascalarray_build( \
+			libandria4_memfuncs_t *mf,  size_t len ) \
 		{ void *a = (void*)0; \
 			libandria4_failure_uipresult b; \
 			b.val = LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED; \
@@ -179,8 +182,8 @@ SOFTWARE.
 		#define LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL_ONFAIL( err ) \
 			fail.val = err.val; goto on_err;
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL( head, parrtype, type ) \
-		parrtype##_result head##pascalarray_buildNfill \
-		( libandria4_memfuncs_t *mf,  size_t len, type *src ) \
+		parrtype##_result head##pascalarray_buildNfill( \
+			libandria4_memfuncs_t *mf,  size_t len, type *src ) \
 		{ if( !src ) { \
 				return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
 					parrtype, LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
@@ -203,6 +206,71 @@ SOFTWARE.
 				{ visitor( data, &( parr->body[ l++ ] ) ); } } }
 	
 	
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_ISVALID( head, parrtype, type ) \
+		int head##pascalarray_excerpt_isvalid( head##pascalarray_excerpt *exc ) { \
+			if( exc ) { \
+				if( exc->arr ) { return( -2 ); } \
+				\
+				if( exc->arr->len <= exc->start ) { return( -3 ); } \
+				if( exc->arr->len < exc->start + exc->len ) { return( -4 ); } \
+				\
+				if( !( exc->len ) ) { return( 0 ); } \
+				return( 1 ); } \
+			return( -1 ); }
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_BAREARRAYIFY( head, parrtype, type ) \
+		parrtype##_result head##pascalarray_excerpt_arrayify( \
+			libandria4_memfuncs_t *mf, parrtype##_excerpt *exc, \
+			size_t padsize, (type) padval ) \
+		{ if( exc ) { \
+				if( parrtype##_excerpt_isvalid( exc ) < 0 ) { \
+					return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
+						parrtype, LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) ); } \
+				\
+				padsize = ( padsize ? padsize : 0 ); parrtype *a = 0; \
+				\
+				parrtype_result res = \
+						/* Note that using head## ALWAYS gets us the builder that we want HERE. */ \
+					head##pascalarray_build( mf,  exc->len + padsize ); \
+				LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH( \
+					res, LIBANDRIA4_OP_SETa, LIBANDRIA4_NULL_MACRO ); \
+				\
+				size_t iter = 0; \
+				while( a && iter < exc->len ) { \
+					a->body[ iter ] = exc->arr->body[ exc->start + iter ]; ++iter; } \
+				while( a && iter < a->len ) { a->body[ iter ] = padval; ++iter; } \
+				\
+				return( ret ); } \
+			\
+			return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
+				parrtype, LIB4_RESULT_FAILURE_DOMAIN ) ); }
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_BAREINVARRAYIFY( head, parrtype, type ) \
+		parrtype##_result head##pascalarray_excerpt_inversearrayify( \
+			libandria4_memfuncs_t *mf, parrtype##_excerpt *exc, \
+			size_t padsize, (type) padval ) \
+		{ if( exc ) { \
+				if( parrtype##_excerpt_isvalid( exc ) < 0 ) { \
+					return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
+						parrtype, LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN ) ); } \
+				\
+				padsize = ( padsize ? padsize : 0 ); parrtype *a = 0; \
+				\
+				parrtype_result res = \
+						/* Note that using head## ALWAYS gets us the builder that we want HERE. */ \
+					head##pascalarray_build( mf,  ( exc->arr->len - exc->len ) + padsize ); \
+				\
+				size_t iter = 0; \
+				while( a && iter < exc->start ) { \
+					a->body[ iter ] = exc->arr->body[ iter ]; ++iter; } \
+				while( a && exc->len + iter < exc->arr->len ) { \
+					a->body[ iter ] = exc->arr->body[ exc->len + iter ]; ++iter; } \
+				while( a && iter < a->len ) { a->body[ iter ] = padval; ++iter; } \
+				\
+				return( ret ); } \
+			\
+			return( LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDFAILURE( \
+				parrtype, LIB4_RESULT_FAILURE_DOMAIN ) ); }
+	
+	
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( head, type ) \
 			/* *init(), *build(), & *rebuild() all store len into the array. */ \
@@ -213,7 +281,13 @@ SOFTWARE.
 		libandria4_result head##pascalarray_fill( head##pascalarray *parr, type *src ); \
 		head##pascalarray_result head##pascalarray_buildNfill( libandria4_memfuncs_t *mf,  size_t len, type *src ); \
 		libandria4_result head##pascalarray_destroy( libandria4_memfuncs_t *mf, head##pascalarray *parr ); \
-		void head##pascalarray_visit( head##pascalarray *parr,  void *data, void (*visitor)( void*, type* ) );
+		void head##pascalarray_visit( head##pascalarray *parr,  void *data, void (*visitor)( void*, type* ) ); \
+		\
+		int head##pascalarray_excerpt_isvalid( head##pascalarray_excerpt *exc ); \
+		head##pascalarray_result head##pascalarray_excerpt_arrayify( libandria4_memfuncs_t *mf, \
+			head##pascalarray_excerpt *exc,  size_t padsize, (type) padval ); \
+		head##pascalarray_result head##pascalarray_excerpt_inversearrayify( libandria4_memfuncs_t *mf, \
+			head##pascalarray_excerpt *exc,  size_t padsize, (type) padval );
 	
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE( head, type ) \
@@ -223,7 +297,11 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALARRAY_FILL( head, head##pascalarray, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL( head, head##pascalarray, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_DESTROY( head, head##pascalarray, type ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type )
+		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type ) \
+		\
+		LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_ISVALID( head, parrtype, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_BAREARRAYIFY( head, parrtype, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_BAREINVARRAYIFY( head, parrtype, type )
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( head, type ) \
@@ -236,7 +314,13 @@ SOFTWARE.
 		libandria4_result head##pascalarray_fill( head##pascalarray *parr, type *src ); \
 		head##pascalarray_result head##pascalarray_buildNfill( size_t len, type *src ); \
 		libandria4_result head##pascalarray_destroy( head##pascalarray *parr ); \
-		void head##pascalarray_visit( head##pascalarray *parr,  void *data, void (*visitor)( void*, type* ) );
+		void head##pascalarray_visit( head##pascalarray *parr,  void *data, void (*visitor)( void*, type* ) ); \
+		\
+		int head##pascalarray_excerpt_isvalid( head##pascalarray_excerpt *exc ); \
+		head##pascalarray_result head##pascalarray_excerpt_arrayify( head##pascalarray_excerpt *exc, \
+			size_t padsize, (type) padval ); \
+		head##pascalarray_result head##pascalarray_excerpt_inversearrayify( head##pascalarray_excerpt *exc, \
+			size_t padsize, (type) padval );
 	
 		/* This needs to be paired with a LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE() invocation. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
@@ -269,7 +353,19 @@ SOFTWARE.
 		libandria4_result head##pascalarray_destroy( head##pascalarray *parr ) \
 			{ return( libandria4_definer_##head##pascalarray_destroy( \
 				( memfuncs_ptr ),  parr ) ); } \
-		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type )
+		LIBANDRIA4_DEFINE_PASCALARRAY_VISIT( head, head##pascalarray, type ) \
+		\
+		LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_ISVALID( head, head##pascalarray, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_BAREARRAYIFY( libandria4_definer_##head, head##pascalarray, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_BAREINVARRAYIFY( libandria4_definer_##head, head##pascalarray, type ) \
+		head##pascalarray_result head##pascalarray_excerpt_arrayify( head##pascalarray_excerpt *exc, \
+			size_t padsize, (type) padval ) \
+			{ return( libandria4_definer_##head##pascalarray_excerpt_arrayify( \
+				(memfuncs_ptr), exc, padsize, padval ) ); } \
+		head##pascalarray_result head##pascalarray_excerpt_inversearrayify( head##pascalarray_excerpt *exc, \
+			size_t padsize, (type) padval ) \
+			{ return( libandria4_definer_##head##pascalarray_excerpt_inversearrayify( \
+				(memfuncs_ptr), exc, padsize, padval ) ); }
 		
 		
 		/* This needs to be paired with a LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE() invocation. */
