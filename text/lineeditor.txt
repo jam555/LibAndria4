@@ -27,6 +27,11 @@ SOFTWARE.
 */
 
 
+
+#include "pascalarray.h"
+#include "pascalstring.h"
+
+
 	/* Success values are the updated value of curPos. */
 	/* Failure values are failures. */
 libandria4_uipresult pass_separator
@@ -82,8 +87,9 @@ enum
 	libandria4_lineeditor_mods_command = 8, /* Currently control, maybe configurable in the future. */
 	libandria4_lineeditor_mods_select = 16,
 	libandria4_lineeditor_mods_scroll = 32,
+	libandria4_lineeditor_mods_insert = 64,
 	
-	libandria4_lineeditor_mods_last = 64
+	libandria4_lineeditor_mods_last = 128
 };
 enum
 {
@@ -96,12 +102,10 @@ enum
 typedef struct libandria4_lineeditor libandria4_lineeditor;
 struct libandria4_lineeditor
 {
-	libandria4_cts_closure delegate, fetcher, ???;
+	libandria4_cts_closure delegate, fetcher, commandkey, altcommandkey, ???;
 	
 	uintptr_t operation;
 	libandria4_commoniokeys_simplekeycode key;
-	
-	??? stream;
 	
 		/* The string to edit. */
 	libandria4_utf32_pascalarray *str;
@@ -111,6 +115,8 @@ struct libandria4_lineeditor
 	uint8_t modifiers;
 		/* For both: 0 is BEFORE the first character, 1 is AFTER the first character, etc. */
 	size_t cursor, select;
+	
+	??? stream;
 	
 	??? ;
 };
@@ -135,7 +141,12 @@ libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *
 	
 	libandria4_lineeditor *le = (libandria4_lineeditor*)le_;
 	
-	uint8_t mod_xor = 0;
+	if( !le || !isvalid( le ) )
+	{
+		??? ;
+	}
+	
+	uint8_t mod_xor = le->modifiers & libandria4_lineeditor_mods_release;
 	
 	switch( le->operation )
 	{
@@ -161,6 +172,62 @@ libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *
 			
 			break;
 		case libandria4_lineeditor_oper_dispatch:
+			ret.func = &libandria4_lineeditor_iteration_onkey;
+			break;
+			case sub-case edit-mask chara :
+				break;
+				case sub-sub-case set chara :
+					break;
+			case sub-case horizontal :
+				break;
+				case sub-sub-case word-jumps :
+					break;
+			case sub-case backspace/delete :
+				break;
+			case sub-case selector :
+				break;
+				case sub-sub-case word-selector :
+					break;
+			case sub-case clipboard :
+				/*
+			int head##pascalarray_excerpt_isvalid( head##pascalarray_excerpt *exc ); \
+			head##pascalarray_result head##pascalarray_excerpt_arrayify( head##pascalarray_excerpt *exc, \
+				size_t padsize, (type) padval ); \
+			head##pascalarray_result head##pascalarray_excerpt_inversearrayify( head##pascalarray_excerpt *exc, \
+				size_t padsize, (type) padval );
+				*/
+				break;
+			case sub-case IME :
+				break;
+		case line-scroll :
+			break;
+		case terminate :
+			break;
+		
+		default:
+			return( ??? error_continuation ??? ( "Bad step", le->operation ) );
+	}
+	
+	return( ret );
+}
+libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_closure *ctx, void *le_ )
+{
+	libandria4_cts_closure ret =
+		LIBANDRIA4_CTS_BUILDCLOSURE( &libandria4_lineeditor_iteration, le );
+	int retroute = 0;
+	int resi;
+	
+	libandria4_lineeditor *le = (libandria4_lineeditor*)le_;
+	
+	if( !le || !isvalid( le ) )
+	{
+		??? ;
+	}
+	
+	if( le->operation == libandria4_lineeditor_oper_dispatch )
+	{
+			uint8_t mod_xor = le->modifiers & libandria4_lineeditor_mods_release;
+			
 			le->operation = libandria4_lineeditor_oper_fetch;
 			mod_xor |= ( le->modifiers & libandria4_lineeditor_mods_release ) ?
 				libandria4_lineeditor_mods_release : 0;
@@ -279,15 +346,151 @@ libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *
 					
 					/* Deletions */
 						/* These delete selections if existent, else their named function. */
-					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Backerase /* backspace */
-					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Forwarderase /* delete */
-					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Backerase: /* backspace */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Forwarderase: /* delete */
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord:
 						/* As above, but clear to end of line as non-select action. */
-					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete:
 						/* As above, but clear everything as the non-select action. */
-					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clear
-					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Reset
-					LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScreenErase
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clear:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Reset:
+				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScreenErase:
+					resi = libandria4_lineeditor_iteration_deleteselection( libandria4_lineeditor *le );
+					if( resi == 0 )
+					{
+						switch( le->key )
+						{
+							/* Note that command -backerase or -forwarderase should get rid of the word. */
+							case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Backerase: /* backspace */
+								if( le->cursor > 0 )
+								{
+									resi =
+										libandria4_utf32_stringops_mutatingdelete
+										(
+											le->str->body, le->str->len,
+											le->cursor - 1, 1, 0x00 /* Ascii null. */
+										);
+									if( !resi )
+									{
+										??? ;
+									}
+									
+								} else {
+									
+									/* Emit a beep! */
+								}
+								break;
+							case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Forwarderase: /* delete */
+								if( le->cursor < le->str->len )
+								{
+									resi =
+										libandria4_utf32_stringops_mutatingdelete
+										(
+											le->str->body, le->str->len,
+											le->cursor, 1, 0x00 /* Ascii null. */
+										);
+									if( !resi )
+									{
+										??? ;
+									}
+									
+								} else {
+									
+									/* Emit a beep! */
+								}
+								break;
+							case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord:
+								{
+									libandria4_uipresult resui;
+									libandria4_success_uipresult a;
+									libandria4_failure_uipresult b = { 0 };
+									size_t start, end;
+									
+									resui = pass_separator( le->str, le->sep,  le->cursor, -1 );
+									LIBANDRIA4_UIPRESULT_BODYMATCH( resui, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb )
+									if( b.val )
+									{
+										return( -( fail.val ) );
+									}
+									start = a.val;
+									
+									resui = pass_separator( le->str, le->sep,  start, 1 );
+									LIBANDRIA4_UIPRESULT_BODYMATCH( resui, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb )
+									if( b.val )
+									{
+										return( -( fail.val ) );
+									}
+									end = a.val;
+									
+									if( start <= le->cursor && end >= le->cursor && start != end )
+									{
+										resi =
+											libandria4_utf32_stringops_mutatingdelete
+											(
+												le->str->body, le->str->len,
+												start, end - start, 0x00 /* Ascii null. */
+											);
+										if( !resi )
+										{
+											??? ;
+										}
+										
+									} else {
+										
+										/* Emit a beep! */
+									}
+								}
+									/* As above, but clear to end of line as non-select action. */
+							case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete:
+								if( le->cursor < le->str->len )
+								{
+									resi =
+										libandria4_utf32_stringops_mutatingdelete
+										(
+											le->str->body, le->str->len,
+											le->cursor, le->str->len - le->cursor, 0x00 /* Ascii null. */
+										);
+									if( !resi )
+									{
+										??? ;
+									}
+									
+								} else {
+									
+									/* Emit a beep! */
+								}
+								break;
+									/* As above, but clear everything as the non-select action. */
+							case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clear:
+							case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Reset:
+							case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScreenErase:
+								if( le->cursor < le->str->len )
+								{
+									resi =
+										libandria4_utf32_stringops_mutatingdelete
+										(
+											le->str->body, le->str->len,
+											0, le->str->len, 0x00 /* Ascii null. */
+										);
+									if( !resi )
+									{
+										??? ;
+									}
+									
+								} else {
+									
+									/* Emit a beep! */
+								}
+								break;
+							default: /* "Impossible", so logic bug. */
+								??? ;
+						}
+						
+					} else if( resi < 0 )
+					{
+						???
+					}
+					break;
 					
 						/* Movement */
 				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Begin:
@@ -352,14 +555,87 @@ libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *
 				default:
 					if( !( le->key & LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_illegal_mask ) )
 					{
-						/* Add character. */
-						??? ;
+						if
+						(
+							( le->modifiers & libandria4_lineeditor_mods_command ) &&
+							1
+						)
+						{
+							/*
+								Control characters:
+									z: undo
+									y: redo
+									n: new
+									s: save
+									o: open
+									w: close
+									a: select all
+									p: print
+									c: copy
+									v: paste
+									x: cut to clipboard
+									f: find
+									h: replace dialog or similar
+									g: goto line
+									space: autocomplete
+									shift-tab: reduce leading whitespace
+									r: reload
+									ctrl u: to uppercase
+									ctrl shift u: to lowercase
+							*/
+							
+							???
+							
+						} else if( ??? )
+						{
+							resi =
+								libandria4_utf32_stringops_mutatingdelete
+								(
+									le->str->body, le->str->len,
+									0, le->str->len, 0x00 /* Ascii null. */
+								);
+							if( !resi )
+							{
+								??? ;
+							}
+							
+						} else {
+							
+							/* Add character. */
+							
+							if( le->modifiers & libandria4_lineeditor_mods_insert )
+							{
+								resi =
+									libandria4_utf32_stringops_mutatinginsert
+									(
+										le->str->body, le->str->len,
+										le->cursor, le->key, 0 /* Ascii null. */, int force
+									);
+								
+							} else {
+								
+								resi =
+									libandria4_utf32_stringops_mutatingoverwrite
+									(
+										le->str->body, le->str->len,
+										le->cursor, le->key, 0, 0
+									);
+							}
+							if( !resi )
+							{
+								??? ;
+							}
+						}
+						
+						
+						??? ; \
 						
 						break;
 					}
 					/* Fall through. */
 						/* Unused modifiers */
 				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_InsertLock:
+					??? /* Insert is needed! */
 				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_MouseKeysLock:
 				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DragLock:
 				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CapsLock:
@@ -369,32 +645,35 @@ libandria4_cts_closure libandria4_lineeditor_iteration( libandria4_cts_closure *
 					break;
 			}
 			le->modifiers ^= mod_xor;
-			break;
-			case sub-case edit-mask chara :
-				break;
-				case sub-sub-case set chara :
-					break;
-			case sub-case horizontal :
-				break;
-				case sub-sub-case word-jumps :
-					break;
-			case sub-case backspace/delete :
-				break;
-			case sub-case selector :
-				break;
-				case sub-sub-case word-selector :
-					break;
-			case sub-case clipboard :
-				break;
-			case sub-case IME :
-				break;
-		case line-scroll :
-			break;
-		case terminate :
-			break;
+			
+	} else {
+		
+			/* Error!Bad operation setting! */
+		??? ;
+	}
+	
+	return( ret );
+}
+libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_closure *ctx, void *le_ )
+{
+	libandria4_cts_closure ret =
+		LIBANDRIA4_CTS_BUILDCLOSURE( &libandria4_lineeditor_iteration, le );
+	int retroute = 0;
+	int resi;
+	
+	libandria4_lineeditor *le = (libandria4_lineeditor*)le_;
+	
+	if( !le || !isvalid( le ) )
+	{
+		??? ;
+	}
+	
+	switch( le->key )
+	{
+		case ??? :
 		
 		default:
-			return( ??? error_continuation ??? ( "Bad step", le->operation ) );
+			??? ;
 	}
 	
 	return( ret );
@@ -550,15 +829,83 @@ int libandria4_lineeditor_iteration_shift( libandria4_lineeditor *le,  uint8_t *
 	return( -1 );
 }
 
+				/*
+			int head##pascalarray_excerpt_isvalid( head##pascalarray_excerpt *exc ); \
+			head##pascalarray_result head##pascalarray_excerpt_arrayify( head##pascalarray_excerpt *exc, \
+				size_t padsize, (type) padval ); \
+			head##pascalarray_result head##pascalarray_excerpt_inversearrayify( head##pascalarray_excerpt *exc, \
+				size_t padsize, (type) padval );
+				*/
+
+int libandria4_lineeditor_iteration_deleteselection( libandria4_lineeditor *le )
+{
+	if( le )
+	{
+		if( le->cursor == le->select )
+		{
+			return( 0 );
+		}
+		
+		int endwards = ( le->cursor < le->select ) ? 1 : 0;
+		size_t start = ( endwards ? le->cursor : le->select );
+		size_t len = ( endwards ? le->select : le->cursor ) - start;
+		libandria4_utf32_pascalarray_except exc =
+			LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL(
+				libandria4_utf32_pascalarray,  le->str, start, len );
+		if( !( libandria4_utf32_pascalarray_excerpt_isvalid( &exc ) ) )
+		{
+			return( -2 );
+		}
+		
+			/* Delete the designated range. */
+		int resi =
+			libandria4_utf32_stringops_mutatingdelete
+			(
+				le->str->body, le->str->len,
+				start, len, 0x00 /* Ascii null. */
+			);
+		if( !resi )
+		{
+			return( -3 );
+		}
+		
+		le->select = le->cursor;
+		
+		return( 1 );
+	}
+	
+	return( -1 );
+}
 int libandria4_lineeditor_iteration_extent( libandria4_lineeditor *le, size_t extent )
 {
 	if( le )
 	{
 		if( le->modifiers & libandria4_lineeditor_mods_command )
 		{
-			/* Delete to start or end of line. */
+			int endwards = ( le->cursor < extent ) ? 1 : 0;
+			size_t start = ( endwards ? 0 : le->cursor );
+			size_t len = ( endwards ? le->cursor : le->str->len ) - start;
+			libandria4_utf32_pascalarray_except exc =
+				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL(
+					libandria4_utf32_pascalarray,  le->str, start, len );
+			if( !( libandria4_utf32_pascalarray_excerpt_isvalid( &exc ) ) )
+			{
+				return( -2 );
+			}
 			
-			??? ;
+				/* Delete the designated range. */
+			int resi =
+				libandria4_utf32_stringops_mutatingdelete
+				(
+					le->str->body, le->str->len,
+					start, len, 0x00 /* Ascii null. */
+				);
+			if( !resi )
+			{
+				return( -3 );
+			}
+			
+			le->select = le->cursor;
 			
 		} else if( le->modifiers & libandria4_lineeditor_mods_select )
 		{
