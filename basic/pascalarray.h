@@ -69,6 +69,13 @@ SOFTWARE.
 			sizeof( (type[]){ __VA_ARGS__ } ) / sizeof( type ) ]; } outername = \
 			{ (head##pascalarray){ sizeof( (type[]){ __VA_ARGS__ } ) / sizeof( type ) }, \
 				(type[]){ __VA_ARGS__ } };
+	/* These should work fine. */
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL( parrtype,  parrptr, start, len ) \
+		( (parrtype##_excerpt){ (parrptr),  (start), (len) } )
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL2( parrtype,  parrptr, extentA, extentB ) \
+		( (parrtype##_excerpt){ (parrptr), \
+			( (extentA) < (extentB) ? (extentA) : (extentB) ), \
+			( (extentA) < (extentB) ? (extentB) - (extentA) : (extentA) - (extentB) ) } )
 	
 	
 	/* These both need to be changed to take the p-array type instead of */

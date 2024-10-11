@@ -212,6 +212,28 @@ SOFTWARE.
 					operhead##set( str[ delstart + iter ], fill ); ++iter; } \
 				return( 1 ); } \
 			return( -1 ); }
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head, type, operhead ) \
+		int head##mutatinginsert( (type) *str, size_t strlen, \
+			size_t inspoint, (type) insval, (type) fillval, int force ) \
+		{ if( str ) { \
+				if( inspoint >= strlen ) { \
+					/* Indirect Domain error. */ return( -2 ); } \
+				if( !( force || operhead##isequal( str[ strlen - 1 ], fillval ) ) ) { \
+					/* Overflow error. */ return( -3 ); } \
+				while( strlen > inspoint && strlen > 1 ) { \
+					--strlen; str[ strlen ] = str[ strlen - 1 ]; } \
+				str[ strlen ] = insval; \
+				/* Success. */ return( 1 ); } \
+			/* Direct Domain error. */ return( -1 ); }
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head, type, operhead ) \
+		int head##mutatingoverwrite( (type) *str, size_t strlen, \
+			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ) \
+		{ if( str ) { \
+				if( ovrpoint >= strlen ) { \
+					/* Indirect Domain error. */ return( -2 ); } \
+				str[ ovrpoint ] = ovrval; \
+				/* Success. */ return( 1 ); } \
+			/* Direct Domain error. */ return( -1 ); }
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREDECLARE( head, type ) \
@@ -224,7 +246,11 @@ SOFTWARE.
 		head##parrres head##parr_merge( libandria4_memfuncs_t *mf, head##parr *a, head##parr *b ); \
 		\
 		int head##stringops_mutatingdelete( (type) *str, size_t strlen, \
-			size_t delstart, size_t dellen, (type) fill );
+			size_t delstart, size_t dellen, (type) fill ); \
+		int head##stringops_mutatinginsert( (type) *str, size_t strlen, \
+			size_t inspoint, (type) insval, (type) fillval, int force ); \
+		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
+			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 );
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREFINE( head, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( head, type ) \
@@ -233,7 +259,9 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( head, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MERGE( head, type, operhead ) \
 		\
-		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead )
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head##stringops_, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead )
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( head, type ) \
@@ -246,7 +274,11 @@ SOFTWARE.
 		head##parrres head##parr_merge( head##parr *a, head##parr *b ); \
 		\
 		int head##stringops_mutatingdelete( (type) *str, size_t strlen, \
-			size_t delstart, size_t dellen, (type) fill );
+			size_t delstart, size_t dellen, (type) fill ); \
+		int head##stringops_mutatinginsert( (type) *str, size_t strlen, \
+			size_t inspoint, (type) insval, (type) fillval, int force ); \
+		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
+			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 );
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
@@ -261,7 +293,9 @@ SOFTWARE.
 		head##parrres head##parr_merge( head##parr *a, head##parr *b ) \
 			{ return( libandria4_definer_##head##parr_merge( ( memfuncs_ptr ), a, b ) ); } \
 		\
-		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead )
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head##stringops_, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead )
 		
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_STDDEFINE( head, type, operhead ) \
@@ -305,6 +339,7 @@ SOFTWARE.
 	#define LIBANDRIA4_CHAR_STRINGOPS_set( dest, src ) ( ( dest ) = ( src ) )
 	#define LIBANDRIA4_CHAR_STRINGOPS_isnum( val ) ( isdigit( val ) )
 	#define LIBANDRIA4_CHAR_STRINGOPS_isultidigit( val ) ( ( val ) == '9' ? 1 : 0 )
+	#define LIBANDRIA4_CHAR_STRINGOPS_isequal( a, b ) ( ( a ) == ( b ) ? 1 : 0 )
 	#define LIBANDRIA4_CHAR_STRINGOPS_ringincr( var ) ( libandria4_char_stringops_ringincr( &( var ) ) )
 	#define LIBANDRIA4_CHAR_STRINGOPS_zeroval() ( 0 )
 	#define LIBANDRIA4_CHAR_STRINGOPS_strlen( str ) ( strlen( str ) )
@@ -315,6 +350,7 @@ SOFTWARE.
 	#define LIBANDRIA4_WCHAR_STRINGOPS_set( dest, src ) ( ( dest ) = ( src ) )
 	#define LIBANDRIA4_WCHAR_STRINGOPS_isnum( val ) ( iswdigit( val ) )
 	#define LIBANDRIA4_WCHAR_STRINGOPS_isultidigit( val ) ( ( val ) == L'9' ? 1 : 0 )
+	#define LIBANDRIA4_WCHAR_STRINGOPS_isequal( a, b ) ( ( a ) == ( b ) ? 1 : 0 )
 	#define LIBANDRIA4_WCHAR_STRINGOPS_ringincr( var ) ( libandria4_wchar_stringops_ringincr( &( var ) ) )
 	#define LIBANDRIA4_WCHAR_STRINGOPS_zeroval() ( 0 )
 		/* The header for wcslen() is wchar.h, and that's ALREADY included. */
@@ -325,6 +361,7 @@ SOFTWARE.
 	#define LIBANDRIA4_UTF32_STRINGOPS_set( dest, src ) ( ( dest ) = ( src ) )
 	#define LIBANDRIA4_UTF32_STRINGOPS_isnum( val ) ( libandria4_utf32_isdigit( val ) )
 	#define LIBANDRIA4_UTF32_STRINGOPS_isultidigit( val ) ( ( val ) == 57 ? 1 : 0 )
+	#define LIBANDRIA4_UTF32_STRINGOPS_isequal( a, b ) ( ( a ) == ( b ) ? 1 : 0 )
 	#define LIBANDRIA4_UTF32_STRINGOPS_ringincr( var ) ( libandria4_utf32_stringops_ringincr( &( var ) ) )
 	#define LIBANDRIA4_UTF32_STRINGOPS_zeroval() ( 0 )
 	#define LIBANDRIA4_UTF32_STRINGOPS_strlen( str ) ( libandria4_utf32_strlen( str ) )
