@@ -235,6 +235,66 @@ SOFTWARE.
 				/* Success. */ return( 1 ); } \
 			/* Direct Domain error. */ return( -1 ); }
 	
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head, type, parrtype, operhead ) \
+		parrtype##_excerpt_result head##memeqspn( \
+			(parrtype) *str, (parrtype) *matches, \
+			size_t curPos, int stepForward ) \
+		{ \
+			parrtype##_excerpt ret = \
+				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL( \
+					parrtype,  str, 0, 0 );\
+				/* Members: arr ptr; start; len.  */\
+			stepForward = ( stepForward ? 1 : -1 ); \
+			intmax_t bounds = ( !stepForward ? -1 : str->len ); \
+			int curOff = 0; uintptr_t sepOff = 0, found; \
+			void *a; libandria4_failure_uipresult e = { 0 }; \
+			\
+				/* Search for a separator. */ \
+			while( curPos + curOff != bounds ) { \
+				libandria4_ptrresult res = libandria4_memmem ( \
+					(void*)( matches->body ), matches->len, \
+						/* We only check the CURRENT string character, not all */ \
+						/*  of them. */ \
+					(void*)&( str->body[ curPos + curOff ] ), \
+					sizeof( char ), sizeof( char ) ); \
+				LIBANDRIA4_PTRRESULT_BODYMATCH( \
+					res, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe ); \
+				if( e.val == LIBANDRIA4_RESULT_FAILURE_DOMAIN ) { \
+					/* The last argument wasn't an integer multiple of the */ \
+					/*  next-to-last, which obviously shouldn't be possible, */ \
+					/*  so logic fault. */ \
+					LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( \
+						head, LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
+				if( !( e.val ) ) { \
+					/* No failure, thus success. */ \
+					curPos += curOff; curOff = 0; \
+					found = (uintptr_t)a; \
+					sepOff = (uintptr_t)a + 1; \
+					/* Exit the while loop. */ break; } \
+				\
+				curOff += stepForward; } \
+			if( !sepOff ) { /* No match, lets return. */ \
+				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( \
+					head, LIBANDRIA4_RESULT_FAILURE_EOF ); } \
+			/* curPos has been updated. */ \
+			\
+				/* Move past all adjacent duplicate separators. */ \
+			while( sepOff ) { \
+				curOff += stepForward; \
+				if( !( curPos + curOff ) || curPos + curOff >= bounds ) { \
+					/* Limits check. */ break; } \
+				sepOff = \
+					( ( matches->body[ found ] == \
+						str->body[ curPos + curOff ] ) ? \
+							1 : 0 ); \
+				if( !sepOff ) { break; } } \
+			\
+				/* Getting here requires at least one match. */ \
+				ret.start = ( curOff > 0 ? curPos : curPos + curOff ); \
+				ret.len = ( curOff > 0 ? curOff : -curOff ) + 1; \
+			LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNSUCCESS( \
+				head, ret ); }
+	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BAREDECLARE( head, type ) \
@@ -250,7 +310,9 @@ SOFTWARE.
 		int head##stringops_mutatinginsert( (type) *str, size_t strlen, \
 			size_t inspoint, (type) insval, (type) fillval, int force ); \
 		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
-			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 );
+			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ); \
+		head##pascalarray_excerpt_result head##stringops_memeqspn( head##pascalarray *str, \
+			head##pascalarray *matches, size_t curPos, int stepForward );
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREFINE( head, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( head, type ) \
@@ -261,7 +323,8 @@ SOFTWARE.
 		\
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head##stringops_, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead )
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head##pascalarray, operhead )
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( head, type ) \
@@ -278,7 +341,9 @@ SOFTWARE.
 		int head##stringops_mutatinginsert( (type) *str, size_t strlen, \
 			size_t inspoint, (type) insval, (type) fillval, int force ); \
 		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
-			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 );
+			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ); \
+		head##pascalarray_excerpt_result head##stringops_memeqspn( head##pascalarray *str, \
+			head##pascalarray *matches, size_t curPos, int stepForward );
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
@@ -295,7 +360,8 @@ SOFTWARE.
 		\
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head##stringops_, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead )
+		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head##pascalarray, operhead )
 		
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_STDDEFINE( head, type, operhead ) \
