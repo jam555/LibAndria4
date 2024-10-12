@@ -396,3 +396,101 @@ libandria4_uipresult pass_separator
 	
 	LIBANDRIA4_UIPRESULT_RETURNSUCCESS( curPos );
 }
+libandria4_utf32_pascalarray_excerpt_result pass_separator
+(
+	libandria4_utf32_pascalarray *str,
+	libandria4_utf32_pascalarray *separators,
+	
+	size_t curPos,
+	int stepForward
+)
+{
+		/*  */
+		typedef struct head##pascalarray_excerpt { \
+			head##pascalarray *arr; size_t start, len; \
+		} head##pascalarray_excerpt;
+	libandria4_utf32_pascalarray_excerpt ret =
+		LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL(
+			libandria4_utf32_pascalarray,  str, curPos, 0
+		);
+		/* Members: arr ptr; start; len.  */
+	stepForward = ( stepForward ? 1 : -1 );
+	intmax_t bounds = ( !stepForward ? -1 : A->len );
+	int curOff = 0;
+	uintptr_t sepOff, found;
+	void *a;
+	libandria4_failure_uipresult e = { 0 };
+	
+		/* Search for a separator. */
+	while( curPos + curOff != bounds )
+	{
+		sepOff = 0;
+		libandria4_ptrresult res =
+			libandria4_memmem
+			(
+				(void*)( separators->body ), separators->len,
+					/* We only check the CURRENT string character, not all */
+					/*  of them. */
+				(void*)&( str->body[ curPos + curOff ] ),
+				sizeof( char ), sizeof( char )
+			);
+		LIBANDRIA4_PTRRESULT_BODYMATCH(
+			res, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETe );
+		if( e.val == LIBANDRIA4_RESULT_FAILURE_DOMAIN )
+		{
+			/* The last argument wasn't an integer multiple of the */
+			/*  next-to-last, which obviously shouldn't be possible, */
+			/*  so logic fault. */
+			LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL(
+				libandria4_utf32_, LIBANDRIA4_RESULT_FAILURE_LOGICFAULT );
+		}
+		if( !( e.val ) )
+		{
+			/* No failure, thus success. */
+			
+			curPos += curOff;
+			curOff = 0;
+			found = (uintptr_t)a;
+			sepOff = (uintptr_t)a + 1;
+			
+				/* Exit the while loop. */
+			break;
+		}
+		
+		curOff += stepForward;
+	}
+	if( !sepOff )
+	{
+			/* No match, lets return. */
+		LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL(
+			libandria4_utf32_, LIBANDRIA4_RESULT_FAILURE_EOF );
+	}
+	/* curPos has been updated. */
+	
+		/* Move past all adjacent duplicate separators. */
+	while( sepOff )
+	{
+		curOff += stepForward;
+		if( !( curPos + curOff ) || curPos + curOff >= bounds )
+		{
+			/* Limits check. */
+			
+			break;
+		}
+		
+		sepOff =
+			( ( separators->body[ found ] ==
+				str->body[ curPos + curOff ] ) ?
+					1 : 0 );
+		if( !sepOff )
+		{
+			break;
+		}
+	}
+	/* Getting here requires at least one match. */
+	ret.start = ( curOff > 0 ? curPos : curPos + curOff );
+	ret.len = ( curOff > 0 ? curOff : -curOff ) + 1;
+	
+	LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNSUCCESS(
+		libandria4_utf32_, ret );
+}
