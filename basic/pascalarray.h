@@ -57,7 +57,13 @@ SOFTWARE.
 		) \
 		typedef struct head##pascalarray_excerpt { \
 			head##pascalarray *arr; size_t start, len; \
-		} head##pascalarray_excerpt;
+		} head##pascalarray_excerpt; \
+		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( \
+			head##pascalarray_excerpt_result, \
+			head##pascalarray_excerpt, libandria4_failure_uipresult \
+		)
+	
+	
 	
 	/* Both LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL() and */
 	/*  LIBANDRIA4_DEFINE_PASCALARRAY_LITERAL2() used to be here. They */
@@ -78,8 +84,7 @@ SOFTWARE.
 			( (extentA) < (extentB) ? (extentB) - (extentA) : (extentA) - (extentB) ) } )
 	
 	
-	/* These both need to be changed to take the p-array type instead of */
-	/*  the head name, for compatibility with the WRAPPED macro. */
+	
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BUILDSUCCESS( parrtype, val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( \
 			parrtype##_result, parrtype*, (val) \
@@ -107,6 +112,37 @@ SOFTWARE.
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_RETURNFAIL( head, val ) \
 		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( \
 			head##pascalarray_result, libandria4_failure_uipresult, (val) )
+	
+	
+	
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_BUILDSUCCESS( parrtype, val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( \
+			parrtype##_excerpt_result, parrtype##_excerpt, (val) \
+		)
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_BUILDFAILURE( parrtype, val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( \
+			parrtype##_excerpt_result, \
+			libandria4_failure_uipresult, \
+			(libandria4_failure_uipresult){ (val) } \
+		)
+	
+		/* The *BODY* version takes statements, *EXPR* takes expressions. */
+		/*  The matches must be function-style, though function macros are */
+		/*  allowed. */
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_BODYMATCH( var, onsucc, onfail ) \
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, onsucc, onfail )
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_EXPRMATCH( var, onsucc, onfail ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, onsucc, onfail )
+	
+		/* Used to make it easier to convert from one return-wrapper type to */
+		/*  another. */
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNSUCCESS( head, val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( \
+			head##pascalarray_excerpt_result, head##pascalarray_excerpt, (val) )	
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( head, val ) \
+		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( \
+			head##pascalarray_excerpt_result, libandria4_failure_uipresult, (val) )
+	
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_INIT( head, parrtype ) \
