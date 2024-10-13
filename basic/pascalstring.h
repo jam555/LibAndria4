@@ -238,7 +238,7 @@ SOFTWARE.
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head, type, parrtype, operhead ) \
 		parrtype##_excerpt_result head##memeqspn( \
 			(parrtype) *str, (parrtype) *matches, \
-			size_t curPos, int stepForward ) \
+			size_t curPos, int stepForward, int spanMatch ) \
 		{ \
 			parrtype##_excerpt ret = \
 				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL( \
@@ -279,7 +279,7 @@ SOFTWARE.
 			/* curPos has been updated. */ \
 			\
 				/* Move past all adjacent duplicate separators. */ \
-			while( sepOff ) { \
+			while( sepOff && spanMatch > 0 ) { \
 				curOff += stepForward; \
 				if( !( curPos + curOff ) || curPos + curOff >= bounds ) { \
 					/* Limits check. */ break; } \
@@ -289,9 +289,10 @@ SOFTWARE.
 							1 : 0 ); \
 				if( !sepOff ) { break; } } \
 			\
+			if( spanMatch <= 0 ) { curOff = stepForward; } \
 				/* Getting here requires at least one match. */ \
-				ret.start = ( curOff > 0 ? curPos : curPos + curOff ); \
-				ret.len = ( curOff > 0 ? curOff : -curOff ) + 1; \
+				ret.start = ( curOff > 0 ? curPos : curPos + curOff + 1 ); \
+				ret.len = ( curOff > 0 ? curOff : -curOff ); \
 			LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNSUCCESS( \
 				head, ret ); }
 	
@@ -312,7 +313,7 @@ SOFTWARE.
 		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
 			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ); \
 		head##pascalarray_excerpt_result head##stringops_memeqspn( head##pascalarray *str, \
-			head##pascalarray *matches, size_t curPos, int stepForward );
+			head##pascalarray *matches, size_t curPos, int stepForward, int spanMatch );
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREFINE( head, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( head, type ) \
@@ -343,7 +344,7 @@ SOFTWARE.
 		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
 			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ); \
 		head##pascalarray_excerpt_result head##stringops_memeqspn( head##pascalarray *str, \
-			head##pascalarray *matches, size_t curPos, int stepForward );
+			head##pascalarray *matches, size_t curPos, int stepForward, int spanMatch );
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
