@@ -501,7 +501,8 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 {
 	libandria4_cts_closure ret =
 		LIBANDRIA4_CTS_BUILDCLOSURE( &libandria4_lineeditor_iteration, le );
-	int resi;
+	int resi, gate;
+	size_t start, len;
 	
 	libandria4_lineeditor *le = (libandria4_lineeditor*)le_;
 	
@@ -516,21 +517,36 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 				/* Note that command -backerase or -forwarderase should get rid of the relevant word! */
 				/* These delete selections if existent, else their named function. */
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Backerase: /* backspace */
+			start = le->cursor - 1;
+			len = 1;
+			gate = ( le->cursor > 0 );
+			break;
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Forwarderase: /* delete */
-		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord:
+			start = le->cursor;
+			len = 1;
+			gate = ( le->cursor < le->str->len );
+			break;
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete:
+			start = le->cursor;
+			len = le->str->len - le->cursor;
+			gate = ( le->cursor < le->str->len );
+			break;
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clear:
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Reset:
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScreenErase:
-			resi = libandria4_lineeditor_iteration_deleteselection( libandria4_lineeditor *le );
+			start = 0;
+			len = le->str->len;
+			gate = ( le->cursor < le->str->len );
+			break;
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord:
 		
 		
 		
 		case ??? :
-		
 		default:
 			??? ;
 	}
+	resi = libandria4_lineeditor_iteration_deleteselection( libandria4_lineeditor *le );
 	switch( le->key )
 	{
 		case 7: /* Ascii Bell. */
@@ -541,37 +557,22 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 				/* Note that command -backerase or -forwarderase should get rid of the relevant word! */
 				/* These delete selections if existent, else their named function. */
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Backerase: /* backspace */
-			if( resi == 0 )
-			{
-				if( le->cursor > 0 )
-				{
-					resi =
-						libandria4_utf32_stringops_mutatingdelete
-						(
-							le->str->body, le->str->len,
-							le->cursor - 1, 1, 0x00 /* Ascii null. */
-						);
-					if( !resi )
-					{
-						??? ;
-					}
-					
-				} else {
-					
-					ret = le->alerter;
-				}
-			}
-			break;
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Forwarderase: /* delete */
+				/* As above, but clear to end of line as non-select action. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete:
+				/* As above, but clear everything as the non-select action. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clear:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Reset:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScreenErase:
 			if( resi == 0 )
 			{
-				if( le->cursor < le->str->len )
+				if( gate )
 				{
 					resi =
 						libandria4_utf32_stringops_mutatingdelete
 						(
 							le->str->body, le->str->len,
-							le->cursor, 1, 0x00 /* Ascii null. */
+							start, len, 0x00 /* Ascii null. */
 						);
 					if( !resi )
 					{
@@ -589,54 +590,6 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 			{
 				ret.func = &libandria4_lineeditor_iteration_deleteword;
 				??? ;
-			}
-			break;
-				/* As above, but clear to end of line as non-select action. */
-		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ProgressiveDelete:
-			if( resi == 0 )
-			{
-				if( le->cursor < le->str->len )
-				{
-					resi =
-						libandria4_utf32_stringops_mutatingdelete
-						(
-							le->str->body, le->str->len,
-							le->cursor, le->str->len - le->cursor, 0x00 /* Ascii null. */
-						);
-					if( !resi )
-					{
-						ret = le->alerter;
-					}
-					
-				} else {
-					
-					ret = le->alerter;
-				}
-			}
-			break;
-				/* As above, but clear everything as the non-select action. */
-		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Clear:
-		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Reset:
-		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScreenErase:
-			if( resi == 0 )
-			{
-				if( le->cursor < le->str->len )
-				{
-					resi =
-						libandria4_utf32_stringops_mutatingdelete
-						(
-							le->str->body, le->str->len,
-							0, le->str->len, 0x00 /* Ascii null. */
-						);
-					if( !resi )
-					{
-						??? ;
-					}
-					
-				} else {
-					
-					ret = le->alerter;
-				}
 			}
 			break;
 		
@@ -671,23 +624,27 @@ libandria4_cts_closure libandria4_lineeditor_iteration_deleteword( libandria4_ct
 		libandria4_failure_uipresult b = { 0 };
 		size_t start, end;
 		
-		resui = pass_separator( le->str, le->sep,  le->cursor, -1 );
+		resui = libandria4_lineeditor_iteration_firstseparator( le->str, le->sep,  le->cursor, 1 );
 		LIBANDRIA4_UIPRESULT_BODYMATCH( resui, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb )
 		if( b.val )
 		{
-			return( -( fail.val ) );
-		}
-		start = a.val;
-		
-		resui = pass_separator( le->str, le->sep,  start, 1 );
-		LIBANDRIA4_UIPRESULT_BODYMATCH( resui, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb )
-		if( b.val )
-		{
-			return( -( fail.val ) );
+			ret = le->alerter;
 		}
 		end = a.val;
 		
-		if( start <= le->cursor && end >= le->cursor && start != end )
+		resui = libandria4_lineeditor_iteration_firstseparator( le->str, le->sep,  end, -1 );
+		LIBANDRIA4_UIPRESULT_BODYMATCH( resui, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb )
+		if( b.val )
+		{
+			ret = le->alerter;
+		}
+		start = a.val;
+		
+		if( start > end )
+		{
+			return( ??? );
+		}
+		if( start <= le->cursor && end >= le->cursor )
 		{
 			resi =
 				libandria4_utf32_stringops_mutatingdelete
@@ -702,7 +659,7 @@ libandria4_cts_closure libandria4_lineeditor_iteration_deleteword( libandria4_ct
 			
 		} else {
 			
-			/* Emit a beep! */
+			ret = le->alerter;
 		}
 		
 		
