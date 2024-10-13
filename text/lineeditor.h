@@ -83,7 +83,7 @@ enum
 typedef struct libandria4_lineeditor libandria4_lineeditor;
 struct libandria4_lineeditor
 {
-	libandria4_cts_closure delegate, fetcher, alerter, commandkey, altcommandkey, ???;
+	libandria4_cts_closure onerror, delegate, fetcher, alerter, commandkey, altcommandkey, ???;
 	
 	uintptr_t operation;
 	libandria4_commoniokeys_simplekeycode key;
@@ -312,7 +312,7 @@ int libandria4_lineeditor_iteration_shift
 	/* stepForward is STEREOTYPICALLY positive when a user presses */
 	/*  control-right, and stereotypically not positive when the user */
 	/*  presses control-left. */
-libandria4_uipresult pass_separator
+libandria4_uipresult libandria4_lineeditor_iteration_firstseparator
 (
 	libandria4_utf32_pascalarray *str,
 	libandria4_utf32_pascalarray *separators,
@@ -325,12 +325,20 @@ libandria4_uipresult pass_separator
 	libandria4_failure_uipresult e = { 0 };
 	
 	libandria4_utf32_pascalarray_excerpt_result res =
-		libandria4_utf32_stringops_memeqspn( str, separators, curPos, stepForward );
+		libandria4_utf32_stringops_memeqspn( str, separators, curPos, stepForward, 0 );
 	LIBANDRIA4_MONAD_EITHER_BODYMATCH( res, matcha, matchb )
 	if( e.val )
 	{
 			LIBANDRIA4_UIPRESULT_RETURNFAILURE( e.val );
 	}
+	if
+	(
+		( stepForward < 0 && a.start + a.len >= str->len ) ||
+		( stepForward > 0 && a.start <= 0 )
+	)
+	{
+		LIBANDRIA4_UIPRESULT_RETURNFAILURE( LIBANDRIA4_RESULT_FAILURE_EOF );
+	}
 	
-	LIBANDRIA4_UIPRESULT_RETURNSUCCESS( a.start );
+	LIBANDRIA4_UIPRESULT_RETURNSUCCESS( a.start - ( stepForward ? 1 : -1 ) );
 }
