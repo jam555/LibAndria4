@@ -189,50 +189,6 @@ libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_clo
 				libandria4_lineeditor_mods_release : 0;
 			switch( le->key )
 			{
-					/* Implicit exits */
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUp:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDown:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageUp:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageDown:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUp:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDown:
-					retroute += 1;
-					/* Half-effective exits */
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpRight:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownRight:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownLeft:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpLeft:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpRight:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownRight:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownLeft:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpLeft:
-					retroute += 1;
-					/* Explicit exits */
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Escape:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Return:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Execute:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Cancel:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Break:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Quit:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Commit:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Finish:
-					retroute += 1;
-						/* Move the original caller into ret. */
-					resi = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
-					if( !resi )
-					{
-						switch( retroute )
-						{
-							case 1:
-							case 2:
-							case 3:
-							default:
-								??? ;
-						}
-						
-						???
-					}
-					break;
 					
 						/* Explicit selection. */
 				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_SelectLock:
@@ -326,50 +282,6 @@ libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_clo
 						??? ;
 					}
 					break;
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurRight:
-					resi = libandria4_lineeditor_iteration_horizontal( le, 1, 0 );
-					if( !resi )
-					{
-						??? ;
-					}
-					break;
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurLeft:
-					resi = libandria4_lineeditor_iteration_horizontal( le, -1, 0 );
-					if( !resi )
-					{
-						??? ;
-					}
-					break;
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerRight:
-					resi = libandria4_lineeditor_iteration_horizontal( le, 1, 1 );
-					if( !resi )
-					{
-						??? ;
-					}
-					break;
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerLeft:
-					resi = libandria4_lineeditor_iteration_horizontal( le, -1, 1 );
-					if( !resi )
-					{
-						??? ;
-					}
-					break;
-					
-						/* Exterior actions */
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Menu:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Print:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Find:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Help:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Copy:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Delegate:
-					resi = libandria4_cts_push_ctsclsr( ctx, 0,  &ret );
-					if( !resi )
-					{
-						??? ;
-					}
-					ret = le->delegate;
-					break;
-					
 				default:
 					if( !( le->key & LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_illegal_mask ) )
 					{
@@ -453,7 +365,33 @@ libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_clo
 					} else {
 						
 						/* General commands and other unrecognized things. */
-						
+							
+							/* Implicit exits */
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUp:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDown:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageUp:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageDown:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUp:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDown:
+							/* Half-effective exits */
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpRight:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownRight:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownLeft:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpLeft:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpRight:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownRight:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownLeft:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpLeft:
+							/* Explicit exits */
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Escape:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Return:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Execute:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Cancel:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Break:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Quit:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Commit:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Finish:
+							
 							/* Deletions */
 								/* These delete selections if existent, else their named function. */
 						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Backerase: /* backspace */
@@ -474,6 +412,18 @@ libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_clo
 						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Meta:
 						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Alt:
 						
+							/* Exterior actions */
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Menu:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Print:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Find:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Help:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Copy:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Delegate:
+						
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurRight:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurLeft:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerRight:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerLeft:
 						
 						resi = libandria4_cts_push_ctsclsr( ctx, 0,  &ret );
 						if( !resi )
@@ -490,7 +440,7 @@ libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_clo
 			
 	} else {
 		
-			/* Error!Bad operation setting! */
+			/* Error! Bad operation setting! */
 		??? ;
 	}
 	
@@ -501,8 +451,8 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 {
 	libandria4_cts_closure ret =
 		LIBANDRIA4_CTS_BUILDCLOSURE( &libandria4_lineeditor_iteration, le );
-	int resi, gate;
-	size_t start, len;
+	int resi, gate = 0;
+	size_t start = 0, len = 0;
 	
 	libandria4_lineeditor *le = (libandria4_lineeditor*)le_;
 	
@@ -511,6 +461,7 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 		??? ;
 	}
 	
+		/* Preparation. */
 	switch( le->key )
 	{
 			/* Deletions */
@@ -538,19 +489,117 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 			len = le->str->len;
 			gate = ( le->cursor < le->str->len );
 			break;
+			
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurRight:
+			gate = 1;
+			start = 0;
+			break;
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurLeft:
+			gate = -1;
+			start = 0;
+			break;
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerRight:
+			gate = 1;
+			start = 1;
+			break;
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerLeft:
+			gate = -1;
+			start = 1;
+			break;
+			
+			/* Implicit exits */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUp:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDown:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageUp:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageDown:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUp:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDown:
+			start = 3;
+			break;
+			/* Half-effective exits */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownLeft:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpLeft:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownLeft:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpLeft:
+			start = 2;
+			break;
+			/* Explicit exits */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Escape:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Return:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Execute:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Cancel:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Break:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Quit:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Commit:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Finish:
+			start = 1;
+			break;
+			
+			
+			
+			
+			
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord:
 		
 		
 		
 		case ??? :
-		default:
 			??? ;
+			break;
+		default: /* Just do nothing. */
+			break;
 	}
 	resi = libandria4_lineeditor_iteration_deleteselection( libandria4_lineeditor *le );
 	switch( le->key )
 	{
 		case 7: /* Ascii Bell. */
 			ret = le->alerter;
+			break;
+			
+			/* Implicit exits */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUp:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDown:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageUp:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PageDown:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUp:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDown:
+				/* Half-effective exits */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurDownLeft:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUpLeft:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerDownLeft:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerUpLeft:
+				/* Explicit exits */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Escape:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Return:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Execute:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Cancel:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Break:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Quit:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Commit:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Finish:
+				/* Move the original caller into ret. */
+			resi = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
+			if( !resi )
+			{
+				switch( start )
+				{
+					case 1:
+					case 2:
+					case 3:
+					default:
+						??? ;
+				}
+				
+				???
+			}
 			break;
 			
 			/* Deletions */
@@ -585,6 +634,7 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 				}
 			}
 			break;
+			
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord:
 			if( resi == 0 )
 			{
@@ -592,11 +642,37 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 				??? ;
 			}
 			break;
-		
-		
-		
+			
+			/* Exterior actions */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Menu:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Print:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Find:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Help:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Copy:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Delegate:
+			resi = libandria4_cts_push_ctsclsr( ctx, 0,  &ret );
+			if( !resi )
+			{
+				??? ;
+			}
+			ret = le->delegate;
+			break;
+			
+			/* Navigation keys. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurLeft:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerRight:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerLeft:
+			resi = libandria4_lineeditor_iteration_horizontal( le, gate, start );
+			if( !resi )
+			{
+				??? ;
+			}
+			break;
+			
+			
 		case ??? :
-		
+			
 		default:
 			??? ;
 	}
