@@ -29,10 +29,28 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_COMMONLIB_H
 # define LIBANDRIA4_BASIC_COMMONLIB_H
 	
+	
+	/* TODO: */
+		/* Add more time functions. */
+	
+	
 		/* For size_t. */
 	#include <stddef.h>
-		/* For libandria4_ptrresult. */
+		/* For uintprt_t and uint32_t. */
+	#include <stdint.h>
+		/* For libandria4_ptrresult{} and libandria4_errno_2result(). */
 	#include "stdmonads.h"
+		/* For libandria4_error_mayerr{}. */
+	#include "commonerr.h"
+	
+	
+	
+		/* This literally just exists to waste a very small amount of time. */
+		/*  It's implemented in commonlib2.h to stop it from being optimized */
+		/*  into oblivion. */
+	int libandria4_timesink( int dummy );
+	
+	
 	
 		/* Works like C's strstr(), but with arbitrary memory patterns. */
 		/* Note that the "needle" will only be searched for on */
@@ -55,6 +73,9 @@ SOFTWARE.
 		/*  is the size of the elements, while "count" is how many of them */
 		/*  exist. */
 	int libandria4_memreverse( void *base_, size_t count, size_t size );
+	
+		/* Waits for AT LEAST the provided number of milliseconds. */
+	libandria4_error_mayerr libandria4_sleep( uint32_t millisecs );
 	
 #endif
 /* End libandria4 basic commonlib.h */
