@@ -29,8 +29,6 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_COMMONERR_H
 # define LIBANDRIA4_BASIC_COMMONERR_H
 	
-	??? /* We need a .c file too! */
-	
 	#include "monads.h"
 	#include "commonio.h"
 	
@@ -117,6 +115,7 @@ SOFTWARE.
 		LIBANDRIA4_ERROR_BUILD_SIMPLESTRUCT( &( varname ), varname, namestrptr )
 	
 	
+	/* These are both implemented in commonlib.c */
 	libandria4_error_mayerr libandria4_error_print
 	(
 		libandria4_commonio_handle *io,
@@ -124,155 +123,12 @@ SOFTWARE.
 			int line,
 			char *file
 	);
-	
-	
-	
-	#include "simpleops.h"
-	
+		/* Just prints ->str[]. */
 	libandria4_error_mayerr libandria4_error_print_simplestruct
 	(
 		libandria4_commonio_handle *io,
 		libandria4_error_simplestruct *err
-	)
-	{
-		if( io && err )
-		{
-			if( !libandria4_commonio_handle_hasbasics( io ) )
-			{
-				LIBANDRIA4_ERROR_MAYERR_RETERR2();
-			}
-			if( !( io->puts_s ) )
-			{
-				LIBANDRIA4_ERROR_MAYERR_RETERR3();
-			}
-			if( !( err->str ) && err->str_len )
-			{
-				LIBANDRIA4_ERROR_MAYERR_RETERR4();
-			}
-			
-			
-			if
-			(
-				!libandria4_commonio_recursivewrapper_puts_s
-				(
-					io,  (libandria4_commonio_byte*)( err->str ), err->str_len
-				)
-			)
-			{
-				LIBANDRIA4_ERROR_MAYERR_RETERR5();
-			}
-			
-			LIBANDRIA4_ERROR_MAYERR_RETURN_SUCCESS();
-		}
-		LIBANDRIA4_ERROR_MAYERR_RETERR1();
-	}
-	libandria4_error_mayerr libandria4_error_print
-	(
-		libandria4_commonio_handle *io,
-			libandria4_error_basalstruct *err,
-			int line,
-			char *file
-	)
-	{
-		if( io && err )
-		{
-			if( !libandria4_commonio_handle_hasbasics( io ) )
-			{
-				LIBANDRIA4_ERROR_MAYERR_RETERR2();
-			}
-			if( !( io->putc && io->puts_s && io->flush ) )
-			{
-				LIBANDRIA4_ERROR_MAYERR_RETERR3();
-			}
-			
-			libandria4_commonio_eithgeneric res1;
-			libandria4_error_mayerr res2;
-			
-			switch( err->typeid )
-			{
-				case LIBANDRIA4_ERRORSTRUCT_SIMPLETYPE:
-#define libandria4_error_print_STR_FUNC "function: "
-#define libandria4_error_print_STR_SRC " at "
-#define libandria4_error_print_STR_DESC " announces this error: "
-					if
-					(
-						!libandria4_commonio_recursivewrapper_puts_s
-						(
-							io,
-								(libandria4_commonio_byte*)libandria4_error_print_STR_FUNC,
-								sizeof( libandria4_error_print_STR_FUNC )
-						)
-					)
-					{
-						LIBANDRIA4_ERROR_MAYERR_RETERR4();
-					}
-					
-					res2 = libandria4_error_print_simplestruct( io, err->funcname );
-					LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR5 );
-					
-					if( !libandria4_commonio_utility_putint( io,  line ) )
-					{
-						LIBANDRIA4_ERROR_MAYERR_RETERR6();
-					}
-					libandria4_commonio_eithgeneric res1 = io->putc( io,  (libandria4_commonio_byte)' ' );
-					res2 = LIBANDRIA4_COMMONIO_EITHGENERIC_TO_MAYERR( res1 );
-					LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR7 );
-					if
-					(
-						!libandria4_commonio_recursivewrapper_puts_s
-						(
-							io,
-								(libandria4_commonio_byte*)file,
-								strlen( file )
-						)
-					)
-					{
-						LIBANDRIA4_ERROR_MAYERR_RETERR8();
-					}
-					
-					if
-					(
-						!libandria4_commonio_recursivewrapper_puts_s
-						(
-							io,
-								(libandria4_commonio_byte*)libandria4_error_print_STR_SRC,
-								sizeof( libandria4_error_print_STR_SRC )
-						)
-					)
-					{
-						LIBANDRIA4_ERROR_MAYERR_RETERR9();
-					}
-					
-					if
-					(
-						!libandria4_commonio_recursivewrapper_puts_s
-						(
-							io,
-								(libandria4_commonio_byte*)libandria4_error_print_STR_DESC,
-								sizeof( libandria4_error_print_STR_DESC )
-						)
-					)
-					{
-						LIBANDRIA4_ERROR_MAYERR_RETERR10();
-					}
-					
-					res2 = libandria4_error_print_simplestruct( io, err );
-					LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR11 );
-					
-					break;
-					
-				case LIBANDRIA4_ERROR_TYPE_BASALSTRUCT:
-					LIBANDRIA4_ERROR_MAYERR_RETERR12();
-					
-				default:
-					LIBANDRIA4_ERROR_MAYERR_RETERR13();
-			}
-			
-			LIBANDRIA4_ERROR_MAYERR_RETURN_SUCCESS();
-		};
-		
-		LIBANDRIA4_ERROR_MAYERR_RETERR1();
-	}
+	);
 	
 	
 	
@@ -293,4 +149,4 @@ SOFTWARE.
 	int vt100net_report_parser_error( vt100net_termcontext *term_ctx, uint32_t *report_type_member );
 	
 #endif
-/* End libandria4 basic commonerr.h */                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+/* End libandria4 basic commonerr.h */
