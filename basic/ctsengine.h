@@ -31,6 +31,10 @@ SOFTWARE.
 	
 	/* TODO: */
 		/* Add an output handle to control where error messages get routed. */
+		/* Add a "delay closure" system (separate from any actual context */
+		/*  instance) to allow users to easily provide a delay system that */
+		/*  doesn't block other execution. Add something to commonlib.h to */
+		/*  support this. */
 	
 	
 	
@@ -112,6 +116,8 @@ SOFTWARE.
 		libandria4_cts_context*, void*
 	);
 	/* More closure functions are near the end of this header. */
+	
+	extern libandria4_commonio_handle libandria4_cts_errout;
 	
 	
 	

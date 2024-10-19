@@ -308,3 +308,8 @@ libandria4_cts_closure libandria4_cts_innerreturn( libandria4_cts_context *ctx, 
 	
 	return( ret );
 }
+
+
+libandria4_commonio_handle libandria4_cts_errout =
+	{
+	};

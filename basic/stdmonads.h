@@ -43,6 +43,13 @@ SOFTWARE.
 	
 	
 	
+	/* TODO: Move the implementations for libandria4_errno_2result() and */
+	/*  libandria4_errno_popresult( int *errnum ) to commonlib.c from... */
+	/*  WHEREVER they're defined. Also, libandria4_errno_2result() needs */
+	/*  more error translations. */
+	
+	
+	
 	/* These are intended to allow success & failure to be encoded via type, */
 	/*  thus reducing the actual value to just a version of one or the */
 	/*  other. And no, C doesn't have MEANINGFUL direct support for this, */
