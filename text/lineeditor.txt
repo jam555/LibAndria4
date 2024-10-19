@@ -190,98 +190,6 @@ libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_clo
 			switch( le->key )
 			{
 					
-						/* Explicit selection. */
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_SelectLock:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ShiftLock:
-					resi =
-						libandria4_lineeditor_iteration_togglelock
-						( le,  &mod_xor, libandria4_lineeditor_mods_select );
-					if( !resi )
-					{
-						???
-					}
-					if
-					(
-						( le->modifiers & libandria4_lineeditor_mods_select ) &&
-						( le->modifiers & libandria4_lineeditor_mods_scroll )
-					)
-					{
-						mod_xor |= libandria4_lineeditor_mods_scroll;
-					}
-					break;
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ExtendSelection:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Shift:
-					resi =
-						libandria4_lineeditor_iteration_shift
-						( le,  &mod_xor, libandria4_lineeditor_mods_select );
-					if( !resi )
-					{
-						???
-					}
-					if
-					(
-						( le->modifiers & libandria4_lineeditor_mods_select ) &&
-						( le->modifiers & libandria4_lineeditor_mods_scroll )
-					)
-					{
-						mod_xor |= libandria4_lineeditor_mods_scroll;
-					}
-					break;
-						/* Explicit scrolling. */
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScrollLock:
-					resi =
-						libandria4_lineeditor_iteration_togglelock
-						( le,  &mod_xor, libandria4_lineeditor_mods_scroll );
-					if( !resi )
-					{
-						???
-					}
-					if
-					(
-						( le->modifiers & libandria4_lineeditor_mods_select ) &&
-						( le->modifiers & libandria4_lineeditor_mods_scroll )
-					)
-					{
-						mod_xor |= libandria4_lineeditor_mods_select;
-					}
-					break;
-						/* Common modifiers */
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Ctrl:
-					resi =
-						libandria4_lineeditor_iteration_shift
-						( le,  &mod_xor, libandria4_lineeditor_mods_command );
-					if( !resi )
-					{
-						???
-					}
-					break;
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_InsertLock:
-					resi =
-						libandria4_lineeditor_iteration_togglelock
-						( le,  &mod_xor, libandria4_lineeditor_mods_insert );
-					if( !resi )
-					{
-						???
-					}
-					break;
-					
-						/* Movement */
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Begin:
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Home:
-					resi = libandria4_lineeditor_iteration_extent( le, 0 );
-					if( !resi )
-					{
-						??? ;
-					}
-					break;
-						/* End key. */
-				case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_End:
-					resi = libandria4_lineeditor_iteration_extent( le, ??? /* End of line. */ );
-					if( !resi )
-					{
-						??? ;
-					}
-					break;
 				default:
 					if( !( le->key & LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODEMASK_Unicode_illegal_mask ) )
 					{
@@ -365,6 +273,19 @@ libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_clo
 					} else {
 						
 						/* General commands and other unrecognized things. */
+						
+						
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_InsertLock:
+								/* Explicit scrolling. */
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScrollLock:
+								/* Explicit selection. */
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ShiftLock:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_SelectLock:
+						
+							/* Temporary modifiers */
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ExtendSelection:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Shift:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Ctrl:
 							
 							/* Implicit exits */
 						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurUp:
@@ -420,6 +341,11 @@ libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_clo
 						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Copy:
 						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Delegate:
 						
+								/* Movement */
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Home:
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_End:
+							/* Something X11 supports, maybe for forms? */
+						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Begin:
 						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurRight:
 						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurLeft:
 						case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerRight:
@@ -449,21 +375,68 @@ libandria4_cts_closure libandria4_lineeditor_iteration_onkey( libandria4_cts_clo
 	/* Should pop ret from the stack somewhere in this exec chain. */
 libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_closure *ctx, void *le_ )
 {
-	libandria4_cts_closure ret =
-		LIBANDRIA4_CTS_BUILDCLOSURE( &libandria4_lineeditor_iteration, le );
-	int resi, gate = 0;
-	size_t start = 0, len = 0;
-	
 	libandria4_lineeditor *le = (libandria4_lineeditor*)le_;
-	
 	if( !le || !isvalid( le ) )
 	{
 		??? ;
 	}
 	
+	libandria4_cts_closure ret =
+		LIBANDRIA4_CTS_BUILDCLOSURE( &libandria4_lineeditor_iteration, le );
+	int resi, gate = 0;
+	size_t start = 0, len = 0;
+	uint8_t mask = 0, item, mod_xor = 0;
+	
+	/* TODO: verify ALL of the logic that sets mask or gate. */
+	
 		/* Preparation. */
 	switch( le->key )
 	{
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_InsertLock:
+			item = libandria4_lineeditor_mods_insert;
+			break;
+				/* Explicit scrolling. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScrollLock:
+			item = libandria4_lineeditor_mods_scroll;
+			if
+			(
+				( le->modifiers & libandria4_lineeditor_mods_select ) &&
+				( le->modifiers & libandria4_lineeditor_mods_scroll )
+			)
+			{
+				mask = libandria4_lineeditor_mods_select;
+			}
+			break;
+				/* Explicit selection. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ShiftLock:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_SelectLock:
+			item = libandria4_lineeditor_mods_select;
+			if
+			(
+				( le->modifiers & libandria4_lineeditor_mods_select ) &&
+				( le->modifiers & libandria4_lineeditor_mods_scroll )
+			)
+			{
+				mask = libandria4_lineeditor_mods_scroll;
+			}
+			break;
+			
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ExtendSelection:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Shift:
+			item = libandria4_lineeditor_mods_select;
+			if
+			(
+				( le->modifiers & libandria4_lineeditor_mods_select ) &&
+				( le->modifiers & libandria4_lineeditor_mods_scroll )
+			)
+			{
+				mask = libandria4_lineeditor_mods_scroll;
+			}
+			break;
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Ctrl:
+			item = libandria4_lineeditor_mods_command;
+			break;
+			
 			/* Deletions */
 				/* Note that command -backerase or -forwarderase should get rid of the relevant word! */
 				/* These delete selections if existent, else their named function. */
@@ -490,6 +463,15 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 			gate = ( le->cursor < le->str->len );
 			break;
 			
+			/* Movement */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Begin:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Home:
+			start = 0;
+			break;
+				/* End key. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_End:
+			start = le->str->len;
+			break;
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurRight:
 			gate = 1;
 			start = 0;
@@ -544,6 +526,7 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 			
 			
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_DeleteWord:
+			??? ;
 		
 		
 		
@@ -558,6 +541,38 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 	{
 		case 7: /* Ascii Bell. */
 			ret = le->alerter;
+			break;
+			
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_InsertLock:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ScrollLock:
+				/* Explicit selection. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ShiftLock:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_SelectLock:
+			resi =
+				libandria4_lineeditor_iteration_togglelock
+				( le,  &mod_xor, item );
+			if( !resi )
+			{
+				???
+			}
+			if( mask )
+			{
+				mod_xor |= mask;
+			}
+			break;
+			
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_ExtendSelection:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Shift:
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Ctrl:
+			resi = libandria4_lineeditor_iteration_shift( le,  &mod_xor, item );
+			if( !resi )
+			{
+				???
+			}
+			if( mask )
+			{
+				mod_xor |= mask;
+			}
 			break;
 			
 			/* Implicit exits */
@@ -659,6 +674,17 @@ libandria4_cts_closure libandria4_lineeditor_iteration_command( libandria4_cts_c
 			break;
 			
 			/* Navigation keys. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Home:
+				/* Not actually sure what this is for, but X11 has it. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_Begin:
+				/* End key. */
+		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_End:
+			resi = libandria4_lineeditor_iteration_extent( le, start );
+			if( !resi )
+			{
+				??? ;
+			}
+			break;
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurRight:
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_CurLeft:
 		case LIBANDRIA4_COMMONIOKEYS_SIMPLEKEYCODE_PointerRight:
