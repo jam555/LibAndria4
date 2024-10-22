@@ -144,6 +144,11 @@ int libandria4_memreverse( void *base_, size_t count, size_t size )
 }
 
 
+
+/* ... TODO: Move these error-reporter functions elsewhere. commonlib.h/.c */
+/*  should eventually not rely on commonio.h at all, but these shouldn't be */
+/*  de-coupled from it. */
+	/* Remember to remove the note about this TODO in commonlib.h */
 libandria4_error_mayerr libandria4_error_print_simplestruct
 (
 	libandria4_commonio_handle *io,
@@ -290,6 +295,7 @@ libandria4_error_mayerr libandria4_error_print
 }
 
 
+
 libandria4_error_mayerr libandria4_sleep( uint32_t millisecs )
 {
 	#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
@@ -298,6 +304,8 @@ libandria4_error_mayerr libandria4_sleep( uint32_t millisecs )
 		
 		LIBANDRIA4_ERROR_MAYERR_RETURN_SUCCESS();
 		
+		/* TODO : Adapt this to use LibAndria's centralized platform detection. */
+			/* Remove the commonlib.h note when done. */
 	#elif defined(_POSIX_VERSION) || __unix__ || __linux__ || __QNX__ || __ANDROID__ || __APPLE__
 		
 		libandria4_result ret = libandria4_errno_2result();
@@ -354,4 +362,132 @@ libandria4_error_mayerr libandria4_sleep( uint32_t millisecs )
 		LIBANDRIA4_ERROR_MAYERR_RETURN_SUCCESS();
 		
 	#endif
+}
+
+
+int libandria4_cb_ctoi_feedint_c( void *dest, char ignore, int num )
+{
+	libandria4_cb_ctoi_intconv *ic = (*libandria4_cb_ctoi_intconv)dest;
+	
+	if( ic )
+	{
+		ic->stat = ( num >= 0 ? 1 : -1 );
+		ic->num = ( num ? num : 0 );
+	}
+	
+	return( num );
+}
+int libandria4_cb_atoi_feedint_s( void *dest,  size_t ig2, char *ig3, size_t off,  int num )
+{
+	libandria4_cb_ctoi_intconv *ic = (*libandria4_cb_ctoi_intconv)dest;
+	
+	if( ic )
+	{
+		ic->stat = ( off ? 1 : -1 );
+		ic->num = ( off ? num : 0 );
+	}
+	
+	return( num );
+}
+
+libandria4_commonlib_charchar_eithfork libandria4_cb_ctoi( char c,  void *data, int (*func)( void*, char, int ) )
+{
+#if 0
+	#error "libandria4_cb_ctoi() only supports ASCII and similar formats, with all numbers in a contiguous block."
+#else
+	int ret =  c - '0';
+	
+	if( ret < 0 || ret > 9 )
+	{
+		LIBANDRIA4_COMMONLIB_CHARFORK_RETFOREIGN( c );
+	}
+	
+	if( func )
+	{
+		LIBANDRIA4_COMMONLIB_CHARFORK_RETMATCH( func( data, c, ret ) );
+		
+	} else {
+		
+		LIBANDRIA4_COMMONLIB_CHARFORK_RETERROR( LIBANDRIA4_RESULT_FAILURE_DOMAIN );
+	}
+#endif
+}
+libandria4_commonlib_charchar_eithfork libandria4_ctoi( char c )
+{
+	return( libandria4_cb_ctoi( c,  (void*)0, &libandria4_cb_ctoi_feedint_c ) );
+}
+
+libandria4_commonlib_intint_eithfork libandria4_cb_atoi
+(
+	size_t len,
+	char *c,
+	
+	void *data,
+	int (*func)( void*,  size_t, char*, size_t,  int )
+)
+{
+		/* The smallest value that will overflow an int if multiplied by 10. */
+	static const int int_penultideci = (( INT_MAX - ( INT_MAX % 10 )) / 10 ) + 1;
+	libandria4_cb_ctoi_intconv ic = { 0, 1 };
+	size_t off = 0;
+	int ret = 0, mul = 1;
+	
+	if( off >= len || !c )
+	{
+		LIBANDRIA4_COMMONLIB_INTFORK_RETERROR( LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS );
+	}
+	
+	if( c[ off ] == '-' )
+	{
+		mul = -1;
+		off++;
+	}
+	while( off < len && ic.stat == 1 && ret < int_penultideci )
+	{
+		ret *= 10;
+		ret += ic.num;
+		
+		libandria4_cb_ctoi( c[ off ],  (void*)&ic, &libandria4_cb_ctoi_feedint_c );
+		
+		off++;
+	}
+	if( ic.stat == 1 )
+	{
+		/* Clean-up special cases. */
+		
+		if( ret >= int_penultideci )
+		{
+			/* Overflow impending! */
+			
+			ic.stat = 2;
+			off--;
+			
+		} else {
+			
+			/* Last character needs to be accumulated! */
+			
+			ret *= 10;
+			ret += ic.num;
+		}
+	}
+	ret *= mul;
+	
+	if( func )
+	{
+		ret = func( data,  len, c, off,  ret );
+	}
+	if( !off )
+	{
+		LIBANDRIA4_COMMONLIB_INTFORK_RETERROR( LIBANDRIA4_RESULT_FAILURE_INDIRDOMAIN );
+	}
+	if( ic.stat == 2 )
+	{
+		LIBANDRIA4_COMMONLIB_CHARFORK_RETFOREIGN( off );
+	}
+	
+	LIBANDRIA4_COMMONLIB_INTFORK_RETMATCH( ret );
+}
+libandria4_commonlib_intint_eithfork libandria4_atoi( size_t len, char *c )
+{
+	return( libandria4_cb_atoi( len, c,  (void*)0, 0 ) );
 }
