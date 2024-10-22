@@ -42,6 +42,36 @@ SOFTWARE.
 	
 	
 	#define LIBANDRIA4_OP_UNARYIDENTITY( val ) (val)
+	#define LIBANDRIA4_OP_UNARYFROMPTR( val ) ( *(val) )
+	#define LIBANDRIA4_OP_UNARYTOPTR( val ) ( &(val) )
+	
+	
+	#define LIBANDRIA4_OP_ISVALvoid( ... ) ( void )
+	
+	#define LIBANDRIA4_OP_ISVAL0( ... ) ( 0 )
+	#define LIBANDRIA4_OP_ISVAL1( ... ) ( 1 )
+	#define LIBANDRIA4_OP_ISVAL2( ... ) ( 2 )
+	#define LIBANDRIA4_OP_ISVAL3( ... ) ( 3 )
+	#define LIBANDRIA4_OP_ISVAL4( ... ) ( 4 )
+	#define LIBANDRIA4_OP_ISVAL5( ... ) ( 5 )
+	#define LIBANDRIA4_OP_ISVAL6( ... ) ( 6 )
+	#define LIBANDRIA4_OP_ISVAL7( ... ) ( 7 )
+	#define LIBANDRIA4_OP_ISVAL8( ... ) ( 8 )
+	#define LIBANDRIA4_OP_ISVAL9( ... ) ( 9 )
+	
+	#define LIBANDRIA4_OP_ISVARtmp( ... ) ( tmp )
+	#define LIBANDRIA4_OP_ISVARret( ... ) ( ret )
+	#define LIBANDRIA4_OP_ISVARres( ... ) ( res )
+	#define LIBANDRIA4_OP_ISVARa( ... ) ( a )
+	#define LIBANDRIA4_OP_ISVARb( ... ) ( b )
+	#define LIBANDRIA4_OP_ISVARc( ... ) ( c )
+	#define LIBANDRIA4_OP_ISVARd( ... ) ( d )
+	#define LIBANDRIA4_OP_ISVARe( ... ) ( e )
+		/* NEVER treat dummy as holding meaningful data, it ONLY exists to */
+		/*  fill syntactically-demanded value/variable slots (such as in */
+		/*  ternary operations). */
+	#define LIBANDRIA4_OP_ISVARdummy( ... ) ( dummy )
+	
 	
 		/* These are somewhat "special": they're used when you need to embed */
 		/*  a "set" operation via macro. You can always define more of these */
@@ -54,6 +84,10 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETc( val ) ( c = (val) )
 	#define LIBANDRIA4_OP_SETd( val ) ( d = (val) )
 	#define LIBANDRIA4_OP_SETe( val ) ( e = (val) )
+		/* NEVER treat dummy as holding meaningful data, it ONLY exists to */
+		/*  fill syntactically-demanded value/variable slots (such as in */
+		/*  ternary operations). */
+	#define LIBANDRIA4_OP_SETdummy( val ) ( dummy = (val) )
 	
 		/* Take the pointers of variables instead. */
 	#define LIBANDRIA4_OP_SETtmpPTR( var ) ( tmp = &(var) )
@@ -64,6 +98,10 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETcPTR( var ) ( c = &(var) )
 	#define LIBANDRIA4_OP_SETdPTR( var ) ( d = &(var) )
 	#define LIBANDRIA4_OP_SETePTR( var ) ( e = &(var) )
+		/* NEVER treat dummy as holding meaningful data, it ONLY exists to */
+		/*  fill syntactically-demanded value/variable slots (such as in */
+		/*  ternary operations). */
+	#define LIBANDRIA4_OP_SETdummyptr( val ) ( dummy = &(val) )
 	
 	/* Treat different members AS pointers. */
 	#define LIBANDRIA4_OP_SETtmpREF( var ) ( tmp = *(var) )
@@ -74,6 +112,10 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETcREF( var ) ( c = *(var) )
 	#define LIBANDRIA4_OP_SETdREF( var ) ( d = *(var) )
 	#define LIBANDRIA4_OP_SETeREF( var ) ( e = *(var) )
+		/* NEVER treat dummy as holding meaningful data, it ONLY exists to */
+		/*  fill syntactically-demanded value/variable slots (such as in */
+		/*  ternary operations). */
+	#define LIBANDRIA4_OP_SETdummyREF( val ) ( dummy = *(val) )
 	
 	#define LIBANDRIA4_OP_SETREFtmp( var ) ( *tmp = (var) )
 	#define LIBANDRIA4_OP_SETREFret( var ) ( *ret = (var) )
@@ -83,6 +125,10 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETREFc( var ) ( *c = (var) )
 	#define LIBANDRIA4_OP_SETREFd( var ) ( *d = (var) )
 	#define LIBANDRIA4_OP_SETREFe( var ) ( *e = (var) )
+		/* NEVER treat dummy as holding meaningful data, it ONLY exists to */
+		/*  fill syntactically-demanded value/variable slots (such as in */
+		/*  ternary operations). */
+	#define LIBANDRIA4_OP_SETREFdummy( val ) ( *dummy = (val) )
 	
 	#define LIBANDRIA4_OP_SETREFtmpREF( var ) ( *tmp = *(var) )
 	#define LIBANDRIA4_OP_SETREFretREF( var ) ( *ret = *(var) )
@@ -92,6 +138,10 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETREFcREF( var ) ( *c = *(var) )
 	#define LIBANDRIA4_OP_SETREFdREF( var ) ( *d = *(var) )
 	#define LIBANDRIA4_OP_SETREFeREF( var ) ( *e = *(var) )
+		/* NEVER treat dummy as holding meaningful data, it ONLY exists to */
+		/*  fill syntactically-demanded value/variable slots (such as in */
+		/*  ternary operations). */
+	#define LIBANDRIA4_OP_SETREFdummyREF( val ) ( *dummy = *(val) )
 	
 	#define LIBANDRIA4_OP_SETREFtmpPTR( var ) ( *tmp = &(var) )
 	#define LIBANDRIA4_OP_SETREFretPTR( var ) ( *ret = &(var) )
@@ -101,6 +151,10 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETREFcPTR( var ) ( *c = &(var) )
 	#define LIBANDRIA4_OP_SETREFdPTR( var ) ( *d = &(var) )
 	#define LIBANDRIA4_OP_SETREFePTR( var ) ( *e = &(var) )
+		/* NEVER treat dummy as holding meaningful data, it ONLY exists to */
+		/*  fill syntactically-demanded value/variable slots (such as in */
+		/*  ternary operations). */
+	#define LIBANDRIA4_OP_SETREFdummyPTR( val ) ( *dummy = &(val) )
 	
 	/* These are all about hard-wired values. */
 	
