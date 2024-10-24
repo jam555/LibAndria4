@@ -221,7 +221,41 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETaPTRbPTR( aa, bb ) ( a = &(aa), b = &(bb) )
 	#define LIBANDRIA4_OP_SETbPTRcPTR( bb, cc ) ( b = &(bb), c = &(cc) )
 	#define LIBANDRIA4_OP_SETcPTRdPTR( cc, dd ) ( c = &(cc), d = &(dd) )
-	#define LIBANDRIA4_OP_SETdPTRePTR( dd, ee ) ( d = &(dd), e = &(ee) )
+	#define LIBANDRIA4_OP_SETdPTRePTR( dd, ee ) ( d = &(dd), e = &(ee) ) /*  */
+	
+	
+		/* Sometimes we need to set two at once. */
+	#define LIBANDRIA4_OP_SETtmpFLAGtmpASn1( val ) ( tmp = (val), res = -1 )
+	#define LIBANDRIA4_OP_SETretFLAGresASn1( val ) ( ret = (val), res = -1 )
+	#define LIBANDRIA4_OP_SETaFLAGresASn1( val ) ( a = (val), res = -1 )
+	#define LIBANDRIA4_OP_SETbFLAGresASn1( val ) ( b = (val), res = -1 )
+	#define LIBANDRIA4_OP_SETcFLAGresASn1( val ) ( c = (val), res = -1 )
+	#define LIBANDRIA4_OP_SETdFLAGresASn1( val ) ( d = (val), res = -1 )
+	#define LIBANDRIA4_OP_SETdFLAGresASn1( val ) ( e = (val), res = -1 )
+	
+	#define LIBANDRIA4_OP_SETtmpFLAGtmpAS0( val ) ( tmp = (val), res = 0 )
+	#define LIBANDRIA4_OP_SETretFLAGresAS0( val ) ( ret = (val), res = 0 )
+	#define LIBANDRIA4_OP_SETaFLAGresAS0( val ) ( a = (val), res = 0 )
+	#define LIBANDRIA4_OP_SETbFLAGresAS0( val ) ( b = (val), res = 0 )
+	#define LIBANDRIA4_OP_SETcFLAGresAS0( val ) ( c = (val), res = 0 )
+	#define LIBANDRIA4_OP_SETdFLAGresAS0( val ) ( d = (val), res = 0 )
+	#define LIBANDRIA4_OP_SETdFLAGresAS0( val ) ( e = (val), res = 0 )
+	
+	#define LIBANDRIA4_OP_SETtmpFLAGtmpAS1( val ) ( tmp = (val), res = 1 )
+	#define LIBANDRIA4_OP_SETretFLAGresAS1( val ) ( ret = (val), res = 1 )
+	#define LIBANDRIA4_OP_SETaFLAGresAS1( val ) ( a = (val), res = 1 )
+	#define LIBANDRIA4_OP_SETbFLAGresAS1( val ) ( b = (val), res = 1 )
+	#define LIBANDRIA4_OP_SETcFLAGresAS1( val ) ( c = (val), res = 1 )
+	#define LIBANDRIA4_OP_SETdFLAGresAS1( val ) ( d = (val), res = 1 )
+	#define LIBANDRIA4_OP_SETdFLAGresAS1( val ) ( e = (val), res = 1 )
+	
+	#define LIBANDRIA4_OP_SETtmpFLAGtmpAS2( val ) ( tmp = (val), res = 2 )
+	#define LIBANDRIA4_OP_SETretFLAGresAS2( val ) ( ret = (val), res = 2 )
+	#define LIBANDRIA4_OP_SETaFLAGresAS2( val ) ( a = (val), res = 2 )
+	#define LIBANDRIA4_OP_SETbFLAGresAS2( val ) ( b = (val), res = 2 )
+	#define LIBANDRIA4_OP_SETcFLAGresAS2( val ) ( c = (val), res = 2 )
+	#define LIBANDRIA4_OP_SETdFLAGresAS2( val ) ( d = (val), res = 2 )
+	#define LIBANDRIA4_OP_SETdFLAGresAS2( val ) ( e = (val), res = 2 )
 	
 	
 		/* Returns to match the sets above. */

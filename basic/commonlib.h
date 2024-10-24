@@ -90,6 +90,11 @@ SOFTWARE.
 			libandria4_commonlib_byte,
 			libandria4_commonlib_err
 	);
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_commonlib_eithvoidp,
+			void*,
+			libandria4_commonlib_err,
+	);
 	
 		/* Defines libandria4_commonlib_charchar_fork{} and */
 		/*  libandria4_commonlib_charchar_eithfork{}. */
@@ -373,6 +378,41 @@ SOFTWARE.
 		return( LIBANDRIA4_COMMONLIB_EITHBYTE_BYTE( val ) )
 	#define LIBANDRIA4_COMMONLIB_EITHBYTE_RETERR( val ) \
 		return( LIBANDRIA4_COMMONLIB_EITHBYTE_ERR( val ) )
+	
+	
+	
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_VOIDP( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonlib_eithvoidp, void*, val )
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_ERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_commonlib_eithvoidp, libandria4_commonlib_err, val )
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_ERR_1() LIBANDRIA4_COMMONLIB_EITHVOIDP_ERR( 1 )
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_ERR_2() LIBANDRIA4_COMMONLIB_EITHVOIDP_ERR( 2 )
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_ERR_3() LIBANDRIA4_COMMONLIB_EITHVOIDP_ERR( 3 )
+	
+		/* The *BODY* version takes statements, *EXPR* takes expressions. */
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_BODYMATCH( var,  onsucc, onerr ) \
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var,  onsucc, onerr )
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_EXPRMATCH( var,  onsucc, onerr ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var,  onsucc, onerr )
+			/* onsucc() should usually return a */
+				/* LIBANDRIA4_COMMONIO_MAYERR_NOERR() */
+			/*  but generally MUST return a libandria4_commonio_mayerr. */
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_EXPRCHAIN( var,  onsucc ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRCHAIN( \
+			var,  onsucc, LIBANDRIA4_COMMONLIB_MAYERR_JUSTERR )
+			/* A shallow wrapper around *_EXPRMATCH. */
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_REDUCE( var,  reduce_a, reduce_b ) \
+		LIBANDRIA4_MONAD_EITHER_REDUCE( var,  reduce_a, reduce_b )
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_TO_MAYERR( var ) \
+		LIBANDRIA4_COMMONIO_EITHBYTE_REDUCE( \
+			var, \
+				LIBANDRIA4_COMMONLIB_MAYERR_FORCE_NOERR, \
+				LIBANDRIA4_COMMONLIB_MAYERR_JUSTERR )
+	
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_RETBYTE( val ) \
+		return( LIBANDRIA4_COMMONLIB_EITHVOIDP_BYTE( val ) )
+	#define LIBANDRIA4_COMMONLIB_EITHVOIDP_RETERR( val ) \
+		return( LIBANDRIA4_COMMONLIB_EITHVOIDP_ERR( val ) )
 	
 	
 	
