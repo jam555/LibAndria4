@@ -67,8 +67,11 @@ SOFTWARE.
 		/*  defined for it (various string operations). */
 	#include "pascalstring.h"
 	
-		/* Declares libandria4_charparrptr_pascalarray{} */
+		/* Declares libandria4_charparrptr_pascalarray{}, and matching types */
+		/*  for wchar_t and utf32 strings. */
 	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_charparrptr_, libandria4_char_pascalarray* );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_wcharparrptr_, libandria4_wchar_pascalarray* );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_utf32parrptr_, libandria4_utf32_pascalarray* );
 	
 #endif
 /* End lib4 basic commonparrs.h */
