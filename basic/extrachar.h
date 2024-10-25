@@ -50,14 +50,16 @@ SOFTWARE.
 	#include <stddef.h>
 		/* The uint*_t and int*_t types. */
 	#include <stdint.h>
+	#include <errno.h>
 	
 	#include "stdmonads.h"
-		/* Because we WILL want to define full string-handling support. */
-	#include "pascalstring.h"
 	#include "commonlib.h"
 	
-	/* We need an include for the stream type we'll be using. I guess we */
-	/*  need to write a mutastream backend? */
+	#include "stream.h"
+	
+		/* Because we WILL want to define full string-handling support. */
+	#include "pascalstring.h"
+	#include "commonparrs.h"
 	
 	
 	
@@ -114,32 +116,72 @@ SOFTWARE.
 	} libandria4_extrachar_flags;
 	
 	
+		/*
+			* pascalarray
+			* parr (a duplicate of * pascalarray)
+			* pascalarray_result
+			* parrres (a duplicate of * pascalarray_result)
+			* pascalarray_excerpt
+			* pascalarray_excerpt_result
+			* pascalarray_tracker
+			* pascalarray_tracker_result
+		*/
+	typedef libandria4_utf32_pascalarray_tracker libandria4_extrachar_stringtracker;
+		/* libandria4_extrachar_stringtracker_pascalarray{} */
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE(
+		libandria4_extrachar_stringtracker_,
+		libandria4_extrachar_stringtracker );
+	typedef libandria4_extrachar_stringtracker_pascalarray libandria4_extrachar_nameparr;
+	
+	
+	typedef struct libandria4_extrachar_stream
+	{
+		libandria4_extrachar_stringtracker name;
+		
+			/* Data source. Note that buf should be drawn from first. */
+		libandria4_commonio_handle *hand;
+		libandria4_extrachar_pascalarray *buf;
+		size_t used;
+		
+			/* These may or may not get used by the streamset, depending */
+			/*  on it's configuration. */
+		uintmax_t line, column;
+		libandria4_extrachar_flags flags;
+		
+			/* Note: set this to 0, then let the streamset do everything */
+			/*  else. Only the streamset should modify it after it's */
+			/*  initialization. */
+		size_t index;
+		
+	} libandria4_extrachar_stream;
+	libandria4_extrachar_result libandria4_extrachar_getchar
+	(
+		libandria4_extrachar_stream *stream,
+			uintmax_t *over_line,
+			uintmax_t *over_col,
+			libandria4_extrachar_flags *over_flags
+	);
+	int libandria4_extrachar_ungetchar
+	(
+		libandria4_extrachar_stream *stream,
+			libandria4_extrachar ec
+	);
+	libandria4_extrachar_result libandria4_extrachar_peekchar
+	(
+		libandria4_extrachar_stream *stream,
+			uintmax_t *over_line,
+			uintmax_t *over_col,
+			libandria4_extrachar_flags *over_flags
+	);
+	
+	
 	
 	
 	/* The code below here is incomplete: Finish it before using this file. */
 	
 	
 	
-		/* A set of identifiers for the streams being used by a particular */
-		/*  sequence of extrachars. Individual identifiers should have */
-		/*  their ref counts control their lifetimes, so that individual */
-		/*  "slots" can be reused when available. The streamset() should */
-		/*  be managed via refcount too. */
-		/* Actually, thinking about it, the streamset should SPECIFICALLY */
-		/*  be tracked by user code, not individual extrachars. Doing */
-		/*  otherwise would be a bit much bloat to really justify, even if */
-		/*  extrachars use proportionatly no space. Instead of coding it */
-		/*  explicitly, use the refcount/refpointer "monads" for it. */
-	typedef struct libandria4_extrachar_streamset
-	{
-		pascalarray< ??? > *streamnames;
-		uintmax_t line, column;
-		libandria4_extrachar_flags flags;
-		size_t curstream;
-		
-		??? ;
-		
-	} libandria4_extrachar_streamset;
+	typedef struct libandria4_extrachar_streamset libandria4_extrachar_streamset;
 	
 	typedef struct libandria4_extrachar
 	{
@@ -155,6 +197,29 @@ SOFTWARE.
 		libandria4_extrachar_flags flags;
 		
 	} libandria4_extrachar;
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_extrachar_, libandria4_extrachar );
+	
+		/* A set of identifiers for the streams being used by a particular */
+		/*  sequence of extrachars. Individual identifiers should have */
+		/*  their ref counts control their lifetimes, so that individual */
+		/*  "slots" can be reused when available. The streamset() should */
+		/*  be managed via refcount too. */
+		/* Actually, thinking about it, the streamset should SPECIFICALLY */
+		/*  be tracked by user code, not individual extrachars. Doing */
+		/*  otherwise would be a bit much bloat to really justify, even if */
+		/*  extrachars use proportionatly no space. Instead of coding it */
+		/*  explicitly, use the refcount/refpointer "monads" for it. */
+	struct libandria4_extrachar_streamset
+	{
+		libandria4_extrachar_stream *stream;
+		
+		libandria4_extrachar_flags flags;
+		
+		libandria4_extrachar_nameparr *streamnames;
+		
+		??? ;
+		
+	};
 	
 	LIB4_MONAD_EITHER_BUILDTYPE_DEFINITION(
 		libandria4_extrachar_result,
@@ -165,13 +230,13 @@ SOFTWARE.
 		libandria4_commonlib_eithvoidp
 	);
 	
-	#define LIBANDRIA4_EXTRACHARRESULT_SUCCESS( val ) \
+	#define LIBANDRIA4_EXTRACHARRESULT_BUILDSUCCESS( val ) \
 		LIB4_MONAD_EITHER_BUILDLEFT( libandria4_extrachar_result, libandria4_extrachar, (val) )
-	#define LIBANDRIA4_EXTRACHARRESULT_ERROR_VOIDP( val ) \
+	#define LIBANDRIA4_EXTRACHARRESULT_BUILDERROR_VOIDP( val ) \
 		LIB4_MONAD_EITHER_BUILDRIGHT( \
 			libandria4_extrachar_result, libandria4_commonlib_eithvoidp, \
 			LIBANDRIA4_COMMONLIB_EITHVOIDP_VOIDP( val ) )
-	#define LIBANDRIA4_EXTRACHARRESULT_ERROR_NUM( val ) \
+	#define LIBANDRIA4_EXTRACHARRESULT_BUILDERROR_NUM( val ) \
 		LIB4_MONAD_EITHER_BUILDRIGHT( \
 			libandria4_extrachar_result, libandria4_commonlib_eithvoidp, \
 			LIBANDRIA4_COMMONLIB_EITHVOIDP_ERR( val ) )
@@ -199,21 +264,10 @@ SOFTWARE.
 						onptrerr, onnumerr ) ) )
 	
 	#define LIBANDRIA4_EXTRACHARRESULT_RETURNSUCCESS( val ) \
-		return( LIBANDRIA4_EXTRACHARRESULT_SUCCESS( val ) )
+		return( LIBANDRIA4_EXTRACHARRESULT_BUILDSUCCESS( val ) )
 	#define LIBANDRIA4_EXTRACHARRESULT_RETURNERROR_VOIDP( val ) \
-		return( LIBANDRIA4_EXTRACHARRESULT_ERROR_VOIDP( val ) )
+		return( LIBANDRIA4_EXTRACHARRESULT_BUILDERROR_VOIDP( val ) )
 	#define LIBANDRIA4_EXTRACHARRESULT_RETURNERROR_NUM( val ) \
-		return( LIBANDRIA4_EXTRACHARRESULT_ERROR_NUM( val ) )
-	
-	
-	
-	/* The code below here is completely untouched: fix it up before using this file. */
-	
-	
-	
-	int popas_extrachar( stackpair *stkp, void *v,  extrachar *ec );
-	extrachar_result get_extrachar( stackpair *stkp, void *v );
-	extrachar_result peek_extrachar( stackpair *stkp, void *v );
-	int unget_extrachar( extrachar ec );
+		return( LIBANDRIA4_EXTRACHARRESULT_BUILDERROR_NUM( val ) )
 	
 #endif
