@@ -103,6 +103,14 @@ SOFTWARE.
 	
 	
 	
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_NOOP( tracked, file_p, vtab_p ) \
+		( /* No-op. */ )
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_ONDIE( pstr_p, vtab_p ) \
+		( ( mf && mf->dealloc ) ? \
+			(mf->dealloc)( mf->data, (pstr_p) ) ), \
+		(pstr_p) = 0
+	
+	
 		/* Note: DOES include the ending null! */
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_STATICBUILD( outername, innername, head, type, str ) \
 		static struct { head##pascalarray innername; type libandria4_pascalarray_arrmember[ \
@@ -313,9 +321,14 @@ SOFTWARE.
 		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
 			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ); \
 		head##pascalarray_excerpt_result head##stringops_memeqspn( head##pascalarray *str, \
-			head##pascalarray *matches, size_t curPos, int stepForward, int spanMatch );
+			head##pascalarray *matches, size_t curPos, int stepForward, int spanMatch ); \
+		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREDECL( \
+			head##pascalarray_tracker, head##pascalarray* ); \
+		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( \
+			head##pascalarray_tracker_result, \
+			head##pascalarray_tracker, libandria4_failure_uipresult );
 	
-	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREFINE( head, type, operhead ) \
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREDEFINE( head, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_DECIMALINCR( head, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILD( head, type, operhead ) \
@@ -325,7 +338,13 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head##pascalarray, operhead )
+		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head##pascalarray, operhead ) \
+		\
+		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREIMPL( \
+			head##pascalarray_tracker, head##pascalarray*, \
+				LIBANDRIA4_DEFINE_PASCALSTRING_NOOP, \
+				LIBANDRIA4_DEFINE_PASCALSTRING_NOOP, \
+				LIBANDRIA4_DEFINE_PASCALSTRING_ONDIE );
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( head, type ) \
@@ -344,7 +363,13 @@ SOFTWARE.
 		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
 			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ); \
 		head##pascalarray_excerpt_result head##stringops_memeqspn( head##pascalarray *str, \
-			head##pascalarray *matches, size_t curPos, int stepForward, int spanMatch );
+			head##pascalarray *matches, size_t curPos, int stepForward, int spanMatch ); \
+		\
+		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL( \
+			head##pascalarray_tracker, head##pascalarray* ); \
+		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( \
+			head##pascalarray_tracker_result, \
+			head##pascalarray_tracker, libandria4_failure_uipresult );
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
@@ -362,7 +387,14 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head##pascalarray, operhead )
+		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head##pascalarray, operhead ) \
+		\
+		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDIMPL( \
+			head##pascalarray_tracker, head##pascalarray*, \
+				(memfuncs_ptr) ,\
+				LIBANDRIA4_DEFINE_PASCALSTRING_NOOP, \
+				LIBANDRIA4_DEFINE_PASCALSTRING_NOOP, \
+				LIBANDRIA4_DEFINE_PASCALSTRING_ONDIE );
 		
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_STDDEFINE( head, type, operhead ) \
@@ -370,11 +402,8 @@ SOFTWARE.
 	
 	
 	
-	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_char_, char );
-	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_wchar_, wchar_t );
-	
+	#include <wchar.h>
 	#include <stdint.h>
-	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_utf32_, uint32_t );
 	
 	
 	/* These use standard language tools: change that. */
@@ -384,15 +413,62 @@ SOFTWARE.
 	int libandria4_utf32_isnewline( uint32_t c );
 	int libandria4_utf32_halfnewline( uint32_t c );
 	int libandria4_utf32_diversenewline( uint32_t c );
+	#define LIBANDRIA4_UTF32_REFPOINTER_BODYINIT( targvar, newval, aux,  failinit, badalloc, badata ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT( \
+			libandria4_utf32_pascalarray_tracker, targvar, newval, aux, \
+			failinit, badalloc, badata )
+	#define LIBANDRIA4_UTF32_REFPOINTER_WRAPPED_BODYSET( targvar, valptr,  failneglect, failattend, succneglect, succattend, ondead ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET( \
+			libandria4_utf32_pascalarray_tracker, targvar, valptr, \
+			failneglect, failattend, succneglect, succattend, ondead )
+	#define LIBANDRIA4_UTF32_REFPOINTER_WRAPPED_BODYDEINIT( targvar,  failneglect, succneglect, ondead ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYDEINIT( \
+			libandria4_utf32_pascalarray_tracker, targvar, \
+			failneglect, succneglect, ondead )
+	#define LIBANDRIA4_UTF32_REFPOINTER_EXPRINIT_NULL( targvar ) \
+		LIBANDRIA4_MONAD_REFPOINTER_EXPRINIT_NULL( \
+			libandria4_utf32_pascalarray_tracker, targvar )
 	
 	int libandria4_char_isnewline( char c );
 	int libandria4_char_tonum( char var );
 	int libandria4_char_stringops_ringincr( char* );
+	#define LIBANDRIA4_CHARPSTR_REFPOINTER_BODYINIT( targvar, newval, aux,  failinit, badalloc, badata ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT( \
+			libandria4_char_pascalarray_tracker, targvar, newval, aux, \
+			failinit, badalloc, badata )
+	#define LIBANDRIA4_CHARPSTR_REFPOINTER_WRAPPED_BODYSET( targvar, valptr,  failneglect, failattend, succneglect, succattend, ondead ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET( \
+			libandria4_char_pascalarray_tracker, targvar, valptr, \
+			failneglect, failattend, succneglect, succattend, ondead )
+	#define LIBANDRIA4_CHARPSTR_REFPOINTER_WRAPPED_BODYDEINIT( targvar,  failneglect, succneglect, ondead ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYDEINIT( \
+			libandria4_char_pascalarray_tracker, targvar, \
+			failneglect, succneglect, ondead )
+	#define LIBANDRIA4_CHARPSTR_REFPOINTER_EXPRINIT_NULL( targvar ) \
+		LIBANDRIA4_MONAD_REFPOINTER_EXPRINIT_NULL( \
+			libandria4_char_pascalarray_tracker, targvar )
 	
-	#include <wchar.h>
 	int libandria4_wchar_isnewline( wchar_t c );
 	int libandria4_wchar_tonum( wchar_t var );
 	int libandria4_wchar_stringops_ringincr( wchar_t *var );
+	#define LIBANDRIA4_WCHARPSTR_REFPOINTER_BODYINIT( targvar, newval, aux,  failinit, badalloc, badata ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT( \
+			libandria4_wchar_pascalarray_tracker, targvar, newval, aux, \
+			failinit, badalloc, badata )
+	#define LIBANDRIA4_WCHARPSTR_REFPOINTER_WRAPPED_BODYSET( targvar, valptr,  failneglect, failattend, succneglect, succattend, ondead ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET( \
+			libandria4_wchar_pascalarray_tracker, targvar, valptr, \
+			failneglect, failattend, succneglect, succattend, ondead )
+	#define LIBANDRIA4_WCHARPSTR_REFPOINTER_WRAPPED_BODYDEINIT( targvar,  failneglect, succneglect, ondead ) \
+		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYDEINIT( \
+			libandria4_wchar_pascalarray_tracker, targvar, \
+			failneglect, succneglect, ondead )
+	#define LIBANDRIA4_WCHARPSTR_REFPOINTER_EXPRINIT_NULL( targvar ) \
+		LIBANDRIA4_MONAD_REFPOINTER_EXPRINIT_NULL( \
+			libandria4_wchar_pascalarray_tracker, targvar )
+	
+	/* Note: LIBANDRIA4_MONAD_REFPOINTER_EXPRAPPLY( var,  func, onnull ) can */
+	/*  be used with ANY of the libandria4_*_pascalarray_tracker{} types. */
 	
 	
 	
@@ -433,6 +509,29 @@ SOFTWARE.
 	#define LIBANDRIA4_UTF32_STRINGOPS_zeroval() ( 0 )
 	#define LIBANDRIA4_UTF32_STRINGOPS_strlen( str ) ( libandria4_utf32_strlen( str ) )
 	#define LIBANDRIA4_UTF32_STRINGOPS_nullval() ( 48 )
+	
+	
+	
+	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_char_, char );
+	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_wchar_, wchar_t );
+	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_utf32_, uint32_t );
+	
+	/* Note that the following types will be produced for all three of the */
+	/*  declares above: */
+		/*
+			* pascalarray
+			* parr (a duplicate of * pascalarray)
+			* pascalarray_result
+			* parrres (a duplicate of * pascalarray_result)
+			* pascalarray_excerpt
+			* pascalarray_excerpt_result
+			* pascalarray_tracker
+			* pascalarray_tracker_result
+		*/
+	/* The *_result types follow the usual base-type/alt-type order, and all */
+	/*  of the alternate types are struct-wrapped integer members named val. */
+	/* For the *_excerpt types, look at pascalarray.h, but it's the obvious. */
+	/* The *_tracker types are ref-pointer instantiations, ala monads.h */
 	
 #endif
 /* End libandria4 basic text_pascalstring.h */
