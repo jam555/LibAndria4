@@ -225,7 +225,7 @@ SOFTWARE.
 	
 	
 		/* Sometimes we need to set two at once. */
-	#define LIBANDRIA4_OP_SETtmpFLAGtmpASn1( val ) ( tmp = (val), res = -1 )
+	#define LIBANDRIA4_OP_SETtmpFLAGresASn1( val ) ( tmp = (val), res = -1 )
 	#define LIBANDRIA4_OP_SETretFLAGresASn1( val ) ( ret = (val), res = -1 )
 	#define LIBANDRIA4_OP_SETaFLAGresASn1( val ) ( a = (val), res = -1 )
 	#define LIBANDRIA4_OP_SETbFLAGresASn1( val ) ( b = (val), res = -1 )
@@ -233,7 +233,7 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETdFLAGresASn1( val ) ( d = (val), res = -1 )
 	#define LIBANDRIA4_OP_SETdFLAGresASn1( val ) ( e = (val), res = -1 )
 	
-	#define LIBANDRIA4_OP_SETtmpFLAGtmpAS0( val ) ( tmp = (val), res = 0 )
+	#define LIBANDRIA4_OP_SETtmpFLAGresAS0( val ) ( tmp = (val), res = 0 )
 	#define LIBANDRIA4_OP_SETretFLAGresAS0( val ) ( ret = (val), res = 0 )
 	#define LIBANDRIA4_OP_SETaFLAGresAS0( val ) ( a = (val), res = 0 )
 	#define LIBANDRIA4_OP_SETbFLAGresAS0( val ) ( b = (val), res = 0 )
@@ -241,7 +241,7 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETdFLAGresAS0( val ) ( d = (val), res = 0 )
 	#define LIBANDRIA4_OP_SETdFLAGresAS0( val ) ( e = (val), res = 0 )
 	
-	#define LIBANDRIA4_OP_SETtmpFLAGtmpAS1( val ) ( tmp = (val), res = 1 )
+	#define LIBANDRIA4_OP_SETtmpFLAGresAS1( val ) ( tmp = (val), res = 1 )
 	#define LIBANDRIA4_OP_SETretFLAGresAS1( val ) ( ret = (val), res = 1 )
 	#define LIBANDRIA4_OP_SETaFLAGresAS1( val ) ( a = (val), res = 1 )
 	#define LIBANDRIA4_OP_SETbFLAGresAS1( val ) ( b = (val), res = 1 )
@@ -249,13 +249,48 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETdFLAGresAS1( val ) ( d = (val), res = 1 )
 	#define LIBANDRIA4_OP_SETdFLAGresAS1( val ) ( e = (val), res = 1 )
 	
-	#define LIBANDRIA4_OP_SETtmpFLAGtmpAS2( val ) ( tmp = (val), res = 2 )
+	#define LIBANDRIA4_OP_SETtmpFLAGresAS2( val ) ( tmp = (val), res = 2 )
 	#define LIBANDRIA4_OP_SETretFLAGresAS2( val ) ( ret = (val), res = 2 )
 	#define LIBANDRIA4_OP_SETaFLAGresAS2( val ) ( a = (val), res = 2 )
 	#define LIBANDRIA4_OP_SETbFLAGresAS2( val ) ( b = (val), res = 2 )
 	#define LIBANDRIA4_OP_SETcFLAGresAS2( val ) ( c = (val), res = 2 )
 	#define LIBANDRIA4_OP_SETdFLAGresAS2( val ) ( d = (val), res = 2 )
 	#define LIBANDRIA4_OP_SETdFLAGresAS2( val ) ( e = (val), res = 2 )
+	
+	
+		/* ... and sometimes we want to set a flag AND return a "special */
+		/*  value". */
+	#define LIBANDRIA4_OP_ISVARtmpFLAGresASn1( ... ) ( res = -1, tmp )
+	#define LIBANDRIA4_OP_ISVARretFLAGresASn1( ... ) ( res = -1, ret )
+	#define LIBANDRIA4_OP_ISVARaFLAGresASn1( ... ) ( res = -1, a )
+	#define LIBANDRIA4_OP_ISVARbFLAGresASn1( ... ) ( res = -1, b )
+	#define LIBANDRIA4_OP_ISVARcFLAGresASn1( ... ) ( res = -1, c )
+	#define LIBANDRIA4_OP_ISVARdFLAGresASn1( ... ) ( res = -1, d )
+	#define LIBANDRIA4_OP_ISVAReFLAGresASn1( ... ) ( res = -1, e )
+	
+	#define LIBANDRIA4_OP_ISVARtmpFLAGresAS0( ... ) ( res = 0, tmp )
+	#define LIBANDRIA4_OP_ISVARretFLAGresAS0( ... ) ( res = 0, ret )
+	#define LIBANDRIA4_OP_ISVARaFLAGresAS0( ... ) ( res = 0, a )
+	#define LIBANDRIA4_OP_ISVARbFLAGresAS0( ... ) ( res = 0, b )
+	#define LIBANDRIA4_OP_ISVARcFLAGresAS0( ... ) ( res = 0, c )
+	#define LIBANDRIA4_OP_ISVARdFLAGresAS0( ... ) ( res = 0, d )
+	#define LIBANDRIA4_OP_ISVAReFLAGresAS0( ... ) ( res = 0, e )
+	
+	#define LIBANDRIA4_OP_ISVARtmpFLAGresAS1( ... ) ( res = 1, tmp )
+	#define LIBANDRIA4_OP_ISVARretFLAGresAS1( ... ) ( res = 1, ret )
+	#define LIBANDRIA4_OP_ISVARaFLAGresAS1( ... ) ( res = 1, a )
+	#define LIBANDRIA4_OP_ISVARbFLAGresAS1( ... ) ( res = 1, b )
+	#define LIBANDRIA4_OP_ISVARcFLAGresAS1( ... ) ( res = 1, c )
+	#define LIBANDRIA4_OP_ISVARdFLAGresAS1( ... ) ( res = 1, d )
+	#define LIBANDRIA4_OP_ISVAReFLAGresAS1( ... ) ( res = 1, e )
+	
+	#define LIBANDRIA4_OP_ISVARtmpFLAGresAS2( ... ) ( res = 2, tmp )
+	#define LIBANDRIA4_OP_ISVARretFLAGresAS2( ... ) ( res = 2, ret )
+	#define LIBANDRIA4_OP_ISVARaFLAGresAS2( ... ) ( res = 2, a )
+	#define LIBANDRIA4_OP_ISVARbFLAGresAS2( ... ) ( res = 2, b )
+	#define LIBANDRIA4_OP_ISVARcFLAGresAS2( ... ) ( res = 2, c )
+	#define LIBANDRIA4_OP_ISVARdFLAGresAS2( ... ) ( res = 2, d )
+	#define LIBANDRIA4_OP_ISVAReFLAGresAS2( ... ) ( res = 2, e )
 	
 	
 		/* Returns to match the sets above. */
