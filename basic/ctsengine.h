@@ -133,11 +133,42 @@ SOFTWARE.
 			return( libandria4_cts_sizedpop( ctx, stack,  (void*)val, sizeof( type ) ) ); }
 	
 	#define LIBANDRIA4_CTS_DECPUSH( prefix, postfix, type ) \
-		int prefix ## push ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) *val );
+		int prefix ## push ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) *val ); \
+		int prefix ## push2 ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) data );
 	#define LIBANDRIA4_CTS_DEFPUSH( prefix, postfix, type ) \
 		int prefix ## push ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) *val ) { \
 			if( !val ) { return( -1 ); } \
-			return( libandria4_cts_sizedpush( ctx, stack,  (void*)val, sizeof( type ) ) ); }
+			return( libandria4_cts_sizedpush( ctx, stack,  (void*)val, sizeof( type ) ) ); } \
+		int prefix ## push2 ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) data ) { \
+			if( ctx ) { \
+				int res = prefix ## push ## postfix ( ctx, 1,  &data ); \
+				if( res > 0 ) { return( 1 ); } \
+				else if( res == -4 ) { \
+					/* Error: out of space, fix that. */ \
+					libandria4_char_pascalarray_result nalloc = \
+						libandria4_char_pascalarray_rebuild ( \
+							ctx->stacks->body[ stack ], \
+							ctx->stacks->body[ stack ]->len + 64 ); \
+					libandria4_char_pascalarray *a; \
+					libandria4_failure_uipresult e; \
+					res = 0; \
+					LIBANDRIA4_MONAD_EITHER_BODYMATCH( nalloc, \
+							LIBANDRIA4_OP_SETaFLAGresAS1, \
+							LIBANDRIA4_OP_SETeFLAGresASn1 ); \
+					if( 1 ) { \
+						ctx->stacks->body[ stack ] = a; \
+						res = prefix ## push ## postfix ( ctx, 1,  &data ); \
+							if( res ) { return( 2 ); } \
+							else { \
+								/* Just give up. */ \
+								return( -2 ); } } \
+					else if( -1 ) { \
+						/* We don't care anymore, just fail unto oblivion. */ \
+						return( -3 ); } \
+					else { \
+						return( -4 ); } } \
+				return( -5 ); } \
+			return( -1 ); }
 	
 	
 	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _schar, signed char );
@@ -206,6 +237,11 @@ SOFTWARE.
 		
 	} libandria4_cts_innerreturn_data;
 	libandria4_cts_closure libandria4_cts_innerreturn( libandria4_cts_context *ctx, void *dat );
+		/* An easy value for libandria4_cts_innerreturn_data->failfunc. */
+	libandria4_cts_closure libandria4_cts_innerreturn_returnstop
+	(
+		void *ign1, libandria4_cts_context *ign2, int ign3
+	);
 	
 #endif
 /* End libandria4 basic ctsengine.h */

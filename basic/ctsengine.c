@@ -265,19 +265,22 @@ LIBANDRIA4_CTS_DEFPUSH( libandria4_cts_, _ctsctxtp, libandria4_cts_context* );
 
 
 
+static libandria4_cts_closure libandria4_cts_innerreturn_stop;
+
+static libandria4_cts_closure libandria4_cts_innerreturn_stop =
+	LIBANDRIA4_CTS_BUILDCLOSURE(
+		&libandria4_cts_framefunc_stoprun,
+		(void*)&libandria4_cts_innerreturn_stop );
+
+libandria4_cts_closure libandria4_cts_innerreturn_returnstop
+(
+	void *ign1, libandria4_cts_context *ign2, int ign3
+)
+{
+	return( libandria4_cts_innerreturn_stop );
+}
 libandria4_cts_closure libandria4_cts_innerreturn( libandria4_cts_context *ctx, void *dat )
 {
-	static libandria4_cts_closure stop = LIBANDRIA4_CTS_BUILDCLOSURE( 0, 0 );
-	if( !( stop.handler ) )
-	{
-		stop =
-			LIBANDRIA4_CTS_BUILDCLOSURE
-			(
-				&libandria4_cts_framefunc_stoprun,
-				(void*)&stop
-			);
-	}
-	
 	libandria4_cts_closure ret;
 	libandria4_cts_innerreturn_data *data = (libandria4_cts_innerreturn_data*)dat;
 	
@@ -300,7 +303,7 @@ libandria4_cts_closure libandria4_cts_innerreturn( libandria4_cts_context *ctx, 
 					LIBANDRIA4_CTS_BUILDCLOSURE
 					(
 						&libandria4_cts_framefunc_stoprun,
-						(void*)&stop
+						(void*)&libandria4_cts_innerreturn_stop
 					)
 				)
 		);
