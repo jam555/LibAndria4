@@ -1900,16 +1900,15 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 			libandria4_parser_CSV_CSV1_sortchar( data, c );
 		switch( cat )
 		{
+			case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
+				/* Tail-call into libandria4_parser_CSV_CSV1_record() ? Is anything else needed? */
+				
 			case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
 			case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
-			
 			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
-			case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
-				/*
-					( (libandria4_parser_CSV_CSV1_file*)data )->{ libandria4_cts_closure onstr, onval, outrec; }
-				*/
-			case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
 			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
+			
+			case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
 			
 			/* Errors. */
 			case libandria4_parser_CSV_CSV1_sortchar_categories_invalid:
@@ -1958,18 +1957,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 			return( failfunc );
 		}
 		
-		libandria4_parser_CSV_CSV1_list *a = 0;
-		libandria4_parser_CSV_CSV1_list_eitherrlist el =
-			( libandria4_parser_CSV_CSV1_list_buildlist )( (lib4_memfuncs_t*)0 );
-		{
-			unsigned e = 0;
-			LIBANDRIA4_MONAD_EITHER_BODYMATCH( el, LIBANDRIA4_OP_SETe, LIBANDRIA4_OP_SETa );
-			if( e || !a )
-			{
-				return( failfunc );
-			}
-		}
-		
 		libandria4_common_monadicchar8 ec =
 			libandria4_parser_CSV_CSV1_getc( data );
 		unsigned char c, type;
@@ -2000,7 +1987,11 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 			return( failfunc );
 		}
 		
-		/* Return. */
+		
+				/*
+					( (libandria4_parser_CSV_CSV1_file*)data )->{ libandria4_cts_closure onstr, onval, outrec; }
+				*/
+		/* Return. This should actually be pushed onto the stack. */
 		return( acc );
 	}
 	
@@ -2060,48 +2051,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 
 
 
-typedef struct libandria4_parser_CSV_CSV1_listnode libandria4_parser_CSV_CSV1_listnode;
-libandria4_parser_CSV_CSV1_listnode**
-	libandria4_parser_CSV_CSV1_listnode_getneighbor( libandria4_parser_CSV_CSV1_listnode *ref, int getright );
-#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_GETLEFT( refnodeptr ) \
-	( ( refnodeptr ) ? \
-		( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
-		( ( name ## _bitup_buildNodeptr )( \
-			*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 0 ) ) ) )
-#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_GETRIGHT( refnodeptr ) \
-	( ( refnodeptr ) ? \
-		( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
-		( ( name ## _bitup_buildNodeptr )( \
-			*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 1 ) ) ) )
-#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_SETLEFT( refnodeptr, valptr ); \
-	( ( refnodeptr ) ? \
-		( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
-		( *libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 0 ) = (valptr), \
-			( name ## _bitup ) ( name ## _bitup_buildNodeptr )( \
-				*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 0 ) ) ) )
-#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_SETRIGHT( refnodeptr, valptr ); \
-	( ( refnodeptr ) ? \
-		( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
-		( *libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 1 ) = (valptr), \
-			( name ## _bitup ) ( name ## _bitup_buildNodeptr )( \
-				*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 1 ) ) ) )
 
-LIBANDRIA4_LIST_BASICBUILDER_SINGLELINKED(
-	libandria4_parser_CSV_CSV1_list,
-	libandria4_parser_CSV_CSV1_listnode,
-	LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE );
-
-LIBANDRIA4_MONAD_TRIETHER_BUILDTYPE_DEFINITION(
-	libandria4_parser_CSV_CSV1_trival,
-		libandria4_char_pascalarray*,
-		libandria4_parser_CSV_CSV1_list*,
-		libandria4_parser_CSV_CSV1_list* );
- 
-struct libandria4_parser_CSV_CSV1_listnode
-{
-	libandria4_parser_CSV_CSV1_trival here;
-	libandria4_parser_CSV_CSV1_listnode *peers[ 2 ];
-};
 libandria4_parser_CSV_CSV1_listnode**
 	libandria4_parser_CSV_CSV1_listnode_getneighbor( libandria4_parser_CSV_CSV1_listnode *ref, int getright )
 {

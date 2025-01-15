@@ -51,6 +51,8 @@
 		int commaSep, colonSep, semiSep, spacedSep, tabSep;
 		int parenNest, sqrNest, curlNest, angleNest;
 		
+			/* Used for things like allocation failures. */
+		libandria4_cts_closure onfatal;
 		libandria4_cts_closure onstr, onval;
 			/* Gets called when a record seperator is found, NOT when a record starts. */
 		libandria4_cts_closure outrec;
@@ -217,6 +219,55 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 	
 	
 	
+	
+	/* The following is convenience code for those that want to build parse */
+	/*  trees from the parse process. Use it or ignore it as you see fit. */
+	
+	typedef struct libandria4_parser_CSV_CSV1_listnode libandria4_parser_CSV_CSV1_listnode;
+	#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_GETLEFT( refnodeptr ) \
+		( ( refnodeptr ) ? \
+			( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
+			( ( name ## _bitup_buildNodeptr )( \
+				*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 0 ) ) ) )
+	#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_GETRIGHT( refnodeptr ) \
+		( ( refnodeptr ) ? \
+			( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
+			( ( name ## _bitup_buildNodeptr )( \
+				*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 1 ) ) ) )
+	#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_SETLEFT( refnodeptr, valptr ); \
+		( ( refnodeptr ) ? \
+			( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
+			( *libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 0 ) = (valptr), \
+				( name ## _bitup ) ( name ## _bitup_buildNodeptr )( \
+					*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 0 ) ) ) )
+	#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_SETRIGHT( refnodeptr, valptr ); \
+		( ( refnodeptr ) ? \
+			( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
+			( *libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 1 ) = (valptr), \
+				( name ## _bitup ) ( name ## _bitup_buildNodeptr )( \
+					*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 1 ) ) ) )
+	
+	LIBANDRIA4_LIST_BASICBUILDER_SINGLELINKED(
+		libandria4_parser_CSV_CSV1_list,
+		libandria4_parser_CSV_CSV1_listnode,
+		LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE );
+	
+	LIBANDRIA4_MONAD_TRIETHER_BUILDTYPE_DEFINITION(
+		libandria4_parser_CSV_CSV1_trival,
+			libandria4_char_pascalarray*,
+			libandria4_parser_CSV_CSV1_list*,
+			libandria4_parser_CSV_CSV1_list* );
+	
+	struct libandria4_parser_CSV_CSV1_listnode
+	{
+		libandria4_parser_CSV_CSV1_trival here;
+		libandria4_parser_CSV_CSV1_listnode *peers[ 2 ];
+	};
+	
+	
+	
+	libandria4_parser_CSV_CSV1_listnode**
+		libandria4_parser_CSV_CSV1_listnode_getneighbor( libandria4_parser_CSV_CSV1_listnode *ref, int getright );
 	
 	???
 	
