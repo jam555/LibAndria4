@@ -766,7 +766,7 @@ void libandria4_commonio_handle_opaquedata_ondie( void *ign1, libandria4_commoni
 
 
 
-/* Standard FIL* implmentations. */
+/* Standard FILE* implmentations. */
 
 libandria4_commonio_eithhandle
 	libandria4_commonio_fopen
@@ -814,16 +814,20 @@ libandria4_commonio_eithhandle
 			fname = fname_;
 			
 		} else {
+			
+			/* Allocate a new p-string with one extra character, copy over fname, set the last character to null. */
+			
+			??? ;
 		}
 		
 		int e_ = errno, retried = 0;
 		errno = 0;
 		FILE *f = fopen( fname->body, mode );
+		libandria4_commonio_fopen_retrytarget:
 		if( !f )
 		{
-			int e_ = errno;
-			libandria4_commonio_fopen_retrytarget:
-			switch( e_ )
+			int e2_ = errno;
+			switch( e2_ )
 			{
 				case ERANGE:
 			/* The following errors are only defined as on C++11. */
@@ -839,6 +843,8 @@ libandria4_commonio_eithhandle
 				case EWOULDBLOCK:
 					if( !retried )
 					{
+						errno = 0;
+						
 						/* TODO: Add a timer system to wait before retrying. */
 							/* Note: use libandria4_sleep() from commonlib.h */
 						
@@ -848,8 +854,12 @@ libandria4_commonio_eithhandle
 						
 					} else {
 						
+						errno = e_;
 						LIBANDRIA4_COMMONIO_EITHHANDLE_RETERR( LIBANDRIA4_RESULT_FAILURE_WOULDBLOCK );
 					}
+					
+					LIBANDRIA4_COMMONIO_EITHHANDLE_RETERR(
+						LIBANDRIA4_RESULT_FAILURE_LOGICFAULT );
 				
 				
 				
@@ -931,7 +941,7 @@ libandria4_commonio_eithhandle
 						LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED );
 			}
 		}
-		errno = e;
+		errno = e_;
 		
 		/* For successful returns: */
 			/* LIBANDRIA4_COMMONIO_EITHHANDLE_RETHANDLE( val ) */
