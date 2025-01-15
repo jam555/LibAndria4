@@ -31,13 +31,42 @@ SOFTWARE.
 	
 	#include "simpleops.h"
 	#include "monads.h"
+	#include "stdmonads.h"
+	#include "stdmem.h"
 		/* libandria4_commonio_err */
 	#include "commonio.h"
 	#include "commonerrvals.h"
 	
 	/* Note that the compilation unit MUST contain at least the four left & */
 	/*  right macroset macros, so that the implementations below can work */
-	/*  correctly. */
+	/*  correctly. Their approximate signatures are as follows: */
+		/* ( name ## _bitup ) _GETLEFT( (nodetype) *base ); */
+		/* ( name ## _bitup ) _GETRIGHT( (nodetype) *base ); */
+		/* ( name ## _bitup ) _SETLEFT( (nodetype) *base, (nodetype) *newleft ); */
+		/* ( name ## _bitup ) _SETRIGHT( (nodetype) *base, (nodetype) *newright ); */
+	/* Also, they MUST be macros, as the ( name ## _bitup ) type is defined */
+	/*  inside of LIBANDRIA4_LIST_BASICBUILDER_SINGLELINKED() (or the doubly */
+	/*  linked version), preventing that type from being accessed. Thus, the */
+	/*  macros should OFTEN be wrappers around whatever functions are used, */
+	/*  providing simple signature-translation services. The macros are */
+	/*  meant to be a package alongside (nodetype), which must be provided */
+	/*  by the user, as unlike (name), LIBANDRIA4_LIST_BASICBUILDER_SINGLELINKED() */
+	/*  DOESN'T create (nodetype), and this combination allows you to use */
+	/*  any appropriate style of construct that you wish (e.g., you could */
+	/*  use a link-array, like EternallyConfuzzled did for trees, allowing a */
+	/*  linked-list to provide faster sequential access to tree elements).*/
+	/* The bi-tuplic is defined as follows: */
+		/* LIBANDRIA4_MONAD_BITUPLIC_BUILDTYPE_DEFINITION( ( name ## _bitup ), libandria4_commonio_err, nodetype* ) */
+	/* Afterwards, the following two are defined: */
+		/* inline ( name ## _bitup ) ( name ## _bitup_buildError )( libandria4_commonio_err err ); */
+		/* inline ( name ## _bitup ) ( name ## _bitup_buildNodeptr )( nodetype *ptr ); */
+	/* ... use them when appropriate (yes, inside the macros). */
+	
+	
+	
+	
+	/*
+	*/
 	
 	
 	/* TODO: */
@@ -288,6 +317,7 @@ SOFTWARE.
 				if( base->tail == del ) { base->tail = prev; } \
 				\
 				return( ( name ## _eitherrnod_nodeptr )( del ) ); }
+	
 	#define LIBANDRIA4_LIST_BUILDDELBIDIR( name,  nodetype ) \
 		( name ## _eitherrnod ) \
 			( name ## _deleteptr )( (name) *base, (nodetype) *prev, (nodetype) *next,  (nodetype) *del ) { \
@@ -314,7 +344,6 @@ SOFTWARE.
 				if( a != del ) { \
 					( name ## _eitherrnod_err )( LIBANDRIA4_RESULT_FAILURE_GENERICMISMATCH ); } \
 				return( tmp ); }
-	;
 	
 	#define LIBANDRIA4_LIST_BUILDNODELPREV( name,  nodetype,  macroset ) \
 		( name ## _eitherrnod ) \
@@ -389,7 +418,6 @@ SOFTWARE.
 						/* Should never happen, so almost guaranteed loop. */ \
 						return( LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_RESULT_FAILURE_ABOVEBOUNDS ) ); } \
 					return( LIBANDRIA4_COMMONIO_MAYERR_NOERR() ); }
-	
 	#define LIBANDRIA4_LIST_BUILDNOVISITPREV( name,  nodetype,  macroset ) \
 		libandria4_commonio_mayerr ( name ## _visitprev )( \
 				(name) *base,  void *data, void (*func)( void*,  uintptr_t, ((nodetype)*) ) ) { \
@@ -541,6 +569,10 @@ SOFTWARE.
 			LIBANDRIA4_COMMONIO_MAYERR_BODYMATCH( tmp,  LIBANDRIA4_OP_SETe, LIBANDRIA4_NULL_MACRO ); \
 				if( e ) { return( e ); } /* Success. */ return( 0 ); }
 	
+		/* Note that pre-declaring list types isn't needed to avoid reference */
+		/*  loops, because you have to supply a type-name that will only be */
+		/*  accessed via pointers, so you can just break the reference loop */
+		/*  THERE. */
 		/* For a doubly-linked list, replace the following "starting" macros */
 		/*  with the respective "trailing" macro: */
 			/* LIBANDRIA4_LIST_BUILDPREV -> LIBANDRIA4_LIST_BUILDNOPREV */
@@ -575,6 +607,40 @@ SOFTWARE.
 			( name ## _maynodep ) ( name ## _maynodp_just )( nodetype *n ) { \
 				return( LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name ## _maynodp, nodetype*, n ) ); } \
 		typedef struct name { size_t len; (nodetype) *head, *tail; } name; \
+			LIBANDRIA4_MONAD_EITHER_BUILDTYPE( name ## _eitherrlist, unsigned, (name) * ); \
+			( name ## _eitherrlist ) ( name ## _eitherrlist_err )( unsigned err ) { \
+				return( LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name ## _eitherrlist, unsigned, err ) ); } \
+			( name ## _eitherrlist ) ( name ## _eitherrlist_list )( (name) *ptr ) { \
+				return( LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name ## _eitherrlist, (name) *, ptr ) ); } \
+			( name ## _eitherrlist ) ( name ## _buildlist )( lib4_memfuncs_t *mf_ptr ) { \
+				LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf_ptr ); \
+				(name) *ptr = ((name)*)( mf_ptr->alloc( mf_ptr->data,  sizeof( name ) ) ); \
+				if( ptr ) { \
+					ptr->len = 0; ptr->head = ptr->tail = 0; \
+					return( ( name ## _eitherrlist_list )( ptr ) ); } \
+				else { \
+					return( ( name ## _eitherrlist_err )( unsigned err ) ); } } \
+			libandria4_result ( name ## _destroylist )( \
+					lib4_memfuncs_t *mf_ptr, (name) *list,  void *data, void (*nodefunc)( void*, (nodetype)* ) ) { \
+				LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf_ptr ); \
+				if( list ) { (nodetype) *tmp = list->head; \
+					( name ## _bitup ) bi = _GETRIGHT( tmp ); \
+					libandria4_commonio_err e = 0; \
+					(nodetype) *a; \
+					LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( bi, \
+						LIBANDRIA4_OP_SETe, \
+						LIBANDRIA4_OP_SETa, \
+						LIBANDRIA4_RESULT_RETURNFAILURE_LOGICFAULT ); \
+					if( e ) { \
+						LIBANDRIA4_RESULT_RETURNFAILURE( \
+							LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED ); } \
+					while( tmp ) { \
+						list->head = a; \
+						if( nodefunc ) { \
+							nodefunc( data, tmp ); } \
+						tmp = a;  list->len = 0; list->head = list->tail = 0; } \
+					return( ( mf_ptr->dealloc )( mf_ptr->data, list ) ); } \
+				LIBANDRIA4_RESULT_RETURNFAILURE( LIBANDRIA4_RESULT_FAILURE_DOMAIN ); } \
 		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( name ## _eitherrsz, unsigned, size_t ); \
 			( name ## _eitherrsz ) ( name ## _eitherrsz_err )( unsigned err ) { \
 				return( LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name ## _eitherrsz, unsigned, err ) ); } \
