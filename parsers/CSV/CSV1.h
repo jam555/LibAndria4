@@ -1,0 +1,223 @@
+#ifndef LIBANDRIA4_PARSER_CSV_CSV1_H
+ #define LIBANDRIA4_PARSER_CSV_CSV1_H
+ 	/*
+	LibAndria version 4
+	A C-based general purpose utility library.
+	Copyright (c) 2024 Jared A. Maddox
+	
+	Permission is hereby granted, free of charge, to any person obtaining a copy of
+	this software and associated documentation files (the "Software"), to deal in
+	the Software without restriction, including without limitation the rights to
+	use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+	of the Software, and to permit persons to whom the Software is furnished to do
+	so, subject to the following conditions:
+	
+	This grant of rights is subject to two conditions:
+	
+	The above copyright notice and this permission notice shall be included in all
+	copies or substantial portions of the Software.
+	
+	And:
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	SOFTWARE.
+	*/
+	
+	
+	#include <ctype.h>
+		/* For the continuation-trampoline-style engine & related definitions. */
+	#include "../../basic/ctsengine.h"
+		/* For libandria4_char_pascalarray{} and friends. */
+	#include "../../basic/pascalstring.h"
+	
+	
+	
+	typedef struct libandria4_parser_CSV_CSV1_file libandria4_parser_CSV_CSV1_file;
+	typedef struct libandria4_parser_CSV_CSV1_callargs libandria4_parser_CSV_CSV1_callargs;
+	
+	
+	
+	struct libandria4_parser_CSV_CSV1_file
+	{
+		??? file;
+		int cStr, csvStr;
+			/* BitTorrent strings: INCOMPATIBLE with colonSep. */
+		int btStr;
+		int commaSep, colonSep, semiSep, spacedSep, tabSep;
+		int parenNest, sqrNest, curlNest, angleNest;
+		
+		libandria4_cts_closure onstr, onval;
+			/* Gets called when a record seperator is found, NOT when a record starts. */
+		libandria4_cts_closure outrec;
+	};
+	
+	
+	
+		/* Returns a character, or an "error status" (EOF is positive, retry is */
+		/*  0, error is negative). */
+	libandria4_common_monadicchar8 libandria4_parser_CSV_CSV1_getc( libandria4_parser_CSV_CSV1_file* );
+		/* Negative on error, 0 on retry, positive on success. */
+	int libandria4_parser_CSV_CSV1_unget( libandria4_parser_CSV_CSV1_file*, char );
+		/* Negative on null argument, 0 on invalid, 1 on valid. */
+	int libandria4_parser_CSV_CSV1_validate( libandria4_parser_CSV_CSV1_file* );
+	
+	/*
+libandria4_cts_closure libandria4_parser_CSV_CSV1_ungetc
+(
+	libandria4_cts_context *ctx, void *data_
+);
+libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
+(
+	libandria4_cts_context *ctx, void *data_
+);
+	*/
+	
+	typedef enum
+	{
+		libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs = -1,
+		
+		libandria4_parser_CSV_CSV1_sortchar_categories_invalid = 0,
+		
+		libandria4_parser_CSV_CSV1_sortchar_categories_recordsep = 1,
+		libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep,
+		libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar,
+		libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener,
+		libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser,
+		libandria4_parser_CSV_CSV1_sortchar_categories_doublequote
+		
+	} libandria4_parser_CSV_CSV1_sortchar_categories;
+	libandria4_parser_CSV_CSV1_sortchar_categories libandria4_parser_CSV_CSV1_sortchar
+	(
+		libandria4_parser_CSV_CSV1_file *f,
+		char character
+	);
+	
+	
+	
+	/* The following functions are compliant with (libandria4_cts_framefunc*). */
+	
+	/* These two push two unsigned chars onto stack[ 1 ] (so the second stack); */
+	/*  the top character is a tag (0-2: error, EOF, character) */
+		/* Fetches a character outside of a string. */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
+	(
+		libandria4_cts_context*, void*
+	);
+		/* Fetches a character as a member of a string: this may consume */
+		/*  MULTIPLE characters per result, or even consume a character for an */
+		/*  "EOF" result (which happens as the end of a string). */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string
+	(
+		libandria4_cts_context*, void*
+	);
+	
+		/* Preemptively-retrospective note: the string gets allocated by */
+		/*  *_accumulate_string(), not by it's caller. */
+		/* Iteratively fetches a string. The opening double-quote should ALREADY */
+		/*  BE CONSUMED. A void-pointer to the string will be on stack[1], with a */
+		/*  bool (as an unsigned char) on top: the pointer will be invalid if the */
+		/*  char is 0, else the string-pointer will be valid; the string itself */
+		/*  will be a libandria4_char_pascalarray{}. */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_string
+	(
+		libandria4_cts_context*, void*
+	);
+		/* UNUSED! This needs to be tied into the parsing system... except the */
+		/*  *_preaccumulate_*() version probably needs to be used instead. This */
+		/*  probably needs to be used BY the *_preaccumulate_*() version. */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
+	(
+		libandria4_cts_context*, void*
+	);
+			/* Eventually delegates to either: */
+					/* Fetches a character into a string: this consumes characters on a */
+					/*  one-to-one basis. */
+					/* Upon entry, there must be a "characters not yet read" value on */
+					/*  stack[ 1 ] as a size_t, on top of a pascal-string as a */
+					/*  void-pointer, where the size_t IS NOT larger than the size of */
+					/*  the pascal-string. */
+					/* Upon return, there will be a result flag on stack[ 1 ] as a */
+					/*  uchar, on top of a "characters not yet read" as a size_t, on */
+					/*  top of a pascal-string as a void-pointer. The result will */
+					/*  either be 0 for success, or larger than one for a failure. */
+				/* libandria4_parser_CSV_CSV1_accumulate_btstring(), */
+			/*  or */
+					/* As string, but not a string. Not allowed to contain whitespace, commas, */
+					/*  or double-quotes. The storage-string gets allocated by this */
+					/*  accumulator, just like the *string() version, including with the */
+					/*  tag-uchar stored on top of it on stack[1]. */
+				/* libandria4_parser_CSV_CSV1_accumulate_nonstring_inner(), */
+			/*  depending on whether the "full" bit-torrent string header is */
+			/*  detected. Thus, this MUST act like *_nonstring_inner() until */
+			/*  either a colon (':') or a non-decimal character. */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
+	(
+		libandria4_cts_context*, void*
+	);
+		/* As string, but not a string. Not allowed to contain whitespace, commas, */
+		/*  or double-quotes. The storage-string gets allocated by this */
+		/*  accumulator, just like the *string() version, including with the */
+		/*  tag-uchar stored on top of it on stack[1]. */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring
+	(
+		libandria4_cts_context*, void*
+	);
+	
+		/* Fetches the actual value. May use e.g. *_string(). */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
+	(
+		libandria4_cts_context*, void*
+	);
+	
+		/* Fetches a full line (excepting that newlines inside strings don't */
+		/*  count for defining lines...) of values. Returns a pointer to a list, */
+		/*  with a bool (ala *_accumulate_string) on top of it: the list will */
+		/*  contain libandria4_char_pascalarray* instances. */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_record
+	(
+		libandria4_cts_context*, void*
+	);
+	
+	
+	
+		/* Calls the functions registered in it's data pointer, handing them one */
+		/*  record (a "line" of data, as described above) in the form of a list of */
+		/*  libandria4_char_pascalarray* instances at a time. To support this, the */
+		/*  data pointer of the closure used to call this must point to an instance */
+		/*  of libandria4_parser_CSV_CSV1_callargs{}. */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_file
+	(
+		libandria4_cts_context*, void*
+	);
+	
+		/* This initializes an instance of libandria4_parser_CSV_CSV1_callargs{}. */
+		/*  Use it. */
+	int libandria4_parser_CSV_CSV1_callargs_init
+	(
+		libandria4_parser_CSV_CSV1_callargs *dest,
+			
+			??? ???
+	);
+	
+	struct libandria4_parser_CSV_CSV1_callargs
+	{
+		??? ;
+	};
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	???
+	
+#endif
