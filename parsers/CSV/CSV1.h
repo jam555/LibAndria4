@@ -45,17 +45,31 @@
 	struct libandria4_parser_CSV_CSV1_file
 	{
 		??? file;
+			/* This MUST get initialized to 0 at the start, and it WILL get */
+			/*  incremented for EACH distinct record. Also, rollover IS an */
+			/*  error that will cause onfatal() to get called. Be ready to */
+			/*  "dynamically patch" around that by setting this to 3, then */
+			/*  building the needed stack state... or maybe another route is */
+			/*  better? */
+		unsigned recordindex;
 		int cStr, csvStr;
 			/* BitTorrent strings: INCOMPATIBLE with colonSep. */
 		int btStr;
 		int commaSep, colonSep, semiSep, spacedSep, tabSep;
 		int parenNest, sqrNest, curlNest, angleNest;
 		
-			/* Used for things like allocation failures. */
+		/* The following should, except for onfatal(), basically just return */
+		/*  whatever is on top of stack[ 0 ]. They shouldn't alter anything on */
+		/*  any of the "standard" stacks (there's at least two, but I don't */
+		/*  recall the actual total). */
+			/* Used for things like allocation failures. Note that this WILL */
+			/*  blindly get used, so actually fill it with something. */
+			/* Note: find everywhere that uses this, and make sure it has */
+			/*  some way to indicate it's actual position uniquely. Maybe a */
+			/*  pointer to a function-static? */
 		libandria4_cts_closure onfatal;
-		libandria4_cts_closure onstr, onval;
-			/* Gets called when a record seperator is found, NOT when a record starts. */
-		libandria4_cts_closure outrec;
+			/* Which of these get used depends on this->recordindex . */
+		libandria4_cts_closure firstrec, secondrec, restrec;
 	};
 	
 	

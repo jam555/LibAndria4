@@ -1936,29 +1936,28 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 	/*  contain libandria4_char_pascalarray* instances. */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 (
-	libandria4_cts_context *ctx, void *data
+	libandria4_cts_context *ctx, void *data_
 )
 {
-	if( ctx && data )
+	if( ctx && data_ )
 	{
 		static libandria4_cts_innerreturn_data iret_d =
 			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
 		libandria4_cts_closure
-			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_record_inner,
-				data ),
+			acc = LIBANDRIA4_CTS_BUILDCLOSURE( 0, 0 ),
 			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_cts_innerreturn,
 				(void*)&iret_d );
+		libandria4_parser_CSV_CSV1_file *data =
+			(libandria4_parser_CSV_CSV1_file*)data_;
 		
-		if( libandria4_parser_CSV_CSV1_validate(
-			(libandria4_parser_CSV_CSV1_file*)data ) )
+		if( libandria4_parser_CSV_CSV1_validate( data ) )
 		{
 			return( failfunc );
 		}
 		
 		libandria4_common_monadicchar8 ec =
-			libandria4_parser_CSV_CSV1_getc( data );
+			libandria4_parser_CSV_CSV1_getc( data_ );
 		unsigned char c, type;
 		int res = 0;
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( ec,
@@ -1987,11 +1986,47 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 			return( failfunc );
 		}
 		
+		/* Tailor dispatching. */
+		++( data->recordindex );
+		switch( data->recordindex )
+		{
+			case 0:
+					/* This is an error, because of roll-over. */
+				return( data->onfatal );
+			case 1:
+				acc = data->firstrec;
+				break;
+			case 2:
+				acc = data->secondrec;
+				break;
+			default:
+				acc = data->restrec;
+				break;
+		}
+		if( !( acc.handler ) )
+		{
+			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_record_inner,
+				data_ );
+			
+		} else {
+				
+				/* Push the return target. */
+				res =
+					libandria4_cts_push2_ctsclsr
+					(
+						ctx, 0,
+						LIBANDRIA4_CTS_BUILDCLOSURE(
+							&libandria4_parser_CSV_CSV1_record_inner,
+							data_ )
+					);
+				if( !res )
+				{
+					return( failfunc );
+				}
+		}
 		
-				/*
-					( (libandria4_parser_CSV_CSV1_file*)data )->{ libandria4_cts_closure onstr, onval, outrec; }
-				*/
-		/* Return. This should actually be pushed onto the stack. */
+		/* Return. */
 		return( acc );
 	}
 	
