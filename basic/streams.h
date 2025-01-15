@@ -39,6 +39,8 @@ SOFTWARE.
 	/* TODO: */
 		/* Convert commonio.h/.c (and anything else relevant) to use this */
 		/*  new interface instead of the old one. */
+		/* Add "is_valid" test functions to all of the virtual-tables: this */
+		/*  SHOULDN'T indicate the stream status, just the HANDLE status. */
 	/*
 		This is the mostly new LibAndria4 I/O stream system. Previous stabs at
 		this have variously been incomplete, or gotten things very wrong

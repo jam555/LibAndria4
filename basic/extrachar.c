@@ -26,7 +26,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+
+/* TODO: */
+	/* Modify libandria4_extrachar_getchar() to update e.g. */
+	/*  libandria4_extrachar_stream->line under the control of something */
+	/*  else. */
+
+
 #include "extrachar.h"
+
+
 
 LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( libandria4_extrachar_, libandria4_extrachar, memfuncs_ptr );
 
