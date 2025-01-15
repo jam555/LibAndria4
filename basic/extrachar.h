@@ -115,25 +115,56 @@ SOFTWARE.
 		
 	} libandria4_extrachar_flags;
 	
+		/* The annotated-char type. */
+	typedef struct libandria4_extrachar
+	{
+		uintmax_t line, column;
+		size_t srcstream;
+		
+			/* This will stereotypically be Unicode, but could be ASCII, */
+			/*  de-shifted Shift-JIS, or any other fixed-size character */
+			/*  set that WILL actually fit. DO NOT try to shove */
+			/*  variable-width characters into it, convert them to */
+			/*  fixed-width first. */
+		libandria_extrachar_innerchar c;
+		libandria4_extrachar_flags flags;
+		
+	} libandria4_extrachar;
 	
-		/*
-			* pascalarray
-			* parr (a duplicate of * pascalarray)
-			* pascalarray_result
-			* parrres (a duplicate of * pascalarray_result)
-			* pascalarray_excerpt
-			* pascalarray_excerpt_result
-			* pascalarray_tracker
-			* pascalarray_tracker_result
-		*/
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_extrachar_, libandria4_extrachar );
+	
+	LIB4_MONAD_EITHER_BUILDTYPE_DEFINITION(
+		libandria4_extrachar_result,
+		
+		libandria4_extrachar,
+			/* Both cases are meant to be errors, one just provides some */
+			/*  sort of error-description pointer. */
+		libandria4_commonlib_eithvoidp
+	);
+	
+	
 	typedef libandria4_utf32_pascalarray_tracker libandria4_extrachar_stringtracker;
-		/* libandria4_extrachar_stringtracker_pascalarray{} */
+		/* Used for libandria4_extrachar_stringtracker_pascalarray{} */
+		/*
+			This declaration produces types according to the following set of
+			patterns:
+				* pascalarray
+				* parr (a duplicate of * pascalarray)
+				* pascalarray_result
+				* parrres (a duplicate of * pascalarray_result)
+				* pascalarray_excerpt
+				* pascalarray_excerpt_result
+				* pascalarray_tracker
+				* pascalarray_tracker_result
+		*/
 	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE(
 		libandria4_extrachar_stringtracker_,
 		libandria4_extrachar_stringtracker );
 	typedef libandria4_extrachar_stringtracker_pascalarray libandria4_extrachar_nameparr;
 	
 	
+		/* An individual source of characters, that will be converted into */
+		/*  extrachar instances. */
 	typedef struct libandria4_extrachar_stream
 	{
 		libandria4_extrachar_stringtracker name;
@@ -154,7 +185,19 @@ SOFTWARE.
 		size_t index;
 		
 	} libandria4_extrachar_stream;
+	
+		/* The .c file has a TODO about this. */
+		/* The notes for *_peekchar() also apply to this. */
 	libandria4_extrachar_result libandria4_extrachar_getchar
+	(
+		libandria4_extrachar_stream *stream,
+			uintmax_t *over_line,
+			uintmax_t *over_col,
+			libandria4_extrachar_flags *over_flags
+	);
+		/* Note: the next extrachar WILL be affected by these values if it */
+		/*  gets read from the source stream during this call. */
+	libandria4_extrachar_result libandria4_extrachar_peekchar
 	(
 		libandria4_extrachar_stream *stream,
 			uintmax_t *over_line,
@@ -166,13 +209,7 @@ SOFTWARE.
 		libandria4_extrachar_stream *stream,
 			libandria4_extrachar ec
 	);
-	libandria4_extrachar_result libandria4_extrachar_peekchar
-	(
-		libandria4_extrachar_stream *stream,
-			uintmax_t *over_line,
-			uintmax_t *over_col,
-			libandria4_extrachar_flags *over_flags
-	);
+	
 	
 	
 	
@@ -180,24 +217,49 @@ SOFTWARE.
 	/* The code below here is incomplete: Finish it before using this file. */
 	
 	
-	
-	typedef struct libandria4_extrachar_streamset libandria4_extrachar_streamset;
-	
-	typedef struct libandria4_extrachar
+	int libandria4_extrachar_stream_init
+	(
+		libandria4_extrachar_stream *stream,
+			int dummy_arg
+	)
 	{
-		uintmax_t line, column;
-		size_t srcstream;
+		if( stream )
+		{
+			
+		}
 		
-			/* This will stereotypically be Unicode, but could be ASCII, */
-			/*  de-shifted Shift-JIS, or any other fixed-size character */
-			/*  set that WILL actually fit. DO NOT try to shove */
-			/*  variable-width characters into it, convert them to */
-			/*  fixed-width first. */
-		libandria_extrachar_innerchar c;
+		return( ??? );
+	}
+	int libandria4_extrachar_stream_deinit
+	(
+		libandria4_extrachar_stream *stream
+	)
+	{
+		??? ;
+		
+		return( ??? );
+	}
+	typedef struct libandria4_extrachar_stream
+	{
+		libandria4_extrachar_stringtracker name;
+		
+			/* Data source. Note that buf should be drawn from first. */
+		libandria4_commonio_handle *hand;
+		libandria4_extrachar_pascalarray *buf;
+		size_t used;
+		
+			/* These may or may not get used by the streamset, depending */
+			/*  on it's configuration. */
+		uintmax_t line, column;
 		libandria4_extrachar_flags flags;
 		
-	} libandria4_extrachar;
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_extrachar_, libandria4_extrachar );
+			/* Note: set this to 0, then let the streamset do everything */
+			/*  else. Only the streamset should modify it after it's */
+			/*  initialization. */
+		size_t index;
+		
+	} libandria4_extrachar_stream;
+	
 	
 		/* A set of identifiers for the streams being used by a particular */
 		/*  sequence of extrachars. Individual identifiers should have */
@@ -209,6 +271,7 @@ SOFTWARE.
 		/*  otherwise would be a bit much bloat to really justify, even if */
 		/*  extrachars use proportionatly no space. Instead of coding it */
 		/*  explicitly, use the refcount/refpointer "monads" for it. */
+	typedef struct libandria4_extrachar_streamset libandria4_extrachar_streamset;
 	struct libandria4_extrachar_streamset
 	{
 		libandria4_extrachar_stream *stream;
@@ -221,14 +284,19 @@ SOFTWARE.
 		
 	};
 	
-	LIB4_MONAD_EITHER_BUILDTYPE_DEFINITION(
-		libandria4_extrachar_result,
-		
-		libandria4_extrachar,
-			/* Both cases are meant to be errors, one just provides some */
-			/*  sort of error-description pointer. */
-		libandria4_commonlib_eithvoidp
-	);
+	int libandria4_extrachar_streamset_swapstream( libandria4_extrachar_stream* )
+	{
+		??? ;
+	}
+	
+	
+	
+	/* The code below here is once again complete. */
+	
+	
+	
+	
+	
 	
 	#define LIBANDRIA4_EXTRACHARRESULT_BUILDSUCCESS( val ) \
 		LIB4_MONAD_EITHER_BUILDLEFT( libandria4_extrachar_result, libandria4_extrachar, (val) )
