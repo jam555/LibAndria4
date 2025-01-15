@@ -231,7 +231,7 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETbFLAGresASn1( val ) ( b = (val), res = -1 )
 	#define LIBANDRIA4_OP_SETcFLAGresASn1( val ) ( c = (val), res = -1 )
 	#define LIBANDRIA4_OP_SETdFLAGresASn1( val ) ( d = (val), res = -1 )
-	#define LIBANDRIA4_OP_SETdFLAGresASn1( val ) ( e = (val), res = -1 )
+	#define LIBANDRIA4_OP_SETeFLAGresASn1( val ) ( e = (val), res = -1 )
 	
 	#define LIBANDRIA4_OP_SETtmpFLAGresAS0( val ) ( tmp = (val), res = 0 )
 	#define LIBANDRIA4_OP_SETretFLAGresAS0( val ) ( ret = (val), res = 0 )
@@ -239,7 +239,7 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETbFLAGresAS0( val ) ( b = (val), res = 0 )
 	#define LIBANDRIA4_OP_SETcFLAGresAS0( val ) ( c = (val), res = 0 )
 	#define LIBANDRIA4_OP_SETdFLAGresAS0( val ) ( d = (val), res = 0 )
-	#define LIBANDRIA4_OP_SETdFLAGresAS0( val ) ( e = (val), res = 0 )
+	#define LIBANDRIA4_OP_SETeFLAGresAS0( val ) ( e = (val), res = 0 )
 	
 	#define LIBANDRIA4_OP_SETtmpFLAGresAS1( val ) ( tmp = (val), res = 1 )
 	#define LIBANDRIA4_OP_SETretFLAGresAS1( val ) ( ret = (val), res = 1 )
@@ -247,7 +247,7 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETbFLAGresAS1( val ) ( b = (val), res = 1 )
 	#define LIBANDRIA4_OP_SETcFLAGresAS1( val ) ( c = (val), res = 1 )
 	#define LIBANDRIA4_OP_SETdFLAGresAS1( val ) ( d = (val), res = 1 )
-	#define LIBANDRIA4_OP_SETdFLAGresAS1( val ) ( e = (val), res = 1 )
+	#define LIBANDRIA4_OP_SETeFLAGresAS1( val ) ( e = (val), res = 1 )
 	
 	#define LIBANDRIA4_OP_SETtmpFLAGresAS2( val ) ( tmp = (val), res = 2 )
 	#define LIBANDRIA4_OP_SETretFLAGresAS2( val ) ( ret = (val), res = 2 )
@@ -255,7 +255,7 @@ SOFTWARE.
 	#define LIBANDRIA4_OP_SETbFLAGresAS2( val ) ( b = (val), res = 2 )
 	#define LIBANDRIA4_OP_SETcFLAGresAS2( val ) ( c = (val), res = 2 )
 	#define LIBANDRIA4_OP_SETdFLAGresAS2( val ) ( d = (val), res = 2 )
-	#define LIBANDRIA4_OP_SETdFLAGresAS2( val ) ( e = (val), res = 2 )
+	#define LIBANDRIA4_OP_SETeFLAGresAS2( val ) ( e = (val), res = 2 )
 	
 	
 		/* ... and sometimes we want to set a flag AND return a "special */
