@@ -74,25 +74,20 @@
 	
 	
 	
+	/* I think these three actually need to be written... or, more likely, */
+	/*  swapped out for "real" equivalents from elsewhere. */
 		/* Returns a character, or an "error status" (EOF is positive, retry is */
 		/*  0, error is negative). */
 	libandria4_common_monadicchar8 libandria4_parser_CSV_CSV1_getc( libandria4_parser_CSV_CSV1_file* );
-		/* Negative on error, 0 on retry, positive on success. */
+		/* Negative on error, 0 on retry, positive on success. Gets used by */
+		/*  libandria4_parser_CSV_CSV1_ungetc(), which is listed further down. */
 	int libandria4_parser_CSV_CSV1_unget( libandria4_parser_CSV_CSV1_file*, char );
 		/* Negative on null argument, 0 on invalid, 1 on valid. */
 	int libandria4_parser_CSV_CSV1_validate( libandria4_parser_CSV_CSV1_file* );
 	
-	/*
-libandria4_cts_closure libandria4_parser_CSV_CSV1_ungetc
-(
-	libandria4_cts_context *ctx, void *data_
-);
-libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
-(
-	libandria4_cts_context *ctx, void *data_
-);
-	*/
 	
+		/* This identifies the interpretation of the supplied character */
+		/*  according to the settings in the provided *_CSV1_file{}. */
 	typedef enum
 	{
 		libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs = -1,
@@ -115,18 +110,44 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 	
 	
 	
+	
+	
 	/* The following functions are compliant with (libandria4_cts_framefunc*). */
 	
+	
+	
+		/* This wraps around libandria4_parser_CSV_CSV1_unget() */
+		/* Expects a type on top of a character, both as uchars on stack[ 1 ], */
+		/*  and a return closure on stack[ 0 ] as a libandria4_cts_closure{}. */
+		/*  DOES NOT pop the type or character, but DOES pop the return closure. */
+		/*  Note that while the character gets handed to *_unget(), the type is */
+		/*  expected to just be recalculated if needed. */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_ungetc( libandria4_cts_context *ctx, void *data_ );
+		/* Expects a type on top of a character, both as uchars on stack[ 1 ], */
+		/*  and a return closure on stack[ 0 ] as a libandria4_cts_closure{}. It */
+		/*  pops everything it expects, returns the closure, and otherwise does */
+		/*  nothing. Meant to be used with libandria4_parser_CSV_CSV1_ungetc(). */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar( libandria4_cts_context *ctx, void *data_ );
+	
+	
+	
 	/* These two push two unsigned chars onto stack[ 1 ] (so the second stack); */
-	/*  the top character is a tag (0-2: error, EOF, character) */
-		/* Fetches a character outside of a string. */
+	/*  the top character is a tag (0-2: error, EOF, character), and expect a */
+	/*  return closure on top of stack[ 0 ]. */
+		/* Fetches a character outside of a string. 0 is error, 1 is token-EOF */
+		/*  (the character will be un-gotten back to the source), 2 is plain */
+		/*  success. */
 	libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 	(
 		libandria4_cts_context*, void*
 	);
 		/* Fetches a character as a member of a string: this may consume */
 		/*  MULTIPLE characters per result, or even consume a character for an */
-		/*  "EOF" result (which happens as the end of a string). */
+		/*  "EOF" result (which happens as the end of a string). Same type */
+		/*  values as *_getc_notstring(). */
+		/* This hard-codes a CSV behavior, so it needs to be reworked. Work is */
+		/*  needed on C-style escapes too, but only to extend the versions */
+		/*  supported. */
 	libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string
 	(
 		libandria4_cts_context*, void*
@@ -143,9 +164,8 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 	(
 		libandria4_cts_context*, void*
 	);
-		/* UNUSED! This needs to be tied into the parsing system... except the */
-		/*  *_preaccumulate_*() version probably needs to be used instead. This */
-		/*  probably needs to be used BY the *_preaccumulate_*() version. */
+		/* Note: contrary to previous notes, this actually IS used, specifically by */
+		/*  way of *_accumulate_nonstring(). */
 	libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 	(
 		libandria4_cts_context*, void*
@@ -178,7 +198,8 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 		/* As string, but not a string. Not allowed to contain whitespace, commas, */
 		/*  or double-quotes. The storage-string gets allocated by this */
 		/*  accumulator, just like the *string() version, including with the */
-		/*  tag-uchar stored on top of it on stack[1]. */
+		/*  tag-uchar stored on top of it on stack[1]. Also handles the start of */
+		/*  BitTorrent-style strings. */
 	libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring
 	(
 		libandria4_cts_context*, void*

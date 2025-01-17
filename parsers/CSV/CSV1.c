@@ -69,6 +69,31 @@ static libandria4_cts_closure failfunc =
 
 
 
+int libandria4_parser_CSV_CSV1_validate( libandria4_parser_CSV_CSV1_file *f )
+{
+	if( f )
+	{
+		/* Prohibitions: */
+		if( f->btStr && f->colonSep )
+		{
+			return( 0 );
+		}
+		
+		/* Demands: */
+		if( !( f->cStr || f->csvStr || f->btStr ) )
+		{
+			return( 0 );
+		}
+		if( !( f->commaSep || f->colonSep || f->semiSep || f->spaceSep || f->tabSep ) )
+		{
+			return( 0 );
+		}
+		
+		return( 1 );
+	}
+	
+	return( -1 );
+}
 libandria4_parser_CSV_CSV1_sortchar_categories libandria4_parser_CSV_CSV1_sortchar
 (
 	libandria4_parser_CSV_CSV1_file *f,
@@ -145,6 +170,14 @@ libandria4_parser_CSV_CSV1_sortchar_categories libandria4_parser_CSV_CSV1_sortch
 	
 	return( ret );
 }
+
+
+
+	/* Expects a type on top of a character, both as uchars on stack[ 1 ], */
+	/*  and a return closure on stack[ 0 ] as a libandria4_cts_closure{}. */
+	/*  DOES NOT pop the type or character, but DOES pop the return closure. */
+	/*  Note that while the character gets handed to *_unget(), the type is */
+	/*  expected to just be recalculated if needed. */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_ungetc
 (
 	libandria4_cts_context *ctx, void *data_
@@ -212,6 +245,10 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_ungetc
 	
 	return( failfunc );
 }
+	/* Expects a type on top of a character, both as uchars on stack[ 1 ], */
+	/*  and a return closure on stack[ 0 ] as a libandria4_cts_closure{}. It */
+	/*  pops everything it expects, returns the closure, and otherwise does */
+	/*  nothing. Meant to be used with libandria4_parser_CSV_CSV1_ungetc(). */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 (
 	libandria4_cts_context *ctx, void *data_
@@ -250,37 +287,15 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 	
 	return( failfunc );
 }
-int libandria4_parser_CSV_CSV1_validate( libandria4_parser_CSV_CSV1_file *f )
-{
-	if( f )
-	{
-		/* Prohibitions: */
-		if( f->btStr && f->colonSep )
-		{
-			return( 0 );
-		}
-		
-		/* Demands: */
-		if( !( f->cStr || f->csvStr || f->btStr ) )
-		{
-			return( 0 );
-		}
-		if( !( f->commaSep || f->colonSep || f->semiSep || f->spaceSep || f->tabSep ) )
-		{
-			return( 0 );
-		}
-		
-		return( 1 );
-	}
-	
-	return( -1 );
-}
 
 
 
 /* These two push two unsigned chars onto stack[ 1 ] (so the second stack); */
-/*  the top character is a tag (0-2: error, EOF, character) */
-	/* Fetches a character outside of a string. */
+/*  the top character is a tag (0-2: error, EOF, character), and expect a */
+/*  return closure on top of stack[ 0 ]. */
+	/* Fetches a character outside of a string. 0 is error, 1 is token-EOF */
+	/*  (the character will be un-gotten back to the source), 2 is plain */
+	/*  success. */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 (
 	libandria4_cts_context *ctx, void *data_
@@ -442,6 +457,9 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string
 			{
 				case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
 						/* Double-quote, so we need to dig a bit more, so delegate. */
+						/* Note that this implements CSV-style double-quote */
+						/*  embedding manually, so it needs to be revised. */
+						/* TODO: spruce this up a bit. */
 					LIBANDRIA4_CTS_RETURNCLOSURE(
 						&libandria4_parser_CSV_CSV1_getc_string_dquote,
 						data_ );
@@ -451,6 +469,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string
 					if( c == '\\' && data->cStr )
 					{
 							/* Backslash, so we need to dig a bit more, delegate. */
+							/* TODO: add more supported escape sequences. */
 						LIBANDRIA4_CTS_RETURNCLOSURE(
 							&libandria4_parser_CSV_CSV1_getc_string_cescape,
 							data_ );
@@ -1876,13 +1895,13 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 /* Note: Finish this function! */
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 (
-	libandria4_cts_context *ctx, void *data
+	libandria4_cts_context *ctx, void *data_
 )
 {
-	if( ctx && data )
+	if( ctx && data_ )
 	{
 		if( libandria4_parser_CSV_CSV1_validate(
-			(libandria4_parser_CSV_CSV1_file*)data ) )
+			(libandria4_parser_CSV_CSV1_file*)data_ ) )
 		{
 			return( failfunc );
 		}
@@ -1897,11 +1916,17 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 		??? ;
 		
 		libandria4_parser_CSV_CSV1_sortchar_categories cat =
-			libandria4_parser_CSV_CSV1_sortchar( data, c );
+			libandria4_parser_CSV_CSV1_sortchar( data_, c );
 		switch( cat )
 		{
 			case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
-				/* Tail-call into libandria4_parser_CSV_CSV1_record() ? Is anything else needed? */
+				/* Is anything else needed? Do we need to discard and/or fetch anything? */
+				return
+				(
+					LIBANDRIA4_CTS_BUILDCLOSURE(
+						&libandria4_parser_CSV_CSV1_record,
+						data_ )
+				);
 				
 			case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
 			case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
