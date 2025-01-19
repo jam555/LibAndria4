@@ -64,12 +64,15 @@
 		/*  recall the actual total). */
 			/* Used for things like allocation failures. Note that this WILL */
 			/*  blindly get used, so actually fill it with something. */
-			/* Note: find everywhere that uses this, and make sure it has */
+			/* Note: find everywhere that uses these, and make sure it has */
 			/*  some way to indicate it's actual position uniquely. Maybe a */
 			/*  pointer to a function-static? */
-		libandria4_cts_closure onfatal;
-			/* Which of these get used depends on this->recordindex . */
+		libandria4_cts_closure onfatal, onfullEOF;
+			/* Which of these get used depends on this->recordindex . Note */
+			/*  that noe of them are actually required. */
 		libandria4_cts_closure firstrec, secondrec, restrec;
+			/* These are all required, but it's fine for them to be no-ops. */
+		libandria4_cts_closure onopen, onclose, startfield;
 	};
 	
 	
@@ -78,7 +81,8 @@
 	/*  swapped out for "real" equivalents from elsewhere. */
 		/* Returns a character, or an "error status" (EOF is positive, retry is */
 		/*  0, error is negative). */
-	libandria4_common_monadicchar8 libandria4_parser_CSV_CSV1_getc( libandria4_parser_CSV_CSV1_file* );
+		/* WAS named *_getc(). */
+	libandria4_common_monadicchar8 libandria4_parser_CSV_CSV1_get( libandria4_parser_CSV_CSV1_file* );
 		/* Negative on error, 0 on retry, positive on success. Gets used by */
 		/*  libandria4_parser_CSV_CSV1_ungetc(), which is listed further down. */
 	int libandria4_parser_CSV_CSV1_unget( libandria4_parser_CSV_CSV1_file*, char );
@@ -116,6 +120,8 @@
 	
 	
 	
+		/*  */
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_getc( libandria4_cts_context *ctx, void *data_ );
 		/* This wraps around libandria4_parser_CSV_CSV1_unget() */
 		/* Expects a type on top of a character, both as uchars on stack[ 1 ], */
 		/*  and a return closure on stack[ 0 ] as a libandria4_cts_closure{}. */
@@ -257,6 +263,15 @@
 	
 	/* The following is convenience code for those that want to build parse */
 	/*  trees from the parse process. Use it or ignore it as you see fit. */
+/* Basic structure: build a trieither (not just an either!) that can accept */
+/*  a list pointer (of either of two types) or a p-string pointer: this is */
+/*  the "fundamental" value, and each "real" value is represented by one. One */
+/*  list-p will represent a sequential value (a value made of multiple parts), */
+/*  and the other will represent a record (a line when ignoring vertical */
+/*  spacers within a string) composed of some arbitrary number of "real */
+/*  values". Whether these "real values" are simple tokens & strings or */
+/*  include lists depends on the settings inside the relevant */
+/*  libandria4_parser_CSV_CSV1_file{} instance. */
 	
 	typedef struct libandria4_parser_CSV_CSV1_listnode libandria4_parser_CSV_CSV1_listnode;
 	#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_GETLEFT( refnodeptr ) \
