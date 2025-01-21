@@ -49,6 +49,8 @@ SOFTWARE.
 	
 	
 	
+	extern const unsigned char libandria4_commonlib_firstchars[ 128 ];
+	
 	typedef uint8_t libandria4_commonlib_byte;
 	typedef uint32_t libandria4_commonlib_succ;
 	typedef uint32_t libandria4_commonlib_err;
