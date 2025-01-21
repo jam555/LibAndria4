@@ -69,6 +69,11 @@
 			/* Note: find everywhere that uses these, and make sure it has */
 			/*  some way to indicate it's actual position uniquely. Maybe a */
 			/*  pointer to a function-static? */
+			/* onfatal() will find a function-pointer, on a void-pointer, on */
+			/*  an unsigned int, all in stack[ 1 ]. The function pointer */
+			/*  indicates the "entry function" for a group of 1 or more */
+			/*  implementation functions, the other two further refine that */
+			/*  information in group-specific ways. */
 		libandria4_cts_closure onfatal, onfullEOF;
 			/* Which of these get used depends on this->recordindex . Note */
 			/*  that noe of them are actually required. */
