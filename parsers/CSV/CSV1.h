@@ -30,6 +30,8 @@
 	
 	
 	#include <ctype.h>
+		/* For libandria4_commonlib_firstchars[]. */
+	#include "../../basic/commonlib.h"
 		/* For the continuation-trampoline-style engine & related definitions. */
 	#include "../../basic/ctsengine.h"
 		/* For libandria4_char_pascalarray{} and friends. */

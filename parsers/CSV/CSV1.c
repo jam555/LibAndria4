@@ -1919,6 +1919,56 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 /**************************************************************************/
 
 
+static libandria4_cts_closure libandria4_parser_CSV_CSV1_onfatal
+(
+	libandria4_cts_context *ctx, void *data_,
+	libandria4_cts_framefunc tag_ptr, void *tag2, unsigned int tag3
+)
+{
+	if( ctx && data_ )
+	{
+			/* Do we actually want this here? */
+		if( libandria4_parser_CSV_CSV1_validate(
+			(libandria4_parser_CSV_CSV1_file*)data_ ) )
+		{
+			return( failfunc );
+		}
+		libandria4_parser_CSV_CSV1_file *data =
+			(libandria4_parser_CSV_CSV1_file*)data_;
+		
+		if( !( data->onfatal.handler ) )
+		{
+			return( failfunc );
+		}
+		
+		
+		/* Push the tag unsigned. */
+		int res = libandria4_cts_push2_uint( ctx, 1,  tag3 );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+		/* Push the tag void-pointer. */
+		res = libandria4_cts_push2_voidp( ctx, 1,  tag2 );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+		/* Push the tag function. */
+		res = libandria4_cts_push2_voidf( ctx, 1,  tag_ptr );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+		return( data->onfatal );
+	}
+	
+	return( failfunc );
+}
+
 	/*
 		Possible return flags:
 			0: True failure.
@@ -2019,6 +2069,13 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner_helper
 	
 	return( direct );
 }
+#define libandria4_parser_CSV_CSV1_record_RETONFATAL( sec_id, thrd_id ) \
+	return( \
+		libandria4_parser_CSV_CSV1_onfatal( \
+			ctx, data_, \
+			&libandria4_parser_CSV_CSV1_record, \
+			(void*)&( libandria4_commonlib_firstchars[ (sec_id) ] ), \
+			(thrd_id) ) )
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 (
 	libandria4_cts_context *ctx, void *data_
@@ -2042,12 +2099,12 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 		res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
 		if( !res )
 		{
-			return( failfunc );
+			libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 0 );
 		}
 		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
 		if( !res )
 		{
-			return( failfunc );
+			libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 1 );
 		}
 		
 		
@@ -2061,7 +2118,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 				(void (*)()) &libandria4_parser_CSV_CSV1_record );
 			if( !res )
 			{
-				return( failfunc );
+				libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 2 );
 			}
 			
 			return( data->onfullEOF );
@@ -2081,7 +2138,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 				);
 			if( !res )
 			{
-				return( failfunc );
+				libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 3 );
 			}
 			
 			
@@ -2097,15 +2154,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 		{
 			/* Some sort of error. */
 			
-			res = libandria4_cts_push2_voidf(
-				ctx, 1,
-				(void (*)()) &libandria4_parser_CSV_CSV1_record );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			
-			return( data->onfatal );
+			libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 4 );
 		}
 		
 		
@@ -2135,59 +2184,73 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 				
 			case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
 			case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
-				??? ;
+				/* Repush character. */
+				res = libandria4_cts_push2_uchar( ctx, 1,  c );
+				if( !res )
+				{
+					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 5 );
+				}
+				res = libandria4_cts_push2_uchar( ctx, 1,  type );
+				if( !res )
+				{
+					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 6 );
+				}
+				
+				/* Push recursion, to continue parsing the record. */
+				libandria4_cts_closure cls =
+					LIBANDRIA4_CTS_BUILDCLOSURE(
+						&libandria4_parser_CSV_CSV1_record_inner,
+						data_
+					);
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  cls );
+				if( !res )
+				{
+					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 7 );
+				}
+				
+				/* Push value-fetcher, to build up the field's value. */
+				cls =
+					LIBANDRIA4_CTS_BUILDCLOSURE(
+						&libandria4_parser_CSV_CSV1_accumulate_value,
+						data_
+					);
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  cls );
+				if( !res )
+				{
+					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 8 );
+				}
+				
+				/* Push character popper (to clean the character off the stack). */
+				cls =
+					LIBANDRIA4_CTS_BUILDCLOSURE(
+						&libandria4_parser_CSV_CSV1_popchar,
+						data_
+					);
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  cls );
+				if( !res )
+				{
+					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 9 );
+				}
+				
+				
+					/* Tail-call the unget-character code: this DOES NOT remove */
+					/*  the character from the stack. */
+				return
+				(
+					LIBANDRIA4_CTS_BUILDCLOSURE(
+						&libandria4_parser_CSV_CSV1_ungetc,
+						data_
+					)
+				);
 			
 			/* Errors. */
 			case libandria4_parser_CSV_CSV1_sortchar_categories_invalid:
+				libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 10 );
 			case libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs:
+				libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 11 );
 			default:
-				??? ;
+				libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 12 );
 		}
-		
-		
-		
-		
-		
-		
-		??? ;
-		
-		
-			LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_accumulate_value,
-				data_ );
-			
-			
-			
-			/* Push. */
-			res = libandria4_cts_push2_uchar( ctx, 1,  c );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			res = libandria4_cts_push2_uchar( ctx, 1,  type );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			
-			
-			
-			/* Fetch the character. */
-			res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			res = libandria4_cts_pop_uchar( ctx, 1,  &c );
-			if( !res )
-			{
-				return( failfunc );
-			}
-		
-		
-		??? ;
-		
-		??? ;
 	}
 	
 	return( failfunc );
@@ -2221,7 +2284,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 		{
 			case 0:
 					/* This is an error, because of roll-over. */
-				return( data->onfatal );
+				libandria4_parser_CSV_CSV1_record_RETONFATAL( 0, 0 );
 			case 1:
 				acc = data->firstrec;
 				break;
@@ -2244,7 +2307,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 			);
 		if( !res )
 		{
-			return( failfunc );
+			libandria4_parser_CSV_CSV1_record_RETONFATAL( 0, 1 );
 		}
 		
 			/* Announce the start of this record's first field. */
@@ -2257,7 +2320,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 			res = libandria4_cts_push2_ctsclsr( ctx, 0,  data->startfield );
 			if( !res )
 			{
-				return( failfunc );
+				libandria4_parser_CSV_CSV1_record_RETONFATAL( 0, 2 );
 			}
 		}
 		
@@ -2265,7 +2328,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 		res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
 		if( !res )
 		{
-			return( failfunc );
+			libandria4_parser_CSV_CSV1_record_RETONFATAL( 0, 3 );
 		}
 		
 		
