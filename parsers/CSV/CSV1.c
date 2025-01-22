@@ -1716,6 +1716,20 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring
 
 
 
+
+
+
+
+
+
+
+
+
+
+/* NOTE! This function-group should never return to it's caller-closure  unless: */
+/*  A: A field-ender has been encountered, or */
+/*  B: The field-type is non-string. */
+/* Even error returns should follow this pattern. */
 	/* Fetches the actual value. May use e.g. *_string(). Returns a */
 	/*  pstring-pointer underneath of uchar-flag on stack[ 1 ]. Flag 0 == */
 	/*  "no string"/error, flag 1 == string/success, flag 2 == */
@@ -1744,7 +1758,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 		}
 		
 		
-			??? /* This ios wrong, the character is already on stack[ 1 ]. */
+			??? /* This is wrong, the character is already on stack[ 1 ]. */
 		libandria4_common_monadicchar8 ec =
 			libandria4_parser_CSV_CSV1_getc( data );
 		unsigned char c, flag;
@@ -1765,6 +1779,8 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 		{
 			return( failfunc );
 		}
+		
+		??? ;
 		
 		/* String accumulation. */
 		if( flag == 1 )
@@ -1901,16 +1917,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 	return( failfunc );
 }
 
-
-
-
-
-
-
-
-
-
-
 /**************************************************************************/
 /**************************************************************************/
 /** NOTE: The set of functions in the following group are "current", the **/
@@ -2044,16 +2050,33 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 }
 
 
-/* Note: Finish this function! */
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 (
 	libandria4_cts_context *ctx, void *data_
 );
+#define libandria4_parser_CSV_CSV1_record_RETONFATAL( sec_id, thrd_id ) \
+	return( \
+		libandria4_parser_CSV_CSV1_onfatal( \
+			ctx, data_, \
+			&libandria4_parser_CSV_CSV1_record, \
+			(void*)&( libandria4_commonlib_firstchars[ (sec_id) ] ), \
+			(thrd_id) ) )
+	/* Note: Finish this function! */
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner_helper
 (
 	libandria4_cts_closure direct, void *data_
 )
 {
+		/* Do we actually want this here? */
+	if( libandria4_parser_CSV_CSV1_validate(
+		(libandria4_parser_CSV_CSV1_file*)data_ ) )
+	{
+		return( failfunc );
+	}
+	libandria4_parser_CSV_CSV1_file *data =
+		(libandria4_parser_CSV_CSV1_file*)data_;
+	
+	
 	int res =
 		libandria4_cts_push2_ctsclsr
 		(
@@ -2064,18 +2087,20 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner_helper
 		);
 	if( !res )
 	{
-		return( failfunc );
+		libandria4_parser_CSV_CSV1_record_RETONFATAL( 2, 0 );
 	}
+	
+		/* NOTE! We need to queue up a non-string accumulator here. I */
+		/*  believe the correct entry point does not yet exist, but should */
+		/*  be derived from *_accumulate_nonstring(), which contrary to */
+		/*  it's name can actually accumulate BitTorrent-style strings */
+		/*  (because they start with a number). We need to do this because */
+		/*  we should only encounter "non"-string values on any route that */
+		/*  calls this function. */
+	??? ;
 	
 	return( direct );
 }
-#define libandria4_parser_CSV_CSV1_record_RETONFATAL( sec_id, thrd_id ) \
-	return( \
-		libandria4_parser_CSV_CSV1_onfatal( \
-			ctx, data_, \
-			&libandria4_parser_CSV_CSV1_record, \
-			(void*)&( libandria4_commonlib_firstchars[ (sec_id) ] ), \
-			(thrd_id) ) )
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 (
 	libandria4_cts_context *ctx, void *data_
@@ -2112,15 +2137,6 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 		if( flag == 1 )
 		{
 			/* Full EOF. */
-			
-			res = libandria4_cts_push2_voidf(
-				ctx, 1,
-				(void (*)()) &libandria4_parser_CSV_CSV1_record );
-			if( !res )
-			{
-				libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 2 );
-			}
-			
 			return( data->onfullEOF );
 			
 		} else if( flag == 2 )
@@ -2171,17 +2187,48 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 						data_ )
 				);
 			
-			/* "Type agnostic" options. */
+			/* "Non-string" options. Really they're still strings, but they're */
+			/*  ANTI-PATTERN strings, instead of normal ones. */
 			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
 				return( libandria4_parser_CSV_CSV1_record_inner_helper
 							( data->onopen, data_ ) );
 			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
 				return( libandria4_parser_CSV_CSV1_record_inner_helper
 							( data->onclose, data_ ) );
-			case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
-				return( libandria4_parser_CSV_CSV1_record_inner_helper
-							( data->startfield, data_ ) );
 				
+			case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
+				/* Push recursion, to continue parsing the record. */
+				res =
+					libandria4_cts_push2_ctsclsr(
+						ctx, 0,
+						LIBANDRIA4_CTS_BUILDCLOSURE(
+							&libandria4_parser_CSV_CSV1_record_inner,
+							data_
+						)
+					);
+				if( !res )
+				{
+					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 7 );
+				}
+				
+				/* Announce the start of the new field. */
+				res =
+					libandria4_cts_push2_ctsclsr(
+						ctx, 0,
+						data->startfield
+					);
+				if( !res )
+				{
+					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 7 );
+				}
+				
+				/* Tail-call the character reader. */
+				return
+				(
+					LIBANDRIA4_CTS_BUILDCLOSURE(
+						&libandria4_parser_CSV_CSV1_getc,
+						data_ )
+				);
 			case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
 			case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
 				/* Repush character. */
