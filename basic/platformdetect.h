@@ -536,5 +536,12 @@ SOFTWARE.
 	libandria4_int_errint libandria4_fseek( FILE *stream, libandria4_either_fofft offset, int origin );
 	libandria4_either_fofft libandria4_ftell( FILE *stream );
 	
+	
+	
+	int libandria4_endiancheck_islittleendian();
+	int libandria4_endiancheck_isbigendian();
+	int libandria4_endiancheck_ispdp11endian();
+	int libandria4_endiancheck_ishoneywell316endian();
+	
 #endif
 /* End libandria4 basic platformdetect.h */

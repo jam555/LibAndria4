@@ -28,6 +28,7 @@ SOFTWARE.
 
 #include <errno.h>
 #include "platformdetect.h"
+/* We need to actually get CHAR_BIT from somewhere. */
 
 
 #if LIBANDRIA4_PLATFORM_FILE_OFFSET_BITS > 32
@@ -108,4 +109,37 @@ libandria4_either_fofft libandria4_ftell( FILE *stream )
 	errno = err;
 	
 	return( ret );
+}
+
+
+
+	/* We need to actually get CHAR_BIT from somewhere. */
+#if CHAR_BIT != 8
+	#warning "libandria 4 / basic / platformdetect.h detected an unsupported character bit size."
+#endif
+/* Concept grabbed from https://stackoverflow.com/questions/2100331/ */
+typedef enum
+{
+	libandria4_endiancheck_compenum_little = 0x03020100ul,
+	libandria4_endiancheck_compenum_big = 0x00010203ul,
+	libandria4_endiancheck_compenum_pdp11 = 0x01000302ul,
+	libandria4_endiancheck_compenum_honeywell316 = 0x02030001ul
+} ;
+typedef union { unsigned char bytes[ 4 ]; uint32_t word; } libandria4_endianchecxk_uniontype;
+#define LIBANDRIA4_ENDIANCHECK_UNIONVALUE ( (lib4_endianchecxk_uniontype){ { 0, 1, 2, 3 } } )
+int libandria4_endiancheck_islittleendian()
+{
+	return( LIBANDRIA4_ENDIANCHECK_UNIONVALUE.word == lib4_endiancheck_compenum_little );
+}
+int libandria4_endiancheck_isbigendian()
+{
+	return( LIBANDRIA4_ENDIANCHECK_UNIONVALUE.word == lib4_endiancheck_compenum_big );
+}
+int libandria4_endiancheck_ispdp11endian()
+{
+	return( LIBANDRIA4_ENDIANCHECK_UNIONVALUE.word == lib4_endiancheck_compenum_pdp11 );
+}
+int libandria4_endiancheck_ishoneywell316endian()
+{
+	return( LIBANDRIA4_ENDIANCHECK_UNIONVALUE.word == lib4_endiancheck_compenum_honeywell316 );
 }
