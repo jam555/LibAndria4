@@ -1537,7 +1537,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
 				(void*)&iret_d );
 		
 		if( libandria4_parser_CSV_CSV1_validate(
-			(libandria4_parser_CSV_CSV1_file*)data ) )
+			(libandria4_parser_CSV_CSV1_file*)data_ ) )
 		{
 			return( failfunc );
 		}
@@ -1652,77 +1652,11 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
 				/* Neither a length character, nor a begin-body */
 				/*  character, so re-route to *_nonstring_inner(). */
 				
-				/* Fetch the string size. */
-				res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				
-					/* Push the new character, and it's flag. */
-				res = libandria4_cts_push_uchar( ctx, 1,  c );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				res = libandria4_cts_push_uchar( ctx, 1,  flag );
-				if( !res )
-				{
-					return( failfunc );
-				}
-					/* Transfer the accumulated string. */
-				{
-					size_t l = 0;
-					while( l < sz )
-					{
-						res = libandria4_cts_pop_uchar( ctx, 2,  &c );
-						if( !res )
-						{
-							return( failfunc );
-						}
-						res = libandria4_cts_push_uchar( ctx, 1,  c );
-						if( !res )
-						{
-							return( failfunc );
-						}
-						
-						--sz;
-					}
-				}
-				
-				/* Repush the string length. */
-				res = libandria4_cts_push2_sizet( ctx, 2,  sz );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				
-				
-				/* Push the dedicated non-string handler, it'll receive */
-				/*  the character that we popped. */
-				res =
-					libandria4_cts_push2_ctsclsr
-					(
-						ctx, 0,
-						LIBANDRIA4_CTS_BUILDCLOSURE(
-							& ??? ,
-							data_ )
-					);
-				if( !res )
-				{
-					libandria4_parser_CSV_CSV1_record_RETONFATAL( 2, 0 );
-				}
-				
-				
-					/* At this point we have a length in sz, and 1 or */
-					/*  more characters on stack[ 1 ]. The character we */
-					/*  initially popped is one of those, but instead of */
-					/*  being counted in the length it has it's result */
-					/*  flag between that character and the rest of the */
-					/*  characters. */
-				LIBANDRIA4_CTS_RETURNCLOSURE(
-					&libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel,
-					data_ );
+				return 
+				(
+					libandria4_parser_CSV_CSV1_preaccumulate_btstring_nonstring
+						( ctx, data_,  flag, c )
+				);
 		}
 		
 		/* Delegate the string handling & return value. */
@@ -1730,7 +1664,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
 		(
 			libandria4_parser_CSV_CSV1_preaccumulate_btstring_innerhelper
 			(
-				ctx, data,
+				ctx, data_,
 				LIBANDRIA4_CTS_BUILDCLOSURE( 0, 0 ), acc, getc
 			)
 		);
@@ -1956,6 +1890,101 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel
 		LIBANDRIA4_CTS_RETURNCLOSURE(
 			&libandria4_cts_ctspush_uchar_stk1_val3,
 			(void*)&( data->onexprchar ) );
+	}
+	
+	return( failfunc );
+}
+	/* This does the actual dispatch into *_unravel(), and exists */
+	/*  to reduce the size of *_preaccumulate_*(). */
+libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_nonstring
+(
+	libandria4_cts_context *ctx, void *data_,
+	unsigned char flag, unsigned char c
+)
+{
+	if( ctx && data )
+	{
+		if( libandria4_parser_CSV_CSV1_validate(
+			(libandria4_parser_CSV_CSV1_file*)data ) )
+		{
+			return( failfunc );
+		}
+		
+		int res;
+		unsigned char e;
+		size_t sz;
+		
+		/* Fetch the string size. */
+		res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+			/* Push the new character, and it's flag. */
+		res = libandria4_cts_push_uchar( ctx, 1,  c );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		res = libandria4_cts_push_uchar( ctx, 1,  flag );
+		if( !res )
+		{
+			return( failfunc );
+		}
+			/* Transfer the accumulated string. */
+		{
+			size_t l = 0;
+			while( l < sz )
+			{
+				res = libandria4_cts_pop_uchar( ctx, 2,  &c );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				res = libandria4_cts_push_uchar( ctx, 1,  c );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				--sz;
+			}
+		}
+		
+		/* Repush the string length. */
+		res = libandria4_cts_push2_sizet( ctx, 2,  sz );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+		
+		/* Push the dedicated non-string handler, it'll receive */
+		/*  the character that we popped. */
+		res =
+			libandria4_cts_push2_ctsclsr
+			(
+				ctx, 0,
+				LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_parser_CSV_CSV1_accumulate_nonstring_inner,
+					data_ )
+			);
+		if( !res )
+		{
+			libandria4_parser_CSV_CSV1_record_RETONFATAL( 2, 0 );
+		}
+		
+		
+			/* At this point we have a length in sz, and 1 or */
+			/*  more characters on stack[ 1 ]. The character we */
+			/*  initially popped is one of those, but instead of */
+			/*  being counted in the length it has it's result */
+			/*  flag between that character and the rest of the */
+			/*  characters. */
+		LIBANDRIA4_CTS_RETURNCLOSURE(
+			&libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel,
+			data_ );
 	}
 	
 	return( failfunc );
