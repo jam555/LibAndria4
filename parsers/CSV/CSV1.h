@@ -33,6 +33,8 @@
 		/* For libandria4_commonlib_firstchars[]. */
 	#include "../../basic/commonlib.h"
 		/* For the continuation-trampoline-style engine & related definitions. */
+		/* Usually stack[ 0 ] should be a return/C stack. A FORTH data */
+		/*  stack should be stack[ 1 ]. Stack[ 2 ] is used for string building. */
 	#include "../../basic/ctsengine.h"
 		/* For libandria4_char_pascalarray{} and friends. */
 	#include "../../basic/pascalstring.h"
@@ -80,6 +82,7 @@
 		libandria4_cts_closure firstrec, secondrec, restrec;
 			/* These are all required, but it's fine for them to be no-ops. */
 		libandria4_cts_closure onopen, onclose, startfield;
+		libandria4_cts_closure onstrchar, onexprchar;
 	};
 	
 	
