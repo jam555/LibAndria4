@@ -1486,9 +1486,17 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_
 			
 		}
 	/* Used if it turns out to not be a BitTorrent-style string. */
-					/* At this point we have a length in sz, and 0 or */
-					/*  more characters on stack[ 1 ]. Convert from */
-					/*  that, to what we actually need. */
+	/* Requires a size_t string length on stack[ 2 ], and the */
+	/*  string itself (first character on top) on stack[ 1 ]; it */
+	/*  will push a 3 (as a "success" flag) onto stack[ 1 ], */
+	/*  either decrement or (if already just 1) simply remove */
+	/*  the string length, if the length was decremented will */
+	/*  queue itself for recursion, and directly return the */
+	/*  ->onexprchar closure. */
+	/* This will cause the string on stack[ 1 ] to appear to */
+	/*  have never been treated as the start of a BitTorrent-style */
+	/*  string, which is what we want for those cases where such a */
+	/*  string wasn't encountered. */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel
 (
 	libandria4_cts_context *ctx, void *data_
@@ -1542,7 +1550,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel
 			/* We need to push a "success" flag on top of the */
 			/*  stack for each character as the character comes. */
 		LIBANDRIA4_CTS_RETURNCLOSURE(
-			&libandria4_cts_ctspush_uchar_stk2_val3,
+			&libandria4_cts_ctspush_uchar_stk1_val3,
 			(void*)&( data->onexprchar ) );
 	}
 	
