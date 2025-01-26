@@ -42,6 +42,9 @@ SOFTWARE.
 	/* A flexible C-style route to e.g. tail-calls, even for compilers that */
 	/*  won't directly support such. */
 	
+		/* For UCHAR_MAX. */
+	#include <limits.h>
+	
 	#include "pascalarray.h"
 		/* For libandria4_char_pascalarray{} */
 	#include "pascalstring.h"
@@ -171,6 +174,32 @@ SOFTWARE.
 			return( -1 ); }
 	
 	
+	#define LIBANDRIA4_CTS_DECPUSH_VAL( prefix, postfix, stack, value ) \
+		int prefix ## push ## postfix ## _stk ## stack ## _val ## value \
+			( libandria4_cts_context *ctx ); \
+		libandria4_cts_closure prefix ## ctspush ## postfix ## _stk ## stack ## _val ## value \
+			( libandria4_cts_context*, void* );
+	#define LIBANDRIA4_CTS_DEFPUSH_VAL( prefix, postfix, stack, value ) \
+		int prefix ## push ## postfix ## _stk ## stack ## _val ## value \
+			( libandria4_cts_context *ctx ) { \
+				return( \
+					prefix ## push2 ## postfix ( ctx, (stack),  (value) ) ); } \
+		libandria4_cts_closure prefix ## ctspush ## postfix ## _stk ## stack ## _val ## value \
+			( libandria4_cts_context *ctx, void *data_ ) { \
+				if( !libandria4_cts_isvalid( ctx ) && ctx->stacks->len > (stack) ) { \
+					return( \
+						libandria4_cts_innerreturn_returnstop( \
+							(void*)0, (libandria4_cts_context*)0, 0 ) ); } \
+				if( !( prefix ## push2 ## postfix ( ctx, (stack),  (value) ) ) ) { \
+					return( \
+						libandria4_cts_innerreturn_returnstop( \
+							(void*)0, (libandria4_cts_context*)0, 0 ) ); } \
+				return( *( (libandria4_cts_closure*)data_ ) ); }
+	
+	
+	/* Note that all of the *_ctspush_*() funcs require pointer */
+	/*  to a return value as their second argument. */
+	
 	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _schar, signed char );
 	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _uchar, unsigned char );
 	
@@ -223,6 +252,29 @@ SOFTWARE.
 	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _ctsclsr, libandria4_cts_closure );
 	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _ctsclsrp, libandria4_cts_closure* );
 	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _ctsctxtp, libandria4_cts_context* );
+	
+	
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 0, 0 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 0, 1 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 0, 2 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 0, 3 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 0, 4 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 0, UCHAR_MAX );
+	
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 1, 0 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 1, 1 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 1, 2 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 1, 3 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 1, 4 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 1, UCHAR_MAX );
+	
+	/* These obviously depend on stack[ 2 ] actually existing. */
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 2, 0 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 2, 1 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 2, 2 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 2, 3 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 2, 4 );
+	LIBANDRIA4_CTS_DECPUSH_VAL( libandria4_cts_, _uchar, 2, UCHAR_MAX );
 	
 	
 	

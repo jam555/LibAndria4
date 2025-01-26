@@ -265,6 +265,30 @@ LIBANDRIA4_CTS_DEFPUSH( libandria4_cts_, _ctsctxtp, libandria4_cts_context* );
 
 
 
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 0, 0 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 0, 1 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 0, 2 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 0, 3 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 0, 4 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 0, UCHAR_MAX );
+
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 1, 0 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 1, 1 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 1, 2 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 1, 3 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 1, 4 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 1, UCHAR_MAX );
+
+	/* These obviously depend on stack[ 2 ] actually existing. */
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 2, 0 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 2, 1 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 2, 2 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 2, 3 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 2, 4 );
+LIBANDRIA4_CTS_DEFPUSH_VAL( libandria4_cts_, _uchar, 2, UCHAR_MAX );
+
+
+
 static libandria4_cts_closure libandria4_cts_innerreturn_stop;
 
 static libandria4_cts_closure libandria4_cts_innerreturn_stop =
