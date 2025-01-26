@@ -201,7 +201,8 @@ SOFTWARE.
 		/*  return will be used for any successful return from this */
 		/*  function. */
 		/* The first and second arguments define the string: a null */
-		/*  string will return an error. */
+		/*  string will return an error. A minus as the first character */
+		/*  is fine, but ALL other characters must be decimal digits. */
 		/* The third argument will be used as the first argument to the */
 		/*  function pointer. */
 		/* The fourth argument is expected to be either null, or a */
