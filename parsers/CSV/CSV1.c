@@ -1681,6 +1681,12 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
 /**************************************************************************/
 
 
+
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL ( 0 )
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF ( 1 )
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF ( 2 )
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS ( 3 )
+
 #define libandria4_parser_CSV_CSV1_RETONFATAL( ctxptr, dataptr, funcptr, sec_id, thrd_id ) \
 	return( \
 		libandria4_parser_CSV_CSV1_onfatal( \
@@ -1776,14 +1782,12 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		if( res != 1 )
 		{
-			??? /* If EOF, then retry! Or maybe just fail? */ ;
-			
-			type = 0;
+			type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL;
 			
 		} else {
 			
 				/* STOP HARDWIRING! Properly process stuff! */
-			type = 3;
+			type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS;
 		}
 		
 		
@@ -2156,15 +2160,15 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 		
 		
 		/* Handle errors. */
-		if( flag == 1 )
+		if( flag == LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF )
 		{
 			libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 2 );
 		}
-		else if( flag == 2 )
+		else if( flag == LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF )
 		{
 			libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 3 );
 		}
-		else if( flag != 3 )
+		else if( flag != LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS )
 		{
 			libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 4 );
 		}
@@ -2274,7 +2278,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 			{
 				case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
 				case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
-					type = 3;
+					type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS;
 					break;
 				
 				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
@@ -2282,7 +2286,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 				case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
 				case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
 					/* Refer back to the record handler entry point on stack[ 0 ]. */
-					type = 3;
+					type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS;
 					acc = ret;
 					break;
 					
@@ -2307,7 +2311,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 			
 		} else {
 			
-			type = 0;
+			type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL;
 		}
 		
 		/* Push. */
@@ -2421,12 +2425,12 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 		
 		
 		/* Handle flag. */
-		if( flag == 1 )
+		if( flag == LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF )
 		{
 			/* Full EOF. */
 			return( data->onfullEOF );
 			
-		} else if( flag == 2 )
+		} else if( flag == LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF )
 		{
 			/* Sub-stream EOF, retry. */
 			
@@ -2453,7 +2457,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 					data_ )
 			);
 			
-		} else if( flag != 3 )
+		} else if( flag != LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS )
 		{
 			/* Some sort of error. */
 			
