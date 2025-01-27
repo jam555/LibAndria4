@@ -1402,276 +1402,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 
 
 
-	/* At this point we have a length on stack[ 2 ], and 1 or */
-	/*  more characters on stack[ 2 ]. */
-static libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_innerhelper
-(
-	libandria4_cts_context *ctx, void *data,
-	
-	libandria4_cts_closure acc,
-	libandria4_cts_closure getc,
-	libandria4_cts_closure announce
-)
-{
-	if( ctx && data )
-	{
-		static libandria4_cts_closure
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d );
-		libandria4_cts_closure tmpa = announce, tmpb = getc, tmpc = acc;
-		
-		if( libandria4_parser_CSV_CSV1_validate(
-			(libandria4_parser_CSV_CSV1_file*)data ) )
-		{
-			return( failfunc );
-		}
-		
-		
-		/* First-pass blank-killer. */
-		if( !( getc.handler ) )
-		{
-			getc = acc;
-			acc.handler = 0;
-		}
-		if( !( announce.handler ) )
-		{
-			announce = getc;
-			getc = acc;
-			acc.handler = 0;
-		}
-		
-		
-		/* Queue the extra handlers. */
-		if( !( acc.handler ) )
-		{
-			res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
-			if( !res )
-			{
-				return( failfunc );
-			}
-		}
-		if( !( getc.handler ) )
-		{
-			res = libandria4_cts_push2_ctsclsr( ctx, 0,  getc );
-			if( !res )
-			{
-				return( failfunc );
-			}
-		}
-		
-		
-		/* Final-pass blank-killer. */
-		if( !( announce.handler ) )
-		{
-			announce = ret;
-		}
-		
-		return( announce );
-	}
-	
-	return( failfunc );
-}
-		/* Return. */
-		if( flag )
-		{
-			/* Push the return target. */
-			res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			
-			return( getc );
-			
-		}
-/* The length string gets stored on stack[ 2 ] with it's length as */
-/*  a uchar on top of the string: the first character read will be */
-/*  stored deepest. */
-
-	/* Eventually delegates to either: */
-			/* Fetches a character into a string: this consumes characters on a */
-			/*  one-to-one basis. */
-			/* Upon entry, there must be a "characters not yet read" value on */
-			/*  stack[ 1 ] as a size_t, on top of a pascal-string as a */
-			/*  void-pointer, where the size_t IS NOT larger than the size of */
-			/*  the pascal-string. */
-			/* Upon return, there will be a result flag on stack[ 1 ] as a */
-			/*  uchar, on top of a "characters not yet read" as a size_t, on */
-			/*  top of a pascal-string as a void-pointer. The result will */
-			/*  either be 0 for success, or larger than one for a failure. */
-		/* libandria4_parser_CSV_CSV1_accumulate_btstring(), */
-	/*  or */
-			/* As string, but not a string. Not allowed to contain whitespace, commas, */
-			/*  or double-quotes. The storage-string gets allocated by this */
-			/*  accumulator, just like the *string() version, including with the */
-			/*  tag-uchar stored on top of it on stack[1]. */
-		/* libandria4_parser_CSV_CSV1_accumulate_nonstring_inner(), */
-	/*  depending on whether the "full" bit-torrent string header is */
-	/*  detected. Thus, this MUST act like *_nonstring_inner() until */
-	/*  either a colon (':') or a non-decimal character. */
-libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
-(
-	libandria4_cts_context *ctx, void *data_
-)
-{
-	if( ctx && data )
-	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		libandria4_cts_closure
-			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_preaccumulate_btstring,
-				data ),
-			nstr = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_accumulate_nonstring_inner,
-				data ),
-			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_getc_notstring,
-				data ),
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d ),
-			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_popchar,
-				(void*)&iret_d );
-		
-		if( libandria4_parser_CSV_CSV1_validate(
-			(libandria4_parser_CSV_CSV1_file*)data_ ) )
-		{
-			return( failfunc );
-		}
-		
-		int res;
-		unsigned char flag = 0, c, e;
-		size_t sz;
-		
-		/* Get the character values. */
-		res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-		/* Dispatch. */
-		switch( flag )
-		{
-				??? /* Is 2 correct? Didn't that get changed? */ ???
-			case 2: /* character. */
-				/* This takes a fair bit of work, so break out */
-				/*  into it's handler. */
-				break;
-				
-				/* The rest of these can be handled with a single */
-				/*  compact logic sequence. */
-			case 0: /* error. */
-				/* Fall-through. */
-			case 1: /* EOF, including nesting characters. */
-			default: /* Everything else. */
-					/* Well, we have a "valid" flag sitting on */
-					/*  our string pointer, but we no longer know */
-					/*  if the data was relevant... */
-				res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				
-					/* Discard the accumulated string. */
-				while( sz )
-				{
-					res = libandria4_cts_pop_uchar( ctx, 2,  &flag );
-					if( !res )
-					{
-						return( failfunc );
-					}
-					
-					--sz;
-				}
-				return( failfunc );
-		}
-		
-		
-		/* The code above is basically identical to *_nonstring_inner(), */
-		/*  the switch below is specific to BT-strings. */
-		
-		
-		/* "Standard character" handling. */
-		switch( c )
-		{
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-				/* Decimal number, just treat plainly. */
-				
-				/* Fetch the current string length. */
-				res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
-				if( !res )
-				{
-					return( failfunc );
-				}
-					/* Stow the character. */
-					res = libandria4_cts_push_uchar( ctx, 2,  c );
-					if( !res )
-					{
-						return( failfunc );
-					}
-				/* Store the updated length. */
-				res = libandria4_cts_push2_sizet( ctx, 2,  sz + 1 );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				
-				break;
-			case ':':
-				return
-				(
-					libandria4_parser_CSV_CSV1_preaccumulate_btstring_calclen
-					(
-						ctx, data_
-					)
-				);
-				/*
-					( (libandria4_parser_CSV_CSV1_file*)data )->{ libandria4_cts_closure onstr, onval; }
-				*/
-			default:
-				/* Neither a length character, nor a begin-body */
-				/*  character, so re-route to *_nonstring_inner(). */
-				
-				return 
-				(
-					libandria4_parser_CSV_CSV1_preaccumulate_btstring_nonstring
-						( ctx, data_,  flag, c )
-				);
-		}
-		
-		/* Delegate the string handling & return value. */
-		return
-		(
-			libandria4_parser_CSV_CSV1_preaccumulate_btstring_innerhelper
-			(
-				ctx, data_,
-				LIBANDRIA4_CTS_BUILDCLOSURE( 0, 0 ), acc, getc
-			)
-		);
-	}
-	
-	return( failfunc );
-}
 
 /**************************************************************************/
 /**************************************************************************/
@@ -1827,6 +1557,78 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 
 
 
+	/* At this point we have a length on stack[ 2 ], and 1 or */
+	/*  more characters on stack[ 2 ]. */
+static libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_innerhelper
+(
+	libandria4_cts_context *ctx, void *data,
+	
+	libandria4_cts_closure acc,
+	libandria4_cts_closure getc,
+	libandria4_cts_closure announce
+)
+{
+	if( ctx && data )
+	{
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		static libandria4_cts_closure
+			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_innerreturn,
+				(void*)&iret_d );
+		libandria4_cts_closure tmpa = announce, tmpb = getc, tmpc = acc;
+		
+		if( libandria4_parser_CSV_CSV1_validate(
+			(libandria4_parser_CSV_CSV1_file*)data ) )
+		{
+			return( failfunc );
+		}
+		
+		
+		/* First-pass blank-killer. */
+		if( !( getc.handler ) )
+		{
+			getc = acc;
+			acc.handler = 0;
+		}
+		if( !( announce.handler ) )
+		{
+			announce = getc;
+			getc = acc;
+			acc.handler = 0;
+		}
+		
+		
+		/* Queue the extra handlers. */
+		if( !( acc.handler ) )
+		{
+			res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+			if( !res )
+			{
+				return( failfunc );
+			}
+		}
+		if( !( getc.handler ) )
+		{
+			res = libandria4_cts_push2_ctsclsr( ctx, 0,  getc );
+			if( !res )
+			{
+				return( failfunc );
+			}
+		}
+		
+		
+		/* Final-pass blank-killer. */
+		if( !( announce.handler ) )
+		{
+			announce = ret;
+		}
+		
+		return( announce );
+	}
+	
+	return( failfunc );
+}
 	/* Used if it turns out to not be a BitTorrent-style string. */
 	/* Requires a size_t string length on stack[ 2 ], and the */
 	/*  string itself (first character on top) on stack[ 1 ]; it */
@@ -2100,6 +1902,180 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_calclen
 				/* Use libandria4_parser_CSV_CSV1_accumulate_btstring() ? */
 			&libandria4_parser_CSV_CSV1_accumulate_btstring,
 			data_ );
+	}
+	
+	return( failfunc );
+}
+	/* The length string gets stored on stack[ 2 ] with it's length as */
+	/*  a size_t on top of the string as a sequence of characters on the */
+	/*  stack: the first character read will be stored deepest. */
+	/* While it thinks that it's reading a decimal-length, this function */
+	/*  will continue to loop: */
+		/* TODO: add restraints to stop this from becoming a security */
+		/*  risk via a stack-smash or something. */
+	/*  If a colon (the ':' character) is detected then the */
+	/*  decimal-length will considered complete, any other non-decimal */
+	/*  character will be interpreted to mean that the collected */
+	/*  characters are NOT part of a BitTorrent-style string. Anything */
+	/*  other than recursion returns the result of a helper function. */
+	/*  For strings: */
+		/* libandria4_parser_CSV_CSV1_preaccumulate_btstring_calclen */
+	/*  while for non-strings: */
+		/* libandria4_parser_CSV_CSV1_preaccumulate_btstring_nonstring */
+libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
+(
+	libandria4_cts_context *ctx, void *data_
+)
+{
+	if( ctx && data )
+	{
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		libandria4_cts_closure
+			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_preaccumulate_btstring,
+				data ),
+			nstr = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_accumulate_nonstring_inner,
+				data ),
+			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_getc_notstring,
+				data ),
+			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_innerreturn,
+				(void*)&iret_d ),
+			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_popchar,
+				(void*)&iret_d );
+		
+		if( libandria4_parser_CSV_CSV1_validate(
+			(libandria4_parser_CSV_CSV1_file*)data_ ) )
+		{
+			return( failfunc );
+		}
+		
+		int res;
+		unsigned char flag = 0, c, e;
+		size_t sz;
+		
+		/* Get the character values. */
+		res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+		/* Dispatch. */
+		switch( flag )
+		{
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS: /* character. */
+				/* This takes a fair bit of work, so break out */
+				/*  into it's handler. */
+				break;
+				
+				/* The rest of these can be handled with a single */
+				/*  compact logic sequence. */
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL: /* error. */
+				/* Fall-through. */
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF: /* EOF. */
+			default: /* Everything else. */
+					/* Well, we have a "valid" flag sitting on */
+					/*  our string pointer, but we no longer know */
+					/*  if the data was relevant... */
+				res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+					/* Discard the accumulated string. */
+				while( sz )
+				{
+					res = libandria4_cts_pop_uchar( ctx, 2,  &flag );
+					if( !res )
+					{
+						return( failfunc );
+					}
+					
+					--sz;
+				}
+				return( failfunc );
+		}
+		
+		
+		/* The code above is basically identical to *_nonstring_inner(), */
+		/*  the switch below is specific to BT-strings. */
+		
+		
+		/* "Standard character" handling. */
+		switch( c )
+		{
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				/* Decimal number, just treat plainly. */
+				
+				/* Fetch the current string length. */
+				res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
+				if( !res )
+				{
+					return( failfunc );
+				}
+					/* Stow the character. */
+					res = libandria4_cts_push_uchar( ctx, 2,  c );
+					if( !res )
+					{
+						return( failfunc );
+					}
+				/* Store the updated length. */
+				res = libandria4_cts_push2_sizet( ctx, 2,  sz + 1 );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				break;
+			case ':':
+				return
+				(
+					libandria4_parser_CSV_CSV1_preaccumulate_btstring_calclen
+					(
+						ctx, data_
+					)
+				);
+			default:
+				/* Neither a length character, nor a begin-body */
+				/*  character, so re-route to *_nonstring_inner(). */
+				
+				return 
+				(
+					libandria4_parser_CSV_CSV1_preaccumulate_btstring_nonstring
+						( ctx, data_,  flag, c )
+				);
+		}
+		
+		/* Delegate the string handling & return value. */
+		return
+		(
+			libandria4_parser_CSV_CSV1_preaccumulate_btstring_innerhelper
+			(
+				ctx, data_,
+				LIBANDRIA4_CTS_BUILDCLOSURE( 0, 0 ), acc, getc
+			)
+		);
 	}
 	
 	return( failfunc );
