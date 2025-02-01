@@ -1263,9 +1263,16 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_in
 	/*  stack[ 2 ] as a size_t, on top of a pascal-string as a */
 	/*  void-pointer, where the size_t IS NOT larger than the size of */
 	/*  the pascal-string. */
+	/*  Further, there must be a flag as a uchar on stack[ 1 ], on top */
+	/*  of a character as uchar. The flag's values must follow the */
+	/*  rules for *_CSV1_getc(). */
 	/* Upon return, there will be a result flag on stack[ 1 ] as a */
-	/*  uchar, on top of a pascal-string as a void-pointer. The result */
-	/*  will either be 1 for success, or 0 for a failure. */
+	/*  uchar. The result will either be: */
+		/* 1 for success, with a pascal-string as a void-pointer on */
+		/*  stack[ 2 ], or */
+		/* 0 for a failure, with a size_t holding the number of */
+		/*  incomplete characters on stack[ 2 ], with the void-pointer */
+		/*  from the success case under that. */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 (
 	libandria4_cts_context *ctx, void *data_
@@ -1273,6 +1280,28 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 {
 	if( ctx && data_ )
 	{
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		static libandria4_cts_closure
+			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_innerreturn,
+				(void*)&iret_d ),
+			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_accumulate_btstring,
+				data_ ),
+			push0 = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_ctspush_uchar_stk1_val0,
+				data_ ),
+			popc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_popchar,
+				data_ ),
+			ungetc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_ungetc,
+				data_ ),
+			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_getc,
+				data_ );
+		
 		libandria4_parser_CSV_CSV1_file *data =
 			(libandria4_parser_CSV_CSV1_file*)data_;
 		if( libandria4_parser_CSV_CSV1_validate( data ) )
@@ -1280,8 +1309,12 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 			return( failfunc );
 		}
 		
-		/* Fetch progress & string. */
+		int e, res = 0;
 		size_t sz = 0;
+		unsigned char flag, c;
+		
+		
+		/* Fetch progress & string. */
 		res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
 		if( !res )
 		{
@@ -1306,98 +1339,97 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 		{
 			return( failfunc );
 		}
-		res = libandria4_cts_push2_sizet( ctx, 2,  sz - ( sz ? 1 : 0 ) );
+		res = libandria4_cts_push2_sizet( ctx, 2,  sz );
 		if( !res )
 		{
 			return( failfunc );
 		}
 		
 		/* Validate sz value & string's existence. */
-		if( !strparr || sz > strparr->len )
+		if( !strparr || sz < strparr->len || strparr->len < 0 )
 		{
 			return( failfunc );
 		}
 		
-		/* Safely handle the null-length & end-of-string cases, even if */
-		/*  a doofus called us. */
-		if( sz )
+		
+		/* Verify the string progress hasn't been borked. */
+		if( sz && sz == strparr->len )
 		{
-			/* Fetch character. */
-			libandria4_common_monadicchar8 ec =
-				libandria4_parser_CSV_CSV1_getc( data );
-			unsigned char c, type;
-			int e, res = 0;
-			LIBANDRIA4_MONAD_EITHER_BODYMATCH( ec,
-				LIBANDRIA4_OP_SETcFLAGresAS1,
-				LIBANDRIA4_OP_SETeFLAGresASn1 );
-				/* Push failure, then return to caller. */
+			/* Push the error flag once the character has been ungotten. */
+			res = libandria4_cts_push2_ctsclsr( ctx, 0,  push0 );
 			if( !res )
 			{
-				/* Pop the size, we don't want it anymore. */
-				res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				
-				/* Push the error. */
-				res = libandria4_cts_push2_uchar( ctx, 1,  0 );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				
-				/* Get the return target. */
-				libandria4_cts_closure ret;
-				res = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				return( ret );
+				libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 9 );
 			}
 			
-				/* Store the current character. */
-			strparr->body[ strparr->len - sz ] = c;
-			sz -= 1;
+			/* Schedule the character to be poped. */
+			res = libandria4_cts_push2_ctsclsr( ctx, 0,  popc );
+			if( !res )
+			{
+				libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 9 );
+			}
+			
+				/* Tail-call the unget-character code: this DOES NOT remove */
+				/*  the character from the stack. */
+			return( ungetc );
 		}
 		
-		if( sz )
+		
+		/* Fetch the character & grow the string. */
+		res = libandria4_cts_pop_uchar( ctx, 2,  &type );
+		if( !res )
 		{
-			/* Loop. */
-			LIBANDRIA4_CTS_RETURNCLOSURE(
-				&libandria4_parser_CSV_CSV1_getc_btstring,
-				data_ );
-			
-		} else {
-			
-			/* Discard the size. */
-			res = libandria4_cts_pop_sizet( ctx, 1,  &sz );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			
-			/* Mark as success. */
-			res = libandria4_cts_push2_uchar( ctx, 1,  1 );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			
-			/* Get the return value. */
-			libandria4_cts_closure ret;
-			res = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			
-			/*
-				( (libandria4_parser_CSV_CSV1_file*)data )->{ libandria4_cts_closure onstr, onval; }
-			*/
-			return( ret );
+			return( failfunc );
 		}
+		res = libandria4_cts_pop_uchar( ctx, 2,  &c );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		strparr->body[ sz ] = c;
+		sz += 1;
+		
+		/* Dispatch. */
+		if( sz < strparr->len )
+		{
+			/* Queue recursion. */
+			res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			
+			if( data->onstrchar.handler )
+			{
+				/* Queue the character handler to let it peek a look. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  data->onstrchar );
+				if( !res )
+				{
+					return( failfunc );
+				}
+			}
+			
+			return( getc );
+			
+		}
+		
+		
+		/* Discard the size. */
+		res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+		/* Mark as success. */
+		res = libandria4_cts_push2_uchar( ctx, 1,  1 );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+			/* Is this right? Or do we still need to do it manually? */
+		return( ret );
 	}
 	
 	return( failfunc );
