@@ -1241,10 +1241,26 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_in
 	
 	return( failfunc );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/* Fetches a character into a string: this consumes characters on a */
 	/*  one-to-one basis. */
 	/* Upon entry, there must be a "characters not yet read" value on */
-	/*  stack[ 1 ] as a size_t, on top of a pascal-string as a */
+	/*  stack[ 2 ] as a size_t, on top of a pascal-string as a */
 	/*  void-pointer, where the size_t IS NOT larger than the size of */
 	/*  the pascal-string. */
 	/* Upon return, there will be a result flag on stack[ 1 ] as a */
@@ -1266,7 +1282,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 		
 		/* Fetch progress & string. */
 		size_t sz = 0;
-		res = libandria4_cts_pop_sizet( ctx, 1,  &sz );
+		res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
 		if( !res )
 		{
 			return( failfunc );
@@ -1275,7 +1291,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 		{
 			void *a;
 			
-			res = libandria4_cts_pop_voidp( ctx, 1,  &a );
+			res = libandria4_cts_pop_voidp( ctx, 2,  &a );
 			if( !res )
 			{
 				return( failfunc );
@@ -1285,12 +1301,12 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 		}
 		
 		/* Restore the string, and then progress. */
-		res = libandria4_cts_push2_voidp( ctx, 1,  (void*)strparr );
+		res = libandria4_cts_push2_voidp( ctx, 2,  (void*)strparr );
 		if( !res )
 		{
 			return( failfunc );
 		}
-		res = libandria4_cts_push2_sizet( ctx, 1,  sz - ( sz ? 1 : 0 ) );
+		res = libandria4_cts_push2_sizet( ctx, 2,  sz - ( sz ? 1 : 0 ) );
 		if( !res )
 		{
 			return( failfunc );
@@ -1318,7 +1334,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 			if( !res )
 			{
 				/* Pop the size, we don't want it anymore. */
-				res = libandria4_cts_pop_sizet( ctx, 1,  &sz );
+				res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
 				if( !res )
 				{
 					return( failfunc );
@@ -1331,7 +1347,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 					return( failfunc );
 				}
 				
-				/* Get the return value. */
+				/* Get the return target. */
 				libandria4_cts_closure ret;
 				res = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
 				if( !res )
@@ -1386,22 +1402,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 	
 	return( failfunc );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**************************************************************************/
 /**************************************************************************/
@@ -1641,6 +1641,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_
 	/*  have never been treated as the start of a BitTorrent-style */
 	/*  string, which is what we want for those cases where such a */
 	/*  string wasn't encountered. */
+	/* TODO: rename tis "unspin", to better reflect it's purpose. */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel
 (
 	libandria4_cts_context *ctx, void *data_
@@ -1810,24 +1811,25 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_calclen
 			return( failfunc );
 		}
 		
-		int d;
+		libandria4_char_pascalarray *a;
 		
 		/* End of length, so dispatch accordingly. */
 		{
 			static size_t pretest =
 				( SIZE_MAX - ( SIZE_MAX % 10 ) ) / 10;
-			int res;
-			libandria4_char_pascalarray *a;
-			unsigned char size, c;
+			int res, d = -1;
+			size_t sz;
+			unsigned char c;
 			
 			/* Fetch the length string. */
-			res = libandria4_cts_pop_uchar( ctx, 2,  &size );
+				/* Fetch size. */
+			res = libandria4_cts_pop_sizet( ctx, 2,  &sz );
 			{
 				libandria4_failure_uipresult e;
 				
 				{
 					libandria4_char_pascalarray_result strres =
-						libandria4_char_pascalarray_build( size + (int)1 );
+						libandria4_char_pascalarray_build( sz + (int)1 );
 					
 					LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
 						strres,
@@ -1838,11 +1840,11 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_calclen
 				if( res == 1 )
 				{
 					/* Populate the string. */
-					a->body[ size ] = '\0';
+					a->body[ sz ] = '\0';
 					
-					while( size )
+					while( sz )
 					{
-						--size;
+						--sz;
 						
 						/* Fetch the character. */
 						res = libandria4_cts_pop_uchar( ctx, 2,  &c );
@@ -1851,12 +1853,10 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_calclen
 							return( failfunc );
 						}
 						
-						a->body[ size ] = c;
+						a->body[ sz ] = c;
 					}
 					
 				} else {
-					
-					libandria4_result res = libandria4_char_pascalarray_destroy( strparr );
 					
 					/* Note for improvement: e theoretically holds an error code. */
 					
@@ -1868,17 +1868,30 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_calclen
 				/* Requires basic/commonlib.h */
 			if( a->len )
 			{
+				libandria4_result res2;
 				libandria4_commonlib_intint_eithfork ef = libandria4_atoi( a->len - 1, a->body );
 				LIBANDRIA4_COMMONLIB_FORKINGTYPE_BODYMATCH(
 					ef,
 						LIBANDRIA4_OP_SETdFLAGresAS1,
 						LIBANDRIA4_OP_SETeFLAGresASn1 );
-				{
-					libandria4_result res = libandria4_char_pascalarray_destroy( b );
-					b = 0;
-				}
 				if( res < 0 || d < 0 )
 				{
+					res2 = libandria4_char_pascalarray_destroy( a );
+					/* At least log res2? */
+					
+					return( failfunc );
+				}
+				
+				res2 =  libandria4_char_pascalarray_rebuild( a, d );
+				LIBANDRIA4_COMMONLIB_FORKINGTYPE_BODYMATCH(
+					ef,
+						LIBANDRIA4_OP_SETaFLAGresAS1,
+						LIBANDRIA4_OP_SETeFLAGresASn1 );
+				if( res < 0 )
+				{
+					res2 = libandria4_char_pascalarray_destroy( a );
+					/* At least log res2? */
+					
 					return( failfunc );
 				}
 				
@@ -1888,15 +1901,25 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_calclen
 			}
 		}
 		
-		/* Store the string's length. */
-		res = libandria4_cts_push2_sizet( ctx, 2,  d );
+		/* Store the receiving string-container. */
+		res = libandria4_cts_push2_voidp( ctx, 2,  a );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		/* Store the string's accumulated length... which is inherently */
+		/*  0 right now, since we haven't read the proper string yet, */
+		/*  just it's prologue. */
+		res = libandria4_cts_push2_sizet( ctx, 2,  0 );
 		if( !res )
 		{
 			return( failfunc );
 		}
 		
 			/* Reroute to the BT-string accumulator code. */
-			/* Remember: we have the length as a size_t on stack[ 2 ]. */
+			/* Remember: we have the length as a size_t on stack[ 2 ], on */
+			/*  top of a receptacle string as a */
+			/*  libandria4_char_pascalarray*. */
 		LIBANDRIA4_CTS_RETURNCLOSURE(
 				/* We need to get this pointed at the correct target. */
 				/* Use libandria4_parser_CSV_CSV1_accumulate_btstring() ? */
