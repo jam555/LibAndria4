@@ -76,7 +76,8 @@
 			/*  indicates the "entry function" for a group of 1 or more */
 			/*  implementation functions, the other two further refine that */
 			/*  information in group-specific ways. */
-		libandria4_cts_closure onfatal, onfullEOF;
+			/* There WAS a "onfullEOF", but the 'full' has been removed. */
+		libandria4_cts_closure onfatal, onEOF;
 			/* Which of these get used depends on this->recordindex . Note */
 			/*  that noe of them are actually required. */
 		libandria4_cts_closure firstrec, secondrec, restrec;

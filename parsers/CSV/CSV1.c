@@ -1026,221 +1026,10 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_string
 	
 	return( failfunc );
 }
-static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_innerhelper
-(
-	libandria4_cts_context *ctx, void *data,
-	
-	libandria4_cts_closure acc,
-	libandria4_cts_closure getc,
-	libandria4_cts_closure ret,
-	libandria4_cts_closure popchar,
-	
-	char c
-)
-{
-	if( ctx && data )
-	{
-		if( libandria4_parser_CSV_CSV1_validate(
-			(libandria4_parser_CSV_CSV1_file*)data ) )
-		{
-			return( failfunc );
-		}
-		
-		int res;
-		unsigned char flag = 0;
-		
-		
-		/* The code below was pulled from the end of */
-			/* *_nonstring_inner(), */
-		/*  for better synergy with */
-			/* *_preaccumulate_btstring() */
-		/*  by sharing common code. */
-		
-		
-		/* Fetch the in-progress string. */
-		res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		libandria4_char_pascalarray *strparr = 0;
-		{
-			void *a;
-			
-			res = libandria4_cts_pop_voidp( ctx, 1,  &a );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			
-			strparr = (libandria4_char_pascalarray*)a;
-		}
-		
-		/* Grow the existing string with the new character. */
-		{
-			libandria4_char_pascalarray *a;
-			libandria4_failure_uipresult e;
-			libandria4_char_pascalarray_result strres =
-				libandria4_char_pascalarray_rebuild( strparr, strparr->len + 1 );
-			
-			LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
-				strres,
-					LIBANDRIA4_OP_ISVARaFLAGresAS1,
-					LIBANDRIA4_OP_ISVAReFLAGresASn1 );
-			
-			if( res == 1 )
-			{
-				strparr = (libandria4_char_pascalarray*)a;
-				flag = 1;
-				
-			} else if( res == -1 )
-			{
-				flag = 0;
-				
-			} else {
-				
-				libandria4_result res = libandria4_char_pascalarray_destroy( strparr );
-				
-				return( failfunc );
-			}
-		}
-		strparr->body[ strparr->len - ( flag ? 2 : 1 ) ] = c;
-		if( flag )
-		{
-			strparr->body[ strparr->len - 1 ] = '\0';
-		}
-		
-		/* Push the grown string. */
-		res = libandria4_cts_push2_voidp( ctx, 1,  (void*)strparr );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_push2_uchar( ctx, 1,  flag );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-		/* Return. */
-		if( flag )
-		{
-			/* Push the return target. */
-			res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
-			if( !res )
-			{
-				return( failfunc );
-			}
-			
-			return( getc );
-			
-		} else {
-			
-			/*
-				( (libandria4_parser_CSV_CSV1_file*)data )->{ libandria4_cts_closure onstr, onval; }
-			*/
-			return( ret );
-		}
-	}
-	
-	return( failfunc );
-}
-	/* As string, but not a string. Not allowed to contain whitespace, commas, */
-	/*  or double-quotes. The storage-string gets allocated by this */
-	/*  accumulator, just like the *string() version, including with the */
-	/*  tag-uchar stored on top of it on stack[1]. */
-static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_inner
-(
-	libandria4_cts_context *ctx, void *data
-)
-{
-	if( ctx && data )
-	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		libandria4_cts_closure
-			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_accumulate_nonstring_inner,
-				data ),
-			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_getc_notstring,
-				data ),
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d ),
-			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_popchar,
-				(void*)&iret_d );
-		
-		if( libandria4_parser_CSV_CSV1_validate(
-			(libandria4_parser_CSV_CSV1_file*)data ) )
-		{
-			return( failfunc );
-		}
-		
-		int res;
-		unsigned char flag = 0, c;
-		
-		/* Get the character values. */
-		res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-		/* Dispatch. */
-		switch( flag )
-		{
-			case 2: /* character. */
-				/* This takes a fair bit of work, so break out */
-				/*  into it's handler. */
-				break;
-				
-				/* The rest of these can be handled with a single */
-				/*  compact logic sequence. */
-			case 0: /* error. */
-				/* Fall-through. */
-			default: /* Everything else. */
-					/* Well, we have a "valid" flag sitting on */
-					/*  our string pointer, but we no longer know */
-					/*  if the data was relevant... */
-				res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				res = libandria4_cts_push2_uchar( ctx, 1,  0 );
-				if( !res )
-				{
-					return( failfunc );
-				}
-			case 1: /* EOF, including nesting characters. */
-				/* Ok, we're actually just done. */
-				/*
-					( (libandria4_parser_CSV_CSV1_file*)data )->{ libandria4_cts_closure onstr, onval; }
-				*/
-				return( ret );
-		}
-		
-		/* Delegate the string handling & return value. */
-		return
-		(
-			libandria4_parser_CSV_CSV1_accumulate_nonstring_innerhelper
-			(
-				ctx, data,
-				acc, getc, ret, popchar,
-				c
-			)
-		);
-	}
-	
-	return( failfunc );
-}
+
+
+
+
 
 
 
@@ -1410,6 +1199,364 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 	return( failfunc );
 }
 
+
+
+	/* Not allowed to contain separator or newline characters. */
+static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_innernested
+(
+	libandria4_cts_context *ctx, void *data_
+)
+{
+	if( ctx && data_ )
+	{
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		static libandria4_cts_closure
+			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_accumulate_nonstring_innernested,
+				data ),
+			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_getc_notstring,
+				data ),
+			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_innerreturn,
+				(void*)&iret_d ),
+			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_popchar,
+				(void*)&iret_d );
+		
+		if( libandria4_parser_CSV_CSV1_validate(
+			(libandria4_parser_CSV_CSV1_file*)data_ ) )
+		{
+			return( failfunc );
+		}
+		libandria4_parser_CSV_CSV1_file *data =
+			(libandria4_parser_CSV_CSV1_file*)data_;
+		
+		libandria4_cts_closure hand = { 0, 0 };
+		int res, repush = 0;
+		
+		
+		/* Sorted dispatch. */
+		libandria4_parser_CSV_CSV1_sortchar_categories cat =
+			libandria4_parser_CSV_CSV1_sortchar( data, c );
+		switch( cat )
+		{
+			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
+			case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
+			case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
+			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
+				
+				/* Skip these queuings if closing. We'll eventually */
+				/*  fall-through to whatever is already on the return */
+				/*  stack. */
+				if( cat != libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser )
+				{
+					/* We need to recurse. */
+					res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+					if( !res )
+					{
+						return( failfunc );
+					}
+					
+					/* Enter the nesting. */
+					if( cat == libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener )
+					{
+						/* Nest. */
+						res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+						if( !res )
+						{
+							return( failfunc );
+						}
+						
+						/* Announce. */
+						res = libandria4_cts_push2_ctsclsr( ctx, 0,  data->startfield );
+						if( !res )
+						{
+							return( failfunc );
+						}
+					}
+				}
+				
+				/* We'll need the next character to be ready. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  getc );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				/* Pop the opener character. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  popchar );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				/* Set the tail-cal target. */
+				hand =
+					( cat == libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener ) ?
+						( data->onopen ): /* Nest. */
+						(
+							( cat == libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser ) ?
+								( data->onclose ): /* De-nest. */
+								( data->onexprchar ) /* Announce character. */
+						)
+						();
+				
+				/* Repush the character for hand(). */
+				repush = 1;
+				break;
+			case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
+				
+				/* We need to recurse. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				/* Announce. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  data->startfield );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				/* We'll need the next character to be ready. */
+				hand = getc;
+				
+				repush = 0;
+				
+				break;
+			
+			/* Errors. */
+			case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
+				/* Absolute syntax error, there should never be a record seperator here. */
+			case libandria4_parser_CSV_CSV1_sortchar_categories_invalid:
+			case libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs:
+			default:
+				
+				/* Do some logging here. */
+				
+				return( failfunc );
+		}
+		
+		if( repush )
+		{
+			/* Repush the character for hand(). */
+			res = libandria4_cts_push2_uchar( ctx, 1,  c );
+			if( !res )
+			{
+				libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 5 );
+			}
+			res = libandria4_cts_push2_uchar( ctx, 1,  LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS );
+			if( !res )
+			{
+				libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 6 );
+			}
+		}
+		return( hand );
+	}
+	
+	return( failfunc );
+}
+	/* Requires a flag (3 equals "success") as a uchar on */
+	/*  stack[ 1 ], with a character as uchar directly */
+	/*  underneath it. */
+static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_inner
+(
+	libandria4_cts_context *ctx, void *data_
+)
+{
+	if( ctx && data )
+	{
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		static libandria4_cts_closure
+			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_accumulate_nonstring_inner,
+				data ),
+			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_getc_notstring,
+				data ),
+			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_innerreturn,
+				(void*)&iret_d ),
+			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_popchar,
+				(void*)&iret_d ),
+			nested = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_accumulate_nonstring_innernested,
+				data_ );
+		libandria4_cts_closure route = ret;
+		
+		if( libandria4_parser_CSV_CSV1_validate(
+			(libandria4_parser_CSV_CSV1_file*)data_ ) )
+		{
+			return( failfunc );
+		}
+		libandria4_parser_CSV_CSV1_file *data =
+			(libandria4_parser_CSV_CSV1_file*)data_;
+		
+		int res;
+		unsigned char flag = 0, c;
+		
+		
+		/* Get the character values. */
+		res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+		
+		/* Flagged dispatch. */
+		switch( flag )
+		{
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS: /* character. */
+				/* This takes a fair bit of work, so break out */
+				/*  into it's handler. */
+				break;
+				
+				/* The rest of these can be handled with a single */
+				/*  compact logic sequence. */
+			default: /* Everything else. */
+				
+				/* We need to log the specific flag that was detected. */
+				
+				/* Fall-through. */
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL:
+				/* Error. */
+				
+				if( flag == LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL )
+				{
+					/* We need to log an error here. */
+				}
+				
+				if( !( data->onfatal.handler ) )
+				{
+					return( failfunc );
+				}
+				
+				return( data->onfatal );
+				
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF:
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF:
+				/* EOF, including nesting characters. */
+					/* Actually, should nesting characters be relevant? */
+				/* ... Ok, we're actually just done. */
+				/*
+					( (libandria4_parser_CSV_CSV1_file*)data )->{ libandria4_cts_closure onstr, onval; }
+				*/
+				
+				if( !( data->onEOF.handler ) )
+				{
+					return( failfunc );
+				}
+				
+				return( data->onEOF );
+		}
+		
+		
+		/* Sorted dispatch. */
+		libandria4_parser_CSV_CSV1_sortchar_categories cat =
+			libandria4_parser_CSV_CSV1_sortchar( data, c );
+		switch( cat )
+		{
+			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
+			case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
+			case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
+				
+				/* We need to recurse. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				/* Enter the nesting. */
+				if( cat == libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener )
+				{
+					/* Nest. */
+					res = libandria4_cts_push2_ctsclsr( ctx, 0,  nested );
+					if( !res )
+					{
+						return( failfunc );
+					}
+					
+					/* Announce. */
+					res = libandria4_cts_push2_ctsclsr( ctx, 0,  data->startfield );
+					if( !res )
+					{
+						return( failfunc );
+					}
+				}
+				
+				/* We'll need the next character to be ready. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  getc );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				/* Pop the opener character. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  popchar );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				/* Set the tail-cal target. */
+				route =
+					( cat == libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener ) ?
+						( data->onopen ): /* Nest. */
+						( data->onexprchar ); /* Announce character. */
+				
+				/* Repush the character for ret(). */
+				res = libandria4_cts_push2_uchar( ctx, 1,  c );
+				if( !res )
+				{
+					libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 5 );
+				}
+				res = libandria4_cts_push2_uchar( ctx, 1,  LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS );
+				if( !res )
+				{
+					libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 6 );
+				}
+				break;
+			
+			case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
+			case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
+					/* We'll already act appropriately. */
+				break;
+			
+			/* Errors. */
+			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
+					/* This belongs in a specialized branch function. */
+				/*
+				hand = data->onclose;
+				break;
+				*/
+				return( failfunc );
+			case libandria4_parser_CSV_CSV1_sortchar_categories_invalid:
+			case libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs:
+			default:
+				
+				/* Do some logging here. */
+				
+				return( failfunc );
+		}
+		
+		return( route );
+	}
+	
+	return( failfunc );
+}
 
 
 	/* Fetches a character into a string: this consumes characters on a */
@@ -1679,7 +1826,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_
 	/*  have never been treated as the start of a BitTorrent-style */
 	/*  string, which is what we want for those cases where such a */
 	/*  string wasn't encountered. */
-	/* TODO: rename tis "unspin", to better reflect it's purpose. */
+	/* TODO: rename to "unspin", to better reflect it's purpose. */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel
 (
 	libandria4_cts_context *ctx, void *data_
@@ -2465,7 +2612,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 		if( flag == LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF )
 		{
 			/* Full EOF. */
-			return( data->onfullEOF );
+			return( data->onEOF );
 			
 		} else if( flag == LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF )
 		{
