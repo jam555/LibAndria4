@@ -445,106 +445,6 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 );
 
 
-static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_dquote
-(
-	libandria4_cts_context *ctx, void *data_
-)
-{
-	if( ctx && data_ )
-	{
-		libandria4_parser_CSV_CSV1_file *data =
-			(libandria4_parser_CSV_CSV1_file*)data_;
-		if( libandria4_parser_CSV_CSV1_validate( data ) )
-		{
-			return( failfunc );
-		}
-		
-			/* Setup a default "return via return stack" route. */
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		libandria4_cts_closure ret =
-			LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d );
-		
-		libandria4_common_monadicchar8 ec =
-			libandria4_parser_CSV_CSV1_getc( data );
-		unsigned char c, type;
-		int e, res = 0;
-		
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( ec,
-			LIBANDRIA4_OP_SETcFLAGresAS1,
-			LIBANDRIA4_OP_SETeFLAGresASn1 );
-		
-		/* Analyze. */
-		if( res == 1 )
-		{
-			/* Success. */
-			
-			if( c == '\"' )
-			{
-				/* Embedded double-quote. */
-				type = 2;
-				
-			} else {
-				
-				/* Not a double-quote, so unget via delegation. */
-				
-					/* Override the default return route, with unget() as a detour. */
-				ret =
-					LIBANDRIA4_CTS_BUILDCLOSURE(
-						&libandria4_parser_CSV_CSV1_ungetc,
-						data_ );
-				
-				/* We treat this as an EOF. 'c' holds the value to unget, so no touching that. */
-				type = 1;
-			}
-			
-		} else if( res == -1 )
-		{
-			/* Error. */
-			if( e > 0 )
-			{
-				/* EOF. */
-				type = 1;
-				
-			} else if( e == 0 )
-			{
-				/* Retry, so early exit + trigger repeat. */
-				LIBANDRIA4_CTS_RETURNCLOSURE(
-					&libandria4_parser_CSV_CSV1_getc_string_dquote,
-					data_ );
-				
-			} else {
-				
-				/* Error. */
-				type = 0;
-			}
-			
-		} else {
-			
-			/* This should never happen. */
-			return( failfunc );
-		}
-		
-		/* Push. */
-		res = libandria4_cts_push2_uchar( ctx, 1,  c );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_push2_uchar( ctx, 1,  type );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-			/* Just use the pre-set default return. */
-		return( ret );
-	}
-	
-	return( failfunc );
-}
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 (
 	libandria4_cts_context *ctx, void *data
@@ -690,6 +590,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF ( 1 )
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF ( 2 )
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS ( 3 )
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE ( 4 )
 
 #define libandria4_parser_CSV_CSV1_RETONFATAL( ctxptr, dataptr, funcptr, sec_id, thrd_id ) \
 	return( \
@@ -829,6 +730,144 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 	return( failfunc );
 }
 
+		/* This is a bit odd. It implements CSV-style embedding of */
+		/*  double quotes, where you just stick two of them together. */
+		/*  Not how I would do it, but apparently they thought it */
+		/*  made sense. */
+		/* Note that a flag/character pair should be on stack[ 1 ] */
+		/*  already. */
+	static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_dquote
+	(
+		libandria4_cts_context *ctx, void *data_
+	)
+	{
+		if( ctx && data_ )
+		{
+				/* Setup a default "return via return stack" route. */
+			static libandria4_cts_innerreturn_data iret_d =
+				{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+			static libandria4_cts_closure
+				acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_parser_CSV_CSV1_getc_string_dquote,
+					data_ ),
+				getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_parser_CSV_CSV1_getc_string,
+					data_ ),
+				unget = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_parser_CSV_CSV1_ungetc,
+					data_ ),
+				ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_cts_innerreturn,
+					(void*)&iret_d );
+			libandria4_cts_closure route = ret;
+			
+			if( libandria4_parser_CSV_CSV1_validate( data ) )
+			{
+				return( failfunc );
+			}
+			libandria4_parser_CSV_CSV1_file *data =
+				(libandria4_parser_CSV_CSV1_file*)data_;
+			
+			unsigned char c, type;
+			int res = 0;
+			
+			
+			/* Get the character values. */
+			res = libandria4_cts_pop_uchar( ctx, 1,  &type );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			
+			
+			/* Dispatch per getc category. */
+			switch( type )
+			{
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS:
+					break;
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF:
+						/* Queue acc. */
+					res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+					if( !res )
+					{
+						return( failfunc );
+					}
+					
+					return( getc );
+					
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF:
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL:
+				default:
+					/* Should be logging here. */
+					
+					return( failfunc );
+			}
+			
+			
+			/* Dispatch character category. */
+			libandria4_parser_CSV_CSV1_sortchar_categories cat =
+				libandria4_parser_CSV_CSV1_sortchar( data, c );
+			switch( cat )
+			{
+				/* Plain success. */
+				case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
+						/* Override normal treatment of double-quotes. */
+					type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE;
+					break;
+					
+				/* Valid followers to a closing double-quote. */
+				case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
+				case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
+					/* Repush. */
+					res = libandria4_cts_push2_uchar( ctx, 1,  '\"' );
+					if( !res )
+					{
+						return( failfunc );
+					}
+					res = libandria4_cts_push2_uchar( ctx, 1,  LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS );
+					if( !res )
+					{
+						return( failfunc );
+					}
+					
+					route = unget;
+					break;
+					
+				/* Errors. */
+				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
+				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
+				case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
+					return( data->onfatal );
+				case libandria4_parser_CSV_CSV1_sortchar_categories_invalid:
+				case libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs:
+				default:
+					return( failfunc );
+			}
+			
+			
+			/* Repush. */
+			res = libandria4_cts_push2_uchar( ctx, 1,  c );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			res = libandria4_cts_push2_uchar( ctx, 1,  type );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			
+				/* Just use the pre-set default return. */
+			return( route );
+		}
+		
+		return( failfunc );
+	}
 		/* Fetches a character as a member of a string: this may consume */
 		/*  MULTIPLE characters per result, or even consume a character for an */
 		/*  "EOF" result (which happens as the end of a string). */
@@ -884,6 +923,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 			/* Dispatch get-result. */
 			switch( type )
 			{
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE:
 				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS:
 					break;
 				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF:
@@ -910,15 +950,22 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 					/*  embedding manually, so it needs to be revised. */
 					/* TODO: spruce this up a bit. */
 					
-					/* Schedule interpreter. */
-					res = libandria4_cts_push2_ctsclsr( ctx, 0,  dquote );
-					if( !res )
+					if( data->csvStr )
 					{
-						return( failfunc );
+						/* Schedule interpreter. */
+						res = libandria4_cts_push2_ctsclsr( ctx, 0,  dquote );
+						if( !res )
+						{
+							return( failfunc );
+						}
+						
+						/* Get next character. */
+						return( getc );
 					}
 					
-					/* Get next character. */
-					return( getc );
+					/* We aren't acknowledging CSV-style strings, so just exit */
+					/*  the string handling. */
+					break;
 					
 				/* Plain success. */
 				case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
@@ -942,7 +989,6 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 				case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
 				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
 				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
-					type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS;
 					break;
 					
 				/* Errors. */
@@ -1062,13 +1108,16 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_string
 		/* Result dispatch. */
 		switch( flag )
 		{
-			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS: /* character. */
+			/* Characters.. */
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE:
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS:
 				break;
 				
+			/* Errors. */
 			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF:
 			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF:
 				/* Fall-through. */
-			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL: /* error. */
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL:
 			default: /* Everything else. */
 				
 				return( failfunc );
@@ -1093,8 +1142,11 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_string
 					/*  something that guarantees the character is valid, then */
 					/*  returning to the calling closure, but for now this will do. */
 				
-					/* String finished, just drop out to the initial calling closure. */
-				return( ret );
+				if( flag != LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE )
+				{
+						/* String finished, just drop out to the initial calling closure. */
+					return( ret );
+				}
 			default:
 				break;
 		}
@@ -1137,6 +1189,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_string
 				&libandria4_parser_CSV_CSV1_accumulate_string, 0, 1 );
 		}
 		
+		/* Announce the current character. */
 		return( data->onstrchar );
 	}
 	
