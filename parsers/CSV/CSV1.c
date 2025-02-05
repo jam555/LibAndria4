@@ -452,6 +452,24 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 {
 	if( ctx && data_ )
 	{
+			/* Setup a default "return via return stack" route. */
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		static libandria4_cts_closure
+			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_getc_string_cescape,
+				data_ ),
+			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_getc_string,
+				data_ ),
+			unget = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_ungetc,
+				data_ ),
+			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_innerreturn,
+				(void*)&iret_d );
+		libandria4_cts_closure route = ret;
+		
 		libandria4_parser_CSV_CSV1_file *data =
 			(libandria4_parser_CSV_CSV1_file*)data_;
 		if( libandria4_parser_CSV_CSV1_validate( data ) )
@@ -459,100 +477,101 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 			return( failfunc );
 		}
 		
-		libandria4_common_monadicchar8 ec =
-			libandria4_parser_CSV_CSV1_getc( data );
 		unsigned char c, type;
-		int e, res = 0;
+		int res = 0;
 		
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( ec,
-			LIBANDRIA4_OP_SETcFLAGresAS1,
-			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		
-		/* Analyze. */
-		if( res == 1 )
+		/* Get the character values. */
+		res = libandria4_cts_pop_uchar( ctx, 1,  &type );
+		if( !res )
 		{
-			/* Success. */
-			
-			switch( c )
-			{
-				case 'a': /* Audible bell. */
-					c = 0x07;
-					type = 2;
-					break;
-				case 'b': /* Backspace. */
-					c = 0x08;
-					type = 2;
-					break;
-				case 'f': /* Formfeed. */
-					c = 0x0c;
-					type = 2;
-					break;
-				case 'n': /* New line. */
-					c = 0x0a; /* Line feed. */
-					type = 2;
-					break;
-				case 'r': /* Carriage return. */
-					c = 0x0d;
-					type = 2;
-					break;
-				case 't': /* horizontal Tab. */
-					c = 0x09;
-					type = 2;
-					break;
-				case 'v': /* Vertical tab. */
-					c = 0x0;
-					type = 2;
-					break;
-				case '\"':
-				case '\'':
-				case '\\':
-				case '\?':
-					/* Embed character. */
-					type = 2;
-					break;
-				default:
-					/* Not recognized, treat it as a "boring" literal. */
-					
-					/* Unhandled meaningfull characters: */
-						/* A number starts an octal value to be embedded. */
-						/* An 'x' starts a hexadecimal number. */
-						/* A 'u' or 'U' starts a Unicode character. */
-					/* These all should preferably be handled, but currently */
-					/*  aren't: they honestly call for their own functions, */
-					/*  and I don't want to implement that just yet. */
-					
-					type = 2;
-					break;
-			}
-			
-		} else if( res == -1 )
+			return( failfunc );
+		}
+		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+		if( !res )
 		{
-			/* Error. */
-			if( e > 0 )
-			{
-				/* EOF. */
-				type = 1;
-				
-			} else if( e == 0 )
-			{
-				/* Retry, so early exit + trigger repeat. */
-				LIBANDRIA4_CTS_RETURNCLOSURE(
-					&libandria4_parser_CSV_CSV1_getc_string_cescape,
-					data_ );
-				
-			} else {
-				
-				/* Error. */
-				type = 0;
-			}
-			
-		} else {
-			
-			/* This should never happen. */
 			return( failfunc );
 		}
 		
-		/* Push. */
+		
+		/* Dispatch per getc category. */
+		switch( type )
+		{
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS:
+				break;
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF:
+					/* Queue acc. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				return( getc );
+				
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF:
+			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL:
+			default:
+				/* Should be logging here. */
+				
+				return( failfunc );
+		}
+		
+		
+		/* Dispatch per character. */
+		switch( c )
+		{
+			/* BEWARE! The values assigned below are ASCII, */
+			/*  this could be a problem for someone. If you */
+			/*  are that someone, then look at swapping these */
+			/*  hard-coded values for macros from */
+				/* /text/charsets/ */
+			/*  , with some facility to choose which charset */
+			/*  to actually use. */
+			
+			case 'a': /* Audible bell. */
+				c = 0x07;
+				break;
+			case 'b': /* Backspace. */
+				c = 0x08;
+				break;
+			case 'f': /* Formfeed. */
+				c = 0x0c;
+				break;
+			case 'n': /* New line. */
+				c = 0x0a; /* Line feed. */
+				break;
+			case 'r': /* Carriage return. */
+				c = 0x0d;
+				break;
+			case 't': /* horizontal Tab. */
+				c = 0x09;
+				break;
+			case 'v': /* Vertical tab. */
+				c = 0x0;
+				break;
+			case '\"':
+			case '\'':
+			case '\\':
+			case '\?':
+				/* Embed character. */
+				break;
+			default:
+				/* Not recognized, treat it as a "boring" literal. */
+				
+				/* Unhandled meaningfull characters: */
+					/* A number starts an octal value to be embedded. */
+					/* An 'x' starts a hexadecimal number. */
+					/* A 'u' or 'U' starts a Unicode character. */
+				/* These all should preferably be handled, but currently */
+				/*  aren't: they honestly call for their own functions, */
+				/*  and I don't want to implement that just yet. */
+				
+				break;
+		}
+		
+		
+		/* Repush. */
 		res = libandria4_cts_push2_uchar( ctx, 1,  c );
 		if( !res )
 		{
@@ -564,13 +583,8 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 			return( failfunc );
 		}
 		
-		/* Get the return value. */
-		libandria4_cts_closure ret;
-		res = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
-		if( !res )
-		{
-			return( failfunc );
-		}
+		
+		/* Return to calling closure. */
 		return( ret );
 	}
 	
@@ -590,6 +604,8 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF ( 1 )
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF ( 2 )
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS ( 3 )
+	/* *_FORCE should never be returned by *_getc(), just by other */
+	/*  functions that call it. */
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE ( 4 )
 
 #define libandria4_parser_CSV_CSV1_RETONFATAL( ctxptr, dataptr, funcptr, sec_id, thrd_id ) \
@@ -658,6 +674,8 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_onfatal
 			1: True EOF.
 			2: Sub-stream EOF (aka retry).
 			3: Success.
+			Never return any other values, they're reserved for other
+				purposes.
 		Stack delta: 0( return target ) 1() -> 0() 1( character, flags )
 			(top listed last)
 	*/
