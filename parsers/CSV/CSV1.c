@@ -2300,7 +2300,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
 	/*  nesting-modification character (WHEN that is a configured thing). */
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 (
-	libandria4_cts_context *ctx, void *data
+	libandria4_cts_context *ctx, void *data_
 )
 {
 	if( ctx && data )
@@ -2310,7 +2310,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 		libandria4_cts_closure
 			getstr = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_string,
-				data ),
+				data_ ),
 			gettok = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_nonstring_inner,
 				data_ ),
@@ -2319,10 +2319,12 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 				data_ );
 		
 		if( libandria4_parser_CSV_CSV1_validate(
-			(libandria4_parser_CSV_CSV1_file*)data ) )
+			(libandria4_parser_CSV_CSV1_file*)data_ ) )
 		{
 			return( failfunc );
 		}
+		libandria4_parser_CSV_CSV1_file *data =
+			(libandria4_parser_CSV_CSV1_file*)data_;
 		
 		
 		/* Fetch the character. */
@@ -2358,17 +2360,23 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 		switch( cat )
 		{
 			case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
-				/* Push the return target. */
-				res = libandria4_cts_push2_ctsclsr( ctx, 0,  getstr );
-				if( !res )
+				if( data->cStr || data->csvStr )
 				{
-					libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 7 );
+					/* Push the return target. */
+					res = libandria4_cts_push2_ctsclsr( ctx, 0,  getstr );
+					if( !res )
+					{
+						libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 7 );
+					}
+					
+					/* We aren't repushing the character we've read, so fetch the next instead. */
+					LIBANDRIA4_CTS_RETURNCLOSURE(
+						&libandria4_parser_CSV_CSV1_getc_string,
+						data_ );
 				}
 				
-				/* We aren't repushing the character we've read, so fetch the next instead. */
-				LIBANDRIA4_CTS_RETURNCLOSURE(
-					&libandria4_parser_CSV_CSV1_getc_string,
-					data_ );
+				/* We aren't supporting C-style OR CSV-style strings, */
+				/*  so just fall-through. */
 			case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
 				/* Token accumulation. */
 				/* Repush the character for *_accumulate_nonstring(). */
