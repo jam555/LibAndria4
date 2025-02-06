@@ -46,6 +46,9 @@ SOFTWARE.
 	/*  in this file is both declared in another header, and defined */
 	/*  in a matching .c file. */
 	
+	/* Note to self: I forgot to do libandria4_typeinfo_vtable_integers{} */
+	/*  and similar, fix that! */
+	
 	
 	#include <limits.h>
 	#include <stdint.h>

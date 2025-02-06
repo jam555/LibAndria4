@@ -434,7 +434,17 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 
 
 
-	/* An implementation function for libandria4_parser_CSV_CSV1_getc_string(). */
+
+
+
+/**************************************************************************/
+/**************************************************************************/
+/** NOTE: The set of functions in the following group are "current", the **/
+/**  ones above need to be adapted to match those below. ******************/
+/**************************************************************************/
+/**************************************************************************/
+
+/* Implementation functions for libandria4_parser_CSV_CSV1_getc_string(). */
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_dquote
 (
 	libandria4_cts_context *ctx, void *data
@@ -444,166 +454,13 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 	libandria4_cts_context *ctx, void *data
 );
 
-
-static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
-(
-	libandria4_cts_context *ctx, void *data
-)
-{
-	if( ctx && data_ )
-	{
-			/* Setup a default "return via return stack" route. */
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		static libandria4_cts_closure
-			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_getc_string_cescape,
-				data_ ),
-			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_getc_string,
-				data_ ),
-			unget = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_ungetc,
-				data_ ),
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d );
-		libandria4_cts_closure route = ret;
-		
-		libandria4_parser_CSV_CSV1_file *data =
-			(libandria4_parser_CSV_CSV1_file*)data_;
-		if( libandria4_parser_CSV_CSV1_validate( data ) )
-		{
-			return( failfunc );
-		}
-		
-		unsigned char c, type;
-		int res = 0;
-		
-		
-		/* Get the character values. */
-		res = libandria4_cts_pop_uchar( ctx, 1,  &type );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-		
-		/* Dispatch per getc category. */
-		switch( type )
-		{
-			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS:
-				break;
-			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF:
-					/* Queue acc. */
-				res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
-				if( !res )
-				{
-					return( failfunc );
-				}
-				
-				return( getc );
-				
-			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF:
-			case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL:
-			default:
-				/* Should be logging here. */
-				
-				return( failfunc );
-		}
-		
-		
-		/* Dispatch per character. */
-		switch( c )
-		{
-			/* BEWARE! The values assigned below are ASCII, */
-			/*  this could be a problem for someone. If you */
-			/*  are that someone, then look at swapping these */
-			/*  hard-coded values for macros from */
-				/* /text/charsets/ */
-			/*  , with some facility to choose which charset */
-			/*  to actually use. */
-			
-			case 'a': /* Audible bell. */
-				c = 0x07;
-				break;
-			case 'b': /* Backspace. */
-				c = 0x08;
-				break;
-			case 'f': /* Formfeed. */
-				c = 0x0c;
-				break;
-			case 'n': /* New line. */
-				c = 0x0a; /* Line feed. */
-				break;
-			case 'r': /* Carriage return. */
-				c = 0x0d;
-				break;
-			case 't': /* horizontal Tab. */
-				c = 0x09;
-				break;
-			case 'v': /* Vertical tab. */
-				c = 0x0;
-				break;
-			case '\"':
-			case '\'':
-			case '\\':
-			case '\?':
-				/* Embed character. */
-				break;
-			default:
-				/* Not recognized, treat it as a "boring" literal. */
-				
-				/* Unhandled meaningfull characters: */
-					/* A number starts an octal value to be embedded. */
-					/* An 'x' starts a hexadecimal number. */
-					/* A 'u' or 'U' starts a Unicode character. */
-				/* These all should preferably be handled, but currently */
-				/*  aren't: they honestly call for their own functions, */
-				/*  and I don't want to implement that just yet. */
-				
-				break;
-		}
-		
-		
-		/* Repush. */
-		res = libandria4_cts_push2_uchar( ctx, 1,  c );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_push2_uchar( ctx, 1,  type );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-		
-		/* Return to calling closure. */
-		return( ret );
-	}
-	
-	return( failfunc );
-}
-
-/**************************************************************************/
-/**************************************************************************/
-/** NOTE: The set of functions in the following group are "current", the **/
-/**  ones above need to be adapted to match those below. ******************/
-/**************************************************************************/
-/**************************************************************************/
-
-
-
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL ( 0 )
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF ( 1 )
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF ( 2 )
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS ( 3 )
+
+
+
 	/* *_FORCE should never be returned by *_getc(), just by other */
 	/*  functions that call it. */
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE ( 4 )
@@ -748,6 +605,148 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 	return( failfunc );
 }
 
+	static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
+	(
+		libandria4_cts_context *ctx, void *data
+	)
+	{
+		if( ctx && data_ )
+		{
+				/* Setup a default "return via return stack" route. */
+			static libandria4_cts_innerreturn_data iret_d =
+				{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+			static libandria4_cts_closure
+				acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_parser_CSV_CSV1_getc_string_cescape,
+					data_ ),
+				getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_parser_CSV_CSV1_getc_string,
+					data_ ),
+				ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_cts_innerreturn,
+					(void*)&iret_d );
+			libandria4_cts_closure route = ret;
+			
+			if( libandria4_parser_CSV_CSV1_validate( data ) )
+			{
+				return( failfunc );
+			}
+			libandria4_parser_CSV_CSV1_file *data =
+				(libandria4_parser_CSV_CSV1_file*)data_;
+			
+			unsigned char c, type;
+			int res = 0;
+			
+			
+			/* Get the character values. */
+			res = libandria4_cts_pop_uchar( ctx, 1,  &type );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			
+			
+			/* Dispatch per getc category. */
+			switch( type )
+			{
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS:
+					break;
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF:
+						/* Queue acc. */
+					res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+					if( !res )
+					{
+						return( failfunc );
+					}
+					
+					return( getc );
+					
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF:
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL:
+				default:
+					/* Should be logging here. */
+					
+					return( failfunc );
+			}
+			
+			
+			/* Dispatch per character. */
+			switch( c )
+			{
+				/* BEWARE! The values assigned below are ASCII, */
+				/*  this could be a problem for someone. If you */
+				/*  are that someone, then look at swapping these */
+				/*  hard-coded values for macros from */
+					/* /text/charsets/ */
+				/*  , with some facility to choose which charset */
+				/*  to actually use. */
+				
+				case 'a': /* Audible bell. */
+					c = 0x07;
+					break;
+				case 'b': /* Backspace. */
+					c = 0x08;
+					break;
+				case 'f': /* Formfeed. */
+					c = 0x0c;
+					break;
+				case 'n': /* New line. */
+					c = 0x0a; /* Line feed. */
+					break;
+				case 'r': /* Carriage return. */
+					c = 0x0d;
+					break;
+				case 't': /* horizontal Tab. */
+					c = 0x09;
+					break;
+				case 'v': /* Vertical tab. */
+					c = 0x0b;
+					break;
+				case '\"':
+				case '\'':
+				case '\\':
+				case '\?':
+					/* Embed character. */
+					break;
+				default:
+					/* Not recognized, treat it as a "boring" literal. */
+					
+					/* Unhandled meaningfull characters: */
+						/* A number starts an octal value to be embedded. */
+						/* An 'x' starts a hexadecimal number. */
+						/* A 'u' or 'U' starts a Unicode character. */
+					/* These all should preferably be handled, but currently */
+					/*  aren't: they honestly call for their own functions, */
+					/*  and I don't want to implement that just yet. */
+					
+					break;
+			}
+			
+			
+			/* Repush. */
+			res = libandria4_cts_push2_uchar( ctx, 1,  c );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			res = libandria4_cts_push2_uchar( ctx, 1,  type );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			
+			
+			/* Return to calling closure. */
+			return( ret );
+		}
+		
+		return( failfunc );
+	}
 		/* This is a bit odd. It implements CSV-style embedding of */
 		/*  double quotes, where you just stick two of them together. */
 		/*  Not how I would do it, but apparently they thought it */
