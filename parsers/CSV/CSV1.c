@@ -290,126 +290,9 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 
 
 
-/* These two push two unsigned chars onto stack[ 1 ] (so the second stack); */
-/*  the top character is a tag (0-2: error, EOF, character), and expect a */
-/*  return closure on top of stack[ 0 ]. */
-	/* Fetches a character outside of a string. 0 is error, 1 is token-EOF */
-	/*  (the character will be un-gotten back to the source), 2 is plain */
-	/*  success. */
-libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
-(
-	libandria4_cts_context *ctx, void *data_
-)
-{
-	if( ctx && data_ )
-	{
-		libandria4_parser_CSV_CSV1_file *data =
-			(libandria4_parser_CSV_CSV1_file*)data_;
-		if( libandria4_parser_CSV_CSV1_validate( data ) )
-		{
-			return( failfunc );
-		}
-		
-		libandria4_common_monadicchar8 ec =
-			libandria4_parser_CSV_CSV1_getc( data );
-		unsigned char c, type;
-		int e = 0, res = 0;
-		
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( ec,
-			LIBANDRIA4_OP_SETcFLAGresAS1,
-			LIBANDRIA4_OP_SETeFLAGresASn1 );
-		
-		/* Analyze. */
-		if( res == 1 )
-		{
-			/* Success... OR IS IT??? */
-			
-			libandria4_parser_CSV_CSV1_sortchar_categories cat =
-				libandria4_parser_CSV_CSV1_sortchar( data, c );
-			switch( cat )
-			{
-				/* Plain success. */
-				case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
-					type = 2;
-					break;
-					
-				/* "Value breakers." */
-				case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
-				case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
-				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
-				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
-						/* Mark as EOF. */
-					type = 1;
-					break;
-					
-				/* Errors. */
-				case libandria4_parser_CSV_CSV1_sortchar_categories_invalid:
-				case libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs:
-				case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
-				default:
-					type = 0;
-					break;
-			}
-			
-		} else if( res == -1 )
-		{
-			if( e > 0 )
-			{
-				/* EOF. */
-				type = 1;
-				
-			} else if( e == 0 )
-			{
-				/* Retry, so early exit + trigger repeat. */
-				LIBANDRIA4_CTS_RETURNCLOSURE(
-					&libandria4_parser_CSV_CSV1_getc_notstring,
-					data_ );
-				
-			} else {
-				
-				/* Error. */
-				type = 0;
-			}
-			
-		} else {
-			
-			/* This should never happen. */
-			return( failfunc );
-		}
-		
-		/* Push. */
-		res = libandria4_cts_push2_uchar( ctx, 1,  c );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_push2_uchar( ctx, 1,  type );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-		
-			/* For EOF, return via unget(). */
-		if( type == 1 && !e )
-		{
-			LIBANDRIA4_CTS_RETURNCLOSURE(
-				&libandria4_parser_CSV_CSV1_ungetc,
-				data_ );
-		}
-		
-		/* Get the return value. */
-		libandria4_cts_closure ret;
-		res = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		return( ret );
-	}
-	
-	return( failfunc );
-}
+
+
+
 
 
 
@@ -458,12 +341,12 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF ( 1 )
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF ( 2 )
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS ( 3 )
-
-
-
 	/* *_FORCE should never be returned by *_getc(), just by other */
 	/*  functions that call it. */
 #define LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE ( 4 )
+
+
+
 
 #define libandria4_parser_CSV_CSV1_RETONFATAL( ctxptr, dataptr, funcptr, sec_id, thrd_id ) \
 	return( \
@@ -600,6 +483,160 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 		}
 		
 		return( ret );
+	}
+	
+	return( failfunc );
+}
+
+/* These two push two unsigned chars onto stack[ 1 ] (so the second stack); */
+/*  the top character is a tag (same as *_getc(), and both functions expect */
+/*  a return closure on top of stack[ 0 ]. */
+	static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring_inner
+	(
+		libandria4_cts_context *ctx, void *data_
+	)
+	{
+		if( ctx && data_ )
+		{
+				/* Setup a default "return via return stack" route. */
+			static libandria4_cts_innerreturn_data iret_d =
+				{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+			static libandria4_cts_closure
+				acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_parser_CSV_CSV1_getc_notstring_inner,
+					data_ ),
+				getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_parser_CSV_CSV1_getc,
+					data_ ),
+				ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_cts_innerreturn,
+					(void*)&iret_d );
+			
+			if( libandria4_parser_CSV_CSV1_validate( data ) )
+			{
+				return( failfunc );
+			}
+			libandria4_parser_CSV_CSV1_file *data =
+				(libandria4_parser_CSV_CSV1_file*)data_;
+			
+			unsigned char c, type;
+			int res = 0;
+			
+			
+			/* Get the character values. */
+			res = libandria4_cts_pop_uchar( ctx, 1,  &type );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			
+			
+			/* Dispatch per getc category. */
+			switch( type )
+			{
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS:
+					break;
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF:
+						/* Queue acc. */
+					res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+					if( !res )
+					{
+						return( failfunc );
+					}
+					
+					return( getc );
+					
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF:
+				case LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL:
+				default:
+					/* Should be logging here. */
+					
+					return( failfunc );
+			}
+			
+			
+			/* Success... OR IS IT??? */
+			libandria4_parser_CSV_CSV1_sortchar_categories cat =
+				libandria4_parser_CSV_CSV1_sortchar( data, c );
+			switch( cat )
+			{
+				/* "Value breakers." */
+				case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
+				case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
+				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
+				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
+					/* Fall through. */
+				/* Plain success. */
+				case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
+					break;
+				case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
+					type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL;
+					break;
+					
+				/* Errors. */
+				case libandria4_parser_CSV_CSV1_sortchar_categories_invalid:
+				case libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs:
+				default:
+					return( failfunc );
+			}
+			
+			
+			/* Push. */
+			res = libandria4_cts_push2_uchar( ctx, 1,  c );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			res = libandria4_cts_push2_uchar( ctx, 1,  type );
+			if( !res )
+			{
+				return( failfunc );
+			}
+			
+			
+			return( ret );
+		}
+		
+		return( failfunc );
+	}
+libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
+(
+	libandria4_cts_context *ctx, void *data_
+)
+{
+	if( ctx && data_ )
+	{
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		libandria4_cts_closure
+			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_getc_notstring_inner,
+				data_ ),
+			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_getc,
+				data_ );
+		
+		if( libandria4_parser_CSV_CSV1_validate( data_ ) )
+		{
+			return( failfunc );
+		}
+		
+		int res;
+		
+		/* Schedule interpreter. */
+		res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+			/* Fetch unprocessed character. */
+		return( getc );
 	}
 	
 	return( failfunc );
