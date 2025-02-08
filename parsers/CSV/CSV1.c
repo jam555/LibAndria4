@@ -317,14 +317,6 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 {
 	if( ctx && data_ )
 	{
-			/* Setup a default "return via return stack" route. */
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		static libandria4_cts_closure
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d );
-		
 			/* Do we actually want this here? */
 		if( libandria4_parser_CSV_CSV1_validate(
 			(libandria4_parser_CSV_CSV1_file*)data_ ) )
@@ -369,7 +361,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 		}
 		
 		
-		return( ret );
+		return( retfunc );
 	}
 	
 	return( failfunc );
@@ -386,14 +378,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_ungetc
 {
 	if( ctx && data_ )
 	{
-			/* Setup a default "return via return stack" route. */
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		static libandria4_cts_closure
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d );
-		
 		unsigned char c, type;
 		int res = 0;
 		
@@ -440,7 +424,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_ungetc
 		}
 		
 		
-		return( ret );
+		return( retfunc );
 	}
 	
 	return( failfunc );
@@ -456,14 +440,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 {
 	if( ctx && data_ )
 	{
-			/* Setup a default "return via return stack" route. */
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		static libandria4_cts_closure
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d );
-		
 		unsigned char c, type;
 		int res = 0;
 		
@@ -481,7 +457,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 		}
 		
 		
-		return( ret );
+		return( retfunc );
 	}
 	
 	return( failfunc );
@@ -506,10 +482,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 					data_ ),
 				getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc,
-					data_ ),
-				ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-					&libandria4_cts_innerreturn,
-					(void*)&iret_d );
+					data_ );
 			
 			if( libandria4_parser_CSV_CSV1_validate( data ) )
 			{
@@ -598,7 +571,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 			}
 			
 			
-			return( ret );
+			return( retfunc );
 		}
 		
 		return( failfunc );
@@ -657,11 +630,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 					data_ ),
 				getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc_string,
-					data_ ),
-				ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-					&libandria4_cts_innerreturn,
-					(void*)&iret_d );
-			libandria4_cts_closure route = ret;
+					data_ );
 			
 			if( libandria4_parser_CSV_CSV1_validate( data ) )
 			{
@@ -778,7 +747,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 			
 			
 			/* Return to calling closure. */
-			return( ret );
+			return( retfunc );
 		}
 		
 		return( failfunc );
@@ -796,10 +765,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 	{
 		if( ctx && data_ )
 		{
-				/* Setup a default "return via return stack" route. */
-			static libandria4_cts_innerreturn_data iret_d =
-				{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-			static libandria4_cts_closure
+			libandria4_cts_closure
 				acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc_string_dquote,
 					data_ ),
@@ -808,11 +774,8 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 					data_ ),
 				unget = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_ungetc,
-					data_ ),
-				ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-					&libandria4_cts_innerreturn,
-					(void*)&iret_d );
-			libandria4_cts_closure route = ret;
+					data_ );
+			libandria4_cts_closure route = retfunc;
 			
 			if( libandria4_parser_CSV_CSV1_validate( data ) )
 			{
@@ -931,22 +894,17 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 	{
 		if( ctx && data_ )
 		{
-			static libandria4_cts_innerreturn_data iret_d =
-				{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-			libandria4_cts_closure
 				/* We don't WANT recursion, so no "acc" here. */
-				getc = LIBANDRIA4_CTS_BUILDCLOSURE(
-					&libandria4_parser_CSV_CSV1_getc_string,
-					data_ ),
+			static libandria4_cts_closure
 				dquote = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc_string_dquote,
 					(void*)&iret_d ),
 				cesc = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc_string_cescape,
-					(void*)&iret_d ),
-				ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-					&libandria4_cts_innerreturn,
 					(void*)&iret_d );
+			libandria4_cts_closure getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+					&libandria4_parser_CSV_CSV1_getc_string,
+					data_ );
 			
 			
 			if( libandria4_parser_CSV_CSV1_validate( data ) )
@@ -957,7 +915,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 				(libandria4_parser_CSV_CSV1_file*)data_;
 			
 			unsigned char c, type;
-			int e, res = 0;
+			int res = 0;
 			
 			
 			/* Get the character values. */
@@ -1065,7 +1023,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 				return( failfunc );
 			}
 			
-			return( ret );
+			return( retfunc );
 		}
 		
 		return( failfunc );
@@ -1077,8 +1035,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string
 {
 	if( ctx && data_ )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
 		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc_string_inner,
@@ -1118,8 +1074,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_string
 {
 	if( ctx && data_ )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
 		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_string,
@@ -1129,9 +1083,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_string
 				data_ ),
 			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_popchar,
-				(void*)&iret_d ),
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
 				(void*)&iret_d );
 		
 		if( libandria4_parser_CSV_CSV1_validate(
@@ -1198,7 +1149,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_string
 				if( flag != LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE )
 				{
 						/* String finished, just drop out to the initial calling closure. */
-					return( ret );
+					return( retfunc );
 				}
 			default:
 				break;
@@ -1257,18 +1208,13 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_in
 {
 	if( ctx && data_ )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		static libandria4_cts_closure
+		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_nonstring_innernested,
 				data ),
 			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc_notstring,
 				data ),
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d ),
 			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_popchar,
 				(void*)&iret_d );
@@ -1418,25 +1364,20 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_in
 {
 	if( ctx && data )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		static libandria4_cts_closure
+		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_nonstring_inner,
 				data ),
 			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc_notstring,
 				data ),
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d ),
 			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_popchar,
 				(void*)&iret_d ),
 			nested = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_nonstring_innernested,
 				data_ );
-		libandria4_cts_closure route = ret;
+		libandria4_cts_closure route = retfunc;
 		
 		if( libandria4_parser_CSV_CSV1_validate(
 			(libandria4_parser_CSV_CSV1_file*)data_ ) )
@@ -1630,12 +1571,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 {
 	if( ctx && data_ )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		static libandria4_cts_closure
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d ),
+		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_btstring,
 				data_ ),
@@ -1784,7 +1720,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 		}
 		
 			/* Is this right? Or do we still need to do it manually? */
-		return( ret );
+		return( retfunc );
 	}
 	
 	return( failfunc );
@@ -1803,12 +1739,6 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_
 {
 	if( ctx && data )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-		static libandria4_cts_closure
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d );
 		libandria4_cts_closure tmpa = announce, tmpb = getc, tmpc = acc;
 		
 		if( libandria4_parser_CSV_CSV1_validate(
@@ -1854,7 +1784,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_
 		/* Final-pass blank-killer. */
 		if( !( announce.handler ) )
 		{
-			announce = ret;
+			announce = retfunc;
 		}
 		
 		return( announce );
@@ -1882,7 +1812,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel
 {
 	if( ctx && data_ )
 	{
-		static libandria4_cts_closure
+		libandria4_cts_closure
 			recur = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel,
 				data_ );
@@ -2185,8 +2115,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
 {
 	if( ctx && data )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
 		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_preaccumulate_btstring,
@@ -2197,9 +2125,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
 			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc_notstring,
 				data ),
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d ),
 			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_popchar,
 				(void*)&iret_d );
@@ -2358,8 +2283,6 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 {
 	if( ctx && data )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
 		libandria4_cts_closure
 			getstr = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_string,
@@ -2486,15 +2409,10 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 {
 	if( ctx && data )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
 		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_value_inner,
-				data ),
-			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_cts_innerreturn,
-				(void*)&iret_d );
+				data );
 		
 		if( libandria4_parser_CSV_CSV1_validate(
 			(libandria4_parser_CSV_CSV1_file*)data ) )
@@ -2548,7 +2466,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 						libandria4_parser_CSV_CSV1_accval_RETONFATAL( 0, 1 );
 					}
 					
-					return( ret );
+					return( retfunc );
 			}
 			
 		} else {
@@ -2848,8 +2766,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 {
 	if( ctx && data_ )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
 		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE( 0, 0 );
 		int res = 0;
