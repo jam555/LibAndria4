@@ -50,7 +50,7 @@ SOFTWARE.
 
 
 
-
+static libandria4_cts_closure failfunc;
 
 static libandria4_cts_innerreturn_data iret_d =
 	{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
@@ -61,6 +61,9 @@ static libandria4_cts_closure
 		(void*)&failfunc ),
 	retfunc = LIBANDRIA4_CTS_BUILDCLOSURE(
 		&libandria4_cts_innerreturn,
+		(void*)&iret_d ),
+	popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
+		&libandria4_parser_CSV_CSV1_popchar,
 		(void*)&iret_d );
 
 
@@ -438,7 +441,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 	libandria4_cts_context *ctx, void *data_
 )
 {
-	if( ctx && data_ )
+	if( ctx )
 	{
 		unsigned char c, type;
 		int res = 0;
@@ -473,10 +476,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
 	{
 		if( ctx && data_ )
 		{
-				/* Setup a default "return via return stack" route. */
-			static libandria4_cts_innerreturn_data iret_d =
-				{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-			static libandria4_cts_closure
+			libandria4_cts_closure
 				acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc_notstring_inner,
 					data_ ),
@@ -583,8 +583,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 {
 	if( ctx && data_ )
 	{
-		static libandria4_cts_innerreturn_data iret_d =
-			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
 		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc_notstring_inner,
@@ -621,10 +619,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 	{
 		if( ctx && data_ )
 		{
-				/* Setup a default "return via return stack" route. */
-			static libandria4_cts_innerreturn_data iret_d =
-				{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
-			static libandria4_cts_closure
+			libandria4_cts_closure
 				acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc_string_cescape,
 					data_ ),
@@ -895,14 +890,14 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_notstring
 		if( ctx && data_ )
 		{
 				/* We don't WANT recursion, so no "acc" here. */
-			static libandria4_cts_closure
+			libandria4_cts_closure
 				dquote = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc_string_dquote,
-					(void*)&iret_d ),
+					data_ ),
 				cesc = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc_string_cescape,
-					(void*)&iret_d );
-			libandria4_cts_closure getc = LIBANDRIA4_CTS_BUILDCLOSURE(
+					data_ ),
+				getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 					&libandria4_parser_CSV_CSV1_getc_string,
 					data_ );
 			
@@ -1080,10 +1075,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_string
 				data_ ),
 			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc_string,
-				data_ ),
-			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_popchar,
-				(void*)&iret_d );
+				data_ );
 		
 		if( libandria4_parser_CSV_CSV1_validate(
 			(libandria4_parser_CSV_CSV1_file*)data_ ) )
@@ -1214,10 +1206,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_in
 				data ),
 			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc_notstring,
-				data ),
-			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_popchar,
-				(void*)&iret_d );
+				data );
 		
 		if( libandria4_parser_CSV_CSV1_validate(
 			(libandria4_parser_CSV_CSV1_file*)data_ ) )
@@ -1371,9 +1360,6 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_in
 			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc_notstring,
 				data ),
-			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_popchar,
-				(void*)&iret_d ),
 			nested = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_nonstring_innernested,
 				data_ );
@@ -1578,9 +1564,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 			push0 = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_cts_ctspush_uchar_stk1_val0,
 				data_ ),
-			popc = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_popchar,
-				data_ ),
 			ungetc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_ungetc,
 				data_ ),
@@ -1649,7 +1632,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 			}
 			
 			/* Schedule the character to be poped. */
-			res = libandria4_cts_push2_ctsclsr( ctx, 0,  popc );
+			res = libandria4_cts_push2_ctsclsr( ctx, 0,  popchar );
 			if( !res )
 			{
 				libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 9 );
@@ -2124,10 +2107,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
 				data ),
 			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc_notstring,
-				data ),
-			popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_popchar,
-				(void*)&iret_d );
+				data );
 		
 		if( libandria4_parser_CSV_CSV1_validate(
 			(libandria4_parser_CSV_CSV1_file*)data_ ) )
@@ -2385,9 +2365,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
 			case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
 			case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
-				return( LIBANDRIA4_CTS_BUILDCLOSURE(
-						&libandria4_cts_innerreturn,
-						(void*)&iret_d ) );
+				return( retfunc );
 			
 			/* Errors. */
 			case libandria4_parser_CSV_CSV1_sortchar_categories_invalid:
@@ -2723,11 +2701,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 				
 				
 				/* Push character popper (to clean the character off the stack). */
-				cls =
-					LIBANDRIA4_CTS_BUILDCLOSURE(
-						&libandria4_parser_CSV_CSV1_popchar,
-						data_
-					);
+				cls = popchar;
 				res = libandria4_cts_push2_ctsclsr( ctx, 0,  cls );
 				if( !res )
 				{
