@@ -173,120 +173,6 @@ libandria4_parser_CSV_CSV1_sortchar_categories libandria4_parser_CSV_CSV1_sortch
 
 
 
-	/* Expects a type on top of a character, both as uchars on stack[ 1 ], */
-	/*  and a return closure on stack[ 0 ] as a libandria4_cts_closure{}. */
-	/*  DOES NOT pop the type or character, but DOES pop the return closure. */
-	/*  Note that while the character gets handed to *_unget(), the type is */
-	/*  expected to just be recalculated if needed. */
-libandria4_cts_closure libandria4_parser_CSV_CSV1_ungetc
-(
-	libandria4_cts_context *ctx, void *data_
-)
-{
-	if( ctx && data_ )
-	{
-		libandria4_parser_CSV_CSV1_file *data =
-			(libandria4_parser_CSV_CSV1_file*)data_;
-		
-		unsigned char c, type;
-		int e, res = 0;
-		
-		
-		/* Get the values. */
-		res = libandria4_cts_pop_uchar( ctx, 1,  &type );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-		/* Repush. */
-		res = libandria4_cts_push2_uchar( ctx, 1,  c );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_push2_uchar( ctx, 1,  type );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-		/* Unget the character. */
-		res = 0;
-		while( res == 0 )
-		{
-			res = libandria4_parser_CSV_CSV1_unget( data, c );
-		}
-		if( res )
-		{
-			/* Success. Just fall-through. */
-			
-		} else {
-			
-			/* Failure. */
-			return( failfunc );
-		}
-		c = 0;
-		
-		/* Get the return value. */
-		libandria4_cts_closure ret;
-		res = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		return( ret );
-	}
-	
-	return( failfunc );
-}
-	/* Expects a type on top of a character, both as uchars on stack[ 1 ], */
-	/*  and a return closure on stack[ 0 ] as a libandria4_cts_closure{}. It */
-	/*  pops everything it expects, returns the closure, and otherwise does */
-	/*  nothing. Meant to be used with libandria4_parser_CSV_CSV1_ungetc(). */
-libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
-(
-	libandria4_cts_context *ctx, void *data_
-)
-{
-	if( ctx && data_ )
-	{
-		libandria4_parser_CSV_CSV1_file *data =
-			(libandria4_parser_CSV_CSV1_file*)data_;
-		
-		unsigned char c, type;
-		int e, res = 0;
-		
-		
-		/* Pop the character and it's flag. */
-		res = libandria4_cts_pop_uchar( ctx, 1,  &type );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-		/* Get the return value. */
-		libandria4_cts_closure ret;
-		res = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		return( ret );
-	}
-	
-	return( failfunc );
-}
 
 
 
@@ -426,13 +312,20 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 {
 	if( ctx && data_ )
 	{
+			/* Setup a default "return via return stack" route. */
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		static libandria4_cts_closure
+			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_innerreturn,
+				(void*)&iret_d );
+		
 			/* Do we actually want this here? */
 		if( libandria4_parser_CSV_CSV1_validate(
 			(libandria4_parser_CSV_CSV1_file*)data_ ) )
 		{
 			return( failfunc );
 		}
-		
 		
 		
 		/* Read, then categorize result. */
@@ -471,16 +364,117 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 		}
 		
 		
+		return( ret );
+	}
+	
+	return( failfunc );
+}
+	/* Expects a type on top of a character, both as uchars on stack[ 1 ], */
+	/*  and a return closure on stack[ 0 ] as a libandria4_cts_closure{}. */
+	/*  DOES NOT pop the type or character, but DOES pop the return closure. */
+	/*  Note that while the character gets handed to *_unget(), the type is */
+	/*  expected to just be recalculated if needed. */
+libandria4_cts_closure libandria4_parser_CSV_CSV1_ungetc
+(
+	libandria4_cts_context *ctx, void *data_
+)
+{
+	if( ctx && data_ )
+	{
+			/* Setup a default "return via return stack" route. */
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		static libandria4_cts_closure
+			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_innerreturn,
+				(void*)&iret_d );
 		
-		/* Return. */
-		libandria4_cts_closure ret;
-		res = libandria4_cts_pop_ctsclsr( ctx, 0,  &ret );
+		unsigned char c, type;
+		int res = 0;
+		
+		
+		/* Get the values. */
+		res = libandria4_cts_pop_uchar( ctx, 1,  &type );
 		if( !res )
 		{
-			libandria4_parser_CSV_CSV1_RETONFATAL(
-				ctx, data_,
-				&libandria4_parser_CSV_CSV1_getc, 0, 2 );
+			return( failfunc );
 		}
+		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+		/* Repush. */
+		res = libandria4_cts_push2_uchar( ctx, 1,  c );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		res = libandria4_cts_push2_uchar( ctx, 1,  type );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
+		
+		/* Unget the character. */
+		res = 0;
+		while( res == 0 )
+		{
+			res =
+				libandria4_parser_CSV_CSV1_unget
+				(
+					(libandria4_parser_CSV_CSV1_file*)data_, c
+				);
+		}
+		if( !res )
+		{
+			/* Failure. */
+			return( failfunc );
+		}
+		
+		
+		return( ret );
+	}
+	
+	return( failfunc );
+}
+	/* Expects a type on top of a character, both as uchars on stack[ 1 ], */
+	/*  and a return closure on stack[ 0 ] as a libandria4_cts_closure{}. It */
+	/*  pops everything it expects, returns the closure, and otherwise does */
+	/*  nothing. Meant to be used with libandria4_parser_CSV_CSV1_ungetc(). */
+libandria4_cts_closure libandria4_parser_CSV_CSV1_popchar
+(
+	libandria4_cts_context *ctx, void *data_
+)
+{
+	if( ctx && data_ )
+	{
+			/* Setup a default "return via return stack" route. */
+		static libandria4_cts_innerreturn_data iret_d =
+			{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
+		static libandria4_cts_closure
+			ret = LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_cts_innerreturn,
+				(void*)&iret_d );
+		
+		unsigned char c, type;
+		int res = 0;
+		
+		
+		/* Pop the character and it's flag. */
+		res = libandria4_cts_pop_uchar( ctx, 1,  &type );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+		if( !res )
+		{
+			return( failfunc );
+		}
+		
 		
 		return( ret );
 	}
