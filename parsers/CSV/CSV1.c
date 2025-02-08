@@ -47,53 +47,88 @@ SOFTWARE.
 #include "../../commontypes.h"
 #include "../../simpleops.h"
 #include "../../monads.h"
-#include "../../list.h"
 
 
 
-LIBANDRIA4_CTS_RETURNCLOSURE(
-	&libandria4_cts_framefunc_stoprun,
-	(void*)0 )
 
 
+static libandria4_cts_innerreturn_data iret_d =
+	{ 0, &libandria4_cts_innerreturn_returnstop, 0 };
 
-/* WARNING,NOT VALID C! Replace all of the handleeither() constructs with */
-/*  valid macros. */
-static libandria4_cts_closure failfunc;
-
-
-static libandria4_cts_closure failfunc =
-	LIBANDRIA4_CTS_BUILDCLOSURE(
+static libandria4_cts_closure
+	failfunc = LIBANDRIA4_CTS_BUILDCLOSURE(
 		&libandria4_cts_framefunc_stoprun,
-		(void*)&failfunc );
+		(void*)&failfunc ),
+	retfunc = LIBANDRIA4_CTS_BUILDCLOSURE(
+		&libandria4_cts_innerreturn,
+		(void*)&iret_d );
 
 
 
-int libandria4_parser_CSV_CSV1_validate( libandria4_parser_CSV_CSV1_file *f )
-{
-	if( f )
-	{
-		/* Prohibitions: */
-		if( f->btStr && f->colonSep )
-		{
-			return( 0 );
-		}
-		
-		/* Demands: */
-		if( !( f->cStr || f->csvStr || f->btStr ) )
-		{
-			return( 0 );
-		}
-		if( !( f->commaSep || f->colonSep || f->semiSep || f->spaceSep || f->tabSep ) )
-		{
-			return( 0 );
-		}
-		
-		return( 1 );
-	}
-	
-	return( -1 );
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Implementation functions for libandria4_parser_CSV_CSV1_getc_string(). */
+static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_dquote
+(
+	libandria4_cts_context *ctx, void *data
+);
+static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
+(
+	libandria4_cts_context *ctx, void *data
+);
+
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL ( 0 )
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF ( 1 )
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF ( 2 )
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS ( 3 )
+	/* *_FORCE should never be returned by *_getc(), just by other */
+	/*  functions that call it. */
+#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE ( 4 )
+
+
+
+
+#define libandria4_parser_CSV_CSV1_RETONFATAL( ctxptr, dataptr, funcptr, sec_id, thrd_id ) \
+	return( \
+		libandria4_parser_CSV_CSV1_onfatal( \
+			(ctxptr), (dataptr), \
+			(funcptr), \
+			(void*)&( libandria4_commonlib_firstchars[ (sec_id) ] ), \
+			(thrd_id) ) )
+
+
+
 libandria4_parser_CSV_CSV1_sortchar_categories libandria4_parser_CSV_CSV1_sortchar
 (
 	libandria4_parser_CSV_CSV1_file *f,
@@ -170,79 +205,49 @@ libandria4_parser_CSV_CSV1_sortchar_categories libandria4_parser_CSV_CSV1_sortch
 	
 	return( ret );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**************************************************************************/
-/**************************************************************************/
-/** NOTE: The set of functions in the following group are "current", the **/
-/**  ones above need to be adapted to match those below. ******************/
-/**************************************************************************/
-/**************************************************************************/
-
-/* Implementation functions for libandria4_parser_CSV_CSV1_getc_string(). */
-static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_dquote
-(
-	libandria4_cts_context *ctx, void *data
-);
-static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
-(
-	libandria4_cts_context *ctx, void *data
-);
-
-#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL ( 0 )
-#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF ( 1 )
-#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF ( 2 )
-#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS ( 3 )
-	/* *_FORCE should never be returned by *_getc(), just by other */
-	/*  functions that call it. */
-#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE ( 4 )
-
-
-
-
-#define libandria4_parser_CSV_CSV1_RETONFATAL( ctxptr, dataptr, funcptr, sec_id, thrd_id ) \
-	return( \
-		libandria4_parser_CSV_CSV1_onfatal( \
-			(ctxptr), (dataptr), \
-			(funcptr), \
-			(void*)&( libandria4_commonlib_firstchars[ (sec_id) ] ), \
-			(thrd_id) ) )
-
-
+int libandria4_parser_CSV_CSV1_validate( libandria4_parser_CSV_CSV1_file *f )
+{
+	if( f )
+	{
+		/* Prohibitions: */
+		if( f->btStr && f->colonSep )
+		{
+			return( 0 );
+		}
+		/* Do we want to restrict ->recordindex? */
+		
+		/* Demands: */
+		if( !( f->cStr || f->csvStr || f->btStr ) )
+		{
+			/* At least one string type is required. */
+			return( 0 );
+		}
+		if( !( f->commaSep || f->colonSep || f->semiSep || f->spaceSep || f->tabSep ) )
+		{
+				/* At least one field seperator is required. */
+			return( 0 );
+		}
+		if( !( data->onfatal.handler && data->onEOF.handler ) )
+		{
+			return( 0 );
+		}
+		if( !( data->onopen.handler && data->onclose.handler && data->startfield.handler ) )
+		{
+			return( 0 );
+		}
+		if( !( data->onstrchar.handler && data->onexprchar.handler ) )
+		{
+			return( 0 );
+		}
+		
+		/* Nesting options are neither restricted nor required. */
+		/* The ->*rec closures are allowed to be null. */
+		
+		return( 1 );
+	}
+	
+	return( -1 );
+}
 
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_onfatal
 (
