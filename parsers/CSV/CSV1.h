@@ -41,6 +41,16 @@
 	
 	
 	
+	#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL ( 0 )
+	#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEEOF ( 1 )
+	#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SEMIEOF ( 2 )
+	#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS ( 3 )
+		/* *_FORCE should never be returned by *_getc(), just by other */
+		/*  functions that call it. */
+	#define LIBANDRIA4_PARSER_CSV_CSV1_GETC_FORCE ( 4 )
+	
+	
+	
 	typedef struct libandria4_parser_CSV_CSV1_file libandria4_parser_CSV_CSV1_file;
 	typedef struct libandria4_parser_CSV_CSV1_callargs libandria4_parser_CSV_CSV1_callargs;
 	
@@ -97,8 +107,7 @@
 		/* Negative on error, 0 on retry, positive on success. Gets used by */
 		/*  libandria4_parser_CSV_CSV1_ungetc(), which is listed further down. */
 	int libandria4_parser_CSV_CSV1_unget( libandria4_parser_CSV_CSV1_file*, char );
-		/* Negative on null argument, 0 on invalid, 1 on valid. */
-	int libandria4_parser_CSV_CSV1_validate( libandria4_parser_CSV_CSV1_file* );
+	
 	
 	
 		/* This identifies the interpretation of the supplied character */
@@ -122,6 +131,21 @@
 		libandria4_parser_CSV_CSV1_file *f,
 		char character
 	);
+		/* Negative on null argument, 0 on invalid, 1 on valid. */
+	int libandria4_parser_CSV_CSV1_validate( libandria4_parser_CSV_CSV1_file* );
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_onfatal
+	(
+		libandria4_cts_context *ctx, void *data_,
+		libandria4_cts_framefunc tag_ptr, void *tag2, unsigned int tag3
+	);
+	
+	#define libandria4_parser_CSV_CSV1_RETONFATAL( ctxptr, dataptr, funcptr, sec_id, thrd_id ) \
+		return( \
+			libandria4_parser_CSV_CSV1_onfatal( \
+				(ctxptr), (dataptr), \
+				(funcptr), \
+				(void*)&( libandria4_commonlib_firstchars[ (sec_id) ] ), \
+				(thrd_id) ) )
 	
 	
 	
