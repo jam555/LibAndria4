@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 #ifndef LIBANDRIA4_BASIC_COMMONERRVALS_H
-# define LIBANDRIA4_BASIC_COMMONERRVALS_H
+ #define LIBANDRIA4_BASIC_COMMONERRVALS_H
 	
 	
 	/* These defines were pulled out of stdmonads.h, and does have at least */
