@@ -34,6 +34,8 @@ SOFTWARE.
 		/* intptr_t and uintptr_t. */
 	#include <stdint.h>
 	
+	#include "commontypes.h"
+	
 	#include "monads.h"
 	
 	
@@ -308,8 +310,7 @@ SOFTWARE.
 	#define LIBANDRIA4_MAYBEVOIDPTR_RETURNNOTHING() LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( libandria4_maybevoidptr, void* )
 	
 	
-	typedef void (*libandria4_maybefuncptr_fptype)();
-	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( libandria4_maybefuncptr, libandria4_maybefuncptr_fptype );
+	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( libandria4_maybefuncptr, libandria4_common_voidfuncp_void );
 	
 	#define LIBANDRIA4_MAYBEFUNCPTR_BUILDJUST( val ) LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_maybefuncptr, void (*)(), val )
 	#define LIBANDRIA4_MAYBEFUNCPTR_BUILDNOTHING() LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_maybefuncptr, void (*)() )
