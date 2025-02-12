@@ -45,6 +45,7 @@ SOFTWARE.
 		/* For UCHAR_MAX. */
 	#include <limits.h>
 	
+	#include "commontypes.h"
 	#include "pascalarray.h"
 		/* For libandria4_char_pascalarray{} */
 	#include "pascalstring.h"
@@ -129,20 +130,20 @@ SOFTWARE.
 	
 	
 	#define LIBANDRIA4_CTS_DECPOP( prefix, postfix, type ) \
-		int prefix ## pop ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) *val );
+		int prefix ## pop ## postfix ( libandria4_cts_context *ctx, size_t stack,  type *val );
 	#define LIBANDRIA4_CTS_DEFPOP( prefix, postfix, type ) \
-		int prefix ## pop ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) *val ) { \
+		int prefix ## pop ## postfix ( libandria4_cts_context *ctx, size_t stack,  type *val ) { \
 			if( !val ) { return( -1 ); } \
 			return( libandria4_cts_sizedpop( ctx, stack,  (void*)val, sizeof( type ) ) ); }
 	
 	#define LIBANDRIA4_CTS_DECPUSH( prefix, postfix, type ) \
-		int prefix ## push ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) *val ); \
-		int prefix ## push2 ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) data );
+		int prefix ## push ## postfix ( libandria4_cts_context *ctx, size_t stack,  type *val ); \
+		int prefix ## push2 ## postfix ( libandria4_cts_context *ctx, size_t stack,  type data );
 	#define LIBANDRIA4_CTS_DEFPUSH( prefix, postfix, type ) \
-		int prefix ## push ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) *val ) { \
+		int prefix ## push ## postfix ( libandria4_cts_context *ctx, size_t stack,  type *val ) { \
 			if( !val ) { return( -1 ); } \
 			return( libandria4_cts_sizedpush( ctx, stack,  (void*)val, sizeof( type ) ) ); } \
-		int prefix ## push2 ## postfix ( libandria4_cts_context *ctx, size_t stack,  (type) data ) { \
+		int prefix ## push2 ## postfix ( libandria4_cts_context *ctx, size_t stack,  type data ) { \
 			if( ctx ) { \
 				int res = prefix ## push ## postfix ( ctx, 1,  &data ); \
 				if( res > 0 ) { return( 1 ); } \
@@ -219,7 +220,7 @@ SOFTWARE.
 	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _voidp, void* );
 	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _scharp, signed char* );
 	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ucharp, unsigned char* );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _voidf, void (*)() );
+	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _voidf, libandria4_common_voidfuncp_void );
 	
 	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ctsffuncp, libandria4_cts_framefunc* );
 	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ctsclsr, libandria4_cts_closure );
@@ -246,7 +247,7 @@ SOFTWARE.
 	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _voidp, void* );
 	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _scharp, signed char* );
 	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _ucharp, unsigned char* );
-	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _voidf, void (*)() );
+	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _voidf, libandria4_common_voidfuncp_void );
 	
 	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _ctsffuncp, libandria4_cts_framefunc* );
 	LIBANDRIA4_CTS_DECPUSH( libandria4_cts_, _ctsclsr, libandria4_cts_closure );

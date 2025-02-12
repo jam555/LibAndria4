@@ -364,9 +364,9 @@ SOFTWARE.
 	/* The stuff from bintrees/bintrees.h starts here. For searchability: bintree */
 	
 		/* For LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT() . */
-	#include "../monads.h"
+	#include "monads.h"
 		/* For libandria4_commonio_err . */
-	#include "../commonio.h"
+	#include "commonio.h"
 	
 	
 		/* Normal style. */

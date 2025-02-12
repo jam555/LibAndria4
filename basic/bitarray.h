@@ -32,10 +32,10 @@ SOFTWARE.
 	#include "pascalarray.h"
 	
 	
-	LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( libandria4_bitarray_, uint8_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( libandria4_bitsurface_, libandria4_bitarray_pascalarray* );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_bitarray_, uint8_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_bitsurface_, libandria4_bitarray_pascalarray* );
 	
-	typedef libandria4_bitarray
+	typedef struct libandria4_bitarray
 	{
 		size_t width;
 		libandria4_bitarray_pascalarray arr;
@@ -47,7 +47,7 @@ SOFTWARE.
 	#define LIBANDRIA4_BITARRAY_RESULT_BUILDFAILURE( val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_bitarray_result, int, (val) )
 	
-	typedef libandria4_bitsurface
+	typedef struct libandria4_bitsurface
 	{
 		size_t width;
 		libandria4_bitsurface_pascalarray surf;

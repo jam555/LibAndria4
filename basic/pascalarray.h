@@ -361,9 +361,9 @@ SOFTWARE.
 		\
 		int head##pascalarray_excerpt_isvalid( head##pascalarray_excerpt *exc ); \
 		head##pascalarray_result head##pascalarray_excerpt_arrayify( head##pascalarray_excerpt *exc, \
-			size_t padsize, (type) padval ); \
+			size_t padsize, type padval ); \
 		head##pascalarray_result head##pascalarray_excerpt_inversearrayify( head##pascalarray_excerpt *exc, \
-			size_t padsize, (type) padval );
+			size_t padsize, type padval );
 	
 		/* This needs to be paired with a LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE() invocation. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \

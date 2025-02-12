@@ -89,7 +89,9 @@ SOFTWARE.
 	typedef struct libandria4_error_basalstruct
 	{
 		uint32_t typeid;
-	};
+		
+	} libandria4_error_basalstruct;
+	typedef struct libandria4_error_simplestruct libandria4_error_simplestruct;
 	struct libandria4_error_simplestruct
 	{
 		libandria4_error_basalstruct type;
@@ -133,7 +135,10 @@ SOFTWARE.
 	
 	
 	
-	
+	#if 0
+	/* We aren't currently running test compiles on the */
+	/*  VT100 stuff, and this probably doesn't belong */
+	/*  here anyways. */
 	#define VT100NET_REPORT_ERR( ctx, rep_type_mmbr_ptr, filename, linenum ) \
 		{ int res = vt100net_report_parser_error( (vt100net_termcontext*)( ctx ), (uint32_t*)( rep_type_mmbr_ptr ) ); \
 			if( res != -1 ) { \
@@ -147,6 +152,7 @@ SOFTWARE.
 				case -2: case -3: return( -7 ); \
 				default: break; } }
 	int vt100net_report_parser_error( vt100net_termcontext *term_ctx, uint32_t *report_type_member );
+	#endif
 	
 #endif
 /* End libandria4 basic commonerr.h */

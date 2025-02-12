@@ -63,15 +63,18 @@ SOFTWARE.
 	typedef struct libandria4_commonio_istream_vtable libandria4_commonio_istream_vtable;
 	typedef struct libandria4_commonio_ostream_vtable libandria4_commonio_ostream_vtable;
 	
+	typedef struct libandria4_commonio_errorable libandria4_commonio_errorable;
+	typedef struct libandria4_commonio_seekable libandria4_commonio_seekable;
+	
 	
 	
 	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
 		libandria4_commonio_mayerrable,
-		( libandria4_commonio_errorable* )
+		libandria4_commonio_errorable*
 	);
 	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
 		libandria4_commonio_mayseek,
-		( libandria4_commonio_seekable* )
+		libandria4_commonio_seekable*
 	);
 	
 	/* Do I even use these macros anywhere? They may need to be moved */
@@ -90,48 +93,6 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayseek, ( libandria4_commonio_seekable* ) )
 	#define LIBANDRIA4_COMMONIO_MAYERR_NOSEEKABLE() \
 		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayseek, ( libandria4_commonio_seekable* ) )
-	
-	
-	
-	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
-		libandria4_commonio_eithhandle,
-			libandria4_commonio_handle,
-			libandria4_commonio_err
-	);
-	
-		/* These produce the actual values. */
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_HANDLE( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonio_eithhandle, libandria4_commonio_handle, val )
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_commonio_eithhandle, libandria4_commonio_err, val )
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_ERR_1() LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( 1 )
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_ERR_2() LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( 2 )
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_ERR_3() LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( 3 )
-	
-		/* The *BODY* version takes statements, *EXPR* takes expressions. */
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_BODYMATCH( var,  onhand, onerr ) \
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var,  onhand, onerr )
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_EXPRMATCH( var,  onhand, onerr ) \
-		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var,  onhand, onerr )
-			/* onsucc() should usually return a */
-				/* LIBANDRIA4_COMMONIO_MAYERR_NOERR() */
-			/*  but generally MUST return a libandria4_commonio_mayerr. */
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_EXPRCHAIN( var,  onhand ) \
-		LIBANDRIA4_MONAD_EITHER_EXPRCHAIN( \
-			var,  onhand, LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
-			/* A shallow wrapper around *_EXPRMATCH. */
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_REDUCE( var,  reduce_hand, reduce_b ) \
-		LIBANDRIA4_MONAD_EITHER_REDUCE( var,  reduce_hand, reduce_b )
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_TO_MAYERR( var ) \
-		LIBANDRIA4_COMMONIO_EITHHANDLE_REDUCE( \
-			var, \
-				LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERR, \
-				LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
-	
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_RETHANDLE( val ) \
-		return( LIBANDRIA4_COMMONIO_EITHHANDLE_HANDLE( val ) )
-	#define LIBANDRIA4_COMMONIO_EITHHANDLE_RETERR( val ) \
-		return( LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( val ) )
 	
 	
 	
@@ -272,6 +233,13 @@ SOFTWARE.
 		} vtab;
 		libandria4_commonio_handle_vtabtype dispatch;
 	};
+	
+	struct libandria4_commonio_errorable
+	{
+	};
+	struct libandria4_commonio_seekable
+	{
+	};
 	/*
 		For the sake of convenience, a comprehensive set of function macros
 		have been created to access the various standard functions accessible
@@ -316,13 +284,57 @@ SOFTWARE.
 		libandria4_commonio_eithgeneric libandria4_commonio_handle_CLOSE( hptr )
 	*/
 	
+	
+	
+	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
+		libandria4_commonio_eithhandle,
+			libandria4_commonio_handle,
+			libandria4_commonio_err
+	);
+	
+		/* These produce the actual values. */
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_HANDLE( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_commonio_eithhandle, libandria4_commonio_handle, val )
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( val ) \
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_commonio_eithhandle, libandria4_commonio_err, val )
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_ERR_1() LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( 1 )
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_ERR_2() LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( 2 )
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_ERR_3() LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( 3 )
+	
+		/* The *BODY* version takes statements, *EXPR* takes expressions. */
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_BODYMATCH( var,  onhand, onerr ) \
+		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var,  onhand, onerr )
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_EXPRMATCH( var,  onhand, onerr ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var,  onhand, onerr )
+			/* onsucc() should usually return a */
+				/* LIBANDRIA4_COMMONIO_MAYERR_NOERR() */
+			/*  but generally MUST return a libandria4_commonio_mayerr. */
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_EXPRCHAIN( var,  onhand ) \
+		LIBANDRIA4_MONAD_EITHER_EXPRCHAIN( \
+			var,  onhand, LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
+			/* A shallow wrapper around *_EXPRMATCH. */
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_REDUCE( var,  reduce_hand, reduce_b ) \
+		LIBANDRIA4_MONAD_EITHER_REDUCE( var,  reduce_hand, reduce_b )
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_TO_MAYERR( var ) \
+		LIBANDRIA4_COMMONIO_EITHHANDLE_REDUCE( \
+			var, \
+				LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERR, \
+				LIBANDRIA4_COMMONIO_MAYERR_JUSTERR )
+	
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_RETHANDLE( val ) \
+		return( LIBANDRIA4_COMMONIO_EITHHANDLE_HANDLE( val ) )
+	#define LIBANDRIA4_COMMONIO_EITHHANDLE_RETERR( val ) \
+		return( LIBANDRIA4_COMMONIO_EITHHANDLE_ERR( val ) )
+	
+	
+	
 	#include "pascalstring.h"
 	
 	libandria4_commonio_eithhandle
 		libandria4_commonio_fopen
 		(
 			libandria4_char_pascalarray*,
-			libandria4_commonio_handle_vtabtype,
+			libandria4_commonio_handle_vtabtype
 		);
 	
 	

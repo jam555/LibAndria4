@@ -29,6 +29,8 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_SIMPLERUNTIMEOPS_H
 # define LIBANDRIA4_BASIC_SIMPLERUNTIMEOPS_H
 	
+	#include <stdarg.h>
+	
 	#include "stdmaybes.h"
 	
 	

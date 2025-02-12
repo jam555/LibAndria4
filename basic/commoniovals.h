@@ -42,7 +42,7 @@ SOFTWARE.
 		/*  have *_ERR_* in it's name. */
 	#define LIBANDRIA4_COMMONIOVALS_EOF ( LIBANDRIA4_RESULT_FAILURE_EOF )
 	const libandria4_commonio_perr libandria4_commoniovals_eof =
-		LIBANDRIA4_COMONIOVALS_EOF;
+		LIBANDRIA4_COMMONIOVALS_EOF;
 	const libandria4_commonio_mayerr libandria4_commoniovals_justeof =
 		LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_COMMONIOVALS_EOF );
 	const libandria4_commonio_mayerr2 libandria4_commoniovals_justeof2 =

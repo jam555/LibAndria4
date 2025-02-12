@@ -308,7 +308,8 @@ SOFTWARE.
 	#define LIBANDRIA4_MAYBEVOIDPTR_RETURNNOTHING() LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( libandria4_maybevoidptr, void* )
 	
 	
-	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( libandria4_maybefuncptr, void (*)() );
+	typedef void (*libandria4_maybefuncptr_fptype)();
+	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( libandria4_maybefuncptr, libandria4_maybefuncptr_fptype );
 	
 	#define LIBANDRIA4_MAYBEFUNCPTR_BUILDJUST( val ) LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_maybefuncptr, void (*)(), val )
 	#define LIBANDRIA4_MAYBEFUNCPTR_BUILDNOTHING() LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_maybefuncptr, void (*)() )

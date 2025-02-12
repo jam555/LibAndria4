@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 #ifndef LIBANDRIA4_BASIC_MONADS_H
-# define LIBANDRIA4_BASIC_MONADS_H
+ #define LIBANDRIA4_BASIC_MONADS_H
 	
 	/* This is some untested monadic C code. Monads are used for several */
 	/*  things, but in particularly are the latest fad for errors in */
@@ -152,7 +152,7 @@ SOFTWARE.
 		/* This should probably do the "struct type type;" thing directly... */
 	#define LIBANDRIA4_MONAD_TRIETHER_BUILDTYPE_DEFINITION( name, typea, typeb, typec ) \
 		struct name \
-			{ union{ typea a; typeb b;, typec c; } val; \
+			{ union{ typea a; typeb b; typec c; } val; \
 				unsigned char val_id; };
 	#define LIBANDRIA4_MONAD_TRIETHER_BUILDTYPE( name, typea, typeb, typec ) \
 		typedef struct name name; \

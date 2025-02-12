@@ -29,6 +29,8 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_COMMONTYPES_H
 # define LIBANDRIA4_BASIC_COMMONTYPES_H
 	
+	/* TODO: Everything in this file should get a type descriptor. */
+	
 	#if __INTELLISENSE__
 		#include <BaseTsd.h>
 		typedef SSIZE_T libandria4_ssize;
@@ -37,13 +39,17 @@ SOFTWARE.
 		typedef ssize_t libandria4_ssize;
 	#endif
 	
+	/* TODO: Any "release" version should ideally move all names over to */
+	/*  this basic format. */
+	typedef void (*libandria4_common_voidfuncp_void)();
+	
 	
 	
 	#define LIBANDRIA4_DOUBLEELEMENT_DECLARE( newname, type ) \
-		typedef struct ( newname ) { (type) left; (type) right; } ( newname ); \
-		inline ( newname ) ( newname ## _build )( (type) l, (type) r ) { return( (newname){ l, r } ); }
+		typedef struct newname { type left; type right; } ( newname ); \
+		inline newname ( newname ## _build )( type l, type r ) { return( (newname){ l, r } ); }
 	#define LIBANDRIA4_DOUBLEELEMENT_DEFINE( newname, type ) \
-		( newname ) ( newname ## _build )( (type) l, (type) r ) { return( (newname){ l, r } ); }
+		newname ( newname ## _build )( type l, type r ) { return( (newname){ l, r } ); }
 	
 	/* All of these following declares should have a corresponding define in a .c file. */
 	LIBANDRIA4_DOUBLEELEMENT_DECLARE( libandria4_doublechar, char );

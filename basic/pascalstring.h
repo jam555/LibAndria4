@@ -349,19 +349,19 @@ SOFTWARE.
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( head, type ) \
-		typedef libandria4_char_pascalarray libandria4_char_parr; \
-		typedef libandria4_char_pascalarray_result libandria4_char_parrres; \
+		typedef head ## pascalarray head ## parr; \
+		typedef head ## pascalarray_result head ## parrres; \
 		int head##parr_decimalincr( head##parr *parr ); \
 		head##parrres head##parr_strbuild( type *str ); \
 		head##parrres head##parr_strbuildmerge( type *a, type *b ); \
 		head##parrres head##parr_merge( head##parr *a, head##parr *b ); \
 		\
-		int head##stringops_mutatingdelete( (type) *str, size_t strlen, \
-			size_t delstart, size_t dellen, (type) fill ); \
-		int head##stringops_mutatinginsert( (type) *str, size_t strlen, \
-			size_t inspoint, (type) insval, (type) fillval, int force ); \
-		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
-			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ); \
+		int head##stringops_mutatingdelete( type *str, size_t strlen, \
+			size_t delstart, size_t dellen, type fill ); \
+		int head##stringops_mutatinginsert( type *str, size_t strlen, \
+			size_t inspoint, type insval, type fillval, int force ); \
+		int head##stringops_mutatingoverwrite( type *str, size_t strlen, \
+			size_t ovrpoint, type ovrval, type ign1, int ign2 ); \
 		head##pascalarray_excerpt_result head##stringops_memeqspn( head##pascalarray *str, \
 			head##pascalarray *matches, size_t curPos, int stepForward, int spanMatch ); \
 		\

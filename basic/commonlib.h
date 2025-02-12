@@ -95,7 +95,7 @@ SOFTWARE.
 	LIBANDRIA4_MONAD_EITHER_BUILDTYPE(
 		libandria4_commonlib_eithvoidp,
 			void*,
-			libandria4_commonlib_err,
+			libandria4_commonlib_err
 	);
 	
 		/* Defines libandria4_commonlib_charchar_fork{} and */
@@ -149,7 +149,7 @@ SOFTWARE.
 	{
 			/* The converted number. */
 		int num;
-			/* 1 for "number", -1 for "not a number" */.
+			/* 1 for "number", -1 for "not a number" */
 		int stat;
 		
 	} libandria4_cb_ctoi_intconv;
