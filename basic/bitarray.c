@@ -29,6 +29,14 @@ SOFTWARE.
 #include "bitarray.h"
 
 
+/*
+		Do these belong in this file? Where did the file declarations below
+		come from?
+	LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( libandria4_bitarray_, uint8_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( libandria4_bitsurface_, libandria4_bitarray_pascalarray* );
+*/
+
+
 /* WARNING: libandria4_bitarray_visit_helper() is used by */
 /*  libandria4_bitsurface_visit_helper(), so if you edit one then verify */
 /*  against the other. */
