@@ -43,10 +43,10 @@ SOFTWARE.
 
 
 	/* For libandria4_common_monadicchar8{}. */
-#include "../../commonerrvals.h"
-#include "../../commontypes.h"
-#include "../../simpleops.h"
-#include "../../monads.h"
+#include "../../basic/commonerrvals.h"
+#include "../../basic/commontypes.h"
+#include "../../basic/simpleops.h"
+#include "../../basic/monads.h"
 
 
 
@@ -74,7 +74,7 @@ libandria4_parser_CSV_CSV1_sortchar_categories libandria4_parser_CSV_CSV1_sortch
 	char character
 )
 {
-	libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs ret =
+	libandria4_parser_CSV_CSV1_sortchar_categories ret =
 		libandria4_parser_CSV_CSV1_sortchar_categories__error_badargs;
 	
 	if( f )
@@ -84,19 +84,19 @@ libandria4_parser_CSV_CSV1_sortchar_categories libandria4_parser_CSV_CSV1_sortch
 		switch( character )
 		{
 			case ',':
-				ret = ( data->commaSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
+				ret = ( f->commaSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
 				break;
 			case ':':
-				ret = ( data->colonSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
+				ret = ( f->colonSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
 				break;
 			case ';':
-				ret = ( data->semiSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
+				ret = ( f->semiSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
 				break;
 			case ' ':
-				ret = ( data->spaceSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
+				ret = ( f->spaceSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
 				break;
 			case '\t':
-				ret = ( data->tabSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
+				ret = ( f->tabSep ) ? libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep : ret;
 				break;
 			
 				/* Any line-spacing character outside of a string is */
@@ -109,29 +109,29 @@ libandria4_parser_CSV_CSV1_sortchar_categories libandria4_parser_CSV_CSV1_sortch
 				break;
 			
 			case '(':
-				ret = ( data->parenNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener : ret;
+				ret = ( f->parenNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener : ret;
 				break;
 			case '[':
-				ret = ( data->sqrNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener : ret;
+				ret = ( f->sqrNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener : ret;
 				break;
 			case '{':
-				ret = ( data->curlNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener : ret;
+				ret = ( f->curlNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener : ret;
 				break;
 			case '<':
-				ret = ( data->angleNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener : ret;
+				ret = ( f->angleNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener : ret;
 				break;
 			
 			case ')':
-				ret = ( data->parenNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser : ret;
+				ret = ( f->parenNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser : ret;
 				break;
 			case ']':
-				ret = ( data->sqrNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser : ret;
+				ret = ( f->sqrNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser : ret;
 				break;
 			case '}':
-				ret = ( data->curlNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser : ret;
+				ret = ( f->curlNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser : ret;
 				break;
 			case '>':
-				ret = ( data->angleNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser : ret;
+				ret = ( f->angleNest ) ? libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser : ret;
 				break;
 			
 			case '\"':
@@ -166,15 +166,15 @@ int libandria4_parser_CSV_CSV1_validate( libandria4_parser_CSV_CSV1_file *f )
 				/* At least one field seperator is required. */
 			return( 0 );
 		}
-		if( !( data->onfatal.handler && data->onEOF.handler ) )
+		if( !( f->onfatal.handler && f->onEOF.handler ) )
 		{
 			return( 0 );
 		}
-		if( !( data->onopen.handler && data->onclose.handler && data->startfield.handler ) )
+		if( !( f->onopen.handler && f->onclose.handler && f->startfield.handler ) )
 		{
 			return( 0 );
 		}
-		if( !( data->onstrchar.handler && data->onexprchar.handler ) )
+		if( !( f->onstrchar.handler && f->onexprchar.handler ) )
 		{
 			return( 0 );
 		}
@@ -225,7 +225,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_onfatal
 		}
 		
 		/* Push the tag function. */
-		res = libandria4_cts_push2_voidf( ctx, 1,  tag_ptr );
+		res = libandria4_cts_push2_voidf( ctx, 1,  (libandria4_common_voidfuncp_void)tag_ptr );
 		if( !res )
 		{
 			return( failfunc );
@@ -266,8 +266,8 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_getc
 		
 		
 		/* Read, then categorize result. */
-		unsigned char c, flag;
-		int res = 0;
+		unsigned char c, type;
+		int e, res = 0;
 		libandria4_common_monadicchar8 ec =
 			libandria4_parser_CSV_CSV1_get( data_ );
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( ec,

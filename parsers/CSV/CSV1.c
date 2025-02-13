@@ -641,3 +641,16 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 	
 	return( failfunc );
 }
+
+libandria4_cts_closure libandria4_parser_CSV_CSV1_record
+(
+	libandria4_cts_context *ctx, void *data_
+)
+{
+	return
+	(
+		LIBANDRIA4_CTS_BUILDCLOSURE(
+			&libandria4_parser_CSV_CSV1_record,
+			data_ )
+	);
+}

@@ -36,6 +36,83 @@ SOFTWARE.
 
 
 
+#if 0
+	
+	/* This was grabbed from the header. It needs to be worked on. */
+	
+	
+	
+	/* The following is convenience code for those that want to build parse */
+	/*  trees from the parse process. Use it or ignore it as you see fit. */
+/* Basic structure: build a trieither (not just an either!) that can accept */
+/*  a list pointer (of either of two types) or a p-string pointer: this is */
+/*  the "fundamental" value, and each "real" value is represented by one. One */
+/*  list-p will represent a sequential value (a value made of multiple parts), */
+/*  and the other will represent a record (a line when ignoring vertical */
+/*  spacers within a string) composed of some arbitrary number of "real */
+/*  values". Whether these "real values" are simple tokens & strings or */
+/*  include lists depends on the settings inside the relevant */
+/*  libandria4_parser_CSV_CSV1_file{} instance. */
+	
+	typedef struct libandria4_parser_CSV_CSV1_listnode libandria4_parser_CSV_CSV1_listnode;
+	#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_GETLEFT( refnodeptr ) \
+		( ( refnodeptr ) ? \
+			( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
+			( ( name ## _bitup_buildNodeptr )( \
+				*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 0 ) ) ) )
+	#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_GETRIGHT( refnodeptr ) \
+		( ( refnodeptr ) ? \
+			( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
+			( ( name ## _bitup_buildNodeptr )( \
+				*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 1 ) ) ) )
+	#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_SETLEFT( refnodeptr, valptr ); \
+		( ( refnodeptr ) ? \
+			( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
+			( *libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 0 ) = (valptr), \
+				( name ## _bitup ) ( name ## _bitup_buildNodeptr )( \
+					*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 0 ) ) ) )
+	#define LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE_SETRIGHT( refnodeptr, valptr ); \
+		( ( refnodeptr ) ? \
+			( ( name ## _bitup_buildError )( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ) : \
+			( *libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 1 ) = (valptr), \
+				( name ## _bitup ) ( name ## _bitup_buildNodeptr )( \
+					*libandria4_parser_CSV_CSV1_listnode_getneighbor( (refnodeptr), 1 ) ) ) )
+	
+	LIBANDRIA4_LIST_BASICBUILDER_SINGLELINKED(
+		libandria4_parser_CSV_CSV1_list,
+		libandria4_parser_CSV_CSV1_listnode,
+		LIBANDRIA4_PARSER_CSV_CSV1_LISTNODE );
+	
+	LIBANDRIA4_MONAD_TRIETHER_BUILDTYPE_DEFINITION(
+		libandria4_parser_CSV_CSV1_trival,
+			libandria4_char_pascalarray*,
+			libandria4_parser_CSV_CSV1_list*,
+			libandria4_parser_CSV_CSV1_list* );
+	
+	struct libandria4_parser_CSV_CSV1_listnode
+	{
+		libandria4_parser_CSV_CSV1_trival here;
+		libandria4_parser_CSV_CSV1_listnode *peers[ 2 ];
+	};
+	
+	
+	
+	libandria4_parser_CSV_CSV1_listnode**
+		libandria4_parser_CSV_CSV1_listnode_getneighbor( libandria4_parser_CSV_CSV1_listnode *ref, int getright );
+	
+	???
+	
+#endif
+
+
+
+
+
+
+
+
+
+
 /*
 			libandria4_result ( libandria4_parser_CSV_CSV1_list_destroylist )( \
 					lib4_memfuncs_t *mf_ptr, libandria4_parser_CSV_CSV1_list *a,  void *data, void (*nodefunc)( void*, (nodetype)* ) )
