@@ -43,10 +43,10 @@ SOFTWARE.
 
 
 	/* For libandria4_common_monadicchar8{}. */
-#include "../../commonerrvals.h"
-#include "../../commontypes.h"
-#include "../../simpleops.h"
-#include "../../monads.h"
+#include "../../basic/commonerrvals.h"
+#include "../../basic/commontypes.h"
+#include "../../basic/simpleops.h"
+#include "../../basic/monads.h"
 
 
 
@@ -86,12 +86,12 @@ static libandria4_cts_closure
 					&libandria4_parser_CSV_CSV1_getc,
 					data_ );
 			
+			libandria4_parser_CSV_CSV1_file *data =
+				(libandria4_parser_CSV_CSV1_file*)data_;
 			if( libandria4_parser_CSV_CSV1_validate( data ) )
 			{
 				return( failfunc );
 			}
-			libandria4_parser_CSV_CSV1_file *data =
-				(libandria4_parser_CSV_CSV1_file*)data_;
 			
 			unsigned char c, type;
 			int res = 0;
@@ -230,7 +230,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 
 	static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 	(
-		libandria4_cts_context *ctx, void *data
+		libandria4_cts_context *ctx, void *data_
 	)
 	{
 		if( ctx && data_ )
@@ -243,12 +243,12 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 					&libandria4_parser_CSV_CSV1_getc_string,
 					data_ );
 			
+			libandria4_parser_CSV_CSV1_file *data =
+				(libandria4_parser_CSV_CSV1_file*)data_;
 			if( libandria4_parser_CSV_CSV1_validate( data ) )
 			{
 				return( failfunc );
 			}
-			libandria4_parser_CSV_CSV1_file *data =
-				(libandria4_parser_CSV_CSV1_file*)data_;
 			
 			unsigned char c, type;
 			int res = 0;
@@ -388,12 +388,12 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 					data_ );
 			libandria4_cts_closure route = retfunc;
 			
+			libandria4_parser_CSV_CSV1_file *data =
+				(libandria4_parser_CSV_CSV1_file*)data_;
 			if( libandria4_parser_CSV_CSV1_validate( data ) )
 			{
 				return( failfunc );
 			}
-			libandria4_parser_CSV_CSV1_file *data =
-				(libandria4_parser_CSV_CSV1_file*)data_;
 			
 			unsigned char c, type;
 			int res = 0;
@@ -518,12 +518,12 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_getc_string_cescape
 					data_ );
 			
 			
+			libandria4_parser_CSV_CSV1_file *data =
+				(libandria4_parser_CSV_CSV1_file*)data_;
 			if( libandria4_parser_CSV_CSV1_validate( data ) )
 			{
 				return( failfunc );
 			}
-			libandria4_parser_CSV_CSV1_file *data =
-				(libandria4_parser_CSV_CSV1_file*)data_;
 			
 			unsigned char c, type;
 			int res = 0;
