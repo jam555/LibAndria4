@@ -585,9 +585,6 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_btstring,
 				data_ ),
-			ungetc = LIBANDRIA4_CTS_BUILDCLOSURE(
-				&libandria4_parser_CSV_CSV1_ungetc,
-				data_ ),
 			getc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_getc,
 				data_ );
@@ -623,26 +620,43 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 		{
 			return( failfunc );
 		}
-		sz -= 1;
 		
 		
-		/* Recurse if incomplete. */
+		/* Is there any stack to travel? */
 		if( sz )
 		{
-			/* Restore the string, and then progress. */
-			res = libandria4_cts_push2_sizet( ctx, 2,  sz );
-			if( !res )
-			{
-				return( failfunc );
-			}
+			sz -= 1;
 			
 			
-			/* Queue recursion. */
-			res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
-			if( !res )
+			if( sz > 1 )
 			{
-				return( failfunc );
+				/* Not at end, recurse. */
+				
+				/* Store the new length. */
+				res = libandria4_cts_push2_sizet( ctx, 2,  sz );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+				
+				/* Queue recursion. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  acc );
+				if( !res )
+				{
+					return( failfunc );
+				}
+				
+			} else {
+				
+				/* At end, queue stack cleanup. */
+				res = libandria4_cts_push2_ctsclsr( ctx, 0,  popchar );
+				if( !res )
+				{
+					return( failfunc );
+				}
 			}
+			
 			
 			if( data->onstrchar.handler )
 			{
@@ -655,20 +669,9 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring
 			}
 			
 			return( getc );
-			
 		}
-		/* Else, exit with success. */
+		/* The ( sz == 0 ) case is handled transparently by the return below. */
 		
-		
-		??? ; /* Do we actually want to mark this? */
-		/* Mark as success. */
-		res = libandria4_cts_push2_uchar( ctx, 1,  1 );
-		if( !res )
-		{
-			return( failfunc );
-		}
-		
-			/* Is this right? Or do we still need to do it manually? */
 		return( retfunc );
 	}
 	
