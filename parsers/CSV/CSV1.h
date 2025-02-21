@@ -207,6 +207,11 @@
 	(
 		libandria4_cts_context*, void*
 	);
+	
+	libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_inner
+	(
+		libandria4_cts_context *ctx, void *data_
+	);
 		/* Note: contrary to previous notes, this actually IS used, specifically by */
 		/*  way of *_accumulate_nonstring(). */
 	libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_btstring

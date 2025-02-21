@@ -50,6 +50,61 @@ SOFTWARE.
 
 
 
+	/* I think these three actually need to be written... or, more likely, */
+	/*  swapped out for "real" equivalents from elsewhere. */
+		/* Returns a character, or an "error status" (EOF is positive, retry is */
+		/*  0, error is negative). */
+		/* WAS named *_getc(). */
+libandria4_common_monadicchar8 libandria4_parser_CSV_CSV1_get( libandria4_parser_CSV_CSV1_file *f )
+{
+	if( f )
+	{
+		if( !( f->file ) )
+		{
+			??? ;
+		}
+		
+		int c = getc(  f->file );
+		if( c == EOF )
+		{
+			??? ;
+		}
+		
+		??? ;
+	}
+	
+	??? ;
+}
+		/* Negative on error, 0 on retry, positive on success. Gets used by */
+		/*  libandria4_parser_CSV_CSV1_ungetc(), which is listed further down. */
+int libandria4_parser_CSV_CSV1_unget( libandria4_parser_CSV_CSV1_file *f, char c )
+{
+	if( f )
+	{
+		if( !( f->file ) )
+		{
+			return( -??? );
+		}
+		
+		int res = ungetc ( c, f->file );
+		if( res == EOF )
+		{
+			return( -??? );
+			
+		} else if( rec != c )
+		{
+			
+			return( -??? );
+		}
+		
+		return( 1 );;
+	}
+	
+	return( -??? );
+}
+
+
+
 static libandria4_cts_closure failfunc;
 
 static libandria4_cts_innerreturn_data iret_d =
