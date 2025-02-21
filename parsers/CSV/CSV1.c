@@ -43,12 +43,33 @@ SOFTWARE.
 
 
 	/* For libandria4_common_monadicchar8{}. */
-#include "../../commonerrvals.h"
-#include "../../commontypes.h"
-#include "../../simpleops.h"
-#include "../../monads.h"
+#include "../../basic/commonerrvals.h"
+#include "../../basic/commontypes.h"
+#include "../../basic/simpleops.h"
+#include "../../basic/monads.h"
 
 
+
+libandria4_cts_closure libandria4_parser_CSV_CSV1_record
+(
+	libandria4_cts_context *ctx, void *data_
+);
+static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
+(
+	libandria4_cts_context *ctx, void *data_
+);
+static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner_helper
+(
+	libandria4_cts_context *ctx, libandria4_cts_closure direct, void *data_
+);
+libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
+(
+	libandria4_cts_context *ctx, void *data_
+);
+static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
+(
+	libandria4_cts_context *ctx, void *data_
+);
 
 static libandria4_cts_closure failfunc;
 
@@ -85,7 +106,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 	libandria4_cts_context *ctx, void *data_
 )
 {
-	if( ctx && data )
+	if( ctx && data_ )
 	{
 		libandria4_cts_closure
 			getstr = LIBANDRIA4_CTS_BUILDCLOSURE(
@@ -105,7 +126,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 		}
 		libandria4_parser_CSV_CSV1_file *data =
 			(libandria4_parser_CSV_CSV1_file*)data_;
-		
+		int res; unsigned char c, flag;
 		
 		/* Fetch the character. */
 		res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
@@ -165,22 +186,20 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 				{
 					libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 5 );
 				}
-				res = libandria4_cts_push2_uchar( ctx, 1,  type );
+				res = libandria4_cts_push2_uchar( ctx, 1,  flag );
 				if( !res )
 				{
 					libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 6 );
 				}
 				
-					/* If we're going for the BT-string, we need to prep the receiver string. */
-				??? ;
-				
 				/* If a BitTorrent string, push a length of 0 for initial accumulation. */
 				if( data->btStr )
 				{
-					res = libandria4_cts_push2_uchar( ctx, 2,  0 );
+					/* Store the updated length. */
+					res = libandria4_cts_push2_sizet( ctx, 2,  0 );
 					if( !res )
 					{
-						libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 5 );
+						return( failfunc );
 					}
 				}
 				
@@ -204,43 +223,53 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value_inner
 	
 	return( failfunc );
 }
+	/* This REQUIRES a character on stack[ 1 ], under a flag indicating */
+	/*  the result of the fetch that produced that character, both as */
+	/*  uchars. */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 (
-	libandria4_cts_context *ctx, void *data
+	libandria4_cts_context *ctx, void *data_
 )
 {
-	if( ctx && data )
+	if( ctx && data_ )
 	{
 		libandria4_cts_closure
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE(
 				&libandria4_parser_CSV_CSV1_accumulate_value_inner,
-				data );
+				data_ );
 		
 		if( libandria4_parser_CSV_CSV1_validate(
-			(libandria4_parser_CSV_CSV1_file*)data ) )
+			(libandria4_parser_CSV_CSV1_file*)data_ ) )
 		{
 			return( failfunc );
 		}
 		
-		libandria4_common_monadicchar8 ec =
-			libandria4_parser_CSV_CSV1_getc( data );
-		unsigned char c, type;
+		unsigned char c, flag;
 		int e, res = 0;
 		
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( ec,
-			LIBANDRIA4_OP_SETcFLAGresAS1,
-			LIBANDRIA4_OP_SETeFLAGresASn1 );
+		
+		/* Fetch the character. */
+		res = libandria4_cts_pop_uchar( ctx, 1,  &flag );
+		if( !res )
+		{
+			libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 0 );
+		}
+		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+		if( !res )
+		{
+			libandria4_parser_CSV_CSV1_accval_RETONFATAL( 1, 1 );
+		}
 		
 		
 		if( res == 1 )
 		{
 			libandria4_parser_CSV_CSV1_sortchar_categories cat =
-				libandria4_parser_CSV_CSV1_sortchar( data, c );
+				libandria4_parser_CSV_CSV1_sortchar( (libandria4_parser_CSV_CSV1_file*)data_, c );
 			switch( cat )
 			{
 				case libandria4_parser_CSV_CSV1_sortchar_categories_doublequote:
 				case libandria4_parser_CSV_CSV1_sortchar_categories_allvaluechar:
-					type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS;
+					flag = LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS;
 					break;
 				
 				case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
@@ -248,8 +277,8 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 				case libandria4_parser_CSV_CSV1_sortchar_categories_recordsep:
 				case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
 					/* Refer back to the record handler entry point on stack[ 0 ]. */
-					type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS;
-					acc = ret;
+					flag = LIBANDRIA4_PARSER_CSV_CSV1_GETC_SUCCESS;
+					acc = retfunc;
 					break;
 					
 				/* Errors. */
@@ -273,7 +302,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 			
 		} else {
 			
-			type = LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL;
+			flag = LIBANDRIA4_PARSER_CSV_CSV1_GETC_TRUEFAIL;
 		}
 		
 		/* Push. */
@@ -291,7 +320,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_value
 				Stack delta: 0( return target ) 1() -> 0() 1( character, flags )
 					(top listed last)
 			*/
-		res = libandria4_cts_push2_uchar( ctx, 1,  type );
+		res = libandria4_cts_push2_uchar( ctx, 1,  flag );
 		if( !res )
 		{
 			libandria4_parser_CSV_CSV1_accval_RETONFATAL( 0, 3 );
@@ -317,7 +346,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 	/* Note: Finish this function! */
 static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner_helper
 (
-	libandria4_cts_closure direct, void *data_
+	libandria4_cts_context *ctx, libandria4_cts_closure direct, void *data_
 )
 {
 		/* Do we actually want this here? */
@@ -343,14 +372,21 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner_helper
 		libandria4_parser_CSV_CSV1_record_RETONFATAL( 2, 0 );
 	}
 	
-		/* NOTE! We need to queue up a non-string accumulator here. I */
-		/*  believe the correct entry point does not yet exist, but should */
-		/*  be derived from *_accumulate_nonstring(), which contrary to */
-		/*  it's name can actually accumulate BitTorrent-style strings */
-		/*  (because they start with a number). We need to do this because */
-		/*  we should only encounter "non"-string values on any route that */
-		/*  calls this function. */
-	??? ;
+		/* We should encounter only an ANTI-pattern string on */
+		/*  this route, not a "proper" string like a C or */
+		/*  BitTorrent -style string. */
+	res =
+		libandria4_cts_push2_ctsclsr
+		(
+			ctx, 0,
+			LIBANDRIA4_CTS_BUILDCLOSURE(
+				&libandria4_parser_CSV_CSV1_accumulate_nonstring_inner,
+				data_ )
+		);
+	if( !res )
+	{
+		libandria4_parser_CSV_CSV1_record_RETONFATAL( 2, 0 );
+	}
 	
 	return( direct );
 }
@@ -444,10 +480,10 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 			/*  ANTI-PATTERN strings, instead of normal ones. */
 			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingopener:
 				return( libandria4_parser_CSV_CSV1_record_inner_helper
-							( data->onopen, data_ ) );
+							( ctx, data->onopen, data_ ) );
 			case libandria4_parser_CSV_CSV1_sortchar_categories_nestingcloser:
 				return( libandria4_parser_CSV_CSV1_record_inner_helper
-							( data->onclose, data_ ) );
+							( ctx, data->onclose, data_ ) );
 				
 			case libandria4_parser_CSV_CSV1_sortchar_categories_fieldsep:
 				/* Push recursion, to continue parsing the record. */
@@ -496,20 +532,6 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 7 );
 				}
 				
-				/* Push value-fetcher, to build up the field's value. It WILL */
-				/*  NOT have a character available on the stack when first */
-				/*  entered. */
-				cls =
-					LIBANDRIA4_CTS_BUILDCLOSURE(
-						&libandria4_parser_CSV_CSV1_accumulate_value,
-						data_
-					);
-				res = libandria4_cts_push2_ctsclsr( ctx, 0,  cls );
-				if( !res )
-				{
-					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 8 );
-				}
-				
 				
 				/* Repush character. */
 				res = libandria4_cts_push2_uchar( ctx, 1,  c );
@@ -517,31 +539,22 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_record_inner
 				{
 					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 5 );
 				}
-				res = libandria4_cts_push2_uchar( ctx, 1,  type );
+				res = libandria4_cts_push2_uchar( ctx, 1,  flag );
 				if( !res )
 				{
 					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 6 );
 				}
 				
 				
-				/* Push character popper (to clean the character off the stack). */
-				cls = popchar;
-				res = libandria4_cts_push2_ctsclsr( ctx, 0,  cls );
-				if( !res )
-				{
-					libandria4_parser_CSV_CSV1_record_RETONFATAL( 1, 9 );
-				}
-				
-				
-					/* Tail-call the unget-character code: this DOES NOT remove */
-					/*  the character from the stack. */
-				return
-				(
+				/* Push value-fetcher, to build up the field's value. It */
+				/*  REQUIRES a character on stack[ 1 ], under the result-flag */
+				/*  of the character's fetch, both as uchars. */
+				cls =
 					LIBANDRIA4_CTS_BUILDCLOSURE(
-						&libandria4_parser_CSV_CSV1_ungetc,
+						&libandria4_parser_CSV_CSV1_accumulate_value,
 						data_
-					)
-				);
+					);
+				return( cls );
 			
 			/* Errors. */
 			case libandria4_parser_CSV_CSV1_sortchar_categories_invalid:
@@ -568,12 +581,12 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 			acc = LIBANDRIA4_CTS_BUILDCLOSURE( 0, 0 );
 		int res = 0;
 		
+		libandria4_parser_CSV_CSV1_file *data =
+			(libandria4_parser_CSV_CSV1_file*)data_;
 		if( libandria4_parser_CSV_CSV1_validate( data ) )
 		{
 			return( failfunc );
 		}
-		libandria4_parser_CSV_CSV1_file *data =
-			(libandria4_parser_CSV_CSV1_file*)data_;
 		
 		
 			/* Tailor dispatching. */
@@ -642,7 +655,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_record
 	return( failfunc );
 }
 
-libandria4_cts_closure libandria4_parser_CSV_CSV1_record
+libandria4_cts_closure libandria4_parser_CSV_CSV1_parsefile
 (
 	libandria4_cts_context *ctx, void *data_
 )
