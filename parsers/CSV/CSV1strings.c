@@ -366,7 +366,7 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_in
 	/* Requires a flag (3 equals "success") as a uchar on */
 	/*  stack[ 1 ], with a character as uchar directly */
 	/*  underneath it. */
-static libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_inner
+libandria4_cts_closure libandria4_parser_CSV_CSV1_accumulate_nonstring_inner
 (
 	libandria4_cts_context *ctx, void *data_
 )
@@ -757,6 +757,8 @@ static libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_
 	/*  string, which is what we want for those cases where such a */
 	/*  string wasn't encountered. */
 	/* TODO: rename to "unspin", to better reflect it's purpose. */
+	/*  We're disassembling a string into it's constituent */
+	/*  characters, not fabric into it's constituent strings. */
 libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring_unravel
 (
 	libandria4_cts_context *ctx, void *data_
@@ -1122,7 +1124,7 @@ libandria4_cts_closure libandria4_parser_CSV_CSV1_preaccumulate_btstring
 					/* Discard the accumulated string. */
 				while( sz )
 				{
-					res = libandria4_cts_pop_uchar( ctx, 2,  &flag );
+					res = libandria4_cts_pop_uchar( ctx, 2,  &c );
 					if( !res )
 					{
 						return( failfunc );
