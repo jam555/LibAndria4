@@ -28,6 +28,11 @@ SOFTWARE.
 
 
 
+#include <limits.h>
+#include <stdio.h>
+
+
+
 #include "CSV1.h"
 
 
@@ -61,19 +66,51 @@ libandria4_common_monadicchar8 libandria4_parser_CSV_CSV1_get( libandria4_parser
 	{
 		if( !( f->file ) )
 		{
-			??? ;
+			libandria4_common_monadicchar8_RETURNERR(
+				LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED );
 		}
 		
-		int c = getc(  f->file );
+		int c = getc( f->file );
 		if( c == EOF )
 		{
-			??? ;
+			if( ferror( f->file ) != 0 )
+			{
+				clearerr( f->file );
+				
+				libandria4_common_monadicchar8_RETURNERR(
+					LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED );
+				
+			} else if( feof( f->file ) != 0 )
+			{
+				clearerr( f->file );
+				
+				libandria4_common_monadicchar8_RETURNERR(
+					LIBANDRIA4_RESULT_FAILURE_EOF );
+				
+			} else {
+				
+				libandria4_common_monadicchar8_RETURNERR(
+					LIBANDRIA4_RESULT_FAILURE_LOGICFAULT );
+			}
 		}
 		
-		??? ;
+		if( c < CHAR_MIN )
+		{
+			libandria4_common_monadicchar8_RETURNERR(
+				LIBANDRIA4_RESULT_FAILURE_BELOWBOUNDS );
+			
+		} else if( c > CHAR_MAX )
+		{
+			libandria4_common_monadicchar8_RETURNERR(
+				LIBANDRIA4_RESULT_FAILURE_ABOVEBOUNDS );
+		}
+		/* We've confirmed that c falls within the value range of a char. */
+		
+		libandria4_common_monadicchar8_RETURNSUCC( (char)c );
 	}
 	
-	??? ;
+	libandria4_common_monadicchar8_RETURNERR(
+		LIBANDRIA4_RESULT_FAILURE_DOMAIN );
 }
 		/* Negative on error, 0 on retry, positive on success. Gets used by */
 		/*  libandria4_parser_CSV_CSV1_ungetc(), which is listed further down. */
@@ -83,24 +120,24 @@ int libandria4_parser_CSV_CSV1_unget( libandria4_parser_CSV_CSV1_file *f, char c
 	{
 		if( !( f->file ) )
 		{
-			return( -??? );
+			return( -LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED );
 		}
 		
 		int res = ungetc ( c, f->file );
 		if( res == EOF )
 		{
-			return( -??? );
+			return( -LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED );
 			
-		} else if( rec != c )
+		} else if( res != c )
 		{
 			
-			return( -??? );
+			return( -LIBANDRIA4_RESULT_FAILURE_LOGICFAULT );
 		}
 		
-		return( 1 );;
+		return( 1 );
 	}
 	
-	return( -??? );
+	return( -LIBANDRIA4_RESULT_FAILURE_DOMAIN );
 }
 
 
