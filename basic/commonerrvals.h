@@ -172,16 +172,17 @@ SOFTWARE.
 	#define LIBANDRIA4_RESULT_FAILURE_STOPPED ( 32 )
 	
 		/* EEXIST, EADDRNOTAVAIL, EADDRINUSE, ENOTEMPTY, EISCONN: Used */
-		/*  for when a resource has already beenb populated, so an */
+		/*  for when a resource has already been populated, so an */
 		/*  attempt to create it CANNOT succeed. */
 	#define LIBANDRIA4_RESULT_FAILURE_EXISTS ( 33 )
+	
+		/* ELOOP, EXDEV, etc., too many levels of travel. */
+	#define LIBANDRIA4_RESULT_FAILURE_TOODEEP ( 34 )
 	
 	
 	#if 0
 		/* Note: renumber these. */
 	
-			/* ELOOP, EXDEV, etc., too many levels of travel. */
-		#define LIBANDRIA4_RESULT_FAILURE_TOODEEP ( 20 )
 			/* EACCES, EPERM, ECONNREFUSED */
 		#define LIBANDRIA4_RESULT_FAILURE_PERMSDENIED ( 25 )
 			/* ENOENT, EAFNOSUPPORT, EPROTONOSUPPORT, EPROTOTYPE, ENOPROTOOPT, ENODEV, ENXIO, ESRCH, ECHILD, ENETUNREACH, EHOSTUNREACH */
