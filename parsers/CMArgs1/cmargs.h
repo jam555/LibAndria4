@@ -70,7 +70,6 @@
 	typedef struct libandria4_parser_cmargs1_opt
 	{
 		libandria4_char_pascalarray *name;
-			/* Note: switch this to an array of ints or something. */
 		libandria4_parser_cmargs1_opt_spec_pascalarray *subarg_specifiers;
 		
 		libandria4_cts_closure handler, abbrev;
