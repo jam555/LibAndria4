@@ -1,0 +1,108 @@
+About CMArgs1
+
+	CMArgs1 is a parsing system for command-line arguments. It handles
+specifically *nix-style long arguments with arbitrary numbers of sub-arguments,
+and short-style arguments WITHOUT sub-arguments. Long arguments must be entered
+with two leading dashes and CANNOT be combined into a single argument; while
+short arguments must be entered with one leading dash, each consist of a single
+character, and CAN BE combined by placing the indicating characters contiguously
+with only the same single leading dash per contiguous set. Each argument option
+must have a unique name, and must either have the null character (in which case
+it can't be invoked via short form) or a unique character set as it's short
+name.
+	Sub-arguments can be any combination of generic integers (decimal, octal, or
+hexadecimal), signed or unsigned decimal integers, unsigned octal integers,
+unsigned hexadecimal integers, the f, g, or h floating-point options from
+scanf(), the a option floats from scanf(), single characters, or arbitrary
+strings. However, the aub-arguments are mandatory and fixed per-argument option,
+which does limit the options for sub-arguments.
+	     1    1    2    2    3    3    4    4    5    5    6    6    7    7    8
+    5    0    5    0    5    0    5    0    5    0    5    0    5    0    5    0
+
+
+
+
+
+
+
+
+
+
+
+	typedef struct libandria4_parser_cmargs1_opt
+	{
+		libandria4_char_pascalarray *name;
+			/* Note: switch this to an array of ints or something. */
+		libandria4_parser_cmargs1_opt_spec_pascalarray *subarg_specifiers;
+		
+		libandria4_cts_closure handler, abbrev;
+		
+		char name_abbrev;
+		
+	} libandria4_parser_cmargs1_opt;
+	LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( libandria4_parser_cmargs1_opt_, libandria4_parser_cmargs1_opt );
+	/* libandria4_parser_cmargs1_opt_pascalarray{} is now available. */
+	
+	typedef struct libandria4_parser_cmargs1_arginfo
+	{
+		/* The arguments to parse. Conceptually the arguments given to main(), */
+		/*  but frankly can be anything so long as argn correctly specifies the */
+		/*  number of entries in args, and each string in args ends with a null. */
+		int argn;
+		char **args;
+		
+			/* These handlers MUST all point to a valid function. */
+		libandria4_cts_closure
+				/* onfatal() will find a function-pointer, on a void-pointer, on */
+				/*  an unsigned int, all in stack[ 1 ]. The function pointer */
+				/*  indicates the "entry function" for a group of 1 or more */
+				/*  implementation functions, the other two further refine that */
+				/*  information in group-specific ways. The function pointer */
+				/*  will point to libandria4_parser_cmargs1_arginfo_parse() */
+			onfatal,
+				/* Called only when the last argument was reached but the */
+				/*  sub-args of an option were only partially completed. No */
+				/*  particular args, but args[ arg_progress - 1 ] is the */
+				/*  triggering argument. */
+			onshortfall,
+				/* Either there weren't any leading dashes in the arg, or */
+				/*(  nothing matched it. Regardless, it was */
+					/* args[ arg_progress - 1 ] */
+				/*  that triggered this call, just like onshortfall. */
+			onoptless;
+		
+			/* The array of options to look through. */
+		libandria4_parser_cmargs1_opt_pascalarray *opts_list;
+		
+			/* This is just for quick lookup. */
+		libandria4_parser_cmargs1_opt *acti_opt;
+		size_t arg_progress, acti_progress, sub_progress;
+		
+	} libandria4_parser_cmargs1_arginfo;
+	
+	
+	
+	int libandria4_parser_cmargs1_arginfo_invalid( libandria4_parser_cmargs1_arginfo* );	
+	int libandria4_parser_cmargs1_arginfo_invalidopts
+	(
+		libandria4_parser_cmargs1_opt_pascalarray *opts,
+		size_t *last
+	);
+	libandria4_cts_closure libandria4_parser_cmargs1_arginfo_onfatal
+	(
+		libandria4_cts_context *ctx, void *data_,
+		libandria4_cts_framefunc tag_ptr, void *tag2, unsigned int tag3
+	);
+	
+	#define libandria4_parser_cmargs1_arginfo_RETONFATAL( ctxptr, dataptr, funcptr, sec_id, thrd_id ) \
+		return( \
+			libandria4_parser_cmargs1_arginfo_onfatal( \
+				(ctxptr), (dataptr), \
+				(funcptr), \
+				(void*)&( libandria4_commonlib_firstchars[ (sec_id) ] ), \
+				(thrd_id) ) )
+	
+	
+	
+	libandria4_cts_closure libandria4_parser_cmargs1_arginfo_parse( libandria4_cts_context *ctx, void *data_ );
+
