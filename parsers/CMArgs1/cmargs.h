@@ -72,6 +72,12 @@
 		libandria4_char_pascalarray *name;
 		libandria4_parser_cmargs1_opt_spec_pascalarray *subarg_specifiers;
 		
+			/* Note that while the abbreviation matches "can't have arguments", */
+			/*  that doesn't restrict the abbrev closure from implementing */
+			/*  those directly. The abbrev handlers will themselves be called */
+			/*  in the same order as the matching characters (the characters */
+			/*  are scanned from the last to the first, so the last handler */
+			/*  will be "buried below" the earlier ones). */
 		libandria4_cts_closure handler, abbrev;
 		
 		char name_abbrev;
