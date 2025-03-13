@@ -356,9 +356,36 @@ int test1()
 		} );
 	
 	
+	
+	
+	static char ***strs =
+		{
+			{ "--int*2", "2", "3", "\0" },
+			{ "--char*1", "c", "\0" },
+			{ "--int*2", "5", "9", "--char*1", "q", "\0" }
+		};
+		/* ??? Is strn set correctly? */
+	static size_t strn[ 3 ] =
+		{
+			( sizeof( strs[ 0 ] ) / sizeof( char* ) ) - 1,
+			( sizeof( strs[ 1 ] ) / sizeof( char* ) ) - 1,
+			( sizeof( strs[ 2 ] ) / sizeof( char* ) ) - 1
+		};
+	if( strn[ 0 ] != 3 )
+	{
+		return( -1 );
+	}
+	if( strn[ 1 ] != 2 )
+	{
+		return( -1 );
+	}
+	if( strn[ 2 ] != 5 )
+	{
+		return( -1 );
+	}
 	arginf =
 		{
-			strn, strs,
+			0, (char**)0,
 			
 			&onfatal,
 			&onshortfall,
@@ -366,83 +393,150 @@ int test1()
 			
 			&( opts.arr ),
 			
-			(libandria4_parser_cmargs1_opt*)0,
+			(libandria4_parser_cmargs1_opt*)0, /* ??? */
 			0, 0, 0
 		};
 	
 	
-	static char **strs =
+	int res, l, r;
+	char c;
+	
+	
+		/* This runs: "--int*2" with "2", "3", "\0" .*/
+	ctx.next_iteration =
+		(libandria4_cts_closure)
 		{
-			"",
-			"",
-			""
+			&libandria4_parser_cmargs1_arginfo_parse,
+			&arginf
 		};
-		/* ??? Is strn set correctly? */
-	static size_t strn = ( sizeof( strs ) / sizeof( char* ) );
-	
-	
-	if( strn < ??? )
+	ctx.run = -1;
+	arginf.argn = strn[ 0 ];
+	arginf.args = strs[ 0 ];
+	res = libandria4_cts_engine( &ctx );
+	if( !res )
 	{
+		printf( "  libandria4_cts_engine( double-int ) returned %i.\n", res );
+		return( -1 );
+	}
+	res = libandria4_cts_pop_sint( ctx, 1,  &r );
+	if( !res )
+	{
+		printf( "  libandria4_cts_pop_sint()::right returned %i.\n", res );
+		return( -1 );
+	}
+	if( r != 3 )
+	{
+		printf( "  libandria4_cts_pop_sint()::right popped %i instead of 3.\n", r );
+		return( -1 );
+	}
+	res = libandria4_cts_pop_sint( ctx, 1,  &l );
+	if( !res )
+	{
+		printf( "  libandria4_cts_pop_sint()::left returned %i.\n", res );
+		return( -1 );
+	}
+	if( l != 2 )
+	{
+		printf( "  libandria4_cts_pop_sint()::left popped %i instead of 2.\n", l );
 		return( -1 );
 	}
 	
 	
-	ctx.run = ??? ;
-	ctx.next_iteration = (libandria4_cts_closure) ??? ;
-	??? ;
-	
-	
+		/* This runs: "--char*1" with "c", "\0" .*/
+	ctx.next_iteration =
+		(libandria4_cts_closure)
+		{
+			&libandria4_parser_cmargs1_arginfo_parse,
+			&arginf
+		};
+	ctx.run = -1;
+	arginf.argn = strn[ 1 ];
+	arginf.args = strs[ 1 ];
 	res = libandria4_cts_engine( &ctx );
-	if( res ??? )
+	if( !res )
 	{
+		printf( "  libandria4_cts_engine( double-int ) returned %i.\n", res );
+		return( -1 );
+	}
+	#if !defined( CHAR_MIN )
+		#error "cmargs test1.c couldn't find a preprocessor CHAR_MIN."
+	#elif CHAR_MIN < 0
+		res = libandria4_cts_pop_schar( ctx, 1,  &c );
+	#elif CHAR_MIN >= 0
+		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+	#endif
+	if( !res )
+	{
+		printf( "  libandria4_cts_pop_ * char() returned %i.\n", res );
+		return( -1 );
+	}
+	if( c != 'c' )
+	{
+		printf( "  libandria4_cts_pop_ * char() popped %c instead of \'c\'.\n", c );
+		return( -1 );
 	}
 	
 	
-	??? ;
-}
-/*
-	#define LIBANDRIA4_CTS_DECPOP( prefix, postfix, type ) \
-		int prefix ## pop ## postfix ( libandria4_cts_context *ctx, size_t stack,  type *val );
-	
-	
-	
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _schar, signed char );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _uchar, unsigned char );
-	
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _sshort, signed short );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ushort, unsigned short );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _sint, signed int );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _uint, unsigned int );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _slong, signed long );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ulong, unsigned long );
-	
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _float, float );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _double, double );
-	
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _sizet, size_t );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ptrdifft, ptrdiff_t );
-	
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _voidp, void* );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _scharp, signed char* );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ucharp, unsigned char* );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _voidf, libandria4_common_voidfuncp_void );
-	
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ctsffuncp, libandria4_cts_framefunc* );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ctsclsr, libandria4_cts_closure );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ctsclsrp, libandria4_cts_closure* );
-	LIBANDRIA4_CTS_DECPOP( libandria4_cts_, _ctsctxtp, libandria4_cts_context* );
-	
-	
-	
-	
-	
-	
-	struct libandria4_cts_closure
+		/* This runs: "--int*2", then "--char*1", with  "5", "9", "q", "\0" .*/
+	ctx.next_iteration =
+		(libandria4_cts_closure)
+		{
+			&libandria4_parser_cmargs1_arginfo_parse,
+			&arginf
+		};
+	ctx.run = -1;
+	arginf.argn = strn[ 2 ];
+	arginf.args = strs[ 2 ];
+	res = libandria4_cts_engine( &ctx );
+	if( !res )
 	{
-		libandria4_cts_framefunc handler;
-		void *data;
-	};
-*/
+		printf( "  libandria4_cts_engine( double-int, char ) returned %i.\n", res );
+		return( -1 );
+	}
+	#if !defined( CHAR_MIN )
+		#error "cmargs test1.c couldn't find a preprocessor CHAR_MIN."
+	#elif CHAR_MIN < 0
+		res = libandria4_cts_pop_schar( ctx, 1,  &c );
+	#elif CHAR_MIN >= 0
+		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+	#endif
+	if( !res )
+	{
+		printf( "  libandria4_cts_pop_ * char() returned %i.\n", res );
+		return( -1 );
+	}
+	if( c != 'q' )
+	{
+		printf( "  libandria4_cts_pop_ * char() popped %c instead of \'q\'.\n", c );
+		return( -1 );
+	}
+	res = libandria4_cts_pop_sint( ctx, 1,  &r );
+	if( !res )
+	{
+		printf( "  libandria4_cts_pop_sint()::right returned %i.\n", res );
+		return( -1 );
+	}
+	if( r != 9 )
+	{
+		printf( "  libandria4_cts_pop_sint()::right popped %i instead of 9.\n", r );
+		return( -1 );
+	}
+	res = libandria4_cts_pop_sint( ctx, 1,  &l );
+	if( !res )
+	{
+		printf( "  libandria4_cts_pop_sint()::left returned %i.\n", res );
+		return( -1 );
+	}
+	if( l != 5 )
+	{
+		printf( "  libandria4_cts_pop_sint()::left popped %i instead of 5.\n", l );
+		return( -1 );
+	}
+	
+	
+	
+	return( 1 );
+}
 
 int main( int argn, char *args[] )
 {
@@ -462,7 +556,7 @@ int main( int argn, char *args[] )
 			??? ;
 			return( EXIT_FAILURE );
 		}
-		ctx.stacks;
+		ctx.stacks = (*) ???;
 	}
 	{
 		libandria4_char_pascalarray_result tmp;
@@ -472,7 +566,7 @@ int main( int argn, char *args[] )
 		tmp = libandria4_char_pascalarray_build
 			(
 				sizeof( libandria4_cts_closure ) *
-				???
+				16 /* Just some rando value. I don't recall if this will be enough. */
 			);
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
 			LIBANDRIA4_OP_SETaFLAGresAS1,
@@ -486,9 +580,14 @@ int main( int argn, char *args[] )
 		
 		tmp = libandria4_char_pascalarray_build
 			(
-				sizeof( ??? ) *
-				???
+				sizeof( char ) *
+				25 /* The characters in the largest case are 25, */ +
+				sizeof( int ) *
+				2 /*  which encodes two ints, */ +
+				sizeof( char ) *
+				1 /*  and 1 more char. */
 			);
+			/* Maybe that's enough data space? */
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
 			LIBANDRIA4_OP_SETaFLAGresAS1,
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
@@ -501,8 +600,8 @@ int main( int argn, char *args[] )
 		
 		tmp = libandria4_char_pascalarray_build
 			(
-				sizeof( ??? ) *
-				???
+				sizeof( void* ) *
+				4 /* Honestly, I don't think this is even used, so let's just allocate some nonsense amount. */
 			);
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
 			LIBANDRIA4_OP_SETaFLAGresAS1,
@@ -514,13 +613,14 @@ int main( int argn, char *args[] )
 		}
 		ctx.stacks->body[ 2 ];
 	}
+	/* All of the other arrays need to be the same size as ctx.stacks, so we'll just use it's length value for them. */
 	
 	{
 		libandria4_sizet_pascalarray_result tmp;
 		libandria4_sizet_pascalarray *a;
 		libandria4_failure_uipresult e;
 		
-		tmp = libandria4_sizet_pascalarray_build( ??? );
+		tmp = libandria4_sizet_pascalarray_build( ctx.stacks->len );
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
 			LIBANDRIA4_OP_SETaFLAGresAS1,
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
@@ -529,9 +629,9 @@ int main( int argn, char *args[] )
 			??? ;
 			return( EXIT_FAILURE );
 		}
-		ctx.align;
+		ctx.align = (libandria4_sizet_pascalarray*) ??? ;
 		
-		tmp = libandria4_sizet_pascalarray_build( ??? );
+		tmp = libandria4_sizet_pascalarray_build( ctx.stacks->len );
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
 			LIBANDRIA4_OP_SETaFLAGresAS1,
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
@@ -540,9 +640,9 @@ int main( int argn, char *args[] )
 			??? ;
 			return( EXIT_FAILURE );
 		}
-		ctx.used;
+		ctx.used = (libandria4_sizet_pascalarray*) ??? ;
 		
-		tmp = libandria4_sizet_pascalarray_build( ??? );
+		tmp = libandria4_sizet_pascalarray_build( ctx.stacks->len );
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
 			LIBANDRIA4_OP_SETaFLAGresAS1,
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
@@ -551,13 +651,13 @@ int main( int argn, char *args[] )
 			??? ;
 			return( EXIT_FAILURE );
 		}
-		ctx.alignreq;
+		ctx.alignreq = (libandria4_sizet_pascalarray*) ??? ;
 	}
 	
 	{
 		/* libandria4_result libandria4_bitarray_destroy( libandria4_bitarray *barr ); */
 		libandria4_bitarray_result tmp =
-			libandria4_bitarray_build( ??? );
+			libandria4_bitarray_build( ctx.stacks->len );
 		libandria4_bitsurface *a;
 		int e;
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
@@ -587,8 +687,10 @@ int main( int argn, char *args[] )
 	
 	
 	res = test1();
-	if( res ??? )
+	if( !res )
 	{
+		printf( "  cmargs test1() failed. Exiting.\n" );
+		return( EXIT_FAILURE );
 	}
 	
 	
