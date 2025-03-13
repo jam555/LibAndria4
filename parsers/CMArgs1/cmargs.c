@@ -894,7 +894,7 @@ static libandria4_cts_closure libandria4_parser_cmargs1_arginfo_parse_string( li
 }
 
 
-
+	/* The entry-function. Oversees the parsing of the set of strings provided by data_. */
 libandria4_cts_closure libandria4_parser_cmargs1_arginfo_parse( libandria4_cts_context *ctx, void *data_ )
 {
 		/* This is just for the sake of using the same error reporting pattern. */

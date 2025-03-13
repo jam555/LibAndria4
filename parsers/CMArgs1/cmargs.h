@@ -117,7 +117,7 @@
 			/* The array of options to look through. */
 		libandria4_parser_cmargs1_opt_pascalarray *opts_list;
 		
-			/* This is just for quick lookup. */
+			/* This is just for quick lookup, initialize it all to nulls & 0. */
 		libandria4_parser_cmargs1_opt *acti_opt;
 		size_t arg_progress, acti_progress, sub_progress;
 		
@@ -147,6 +147,9 @@
 	
 	
 	
+		/* The entry-function. Oversees the parsing of the set of strings */
+		/*  provided by data_. The actual type of data_ must be */
+			/* (libandria4_parser_cmargs1_arginfo*). */
 	libandria4_cts_closure libandria4_parser_cmargs1_arginfo_parse( libandria4_cts_context *ctx, void *data_ );
 	
 	/* End parsers/cmargs1/cmargs.h */
