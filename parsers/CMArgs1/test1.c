@@ -543,6 +543,9 @@ int main( int argn, char *args[] )
 	int res;
 	
 	
+	printf( "\n\nStarting cmargs1 test1.c.\n" );
+	
+	
 	{
 		libandria4_charparrptr_pascalarray_result tmp =
 			libandria4_charparrptr_pascalarray_build( 3 );
@@ -553,10 +556,10 @@ int main( int argn, char *args[] )
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		if( res != 1 )
 		{
-			??? ;
+			printf( "  cmargs failed to allocate ctx.stacks. Exiting.\n" );
 			return( EXIT_FAILURE );
 		}
-		ctx.stacks = (*) ???;
+		ctx.stacks = a;
 	}
 	{
 		libandria4_char_pascalarray_result tmp;
@@ -573,10 +576,10 @@ int main( int argn, char *args[] )
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		if( res != 1 )
 		{
-			??? ;
+			printf( "  cmargs failed to allocate ctx.stacks->body[ 0 ]. Exiting.\n" );
 			return( EXIT_FAILURE );
 		}
-		ctx.stacks->body[ 0 ];
+		ctx.stacks->body[ 0 ] = a;
 		
 		tmp = libandria4_char_pascalarray_build
 			(
@@ -593,10 +596,10 @@ int main( int argn, char *args[] )
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		if( res != 1 )
 		{
-			??? ;
+			printf( "  cmargs failed to allocate ctx.stacks->body[ 1 ]. Exiting.\n" );
 			return( EXIT_FAILURE );
 		}
-		ctx.stacks->body[ 1 ];
+		ctx.stacks->body[ 1 ] = a;
 		
 		tmp = libandria4_char_pascalarray_build
 			(
@@ -608,10 +611,10 @@ int main( int argn, char *args[] )
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		if( res != 1 )
 		{
-			??? ;
+			printf( "  cmargs failed to allocate ctx.stacks->body[ 2 ]. Exiting.\n" );
 			return( EXIT_FAILURE );
 		}
-		ctx.stacks->body[ 2 ];
+		ctx.stacks->body[ 2 ] = a;
 	}
 	/* All of the other arrays need to be the same size as ctx.stacks, so we'll just use it's length value for them. */
 	
@@ -626,10 +629,10 @@ int main( int argn, char *args[] )
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		if( res != 1 )
 		{
-			??? ;
+			printf( "  cmargs failed to allocate ctx.align. Exiting.\n" );
 			return( EXIT_FAILURE );
 		}
-		ctx.align = (libandria4_sizet_pascalarray*) ??? ;
+		ctx.align = a;
 		
 		tmp = libandria4_sizet_pascalarray_build( ctx.stacks->len );
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
@@ -637,10 +640,10 @@ int main( int argn, char *args[] )
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		if( res != 1 )
 		{
-			??? ;
+			printf( "  cmargs failed to allocate ctx.used. Exiting.\n" );
 			return( EXIT_FAILURE );
 		}
-		ctx.used = (libandria4_sizet_pascalarray*) ??? ;
+		ctx.used = a;
 		
 		tmp = libandria4_sizet_pascalarray_build( ctx.stacks->len );
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
@@ -648,10 +651,10 @@ int main( int argn, char *args[] )
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		if( res != 1 )
 		{
-			??? ;
+			printf( "  cmargs failed to allocate ctx.alignreq. Exiting.\n" );
 			return( EXIT_FAILURE );
 		}
-		ctx.alignreq = (libandria4_sizet_pascalarray*) ??? ;
+		ctx.alignreq = a;
 	}
 	
 	{
@@ -665,7 +668,7 @@ int main( int argn, char *args[] )
 			LIBANDRIA4_OP_SETeFLAGresASn1 );
 		if( res != 1 )
 		{
-			??? ;
+			printf( "  cmargs failed to allocate ctx.reallocatable. Exiting.\n" );
 			return( EXIT_FAILURE );
 		}
 		ctx.reallocatable = a;
@@ -673,19 +676,21 @@ int main( int argn, char *args[] )
 	
 	
 	res = libandria4_cts_isvalid( &ctx );
-	if( res ??? )
+	if( !res )
 	{
+		printf( "  cmargs libandria4_cts_isvalid() failed. Exiting.\n" );
+		return( EXIT_FAILURE );
 	}
 	res = libandria4_cts_isvalid2( &ctx );
-	if( res ??? )
+	if( !res )
 	{
+		printf( "  cmargs libandria4_cts_isvalid2() failed. Exiting.\n" );
+		return( EXIT_FAILURE );
 	}
 	
 	
 	
-	??? ;
-	
-	
+	/* Actually run our tests. */
 	res = test1();
 	if( !res )
 	{
@@ -694,12 +699,10 @@ int main( int argn, char *args[] )
 	}
 	
 	
-	??? ;
-	
-	
 	
 	/* We don't even TRY to deallocate anything. Bad for real-world */
 	/*  use, but works for discrete test programs like this one. */
 	
+	printf( " cmargs test1.c succeeded. Exiting.\n" );
 	return( EXIT_SUCCESS );
 }
