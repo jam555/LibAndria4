@@ -189,6 +189,38 @@ SOFTWARE.
 	} libandria4_typeinfo_typeenum;
 	
 	
+	??? ; /* TODO: Actually bring this into reality, for MetaC/real-world */
+	/*  representation. */
+		/* Some types, such as object-oriented-design structs, are effectively */
+		/*  several different types at the same time: */
+			/* libandria4_typeinfo_multiplicitoustype */
+		/*  both IS one of these types, and also DESCRIBES other such types. */
+		/*  It describes them by having it's target type's real description */
+		/*  immediately follow it, while having pointers accessed through this */
+		/*  descriptor to descriptions for it's other forms. Each alternate */
+		/*  type might be at a different location than the "real" type */
+		/*  (example: C strings versus MSVC++'s BSTR Pascal-style strings, */
+		/*  where the prefix length is in front of both the C string, AND the */
+		/*  location pointed to be a BSTR's pointer), and so offsets for each */
+		/*  alternate type are included. */
+	/*
+		typedef struct libandria4_typeinfo_multiplicitoustype
+		{
+			libandria4_typeinfo_pretype header1;
+			
+			libandria4_typeinfo_pretype *alttype;
+				/ * Note that ptrdiff_t and size_t are both defined in stddef.h, * /
+				/ *  though size_t is also defined in multiple other places. * /
+			ptrdiff_t *altoffset;
+			size_t altcount;
+			
+				/ * The header for the "real" typeinfo type, which should be one * /
+				/ *  of the others defined below. * /
+			libandria4_typeinfo_pretype real_header;
+			
+		} libandria4_typeinfo_multiplicitoustype;
+	*/
+	
 		/* Just a header for the real description structures. */
 	typedef struct libandria4_typeinfo_pretype
 	{
