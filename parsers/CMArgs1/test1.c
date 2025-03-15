@@ -358,12 +358,11 @@ int test1()
 	
 	
 	
-	static char ***strs =
-		{
-			{ "--int*2", "2", "3", "\0" },
-			{ "--char*1", "c", "\0" },
-			{ "--int*2", "5", "9", "--char*1", "q", "\0" }
-		};
+	static char
+		*str1[] = { "--int*2", "2", "3", "\0" },
+		*str2[] = { "--char*1", "c", "\0" },
+		*str3[] = { "--int*2", "5", "9", "--char*1", "q", "\0" },
+		**strs[] = { str1, str2, str3 };
 		/* ??? Is strn set correctly? */
 	static size_t strn[ 3 ] =
 		{
@@ -384,6 +383,7 @@ int test1()
 		return( -1 );
 	}
 	arginf =
+		(libandria4_parser_cmargs1_arginfo)
 		{
 			0, (char**)0,
 			
@@ -393,7 +393,8 @@ int test1()
 			
 			&( opts.arr ),
 			
-			(libandria4_parser_cmargs1_opt*)0, /* ??? */
+			/* (libandria4_parser_cmargs1_opt*)0 */
+			(libandria4_cts_closure (*)(libandria4_cts_context *, void *))0, /* ??? */
 			0, 0, 0
 		};
 	
@@ -418,7 +419,7 @@ int test1()
 		printf( "  libandria4_cts_engine( double-int ) returned %i.\n", res );
 		return( -1 );
 	}
-	res = libandria4_cts_pop_sint( ctx, 1,  &r );
+	res = libandria4_cts_pop_sint( &ctx, 1,  &r );
 	if( !res )
 	{
 		printf( "  libandria4_cts_pop_sint()::right returned %i.\n", res );
@@ -429,7 +430,7 @@ int test1()
 		printf( "  libandria4_cts_pop_sint()::right popped %i instead of 3.\n", r );
 		return( -1 );
 	}
-	res = libandria4_cts_pop_sint( ctx, 1,  &l );
+	res = libandria4_cts_pop_sint( &ctx, 1,  &l );
 	if( !res )
 	{
 		printf( "  libandria4_cts_pop_sint()::left returned %i.\n", res );
@@ -461,9 +462,9 @@ int test1()
 	#if !defined( CHAR_MIN )
 		#error "cmargs test1.c couldn't find a preprocessor CHAR_MIN."
 	#elif CHAR_MIN < 0
-		res = libandria4_cts_pop_schar( ctx, 1,  &c );
+		res = libandria4_cts_pop_schar( &ctx, 1,  &c );
 	#elif CHAR_MIN >= 0
-		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+		res = libandria4_cts_pop_uchar( &ctx, 1,  &c );
 	#endif
 	if( !res )
 	{
@@ -496,9 +497,9 @@ int test1()
 	#if !defined( CHAR_MIN )
 		#error "cmargs test1.c couldn't find a preprocessor CHAR_MIN."
 	#elif CHAR_MIN < 0
-		res = libandria4_cts_pop_schar( ctx, 1,  &c );
+		res = libandria4_cts_pop_schar( &ctx, 1,  &c );
 	#elif CHAR_MIN >= 0
-		res = libandria4_cts_pop_uchar( ctx, 1,  &c );
+		res = libandria4_cts_pop_uchar( &ctx, 1,  &c );
 	#endif
 	if( !res )
 	{
@@ -510,7 +511,7 @@ int test1()
 		printf( "  libandria4_cts_pop_ * char() popped %c instead of \'q\'.\n", c );
 		return( -1 );
 	}
-	res = libandria4_cts_pop_sint( ctx, 1,  &r );
+	res = libandria4_cts_pop_sint( &ctx, 1,  &r );
 	if( !res )
 	{
 		printf( "  libandria4_cts_pop_sint()::right returned %i.\n", res );
@@ -521,7 +522,7 @@ int test1()
 		printf( "  libandria4_cts_pop_sint()::right popped %i instead of 9.\n", r );
 		return( -1 );
 	}
-	res = libandria4_cts_pop_sint( ctx, 1,  &l );
+	res = libandria4_cts_pop_sint( &ctx, 1,  &l );
 	if( !res )
 	{
 		printf( "  libandria4_cts_pop_sint()::left returned %i.\n", res );
@@ -661,7 +662,7 @@ int main( int argn, char *args[] )
 		/* libandria4_result libandria4_bitarray_destroy( libandria4_bitarray *barr ); */
 		libandria4_bitarray_result tmp =
 			libandria4_bitarray_build( ctx.stacks->len );
-		libandria4_bitsurface *a;
+		libandria4_bitarray *a;
 		int e;
 		LIBANDRIA4_MONAD_EITHER_BODYMATCH( tmp,
 			LIBANDRIA4_OP_SETaFLAGresAS1,
