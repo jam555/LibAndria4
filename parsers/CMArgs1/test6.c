@@ -35,27 +35,73 @@ SOFTWARE.
 #include <stdlib.h>
 #include "../../basic/pascalarray.h"
 
-LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( libandria4_char_, char )
+typedef struct testtype
+{
+	int *ptr;
+	
+} testtype;
+LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( testtype_arr_, testtype )
+
+int dummy1;
 
 int main( int argn, char *args[] )
 {
+	int dummy2;
+	
+	static int
+		*reftest1 = &dummy1,
+		*reftest2[] = { &dummy1 };
+	
+	static struct
+	{
+		testtype_arr_pascalarray arr;
+		testtype libandria4_pascalarray_arrmember
+			[
+				sizeof(
+					(testtype[])
+					{
+						(testtype){ &dummy1 },
+						(testtype){ &dummy1 }
+					}
+				) /
+				sizeof( testtype )
+			];
+	} test1 =
+		{
+			(testtype_arr_pascalarray)
+			{
+				sizeof(
+					(testtype[])
+					{
+						(testtype){ &dummy1 },
+						(testtype){ &dummy1 }
+					}
+				) /
+				sizeof( testtype )
+			},
+			(const testtype[])
+			{
+				(testtype){ &dummy1 },
+				(testtype){ &dummy1 }
+			}
+		};
 	LIBANDRIA4_DEFINE_PASCALARRAY_STATICBUILD(
-		name1,
+		test2,
 		arr,
 		
-		libandria4_char_,
-		char,
+		testtype_arr_,
+		testtype,
 		
-		'c','h','a','r', '\0' );
+		(testtype){ &dummy2 },
+		(testtype){ &dummy2 } );
 	
-	printf( "\nTest 2.\n    :" );
+	printf( "\nTest 6." );
 	
-	int l = 0;
-	while( name1.arr.len > l )
-	{
-		putc( name1.arr.body[ l ], stdout );
-		++l;
-	}
+	printf( "\n    :%c %i",  'a', *( test1.arr.body[ 0 ].ptr ) );
+	printf( "\n    :%c %i",  'b', *( test1.arr.body[ 1 ].ptr ) );
+	
+	printf( "\n    :%c %i",  'c', *( test2.arr.body[ 0 ].ptr ) );
+	printf( "\n    :%c %i",  'd', *( test2.arr.body[ 1 ].ptr ) );
 	
 	putc( '\n', stdout );
 }

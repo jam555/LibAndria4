@@ -36,6 +36,7 @@ SOFTWARE.
 #include "../../basic/pascalarray.h"
 
 LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( libandria4_char_, char )
+LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( test_chararr_, char* )
 
 int main( int argn, char *args[] )
 {
@@ -48,7 +49,24 @@ int main( int argn, char *args[] )
 		
 		'c','h','a','r', '\0' );
 	
-	printf( "\nTest 2.\n    :" );
+	LIBANDRIA4_DEFINE_PASCALARRAY_STATICBUILD(
+		name2,
+		arr,
+		
+		test_chararr_,
+		char*,
+		
+		name1.arr.body );
+	LIBANDRIA4_DEFINE_PASCALARRAY_STATICBUILD(
+		name3,
+		arr,
+		
+		test_chararr_,
+		char*,
+		
+		&( name1.arr.body[ 0 ] ) );
+	
+	printf( "\nTest 3.\n    :" );
 	
 	int l = 0;
 	while( name1.arr.len > l )
@@ -56,6 +74,8 @@ int main( int argn, char *args[] )
 		putc( name1.arr.body[ l ], stdout );
 		++l;
 	}
+	printf( "    :%s\n", name2.arr.body[ 0 ] );
+	printf( "    :%s\n", name3.arr.body[ 0 ] );
 	
 	putc( '\n', stdout );
 }
