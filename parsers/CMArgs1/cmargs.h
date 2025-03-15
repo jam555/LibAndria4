@@ -142,7 +142,7 @@
 			libandria4_parser_cmargs1_arginfo_onfatal( \
 				(ctxptr), (dataptr), \
 				(funcptr), \
-				(void*)&( libandria4_commonlib_firstchars[ (sec_id) ] ), \
+				(sec_id), \
 				(thrd_id) ) )
 	
 	
