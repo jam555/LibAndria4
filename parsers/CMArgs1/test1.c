@@ -334,7 +334,7 @@ int test1()
 		libandria4_parser_cmargs1_opt_,
 		libandria4_parser_cmargs1_opt,
 		
-		(const libandria4_parser_cmargs1_opt)
+		
 		{
 			&( name_dint.arr ),
 			&( subs_dint.arr ),
@@ -344,7 +344,7 @@ int test1()
 			
 			(char)'I' /* name_abbrev */
 		},
-		(const libandria4_parser_cmargs1_opt)
+		
 		{
 			&( name_char.arr ),
 			&( subs_char.arr ),
