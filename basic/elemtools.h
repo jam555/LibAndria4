@@ -366,7 +366,7 @@ SOFTWARE.
 		/* For LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT() . */
 	#include "monads.h"
 		/* For libandria4_commonio_err . */
-	#include "commonio.h"
+	#include "commoniotypes.h"
 	
 	
 		/* Normal style. */
