@@ -65,7 +65,7 @@ libandria4_cts_closure onfatal( libandria4_cts_context *ctx, void *data_ )
 {
 	{
 		printf( "\nonfatal() was called.\n" );
-		return( EXIT_FAILURE );
+		/* return( EXIT_FAILURE ); */
 	}
 	
 	return( failfunc );
@@ -73,8 +73,8 @@ libandria4_cts_closure onfatal( libandria4_cts_context *ctx, void *data_ )
 libandria4_cts_closure onshortfall( libandria4_cts_context *ctx, void *data_ )
 {
 	{
-		printf( "\onshortfall() was called.\n" );
-		return( EXIT_FAILURE );
+		printf( "\nonshortfall() was called.\n" );
+		/* return( EXIT_FAILURE ); */
 	}
 	
 	return( failfunc );
@@ -82,8 +82,8 @@ libandria4_cts_closure onshortfall( libandria4_cts_context *ctx, void *data_ )
 libandria4_cts_closure onoptless( libandria4_cts_context *ctx, void *data_ )
 {
 	{
-		printf( "\onoptless() was called.\n" );
-		return( EXIT_FAILURE );
+		printf( "\nonoptless() was called.\n" );
+		/* return( EXIT_FAILURE ); */
 	}
 	
 	return( failfunc );
@@ -334,23 +334,23 @@ int test1()
 		libandria4_parser_cmargs1_opt_,
 		libandria4_parser_cmargs1_opt,
 		
-		(libandria4_parser_cmargs1_opt)
+		(const libandria4_parser_cmargs1_opt)
 		{
 			&( name_dint.arr ),
 			&( subs_dint.arr ),
 			
-			LIBANDRIA4_CTS_BUILDCLOSURE( &nullactor, (void*)&arginf ) /* handler */,
-			LIBANDRIA4_CTS_BUILDCLOSURE( &doubleint_actor, (void*)&arginf ) /* abbreviation handler */,
+			LIBANDRIA4_CTS_BUILDCONSTCLOSURE( &nullactor, (void*)&arginf ) /* handler */,
+			LIBANDRIA4_CTS_BUILDCONSTCLOSURE( &doubleint_actor, (void*)&arginf ) /* abbreviation handler */,
 			
 			(char)'I' /* name_abbrev */
 		},
-		(libandria4_parser_cmargs1_opt)
+		(const libandria4_parser_cmargs1_opt)
 		{
 			&( name_char.arr ),
 			&( subs_char.arr ),
 			
-			LIBANDRIA4_CTS_BUILDCLOSURE( &nullactor, (void*)&arginf ) /* handler */,
-			LIBANDRIA4_CTS_BUILDCLOSURE( &char_actor, (void*)&arginf ) /* abbreviation handler */,
+			LIBANDRIA4_CTS_BUILDCONSTCLOSURE( &nullactor, (void*)&arginf ) /* handler */,
+			LIBANDRIA4_CTS_BUILDCONSTCLOSURE( &char_actor, (void*)&arginf ) /* abbreviation handler */,
 			
 			(char)'c' /* name_abbrev */
 		} );
