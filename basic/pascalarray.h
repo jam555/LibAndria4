@@ -74,7 +74,8 @@ SOFTWARE.
 		static struct { head##pascalarray innername; type libandria4_pascalarray_arrmember[ \
 			sizeof( (type[]){ __VA_ARGS__ } ) / sizeof( type ) ]; } outername = \
 			{ (head##pascalarray){ sizeof( (type[]){ __VA_ARGS__ } ) / sizeof( type ) }, \
-				(type[]){ __VA_ARGS__ } };
+				/* (type[]) *//*Using an aggregate initializer HERE causes parse errors, nowhere else.*/ \
+				{ __VA_ARGS__ } };
 	/* These should work fine. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL( parrtype,  parrptr, start, len ) \
 		( (parrtype##_excerpt){ (parrptr),  (start), (len) } )
