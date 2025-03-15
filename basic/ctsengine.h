@@ -104,6 +104,8 @@ SOFTWARE.
 	int libandria4_cts_engine( libandria4_cts_context *ctx );
 	
 	
+	#define LIBANDRIA4_CTS_BUILDCONSTCLOSURE( funcptr, voidptr ) \
+		( (const libandria4_cts_closure){ (funcptr), (voidptr) } )
 	#define LIBANDRIA4_CTS_BUILDCLOSURE( funcptr, voidptr ) \
 		( (libandria4_cts_closure){ (funcptr), (voidptr) } )
 	#define LIBANDRIA4_CTS_RETURNCLOSURE( funcptr, voidptr ) \
@@ -121,7 +123,8 @@ SOFTWARE.
 	);
 	/* More closure functions are near the end of this header. */
 	
-	extern libandria4_commonio_handle libandria4_cts_errout;
+		/* Hide this for debugging in CMArgs1. */
+	/* extern libandria4_commonio_handle libandria4_cts_errout; */
 	
 	
 	
