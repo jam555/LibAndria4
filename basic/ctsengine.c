@@ -40,7 +40,7 @@ int libandria4_cts_isvalid( libandria4_cts_context *ctx )
 			len == ctx->align->len &&
 			len == ctx->used->len &&
 			len == ctx->alignreq->len &&
-			len == ctx->reallocatable->len
+			len == ctx->reallocatable->width
 		)
 		{
 			if( ctx->next_iteration.handler )
@@ -125,13 +125,13 @@ libandria4_cts_closure libandria4_cts_framefunc_stoprun
 
 int libandria4_cts_sizedpop( libandria4_cts_context *ctx, size_t stack,  void *dest_, size_t size )
 {
-	if( ctx && dest )
+	if( ctx && dest_ )
 	{
 		if( !libandria4_cts_isvalid2( ctx ) )
 		{
 			return( -2 );
 		}
-		if( ctx->stacks.len <= stack )
+		if( ctx->stacks->len <= stack )
 		{
 			return( -3 );
 		}
@@ -165,13 +165,13 @@ int libandria4_cts_sizedpop( libandria4_cts_context *ctx, size_t stack,  void *d
 }
 int libandria4_cts_sizedpush( libandria4_cts_context *ctx, size_t stack,  void *dest_, size_t size )
 {
-	if( ctx && dest )
+	if( ctx && dest_ )
 	{
 		if( !libandria4_cts_isvalid2( ctx ) )
 		{
 			return( -2 );
 		}
-		if( ctx->stacks.len <= stack )
+		if( ctx->stacks->len <= stack )
 		{
 			return( -3 );
 		}
@@ -337,6 +337,6 @@ libandria4_cts_closure libandria4_cts_innerreturn( libandria4_cts_context *ctx, 
 }
 
 
-libandria4_commonio_handle libandria4_cts_errout =
+/* libandria4_commonio_handle libandria4_cts_errout =
 	{
-	};
+	}; */
