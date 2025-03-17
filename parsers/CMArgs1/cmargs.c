@@ -952,7 +952,7 @@ libandria4_cts_closure libandria4_parser_cmargs1_arginfo_parse( libandria4_cts_c
 			{
 				/* This only works right if we run the first subarg BEFORE cycling around again. */
 				
-				return( arginf->onshortfall );
+				return( data->onshortfall );
 				
 			} else {
 				
@@ -1031,9 +1031,17 @@ libandria4_cts_closure libandria4_parser_cmargs1_arginfo_parse( libandria4_cts_c
 						
 						while( data->opts_list->len > i && !opt )
 						{
-							if( strcmp( opts->body[ i ].name, ( data->args[ data->arg_progress - 1 ] ) + 2 ) != 0 )
+							if
+							(
+								strcmp
+								(
+									data->opts_list->body[ i ].name->body,
+									( data->args[ data->arg_progress - 1 ] ) + 2
+									
+								) != 0
+							)
 							{
-								opt = &( opts->body[ i ] );
+								opt = &( data->opts_list->body[ i ] );
 							}
 							
 							++i;
@@ -1089,9 +1097,13 @@ libandria4_cts_closure libandria4_parser_cmargs1_arginfo_parse( libandria4_cts_c
 							iter = data->onoptless;
 							while( data->opts_list->len > i && !opt )
 							{
-								if( opts->body[ i ]->name_abbrev == data->args[ data->arg_progress - 1 ][ ci ] )
+								if
+								(
+									data->opts_list->body[ i ].name_abbrev ==
+									data->args[ data->arg_progress - 1 ][ ci ]
+								)
 								{
-									iter = opts->body[ i ]->abbrev;
+									iter = data->opts_list->body[ i ].abbrev;
 								}
 								
 								++i;
