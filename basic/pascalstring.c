@@ -44,7 +44,7 @@ int libandria4_ascii_isnewline( char c )
 }
 int libandria4_ascii_tonum( char var )
 {
-	if( !isdigit( *var ) )
+	if( !isdigit( var ) )
 	{
 		return( -2 );
 	}
@@ -111,7 +111,7 @@ int libandria4_utf32_isdigit( uint32_t val )
 	
 	return( -1 );
 }
-int libandria4_utf32_tonum( uint32_t var )
+int libandria4_utf32_tonum( uint32_t val )
 {
 	if( val > 255 )
 	{
@@ -141,7 +141,7 @@ size_t libandria4_utf32_strlen( uint32_t *str )
 	
 	return( -1 );
 }
-int libandria4_utf32_stringops_ringincr( uint32_t *str )
+int libandria4_utf32_stringops_ringincr( uint32_t *var )
 {
 	if( var )
 	{

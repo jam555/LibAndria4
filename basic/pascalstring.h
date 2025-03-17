@@ -39,6 +39,7 @@ SOFTWARE.
 	#include <ctype.h>
 	#include <string.h>
 	
+	#include "commonlib.h"
 	#include "stdmem.h"
 	#include "pascalarray.h"
 	
@@ -158,9 +159,9 @@ SOFTWARE.
 					LIBANDRIA4_OP_SETa, \
 					LIBANDRIA4_NULL_MACRO ) \
 				if( a ) { \
-					operhead##set( res->body[ len ], operhead##nullval() ); \
+					operhead##set( a->body[ len ], operhead##nullval() ); \
 					while( len ) { \
-						operhead##set( res->body[ res->len - ( len + 1 ) ], *str ); \
+						operhead##set( a->body[ a->len - ( len + 1 ) ], *str ); \
 						--len; ++str; } } } \
 			return( ret ); }
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( head, type, operhead ) \
@@ -208,7 +209,7 @@ SOFTWARE.
 			return( ret ); }
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head, type, operhead ) \
 		int head##mutatingdelete( \
-			(type) *str, size_t strlen, size_t delstart, size_t dellen, (type) fill ) \
+			type *str, size_t strlen, size_t delstart, size_t dellen, type fill ) \
 		{ \
 			if( str && delstart + dellen <= strlen ) { \
 				size_t iter = 0; \
@@ -221,8 +222,8 @@ SOFTWARE.
 				return( 1 ); } \
 			return( -1 ); }
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head, type, operhead ) \
-		int head##mutatinginsert( (type) *str, size_t strlen, \
-			size_t inspoint, (type) insval, (type) fillval, int force ) \
+		int head##mutatinginsert( type *str, size_t strlen, \
+			size_t inspoint, type insval, type fillval, int force ) \
 		{ if( str ) { \
 				if( inspoint >= strlen ) { \
 					/* Indirect Domain error. */ return( -2 ); } \
@@ -234,8 +235,8 @@ SOFTWARE.
 				/* Success. */ return( 1 ); } \
 			/* Direct Domain error. */ return( -1 ); }
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head, type, operhead ) \
-		int head##mutatingoverwrite( (type) *str, size_t strlen, \
-			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ) \
+		int head##mutatingoverwrite( type *str, size_t strlen, \
+			size_t ovrpoint, type ovrval, type ign1, int ign2 ) \
 		{ if( str ) { \
 				if( ovrpoint >= strlen ) { \
 					/* Indirect Domain error. */ return( -2 ); } \
@@ -245,7 +246,7 @@ SOFTWARE.
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head, type, parrtype, operhead ) \
 		parrtype##_excerpt_result head##memeqspn( \
-			(parrtype) *str, (parrtype) *matches, \
+			parrtype *str, parrtype *matches, \
 			size_t curPos, int stepForward, int spanMatch ) \
 		{ \
 			parrtype##_excerpt ret = \
@@ -314,12 +315,12 @@ SOFTWARE.
 		head##parrres head##parr_strbuildmerge( libandria4_memfuncs_t *mf, type *a, type *b ); \
 		head##parrres head##parr_merge( libandria4_memfuncs_t *mf, head##parr *a, head##parr *b ); \
 		\
-		int head##stringops_mutatingdelete( (type) *str, size_t strlen, \
-			size_t delstart, size_t dellen, (type) fill ); \
-		int head##stringops_mutatinginsert( (type) *str, size_t strlen, \
-			size_t inspoint, (type) insval, (type) fillval, int force ); \
-		int head##stringops_mutatingoverwrite( (type) *str, size_t strlen, \
-			size_t ovrpoint, (type) ovrval, (type) ign1, int ign2 ); \
+		int head##stringops_mutatingdelete( type *str, size_t strlen, \
+			size_t delstart, size_t dellen, type fill ); \
+		int head##stringops_mutatinginsert( type *str, size_t strlen, \
+			size_t inspoint, type insval, type fillval, int force ); \
+		int head##stringops_mutatingoverwrite( type *str, size_t strlen, \
+			size_t ovrpoint, type ovrval, type ign1, int ign2 ); \
 		head##pascalarray_excerpt_result head##stringops_memeqspn( head##pascalarray *str, \
 			head##pascalarray *matches, size_t curPos, int stepForward, int spanMatch ); \
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREDECL( \
@@ -390,15 +391,15 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head##pascalarray, operhead ) \
 		\
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDIMPL( \
-			head##pascalarray_tracker, head##pascalarray*, \
-				(memfuncs_ptr) ,\
+			head##pascalarray_tracker , head##pascalarray* , \
+				memfuncs_ptr ,\
 				LIBANDRIA4_DEFINE_PASCALSTRING_NOOP, \
 				LIBANDRIA4_DEFINE_PASCALSTRING_NOOP, \
 				LIBANDRIA4_DEFINE_PASCALSTRING_ONDIE );
 		
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_STDDEFINE( head, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, &libandria4_stdmemfuncs )
+		LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, (&libandria4_stdmemfuncs) )
 	
 	
 	
