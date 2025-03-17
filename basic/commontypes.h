@@ -29,6 +29,8 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_COMMONTYPES_H
 # define LIBANDRIA4_BASIC_COMMONTYPES_H
 	
+	#include <stdint.h>
+	
 	/* TODO: Everything in this file should get a type descriptor. */
 	
 	#if __INTELLISENSE__
