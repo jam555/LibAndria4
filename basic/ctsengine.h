@@ -133,20 +133,34 @@ SOFTWARE.
 	
 	
 	#define LIBANDRIA4_CTS_DECPOP( prefix, postfix, type ) \
-		int prefix ## pop ## postfix ( libandria4_cts_context *ctx, size_t stack,  type *val );
+		typedef type libandria4_ctsenginetypedef_ ## prefix ## pop ## postfix ## _basetype; \
+		int prefix ## pop ## postfix ( \
+			libandria4_cts_context *ctx, size_t stack, \
+			libandria4_ctsenginetypedef_ ## prefix ## pop ## postfix ## _basetype *val );
 	#define LIBANDRIA4_CTS_DEFPOP( prefix, postfix, type ) \
-		int prefix ## pop ## postfix ( libandria4_cts_context *ctx, size_t stack,  type *val ) { \
+		int prefix ## pop ## postfix ( \
+				libandria4_cts_context *ctx, size_t stack, \
+				libandria4_ctsenginetypedef_ ## prefix ## pop ## postfix ## _basetype *val ) { \
 			if( !val ) { return( -1 ); } \
 			return( libandria4_cts_sizedpop( ctx, stack,  (void*)val, sizeof( type ) ) ); }
 	
 	#define LIBANDRIA4_CTS_DECPUSH( prefix, postfix, type ) \
-		int prefix ## push ## postfix ( libandria4_cts_context *ctx, size_t stack,  type *val ); \
-		int prefix ## push2 ## postfix ( libandria4_cts_context *ctx, size_t stack,  type data );
+		typedef type libandria4_ctsenginetypedef_ ## prefix ## push ## postfix ## _basetype; \
+		int prefix ## push ## postfix ( \
+			libandria4_cts_context *ctx, size_t stack, \
+			libandria4_ctsenginetypedef_ ## prefix ## push ## postfix ## _basetype *val ); \
+		int prefix ## push2 ## postfix ( \
+			libandria4_cts_context *ctx, size_t stack, \
+			libandria4_ctsenginetypedef_ ## prefix ## push ## postfix ## _basetype data );
 	#define LIBANDRIA4_CTS_DEFPUSH( prefix, postfix, type ) \
-		int prefix ## push ## postfix ( libandria4_cts_context *ctx, size_t stack,  type *val ) { \
+		int prefix ## push ## postfix ( \
+				libandria4_cts_context *ctx, size_t stack, \
+				libandria4_ctsenginetypedef_ ## prefix ## push ## postfix ## _basetype *val ) { \
 			if( !val ) { return( -1 ); } \
 			return( libandria4_cts_sizedpush( ctx, stack,  (void*)val, sizeof( type ) ) ); } \
-		int prefix ## push2 ## postfix ( libandria4_cts_context *ctx, size_t stack,  type data ) { \
+		int prefix ## push2 ## postfix ( \
+				libandria4_cts_context *ctx, size_t stack, \
+				libandria4_ctsenginetypedef_ ## prefix ## push ## postfix ## _basetype data ) { \
 			if( ctx ) { \
 				int res = prefix ## push ## postfix ( ctx, 1,  &data ); \
 				if( res > 0 ) { return( 1 ); } \
