@@ -28,7 +28,7 @@ SOFTWARE.
 
 
 
-#include <string>
+#include <string.h>
 
 
 
@@ -45,9 +45,6 @@ static libandria4_cts_closure
 		(void*)&failfunc ),
 	retfunc = LIBANDRIA4_CTS_BUILDCLOSURE(
 		&libandria4_cts_innerreturn,
-		(void*)&iret_d ),
-	popchar = LIBANDRIA4_CTS_BUILDCLOSURE(
-		&libandria4_parser_CSV_CSV1_popchar,
 		(void*)&iret_d );
 
 
@@ -134,7 +131,7 @@ int libandria4_parser_cmargs1_arginfo_invalidopts
 		/* Check all the options. */
 		while( opts->len > *last )
 		{
-			opt = opts->body[ *last ]->name_abbrev;
+			opt = opts->body[ *last ].name_abbrev;
 			bit = opt & 7;
 			elem = ( opt - bit ) >> 3;
 			
@@ -155,7 +152,7 @@ int libandria4_parser_cmargs1_arginfo_invalidopts
 				if
 				(
 					other != *last &&
-					strcmp( opts->body[ *last ]->name, opts->body[ other ]->name )
+					strcmp( opts->body[ *last ].name->body, opts->body[ other ].name->body )
 				)
 				{
 					return( 3 );
@@ -165,10 +162,10 @@ int libandria4_parser_cmargs1_arginfo_invalidopts
 			}
 			
 			/* Check the specifier values. */
-			if( opts->body[ *last ]->subarg_specifiers )
+			if( opts->body[ *last ].subarg_specifiers )
 			{
 				libandria4_parser_cmargs1_opt_spec_pascalarray *sub =
-					opts->body[ *last ]->subarg_specifiers;
+					opts->body[ *last ].subarg_specifiers;
 				other = 0;
 				while( sub->len > other )
 				{
@@ -1034,7 +1031,7 @@ libandria4_cts_closure libandria4_parser_cmargs1_arginfo_parse( libandria4_cts_c
 						
 						while( data->opts_list->len > i && !opt )
 						{
-							if( strcmp( opts->body[ i ]->name, ( data->args[ data->arg_progress - 1 ] ) + 2 ) != 0 )
+							if( strcmp( opts->body[ i ].name, ( data->args[ data->arg_progress - 1 ] ) + 2 ) != 0 )
 							{
 								opt = &( opts->body[ i ] );
 							}
@@ -1137,50 +1134,3 @@ libandria4_cts_closure libandria4_parser_cmargs1_arginfo_parse( libandria4_cts_c
 		(libandria4_cts_framefunc)&libandria4_parser_cmargs1_arginfo_parse,
 		(void*)spec, LIBANDRIA4_RESULT_FAILURE_DOMAIN );
 }
-	struct libandria4_parser_cmargs1_arginfo
-	{
-		int argn;
-		char **args;
-			/* The handler MUST point to a valid function. */
-		libandria4_cts_closure onfatal, onshortfall, onsubless;
-		
-		libandria4_parser_cmargs1_opt_pascalarray *opts_list;
-		
-			/* This is just for quick lookup. */
-		libandria4_parser_cmargs1_opt *acti_opt;
-		size_t arg_progress, acti_progress, sub_progress;
-	};
-	
-	struct libandria4_parser_cmargs1_opt
-	{
-		libandria4_char_pascalarray *name;
-			/* Note: switch this to an array of ints or something. */
-		libandria4_parser_cmargs1_opt_spec_pascalarray *subarg_specifiers;
-		
-		char name_abbrev;
-	};
-	LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( libandria4_parser_cmargs1_opt_, libandria4_parser_cmargs1_opt );
-	/* libandria4_parser_cmargs1_opt_pascalarray{} is now available. */
-	
-	typedef enum
-	{
-		libandria4_parser_cmargs1_opt_spec__INVALID = -1,
-		libandria4_parser_cmargs1_opt_spec__NULL = 0,
-		
-		libandria4_parser_cmargs1_opt_spec__generint = 1,
-		libandria4_parser_cmargs1_opt_spec__signdec,
-		libandria4_parser_cmargs1_opt_spec__usigndec,
-		libandria4_parser_cmargs1_opt_spec__oct,
-		libandria4_parser_cmargs1_opt_spec__hex,
-		
-		libandria4_parser_cmargs1_opt_spec__generfloat,
-		libandria4_parser_cmargs1_opt_spec__floata,
-		
-		libandria4_parser_cmargs1_opt_spec__char,
-		libandria4_parser_cmargs1_opt_spec__string,
-		
-		libandria4_parser_cmargs1_opt_spec__PASTEND
-		
-	} libandria4_parser_cmargs1_opt_spec;
-	LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( libandria4_parser_cmargs1_opt_spec_, libandria4_parser_cmargs1_opt_spec );
-	/* libandria4_parser_cmargs1_opt_spec_pascalarray{} is now available. */
