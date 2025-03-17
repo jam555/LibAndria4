@@ -41,12 +41,9 @@ SOFTWARE.
 		/*  so EOF had to make way. Note though that it still doesn't */
 		/*  have *_ERR_* in it's name. */
 	#define LIBANDRIA4_COMMONIOVALS_EOF ( LIBANDRIA4_RESULT_FAILURE_EOF )
-	const libandria4_commonio_perr libandria4_commoniovals_eof =
-		LIBANDRIA4_COMMONIOVALS_EOF;
-	const libandria4_commonio_mayerr libandria4_commoniovals_justeof =
-		LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_COMMONIOVALS_EOF );
-	const libandria4_commonio_mayerr2 libandria4_commoniovals_justeof2 =
-		LIBANDRIA4_COMMONIO_MAYERR2_BUILDJUST( LIBANDRIA4_COMMONIOVALS_EOF );
+	extern const libandria4_commonio_perr libandria4_commoniovals_eof;
+	extern const libandria4_commonio_mayerr libandria4_commoniovals_justeof;
+	extern const libandria4_commonio_mayerr2 libandria4_commoniovals_justeof2;
 	
 		/* EIO, generic I/O error. Was LIBANDRIA4_COMMONIOVALS_ERR_IO. Usually hardware related. */
 	#define LIBANDRIA4_COMMONIOVALS_ERR_GENERIC ( LIBANDRIA4_RESULT_FAILURE_IOERROR )

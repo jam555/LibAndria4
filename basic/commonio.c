@@ -31,6 +31,15 @@ SOFTWARE.
 
 
 
+const libandria4_commonio_perr libandria4_commoniovals_eof =
+	LIBANDRIA4_COMMONIOVALS_EOF;
+const libandria4_commonio_mayerr libandria4_commoniovals_justeof =
+	LIBANDRIA4_COMMONIO_MAYERR_JUSTERR( LIBANDRIA4_COMMONIOVALS_EOF );
+const libandria4_commonio_mayerr2 libandria4_commoniovals_justeof2 =
+	LIBANDRIA4_COMMONIO_MAYERR2_BUILDJUST( LIBANDRIA4_COMMONIOVALS_EOF );
+
+
+
 int libandria4_commonio_handle_hasbasics( libandria4_commonio_handle *io )
 {
 	if( io )
