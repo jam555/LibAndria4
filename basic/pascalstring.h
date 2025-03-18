@@ -243,11 +243,11 @@ SOFTWARE.
 			/* Direct Domain error. */ return( -1 ); }
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head, type, parrtype, operhead ) \
-		parrtype##_excerpt_result head##memeqspn( \
-			parrtype *str, parrtype *matches, \
+		parrtype##parrexrptres head##memeqspn( \
+			parrtype##parr *str, parrtype##parr *matches, \
 			size_t curPos, int stepForward, int spanMatch ) \
 		{ \
-			parrtype##_excerpt ret = \
+			parrtype##parrexrpt ret = \
 				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL( \
 					parrtype,  str, 0, 0 );\
 				/* Members: arr ptr; start; len.  */\
@@ -271,7 +271,7 @@ SOFTWARE.
 					/*  next-to-last, which obviously shouldn't be possible, */ \
 					/*  so logic fault. */ \
 					LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( \
-						head, LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
+						parrtype, LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
 				if( !( e.val ) ) { \
 					/* No failure, thus success. */ \
 					curPos += curOff; curOff = 0; \
@@ -282,7 +282,7 @@ SOFTWARE.
 				curOff += stepForward; } \
 			if( !sepOff ) { /* No match, lets return. */ \
 				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( \
-					head, LIBANDRIA4_RESULT_FAILURE_EOF ); } \
+					parrtype, LIBANDRIA4_RESULT_FAILURE_EOF ); } \
 			/* curPos has been updated. */ \
 			\
 				/* Move past all adjacent duplicate separators. */ \
@@ -301,7 +301,7 @@ SOFTWARE.
 				ret.start = ( curOff > 0 ? curPos : curPos + curOff + 1 ); \
 				ret.len = ( curOff > 0 ? curOff : -curOff ); \
 			LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNSUCCESS( \
-				head, ret ); }
+				parrtype, ret ); }
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREDECLARE( head, type ) \
@@ -337,7 +337,7 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head##pascalarray, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head, operhead ) \
 		\
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREIMPL( \
 			head##pascalarray_tracker, head##pascalarray*, \
@@ -386,7 +386,7 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAOVER( head##stringops_, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head##pascalarray, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MEMEQSPN( head##stringops_, type, head, operhead ) \
 		\
 		LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDIMPL( \
 			head##pascalarray_tracker , head##pascalarray* , \
