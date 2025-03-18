@@ -37,6 +37,7 @@ SOFTWARE.
 		/*  belongs in a DIFFERENT file-pair. */
 	
 	#include <ctype.h>
+	#include <wctype.h>
 	#include <string.h>
 	
 	#include "pascalarray.h"
@@ -103,10 +104,12 @@ SOFTWARE.
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_NOOP( tracked, file_p, vtab_p ) \
-		/* No-op. */
+		/* LIBANDRIA4_DEFINE_PASCALSTRING_NOOP() */
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_ONDIE( pstr_p, vtab_p ) \
+		/* LIBANDRIA4_DEFINE_PASCALSTRING_ONDIE() */ \
 		( ( mf && mf->dealloc ) ? \
-			(mf->dealloc)( mf->data, (pstr_p) ) ), \
+			( (mf->dealloc)( mf->data, (pstr_p) ) ) : \
+			LIBANDRIA4_RESULT_BUILDFAILURE_NOTINITIALIZED( dummy_arg ) ), \
 		(pstr_p) = 0
 	
 	
@@ -249,7 +252,7 @@ SOFTWARE.
 		{ \
 			parrtype##parrexrpt ret = \
 				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL( \
-					head,  str, 0, 0 ); \
+					parrtype,  str, 0, 0 ); \
 				/* Members: arr ptr; start; len.  */\
 			stepForward = ( stepForward ? 1 : -1 ); \
 			intmax_t bounds = ( !stepForward ? -1 : str->len ); \
@@ -271,7 +274,8 @@ SOFTWARE.
 					/*  next-to-last, which obviously shouldn't be possible, */ \
 					/*  so logic fault. */ \
 					LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( \
-						head, LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
+						parrtype, \
+						(libandria4_failure_uipresult){ LIBANDRIA4_RESULT_FAILURE_LOGICFAULT } ); } \
 				if( !( e.val ) ) { \
 					/* No failure, thus success. */ \
 					curPos += curOff; curOff = 0; \
@@ -282,7 +286,8 @@ SOFTWARE.
 				curOff += stepForward; } \
 			if( !sepOff ) { /* No match, lets return. */ \
 				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( \
-					head, LIBANDRIA4_RESULT_FAILURE_EOF ); } \
+					parrtype, \
+					(libandria4_failure_uipresult){ LIBANDRIA4_RESULT_FAILURE_EOF } ); } \
 			/* curPos has been updated. */ \
 			\
 				/* Move past all adjacent duplicate separators. */ \
@@ -301,7 +306,7 @@ SOFTWARE.
 				ret.start = ( curOff > 0 ? curPos : curPos + curOff + 1 ); \
 				ret.len = ( curOff > 0 ? curOff : -curOff ); \
 			LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNSUCCESS( \
-				head, ret ); }
+				parrtype, ret ); }
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREDECLARE( head, type ) \
@@ -412,6 +417,10 @@ SOFTWARE.
 	int libandria4_utf32_isnewline( uint32_t c );
 	int libandria4_utf32_halfnewline( uint32_t c );
 	int libandria4_utf32_diversenewline( uint32_t c );
+	int libandria4_utf32_isdigit( uint32_t val );
+	int libandria4_utf32_tonum( uint32_t val );
+	size_t libandria4_utf32_strlen( uint32_t *str );
+	int libandria4_utf32_stringops_ringincr( uint32_t *var );
 	#define LIBANDRIA4_UTF32_REFPOINTER_BODYINIT( targvar, newval, aux,  failinit, badalloc, badata ) \
 		LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT( \
 			libandria4_utf32_pascalarray_tracker, targvar, newval, aux, \
