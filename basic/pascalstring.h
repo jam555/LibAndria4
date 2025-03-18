@@ -103,7 +103,7 @@ SOFTWARE.
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_NOOP( tracked, file_p, vtab_p ) \
-		( /* No-op. */ )
+		/* No-op. */
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_ONDIE( pstr_p, vtab_p ) \
 		( ( mf && mf->dealloc ) ? \
 			(mf->dealloc)( mf->data, (pstr_p) ) ), \
