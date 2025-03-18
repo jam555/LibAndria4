@@ -55,9 +55,9 @@ SOFTWARE.
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name, type, val ) \
-		( (name){ (type){ val }, 0 } )
+		( (name){ (type)( val ), 0 } )
 	#define LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name, type ) \
-		( (name){ (type){ 0 }, 1 } ) \
+		( (name){ (type)( 0 ), 1 } ) \
 		/* C allows compound-literals for scalar types too, so this is fine. */
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
@@ -104,9 +104,9 @@ SOFTWARE.
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name, typea, val ) \
-		( (name){ { .a = (typea){ val } }, 0 } )
+		( (name){ { .a = (typea)( val ) }, 0 } )
 	#define LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( name, typeb, val ) \
-		( (name){ { .b = (typeb){ val } }, 1 } )
+		( (name){ { .b = (typeb)( val ) }, 1 } )
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 	#define LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, matcha, matchb ) \
@@ -135,10 +135,10 @@ SOFTWARE.
 		/*  returned by one of it's own internal calls. */
 	#define LIBANDRIA4_MONAD_EITHER_RETURNLEFT( name, typea, val ) \
 		return( LIBANDRIA4_MONAD_EITHER_BUILDLEFT( \
-			name, typea, ( (typea){ val } ) ) );
+			name, typea, ( val ) ) );
 	#define LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( name, typeb, val ) \
 		return( LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( \
-			name, typeb, ( (typeb){ val } ) ) );
+			name, typeb, ( val ) ) );
 	#define LIBANDRIA4_MONAD_EITHER_RETURN_A( name, typea, val ) \
 		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( name, typea, val )
 	#define LIBANDRIA4_MONAD_EITHER_RETURN_B( name, typeb, val ) \
@@ -160,11 +160,11 @@ SOFTWARE.
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_TRIETHER_BUILDLEFT( name, typea, val ) \
-		( (name){ { .a = (typea){ val } }, 1 } )
+		( (name){ { .a = (typea)( val ) }, 1 } )
 	#define LIBANDRIA4_MONAD_TRIETHER_BUILDCENTER( name, typeb, val ) \
-		( (name){ { .b = (typeb){ val } }, 2 } )
+		( (name){ { .b = (typeb)( val ) }, 2 } )
 	#define LIBANDRIA4_MONAD_TRIETHER_BUILDRIGHT( name, typec, val ) \
-		( (name){ { .c = (typec){ val } }, 3 } )
+		( (name){ { .c = (typec)( val ) }, 3 } )
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 	#define LIBANDRIA4_MONAD_TRIETHER_BODYMATCH( var, matcha, matchb, matchc ) \
