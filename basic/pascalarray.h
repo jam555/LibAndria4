@@ -101,7 +101,7 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( \
 			parrtype##_result, \
 			libandria4_failure_uipresult, \
-			(libandria4_failure_uipresult){ (val) } \
+			(val) \
 		)
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
@@ -146,7 +146,7 @@ SOFTWARE.
 		/*  another. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNSUCCESS( head, val ) \
 		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( \
-			head##pascalarray_excerpt_result, head##pascalarray_excerpt, (val) )	
+			head##pascalarray_excerpt_result, head##pascalarray_excerpt, (val) )
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( head, val ) \
 		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( \
 			head##pascalarray_excerpt_result, libandria4_failure_uipresult, (val) )
@@ -219,17 +219,17 @@ SOFTWARE.
 			libandria4_memfuncs_t *mf, parrtype *parr ) \
 		{ if( mf->dealloc ) { return( (mf->dealloc)( mf->data, parr ) ); } \
 			return( LIBANDRIA4_RESULT_BUILDFAILURE( \
-				(libandria4_failure_result){ LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS } ) ); }
+				LIBANDRIA4_RESULT_FAILURE_BADMEMADDRESS ) ); }
 	
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_FILL( head, parrtype, type ) \
 		libandria4_result head##pascalarray_fill( parrtype *parr, type *src ) \
 			{ if( !parr || !src ) { \
 					return( LIBANDRIA4_RESULT_BUILDFAILURE( \
-							(libandria4_failure_result){ LIBANDRIA4_RESULT_FAILURE_DOMAIN } ) ); } \
+							LIBANDRIA4_RESULT_FAILURE_DOMAIN ) ); } \
 				size_t len = 0; while( len < parr->len ) { \
 					parr->body[ len ] = src[ len ]; ++len; } \
 				return ( LIBANDRIA4_RESULT_BUILDSUCCESS( \
-						(libandria4_success_result){ LIBANDRIA4_RESULT_GENERICTRUE } ) ); }
+						LIBANDRIA4_RESULT_GENERICTRUE ) ); }
 		#define LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL_ONFAIL( err ) \
 			fail.val = err.val; goto on_err;
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_BUILDnFILL( head, parrtype, type ) \
