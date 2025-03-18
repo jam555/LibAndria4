@@ -29,6 +29,7 @@ SOFTWARE.
 #include <errno.h>
 
 #include "stdmonads.h"
+#include "simpleops.h"
 
 
 
@@ -93,4 +94,77 @@ libandria4_result libandria4_errno_popresult( int *errnum )
 	errno = 0;
 	
 	return( res );
+}
+
+libandria4_result libandria4_result_from_maybeerr( libandria4_maybeint err )
+{
+	int a, res;
+	LIBANDRIA4_MAYBEINT_BODYMATCH(
+		err,
+		
+		LIBANDRIA4_OP_SETaFLAGresAS1,
+		LIBANDRIA4_OP_SETresTOn1 );
+	
+	if( res )
+	{
+		LIBANDRIA4_RESULT_RETURNFAILURE( a );
+		
+	} else {
+		
+		LIBANDRIA4_RESULT_RETURNSUCCESS( LIBANDRIA4_RESULT_GENERIC );
+	}
+}
+libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ )
+{
+	int a, res;
+	LIBANDRIA4_MAYBEINT_BODYMATCH(
+		succ,
+		
+		LIBANDRIA4_OP_SETresTOn1,
+		LIBANDRIA4_OP_SETaFLAGresAS1 );
+	
+	if( res )
+	{
+		LIBANDRIA4_RESULT_RETURNSUCCESS( a );
+		
+	} else {
+		
+		LIBANDRIA4_RESULT_RETURNFAILURE( LIBANDRIA4_RESULT_GENERIC );
+	}
+}
+libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err )
+{
+	int a, res;
+	LIBANDRIA4_RESULT_BODYMATCH(
+		err,
+		
+		LIBANDRIA4_OP_SETresTOn1,
+		LIBANDRIA4_OP_SETaFLAGresAS1 );
+	
+	if( res )
+	{
+		LIBANDRIA4_MAYBEINT_RETURNJUST( a );
+		
+	} else {
+		
+		LIBANDRIA4_MAYBEINT_RETURNNOTHING();
+	}
+}
+libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ )
+{
+	int a, res;
+	LIBANDRIA4_RESULT_BODYMATCH(
+		err,
+		
+		LIBANDRIA4_OP_SETaFLAGresAS1,
+		LIBANDRIA4_OP_SETresTOn1 );
+	
+	if( res )
+	{
+		LIBANDRIA4_MAYBEINT_RETURNJUST( a );
+		
+	} else {
+		
+		LIBANDRIA4_MAYBEINT_RETURNNOTHING();
+	}
 }

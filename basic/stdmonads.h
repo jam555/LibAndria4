@@ -33,6 +33,7 @@ SOFTWARE.
 	#include <stddef.h>
 		/* intptr_t and uintptr_t. */
 	#include <stdint.h>
+	#include <errno.h>
 	
 	#include "monads.h"
 	#include "commonerrvals.h"
@@ -103,13 +104,34 @@ SOFTWARE.
 	#define LIBANDRIA4_RESULT_EXPRMATCH( var, onsucc, onfail ) \
 		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, onsucc, onfail )
 	
+	#define LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT( var ) \
+		LIBANDRIA4_MAYBEINT_BUILDJUST( (var).val )
+	
+	
 		/* Convenience wrappers. See monads.h for more details. */
 	#define LIBANDRIA4_RESULT_RETURNSUCCESS( val ) \
 		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( libandria4_result, libandria4_success_result, val )
 	#define LIBANDRIA4_RESULT_RETURNFAILURE( val ) \
 		LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( libandria4_result, libandria4_failure_result, val )
 	
+	
+	#define LIBANDRIA4_RESULT_BUILDSUCCESS_GENERIC( ... ) \
+		LIBANDRIA4_RESULT_BUILDSUCCESS( LIBANDRIA4_RESULT_GENERIC )
+	
+	#define LIBANDRIA4_RESULT_BUILDFAILURE_GENERIC( ... ) \
+		LIBANDRIA4_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_GENERIC )
+	#define LIBANDRIA4_RESULT_BUILDFAILURE_DOMAIN( ... ) \
+		LIBANDRIA4_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_FAILURE_DOMAIN )
+	#define LIBANDRIA4_RESULT_BUILDFAILURE_RANGE( ... ) \
+		LIBANDRIA4_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_FAILURE_RANGE )
+	#define LIBANDRIA4_BUILDFAILURE_UNDIFFERENTIATED( ... ) \
+		LIBANDRIA4_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED )
+	
+	
 	#if 0
+	#define LIBANDRIA4_RESULT_RETURNSUCCESS_GENERIC( ... ) \
+		LIBANDRIA4_RESULT_RETURNFAILURE( LIBANDRIA4_RESULT_GENERIC )
+	
 	#define LIBANDRIA4_RESULT_RETURNFAILURE_DOMAIN( ... ) \
 		LIBANDRIA4_RESULT_RETURNFAILURE( LIBANDRIA4_RESULT_FAILURE_DOMAIN )
 	#define LIBANDRIA4_RESULT_RETURNFAILURE_RANGE( ... ) \
@@ -127,6 +149,68 @@ SOFTWARE.
 	
 	libandria4_result libandria4_errno_2result();
 	libandria4_result libandria4_errno_popresult( int *errnum );
+	libandria4_result libandria4_result_from_maybeerr( libandria4_maybeint err );
+	libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ );
+	libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err );
+	libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ );
+	
+	extern inline libandria4_result libandria4_errno_popresult( int *errnum )
+	{
+		libandria4_result res = libandria4_errno_2result();
+		
+		if( errnum )
+		{
+			*errnum = errno;
+		}
+		
+		errno = 0;
+		
+		return( res );
+	}
+	extern inline libandria4_result libandria4_result_from_maybeerr( libandria4_maybeint err )
+	{
+		return
+		(
+			LIBANDRIA4_MAYBEINT_EXPRMATCH(
+				err,
+				
+				LIBANDRIA4_RESULT_BUILDFAILURE,
+				LIBANDRIA4_RESULT_BUILDSUCCESS_GENERIC )
+		);
+	}
+	extern inline libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ )
+	{
+		return
+		(
+			LIBANDRIA4_MAYBEINT_EXPRMATCH(
+				succ,
+				
+				LIBANDRIA4_RESULT_BUILDSUCCESS,
+				LIBANDRIA4_RESULT_BUILDFAILURE_GENERIC )
+		);
+	}
+	extern inline libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err )
+	{
+		return
+		(
+			LIBANDRIA4_RESULT_EXPRMATCH(
+				err,
+				
+				LIBANDRIA4_MAYBEINT_BUILDNOTHING2,
+				LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT )
+		);
+	}
+	extern inline libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ )
+	{
+		return
+		(
+			LIBANDRIA4_RESULT_EXPRMATCH(
+				succ,
+				
+				LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT,
+				LIBANDRIA4_MAYBEINT_BUILDNOTHING2 )
+		);
+	}
 	
 	
 	
