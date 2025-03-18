@@ -249,7 +249,7 @@ SOFTWARE.
 		{ \
 			parrtype##parrexrpt ret = \
 				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL( \
-					parrtype,  str, 0, 0 );\
+					head,  str, 0, 0 ); \
 				/* Members: arr ptr; start; len.  */\
 			stepForward = ( stepForward ? 1 : -1 ); \
 			intmax_t bounds = ( !stepForward ? -1 : str->len ); \
@@ -271,7 +271,7 @@ SOFTWARE.
 					/*  next-to-last, which obviously shouldn't be possible, */ \
 					/*  so logic fault. */ \
 					LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( \
-						parrtype, LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
+						head, LIBANDRIA4_RESULT_FAILURE_LOGICFAULT ); } \
 				if( !( e.val ) ) { \
 					/* No failure, thus success. */ \
 					curPos += curOff; curOff = 0; \
@@ -282,7 +282,7 @@ SOFTWARE.
 				curOff += stepForward; } \
 			if( !sepOff ) { /* No match, lets return. */ \
 				LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNFAIL( \
-					parrtype, LIBANDRIA4_RESULT_FAILURE_EOF ); } \
+					head, LIBANDRIA4_RESULT_FAILURE_EOF ); } \
 			/* curPos has been updated. */ \
 			\
 				/* Move past all adjacent duplicate separators. */ \
@@ -301,7 +301,7 @@ SOFTWARE.
 				ret.start = ( curOff > 0 ? curPos : curPos + curOff + 1 ); \
 				ret.len = ( curOff > 0 ? curOff : -curOff ); \
 			LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_RESULT_RETURNSUCCESS( \
-				parrtype, ret ); }
+				head, ret ); }
 	
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREDECLARE( head, type ) \
