@@ -412,7 +412,7 @@ SOFTWARE.
 			name##_onbadfp badalloc, void *badata ); \
 		libandria4_maybeint name##_attend( name **ptr ); \
 		libandria4_maybeint name##_neglect( name **ptr );
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDIMPL( name, valuetype, memfuncs_ptr,  onattend, onneglect, ondie ) \
+	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPPEDIMPL( name, valuetype, memfuncs_ptr,  onattend, onneglect, ondie ) \
 		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_INIT( libandria4_definer_##name, valuetype ) \
 		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_NEGLECT( libandria4_definer_##name,  onneglect, ondie ) \
 		int name##_init( name **ptr,  valuetype val, void *aux,  name##_onbadfp badalloc, void *badata ) \
@@ -433,7 +433,7 @@ SOFTWARE.
 	
 		/* This needs to be paired with a LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDDECL() invocation. */
 	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_STDIMPL( name, valuetype,  onattend, onneglect, ondie ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDIMPL( \
+		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPPEDIMPL( \
 			name, valuetype, &libandria4_stdmemfuncs, \
 			onattend, onneglect, ondie )
 	

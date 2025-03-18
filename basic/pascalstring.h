@@ -346,8 +346,8 @@ SOFTWARE.
 				LIBANDRIA4_DEFINE_PASCALSTRING_ONDIE );
 	
 	
-	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( head, type ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( head, type ) \
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPPEDDECLARE( head, type ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( head, type ) \
 		typedef head ## pascalarray head ## parr; \
 		typedef head ## pascalarray_result head ## parrres; \
 		int head##parr_decimalincr( head##parr *parr ); \
@@ -370,8 +370,8 @@ SOFTWARE.
 			head##pascalarray_tracker_result, \
 			head##pascalarray_tracker, libandria4_failure_uipresult );
 	
-	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, memfuncs_ptr ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPPEDDEFINE( head, type, operhead, memfuncs_ptr ) \
+		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDEFINE( head, type, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_DECIMALINCR( head, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILD( libandria4_definer_##head, head, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( libandria4_definer_##head, head, type, operhead ) \
@@ -397,7 +397,7 @@ SOFTWARE.
 		
 	
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_STDDEFINE( head, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, (&libandria4_stdmemfuncs) )
+		LIBANDRIA4_DEFINE_PASCALSTRING_WRAPPEDDEFINE( head, type, operhead, (&libandria4_stdmemfuncs) )
 	
 	
 	
@@ -511,9 +511,9 @@ SOFTWARE.
 	
 	
 	
-	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_char_, char );
-	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_wchar_, wchar_t );
-	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_utf32_, uint32_t );
+	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPPEDDECLARE( libandria4_char_, char );
+	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPPEDDECLARE( libandria4_wchar_, wchar_t );
+	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPPEDDECLARE( libandria4_utf32_, uint32_t );
 	
 	#include "commonlib.h"
 	#include "stdmem.h"

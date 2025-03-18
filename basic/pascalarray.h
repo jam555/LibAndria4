@@ -355,7 +355,7 @@ SOFTWARE.
 		LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_BAREINVARRAYIFY( head, parrtype, type )
 	
 	
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( head, type ) \
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_TYPE( head, type ) \
 			/* *init(), *build(), & *rebuild() all store len into the array. */ \
 		int head##pascalarray_init( head##pascalarray *parr, size_t len ); \
@@ -373,8 +373,8 @@ SOFTWARE.
 		head##pascalarray_result head##pascalarray_excerpt_inversearrayify( head##pascalarray_excerpt *exc, \
 			size_t padsize, type padval );
 	
-		/* This needs to be paired with a LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE() invocation. */
-	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
+		/* This needs to be paired with a LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE() invocation. */
+	#define LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDEFINE( head, type, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_INIT( libandria4_definer_##head, head##pascalarray ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BUILD( libandria4_definer_##head, \
 			head##pascalarray, type ) \
@@ -421,7 +421,7 @@ SOFTWARE.
 		
 		/* This needs to be paired with a LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE() invocation. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( head, type ) \
-		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type,  &libandria4_stdmemfuncs )
+		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDEFINE( head, type,  &libandria4_stdmemfuncs )
 	
 #endif
 /* End libandria4 basic pascalarray.h */
