@@ -419,7 +419,8 @@ SOFTWARE.
 		int name##_init( typename **ptr,  valuetype val, void *aux,  name##_refc_fp badalloc, void *badata ) \
 				{ return( libandria4_definer_##name##_init( ( memfuncs_ptr ),  ptr,  val, aux, badalloc, badata ) ); } \
 		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_ATTEND( name, typename,  onattend ) \
-		libandria4_maybeint name##_neglect( typename **ptr ) { return( name##_neglect( ( memfuncs_ptr ),  ptr ) ); }
+		libandria4_maybeint name##_neglect( typename **ptr ) { \
+			return( libandria4_definer_##name##_neglect( ( memfuncs_ptr ),  ptr ) ); }
 		/* Start tracking. */
 	#define LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_EXPRINIT( name, pointer,  value, aux,  onfull, badalloc, badata ) \
 		( !(pointer) ? \
