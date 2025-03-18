@@ -39,8 +39,6 @@ SOFTWARE.
 	#include <ctype.h>
 	#include <string.h>
 	
-	#include "commonlib.h"
-	#include "stdmem.h"
 	#include "pascalarray.h"
 	
 	/* "Pascal" strings, in addition to the functionality of "Pascal" arrays */
@@ -147,14 +145,14 @@ SOFTWARE.
 				return( ret ); } \
 			return( -1 ); }
 	
-	#define LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILD( head, type, operhead ) \
-		head##parrres head##parr_strbuild( libandria4_memfuncs_t *mf, type *str ) { \
-			head##parrres ret; \
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILD( head, parrtype, simptype, operhead ) \
+		parrtype##parrres head##parr_strbuild( libandria4_memfuncs_t *mf, simptype *str ) { \
+			parrtype##parrres ret; \
 			if( str ) { \
 				size_t len = operhead##strlen( str ); \
 					/* Note: allocates an extra entry for the end-marking null. */ \
 				ret = head##pascalarray_build( mf, len + 1 ); \
-				head##parr *a = 0; \
+				parrtype##parr *a = 0; \
 				LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH( ret, \
 					LIBANDRIA4_OP_SETa, \
 					LIBANDRIA4_NULL_MACRO ) \
@@ -164,15 +162,15 @@ SOFTWARE.
 						operhead##set( a->body[ a->len - ( len + 1 ) ], *str ); \
 						--len; ++str; } } } \
 			return( ret ); }
-	#define LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( head, type, operhead ) \
-		head##parrres head##parr_strbuildmerge( libandria4_memfuncs_t *mf, type *a, type *b ) { \
-			head##parrres ret; \
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( head, parrtype, simptype, operhead ) \
+		parrtype##parrres head##parr_strbuildmerge( libandria4_memfuncs_t *mf, simptype *a, simptype *b ) { \
+			parrtype##parrres ret; \
 			if( a && b ) { size_t \
 					a_len = operhead##strlen( a ), \
 					b_len = operhead##strlen( b ); \
 					/* Note: allocates an extra entry for the end-marking null. */ \
 				ret = head##pascalarray_build( mf, a_len + b_len + 1 ); \
-				head##parr *c; \
+				parrtype##parr *c; \
 				LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH( ret, \
 					LIBANDRIA4_OP_SETc, \
 					LIBANDRIA4_NULL_MACRO ) \
@@ -187,12 +185,12 @@ SOFTWARE.
 						++len; ++targ; } \
 					operhead##set( c->body[ targ ], operhead##nullval() ); } } \
 			return( ret ); }
-	#define LIBANDRIA4_DEFINE_PASCALSTRING_MERGE( head, type, operhead ) \
-		head##parrres head##parr_merge( libandria4_memfuncs_t *mf, head##parr *a, head##parr *b ) { \
-			head##parrres ret; \
+	#define LIBANDRIA4_DEFINE_PASCALSTRING_MERGE( head, parrtype, simptype, operhead ) \
+		parrtype##parrres head##parr_merge( libandria4_memfuncs_t *mf, parrtype##parr *a, parrtype##parr *b ) { \
+			parrtype##parrres ret; \
 			if( a && b ) { \
 				ret = head##pascalarray_build( mf, a->len + b->len - 1 ); \
-				head##parr *c; \
+				parrtype##parr *c; \
 				LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH( ret, \
 					LIBANDRIA4_OP_SETc, \
 					LIBANDRIA4_NULL_MACRO ) \
@@ -332,9 +330,9 @@ SOFTWARE.
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_BAREDEFINE( head, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_BAREDEFINE( head, type ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_DECIMALINCR( head, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILD( head, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( head, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_MERGE( head, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILD( head, head, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( head, head, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MERGE( head, head, type, operhead ) \
 		\
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTADEL( head##stringops_, type, operhead ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_MUTAINS( head##stringops_, type, operhead ) \
@@ -375,9 +373,9 @@ SOFTWARE.
 	#define LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDEFINE( head, type, operhead, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDEFINE( head, type, memfuncs_ptr ) \
 		LIBANDRIA4_DEFINE_PASCALSTRING_DECIMALINCR( head, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILD( libandria4_definer_##head, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( libandria4_definer_##head, type, operhead ) \
-		LIBANDRIA4_DEFINE_PASCALSTRING_MERGE( libandria4_definer_##head, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILD( libandria4_definer_##head, head, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_STRBUILDMERGE( libandria4_definer_##head, head, type, operhead ) \
+		LIBANDRIA4_DEFINE_PASCALSTRING_MERGE( libandria4_definer_##head, head, type, operhead ) \
 		head##parrres head##parr_strbuild( type *str ) \
 			{ return( libandria4_definer_##head##parr_strbuild( ( memfuncs_ptr ), str ) ); } \
 		head##parrres head##parr_strbuildmerge( type *a, type *b ) \
@@ -516,6 +514,9 @@ SOFTWARE.
 	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_char_, char );
 	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_wchar_, wchar_t );
 	LIBANDRIA4_DEFINE_PASCALSTRING_WRAPEDDECLARE( libandria4_utf32_, uint32_t );
+	
+	#include "commonlib.h"
+	#include "stdmem.h"
 	
 	/* Note that the following types will be produced for all three of the */
 	/*  declares above: */

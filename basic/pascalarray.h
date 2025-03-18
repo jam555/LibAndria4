@@ -51,17 +51,24 @@ SOFTWARE.
 		typedef struct head##pascalarray { \
 			size_t len; type body[ LIBANDRIA4_FLEXARRAY_FILLERLENGTH ]; \
 		} head##pascalarray; \
+		typedef head##pascalarray head##parr;\
 		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( \
 			head##pascalarray_result, \
 			head##pascalarray*, libandria4_failure_uipresult \
 		) \
+		typedef head##pascalarray_result head##parres;\
+		typedef head##pascalarray_result head##parrres;\
 		typedef struct head##pascalarray_excerpt { \
 			head##pascalarray *arr; size_t start, len; \
 		} head##pascalarray_excerpt; \
+		typedef head##pascalarray_excerpt head##parrexrp; \
+		typedef head##pascalarray_excerpt head##parrexrpt; \
 		LIBANDRIA4_MONAD_EITHER_BUILDTYPE( \
 			head##pascalarray_excerpt_result, \
 			head##pascalarray_excerpt, libandria4_failure_uipresult \
-		)
+		) \
+		typedef head##pascalarray_excerpt_result head##parrexrpres; \
+		typedef head##pascalarray_excerpt_result head##parrexrptres;
 	
 	
 	
@@ -78,9 +85,9 @@ SOFTWARE.
 				{ __VA_ARGS__ } };
 	/* These should work fine. */
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL( parrtype,  parrptr, start, len ) \
-		( (parrtype##_excerpt){ (parrptr),  (start), (len) } )
+		( (parrtype##parrexrpt){ (parrptr),  (start), (len) } )
 	#define LIBANDRIA4_DEFINE_PASCALARRAY_EXCERPT_LITERAL2( parrtype,  parrptr, extentA, extentB ) \
-		( (parrtype##_excerpt){ (parrptr), \
+		( (parrtype##parrexrpt){ (parrptr), \
 			( (extentA) < (extentB) ? (extentA) : (extentB) ), \
 			( (extentA) < (extentB) ? (extentB) - (extentA) : (extentA) - (extentB) ) } )
 	
