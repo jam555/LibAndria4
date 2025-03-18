@@ -35,8 +35,8 @@ SOFTWARE.
 	#include <stdint.h>
 	#include <errno.h>
 	
-	#include "monads.h"
 	#include "commonerrvals.h"
+	#include "monads.h"
 	
 		/* Some OTHER standard monads, that are plain maybe wrappers for */
 		/*  standard C types. */
@@ -55,6 +55,8 @@ SOFTWARE.
 	/*  thus reducing the actual value to just a version of one or the */
 	/*  other. And no, C doesn't have MEANINGFUL direct support for this, */
 	/*  but it does have simple typing, and that is enough to be useful. */
+	
+	/* These freaking struct-wrapped integers cause me so much trouble... */
 	
 	typedef struct libandria4_success_stdresult
 	{
@@ -92,9 +94,17 @@ SOFTWARE.
 	);
 	
 	#define LIBANDRIA4_RESULT_BUILDSUCCESS( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_result, libandria4_success_result, (val) )
+		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( \
+			libandria4_result, \
+			libandria4_success_result, \
+			\
+			(libandria4_success_result){ val } )
 	#define LIBANDRIA4_RESULT_BUILDFAILURE( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_result, libandria4_failure_result, (val) )
+		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( \
+			libandria4_result, \
+			libandria4_failure_result, \
+			\
+			(libandria4_failure_result){ val } )
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 		/*  The matches must be function-style, though function macros are */
@@ -124,8 +134,10 @@ SOFTWARE.
 		LIBANDRIA4_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_FAILURE_DOMAIN )
 	#define LIBANDRIA4_RESULT_BUILDFAILURE_RANGE( ... ) \
 		LIBANDRIA4_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_FAILURE_RANGE )
-	#define LIBANDRIA4_BUILDFAILURE_UNDIFFERENTIATED( ... ) \
+	#define LIBANDRIA4_RESULT_BUILDFAILURE_UNDIFFERENTIATED( ... ) \
 		LIBANDRIA4_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED )
+	#define LIBANDRIA4_RESULT_BUILDFAILURE_NOTINITIALIZED( ... ) \
+		LIBANDRIA4_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED )
 	
 	
 	#if 0

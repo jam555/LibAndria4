@@ -101,7 +101,7 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( \
 			parrtype##_result, \
 			libandria4_failure_uipresult, \
-			(val) \
+			(libandria4_failure_uipresult){ val } \
 		)
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
