@@ -55,7 +55,7 @@ SOFTWARE.
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name, type, val ) \
-		( (name){ (type)( val ), 0 } )
+		( (name){ (type){ val }, 0 } )
 	#define LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name, type ) \
 		( (name){ (type){ 0 }, 1 } ) \
 		/* C allows compound-literals for scalar types too, so this is fine. */
@@ -69,7 +69,7 @@ SOFTWARE.
 		/*  Zoran Horvat made mention of it around minute 13, and I CAN see */
 		/*  the utility of it, so I've added it. */
 	#define LIBANDRIA4_MONAD_MAYBE_REDUCE( type, var, alt ) \
-		( ( ( var ).is_valid ) ? ( ( var ).val ) : (type)( alt ) )
+		( ( ( var ).is_valid ) ? ( ( var ).val ) : (type){ alt } )
 	
 		/* Like the *MATCH() stuff above, but intended for chaining. I */
 		/*  honestly don't know if the re-ordering does anything useful, but */
@@ -77,13 +77,13 @@ SOFTWARE.
 	#define LIBANDRIA4_MONAD_MAYBE_EXPRCHAIN( name, type, var, match ) \
 		( ( !( ( var ).is_valid ) ) \
 			? ( LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name, type ) ) \
-			: ( match )( ( var ).val ) )
+			: ( match( ( var ).val ) ) )
 	
 		/* Convenience wrappers. See the *_EITHER_* versions for the */
 		/*  involved concept. Remember that the "type" is in both cases the */
 		/*  SAME type. */
 	#define LIBANDRIA4_MONAD_MAYBE_RETURNLEFT( name, type, val ) \
-		return( LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name, type, ( (type)( val ) ) ) );
+		return( LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name, type, ( val ) ) );
 	#define LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( name, type ) \
 		return( LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name, type ) );
 	
@@ -104,9 +104,9 @@ SOFTWARE.
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_EITHER_BUILDLEFT( name, typea, val ) \
-		( (name){ { .a = (typea)( val ) }, 0 } )
+		( (name){ { .a = (typea){ val } }, 0 } )
 	#define LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( name, typeb, val ) \
-		( (name){ { .b = (typeb)( val ) }, 1 } )
+		( (name){ { .b = (typeb){ val } }, 1 } )
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 	#define LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, matcha, matchb ) \
@@ -135,10 +135,10 @@ SOFTWARE.
 		/*  returned by one of it's own internal calls. */
 	#define LIBANDRIA4_MONAD_EITHER_RETURNLEFT( name, typea, val ) \
 		return( LIBANDRIA4_MONAD_EITHER_BUILDLEFT( \
-			name, typea, ( (typea)( val ) ) ) );
+			name, typea, ( (typea){ val } ) ) );
 	#define LIBANDRIA4_MONAD_EITHER_RETURNRIGHT( name, typeb, val ) \
 		return( LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( \
-			name, typeb, ( (typeb)( val ) ) ) );
+			name, typeb, ( (typeb){ val } ) ) );
 	#define LIBANDRIA4_MONAD_EITHER_RETURN_A( name, typea, val ) \
 		LIBANDRIA4_MONAD_EITHER_RETURNLEFT( name, typea, val )
 	#define LIBANDRIA4_MONAD_EITHER_RETURN_B( name, typeb, val ) \
@@ -160,11 +160,11 @@ SOFTWARE.
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_TRIETHER_BUILDLEFT( name, typea, val ) \
-		( (name){ { .a = (typea)( val ) }, 1 } )
+		( (name){ { .a = (typea){ val } }, 1 } )
 	#define LIBANDRIA4_MONAD_TRIETHER_BUILDCENTER( name, typeb, val ) \
-		( (name){ { .b = (typeb)( val ) }, 2 } )
+		( (name){ { .b = (typeb){ val } }, 2 } )
 	#define LIBANDRIA4_MONAD_TRIETHER_BUILDRIGHT( name, typec, val ) \
-		( (name){ { .c = (typec)( val ) }, 3 } )
+		( (name){ { .c = (typec){ val } }, 3 } )
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 	#define LIBANDRIA4_MONAD_TRIETHER_BODYMATCH( var, matcha, matchb, matchc ) \
@@ -199,13 +199,13 @@ SOFTWARE.
 		/*  returned by one of it's own internal calls. */
 	#define LIBANDRIA4_MONAD_TRIETHER_RETURNLEFT( name, typea, val ) \
 		return( LIBANDRIA4_MONAD_TRIETHER_BUILDLEFT( \
-			name, typea, ( (typea)( val ) ) ) );
+			name, typea, ( (typea){ val } ) ) );
 	#define LIBANDRIA4_MONAD_TRIETHER_RETURNCENTER( name, typeb, val ) \
 		return( LIBANDRIA4_MONAD_TRIETHER_BUILDCENTER( \
-			name, typeb, ( (typeb)( val ) ) ) );
+			name, typeb, ( (typeb){ val } ) ) );
 	#define LIBANDRIA4_MONAD_TRIETHER_RETURNRIGHT( name, typec, val ) \
 		return( LIBANDRIA4_MONAD_TRIETHER_BUILDRIGHT( \
-			name, typec, ( (typec)( val ) ) ) );
+			name, typec, ( (typec){ val } ) ) );
 	#define LIBANDRIA4_MONAD_TRIETHER_RETURN_A( name, typea, val ) \
 		LIBANDRIA4_MONAD_TRIETHER_RETURNLEFT( name, typea, val )
 	#define LIBANDRIA4_MONAD_TRIETHER_RETURN_B( name, typeb, val ) \
@@ -227,11 +227,11 @@ SOFTWARE.
 		( (name){ (typea){ 0 }, (typeb){ 0 }, 0 } ) \
 		/* C allows compound-literals for scalar types too, so this is fine. */
 	#define LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTLEFT( name, typea, typeb, val ) \
-		( (name){ (typea)( val ), (typeb){ 0 }, 1 } )
+		( (name){ (typea){ val }, (typeb){ 0 }, 1 } )
 	#define LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( name, typea, typeb, val ) \
-		( (name){ (typea){ 0 }, (typeb)( val ), 2 } )
+		( (name){ (typea){ 0 }, (typeb){ val }, 2 } )
 	#define LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH( name, typea, typeb, vala, valb ) \
-		( (name){ (typea)( vala ), (typeb)( valb ), 3 } )
+		( (name){ (typea){ vala }, (typeb){ valb }, 3 } )
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 	#define LIBANDRIA4_MONAD_BITUPLIC_BODYMATCH( var, matchleft, matchright, onempty ) \
@@ -258,16 +258,16 @@ SOFTWARE.
 				( ( ( var ).valid_flags & 2 ) ? \
 					( LIBANDRIA4_MONAD_MAYBE_BUILDJUST( mayb, typeb, ( var ).right ) ) : \
 					( LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( mayb, typeb ) ) ) ) \
-			: (alttype)( altval ) )
+			: (alttype){ altval } )
 	
 	#define LIBANDRIA4_MONAD_BITUPLIC_RETURNNOTHING( name, typea, typeb ) \
 		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDNOTHING( name, typea, typeb ) );
 	#define LIBANDRIA4_MONAD_BITUPLIC_RETURNLEFT( name, typea, typeb, val ) \
-		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTLEFT( name, typea, typeb, ( (typea)( val ) ) ) );
+		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTLEFT( name, typea, typeb, ( (typea){ val } ) ) );
 	#define LIBANDRIA4_MONAD_BITUPLIC_RETURNRIGHT( name, typea, typeb, val ) \
-		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( name, typea, typeb, ( (typeb)( val ) ) ) );
+		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTRIGHT( name, typea, typeb, ( (typeb){ val } ) ) );
 	#define LIBANDRIA4_MONAD_BITUPLIC_RETURNBOTH( name, typea, typeb, vala, valb ) \
-		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH( name, typea, typeb, ( (typea)( vala ) ), ( (typeb)( valb ) ) ) );
+		return( LIBANDRIA4_MONAD_BITUPLIC_BUILDJUSTBOTH( name, typea, typeb, ( (typea){ vala } ), ( (typeb){ valb } ) ) );
 	
 	
 	
@@ -330,103 +330,104 @@ SOFTWARE.
 	
 		/* The "auxiliary" member exists because there might be important */
 		/*  back-end stuff that needs separate tracking. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE_DEFINITION( name, valuetype ) \
-		struct name \
+	#define LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE_DEFINITION( typename, valuetype ) \
+		struct typename \
 			{ uintptr_t ref_count; \
 				void *auxiliary; \
 				/* Note that for the sake of supporting arrays (pascal or */ \
 				/*  otherwise), the valuetype member MUST be the last in */ \
 				/*  the structure. */ \
-				valuetype val; };
-	#define LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name, valuetype ) \
-		typedef struct name name; \
-		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE_DEFINITION( name, valuetype ); \
-		typedef void (*name##_onbadfp)( void*,  name**, valuetype, void* );
+				valuetype val; }; \
+		typedef void (* typename##_refcounted_onbadfp)( void*,  typename**, valuetype, void* ); \
+		typedef typename##_refcounted_onbadfp typename##_refc_fp;
+	#define LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name, typename, valuetype ) \
+		typedef struct typename typename; \
+		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE_DEFINITION( typename, valuetype );
 	
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_INIT( name, valuetype ) \
-		int name##_init( libandria4_memfuncs_t *mf,  name **ptr, \
+	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_INIT( name, typename, valuetype ) \
+		int name##_init( libandria4_memfuncs_t *mf,  typename **ptr, \
 			valuetype val, void *aux, \
-			name##_onbadfp badalloc, void *badata ) \
-		{ if( ptr && !( *ptr ) ) { LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf ); \
+			typename##_refcounted_onbadfp badalloc, void *badata ) \
+		{ void *a = (void*)0; \
+			if( ptr && !( *ptr ) ) { LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf ); \
 				if( !( mf->alloc ) ) { if( badalloc ) { badalloc( badata,  ptr,  val, aux ); } \
 					return( -2 ); } \
-				void *a = (void*)0; \
-				libandria4_ptrresult ptrres = (mf->alloc)( mf->data, sizeof( name ) ); \
+				libandria4_ptrresult ptrres = (mf->alloc)( mf->data, sizeof( typename ) ); \
 				LIBANDRIA4_PTRRESULT_BODYMATCH( ptrres, \
 					LIBANDRIA4_OP_SETa, LIBANDRIA4_NULL_MACRO ) } \
-				if( a ) { \
-					*ptr = (name*)a; ( *ptr )->ref_count = 1; \
-					( *ptr )->auxiliary = aux; ( *ptr )->val = val; } \
-				else { if( badalloc ) { badalloc( badata,  ptr,  val, aux ); } \
-					return( -3 ); } \
+			if( a ) { *ptr = (typename*)a; ( *ptr )->ref_count = 1; \
+				( *ptr )->auxiliary = aux; ( *ptr )->val = val; \
 				return( 1 ); } \
+			else { if( badalloc ) { badalloc( badata,  ptr,  val, aux ); } \
+				return( -3 ); } \
 			return( -1 ); }
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_ATTEND( name,  onattend ) \
-		libandria4_maybeint name##_attend( name **ptr ) { \
-			if( ptr && *ptr && ( *ptr )->ref_count =< 1 ) { \
+	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_ATTEND( name, typename,  onattend ) \
+		libandria4_maybeint name##_attend( typename **ptr ) { \
+			if( ptr && *ptr && ( *ptr )->ref_count <= 1 ) { \
 				++( ( *ptr )->ref_count ); \
 				onattend( *ptr, ( *ptr )->auxiliary, ( *ptr )->val ); \
 				LIBANDRIA4_MAYBEINT_RETURNJUST( 1 ); } \
 			LIBANDRIA4_MAYBEINT_RETURNNOTHING(); }
 		/* Returns "nothing" for bad args, 1 for normal success, 2 for deallocating success. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_NEGLECT( name,  onneglect, ondie ) \
-		libandria4_maybeint name##_neglect( libandria4_memfuncs_t *mf,  name **ptr ) { \
-			if( ptr && ( *ptr )->ref_count =< 1 ) { int res = 1; \
+	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_NEGLECT( name, typename,  onneglect, ondie ) \
+		libandria4_maybeint name##_neglect( libandria4_memfuncs_t *mf,  typename **ptr ) { \
+			if( ptr && ( *ptr )->ref_count <= 1 ) { int res = 1; \
 				--( ( *ptr )->ref_count ); \
 				onneglect( *ptr, ( *ptr )->auxiliary, ( *ptr )->val ); \
 				if( ( *ptr )->ref_count < 1 ) { \
 					ondie( ( *ptr )->auxiliary, ( *ptr )->val ); \
-					if( mf->dealloc ) { return( (mf->dealloc)( mf->data, *ptr ) ); } \
+					if( mf->dealloc ) { \
+						return( libandria4_result_to_maybesucc( (mf->dealloc)( mf->data, *ptr ) ) ); } \
 					res = 2; } \
-				*ptr = ((name)*)0; \
+				*ptr = (typename*)0; \
 				LIBANDRIA4_MAYBEINT_RETURNJUST( res ); } \
 			LIBANDRIA4_MAYBEINT_RETURNNOTHING(); }
 	
 	
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_BAREDECL( name, valuetype ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name, valuetype ); \
-		int name##_init( libandria4_memfuncs_t *mf,  name **ptr,  valuetype val, void *aux, \
-			name##_onbadfp badalloc, void *badata ); \
-		libandria4_maybeint name##_attend( name **ptr ); \
-		libandria4_maybeint name##_neglect( libandria4_memfuncs_t *mf,  name **ptr );
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_BAREIMPL( name, valuetype,  onattend, onneglect, ondie ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_INIT( name, valuetype ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_ATTEND( name,  onattend ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_NEGLECT( name,  onneglect, ondie )
+	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_BAREDECL( name, typename, valuetype ) \
+		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name, typename, valuetype ); \
+		int name##_init( libandria4_memfuncs_t *mf,  typename **ptr,  valuetype val, void *aux, \
+			name##_refcounted_onbadfp badalloc, void *badata ); \
+		libandria4_maybeint name##_attend( typename **ptr ); \
+		libandria4_maybeint name##_neglect( libandria4_memfuncs_t *mf,  typename **ptr );
+	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_BAREIMPL( name, typename, valuetype,  onattend, onneglect, ondie ) \
+		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_INIT( name, typename, valuetype ) \
+		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_ATTEND( name, typename,  onattend ) \
+		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_NEGLECT( name, typename,  onneglect, ondie )
 		/* Start tracking. */
 	#define LIBANDRIA4_MONAD_REFCOUNTED_BARE_EXPRINIT( name, pointer, memfuncs_ptr,  value, aux,  onfull, badalloc, badata ) \
 		( !(pointer) ? \
 			name##_init( ( memfuncs_ptr ), &(pointer),  (value), (aux), &(badalloc), (badata) ) : \
 			onfull( pointer,  value, aux ) )
 		/* Drop reference. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_BARE_BODYNEGLECT( name, pointer, memfuncs_ptr,  onbad, onsucc, ondead ) \
-		{ name ** name##_ptr = (pointer); \
+	#define LIBANDRIA4_MONAD_REFCOUNTED_BARE_BODYNEGLECT( name, typename, pointer, memfuncs_ptr,  onbad, onsucc, ondead ) \
+		{ typename ** name##_ptr = (pointer); \
 			libandria4_maybeint name##res = name##_neglect( ( memfuncs_ptr ),  name##_ptr ); \
 			int a = 0;   LIBANDRIA4_MAYBEINT_BODYMATCH( name##res,  LIBANDRIA4_OP_SETa, onbad ); \
 			if( a == 1 ) { onsucc( name##_ptr ); } \
 			else { ondead( name##_ptr ); } }
 	
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDDECL( name, valuetype ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name, valuetype ); \
-		int name##_init( name **ptr,  valuetype val, void *aux, \
-			name##_onbadfp badalloc, void *badata ); \
-		libandria4_maybeint name##_attend( name **ptr ); \
-		libandria4_maybeint name##_neglect( name **ptr );
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPPEDIMPL( name, valuetype, memfuncs_ptr,  onattend, onneglect, ondie ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_INIT( libandria4_definer_##name, valuetype ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_NEGLECT( libandria4_definer_##name,  onneglect, ondie ) \
-		int name##_init( name **ptr,  valuetype val, void *aux,  name##_onbadfp badalloc, void *badata ) \
+	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDDECL( name, typename, valuetype ) \
+		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name, typename, valuetype ); \
+		int name##_init( typename **ptr,  valuetype val, void *aux, \
+			name##_refcounted_onbadfp badalloc, void *badata ); \
+		libandria4_maybeint name##_attend( typename **ptr ); \
+		libandria4_maybeint name##_neglect( typename **ptr );
+	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPPEDIMPL( name, typename, valuetype, memfuncs_ptr,  onattend, onneglect, ondie ) \
+		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_INIT( libandria4_definer_##name, typename, valuetype ) \
+		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_NEGLECT( libandria4_definer_##name, typename,  onneglect, ondie ) \
+		int name##_init( typename **ptr,  valuetype val, void *aux,  name##_refc_fp badalloc, void *badata ) \
 				{ return( libandria4_definer_##name##_init( ( memfuncs_ptr ),  ptr,  val, aux, badalloc, badata ) ); } \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_ATTEND( name,  onattend ) \
-		libandria4_maybeint name##_neglect( name **ptr ) { return( name##_neglect( ( memfuncs_ptr ),  ptr ) ); }
+		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_ATTEND( name, typename,  onattend ) \
+		libandria4_maybeint name##_neglect( typename **ptr ) { return( name##_neglect( ( memfuncs_ptr ),  ptr ) ); }
 		/* Start tracking. */
 	#define LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_EXPRINIT( name, pointer,  value, aux,  onfull, badalloc, badata ) \
 		( !(pointer) ? \
 			name##_init( &(pointer),  (value), (aux), &(badalloc), (badata) ) : \
 			onfull( pointer,  value, aux ) )
 		/* Drop reference. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( name, pointer,  onbad, onsucc, ondead ) \
-		{ name ** name##_ptr = (pointer);  libandria4_maybeint name##res = name##_neglect( name##_ptr ); \
+	#define LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( name, typename, pointer,  onbad, onsucc, ondead ) \
+		{ typename ** name##_ptr = (pointer);  libandria4_maybeint name##res = name##_neglect( name##_ptr ); \
 			int a = 0;   LIBANDRIA4_MAYBEINT_BODYMATCH( name##res,  LIBANDRIA4_OP_SETa, onbad ); \
 			if( a == 1 ) { onsucc( name##_ptr ); } \
 			else { ondead( name##_ptr ); } }
@@ -434,7 +435,7 @@ SOFTWARE.
 		/* This needs to be paired with a LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDDECL() invocation. */
 	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_STDIMPL( name, valuetype,  onattend, onneglect, ondie ) \
 		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPPEDIMPL( \
-			name, valuetype, &libandria4_stdmemfuncs, \
+			name, typename, valuetype, &libandria4_stdmemfuncs, \
 			onattend, onneglect, ondie )
 	
 	
@@ -445,8 +446,8 @@ SOFTWARE.
 	#define LIBANDRIA4_MONAD_REFCOUNTED_EXPRREDUCE( pointer,  func, badptr ) \
 		( !!(pointer) ? ( func( (pointer)->auxiliary, (pointer)->val ) ) : ( badptr( pointer ) ) )
 		/* Add reference. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_BODYATTEND( name, pointer,  onbad, onsucc ) \
-		{ name ** name##_ptr = &(pointer);  libandria4_maybeint name##res = name##_attend( name##_ptr ); \
+	#define LIBANDRIA4_MONAD_REFCOUNTED_BODYATTEND( name, typename, pointer,  onbad, onsucc ) \
+		{ typename ** name##_ptr = &(pointer);  libandria4_maybeint name##res = name##_attend( name##_ptr ); \
 			int a = 0;   LIBANDRIA4_MAYBEINT_BODYMATCH( name##res,  LIBANDRIA4_OP_SETa, onbad ); \
 			if( a == 1 ) { onsucc( name##_ptr ); } }
 	
@@ -480,8 +481,8 @@ SOFTWARE.
 	
 	#define LIBANDRIA4_MONAD_REFPOINTER_BUILDTYPE_DEFINITION( name ) \
 		struct name { name##_counttype *counted; };
-	#define LIBANDRIA4_MONAD_REFPOINTER_BUILDTYPE( name, valuetype ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name##_counttype, valuetype ); \
+	#define LIBANDRIA4_MONAD_REFPOINTER_BUILDTYPE( name ) \
+		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name##_counttype, name##_counttype, valuetype ); \
 		typedef struct name name; \
 		LIBANDRIA4_MONAD_REFPOINTER_BUILDTYPE_DEFINITION( name );
 	
@@ -518,56 +519,56 @@ SOFTWARE.
 	/*  best for ordinary usages. */
 	
 	#define LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREDECL( name, valuetype ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_BAREDECL( name##_counttype, valuetype ); \
+		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_BAREDECL( name##_counttype, name##_counttype, valuetype ); \
 		typedef struct name name; \
 		LIBANDRIA4_MONAD_REFPOINTER_BUILDTYPE_DEFINITION( name );
 	#define LIBANDRIA4_MONAD_REFPOINTER_DEFINE_BAREIMPL( name, valuetype,  onattend, onneglect, ondie ) \
 		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_BAREIMPL( \
-			name##_counttype, valuetype,  onattend, onneglect, ondie )
+			name##_counttype, name, valuetype,  onattend, onneglect, ondie )
 	#define LIBANDRIA4_MONAD_REFPOINTER_BARE_BODYINIT( name, var, innerval, aux, memfuncs_ptr,  failinit, badalloc, badata ) \
 		{ name##_counttype ** name##_ptr = &( (var).counted ); \
-			LIBANDRIA4_MONAD_REFCOUNTED_BARE_EXPRINIT( name##_counttype, name##_ptr, ( memfuncs_ptr ), \
+			LIBANDRIA4_MONAD_REFCOUNTED_BARE_EXPRINIT( name##_counttype, name##_counttype, name##_ptr, ( memfuncs_ptr ), \
 				innerval, aux,  failinit, badalloc, badata ); }
 	#define LIBANDRIA4_MONAD_REFPOINTER_BARE_BODYSET( name, var, valptr, memfuncs_ptr,  failneglect, failattend, succneglect, succattend, ondead ) \
 		{ if( (var).counted == (valptr) ) { /* Do nothing. */ ; } \
 			else { if( valptr ) { \
 					LIBANDRIA4_MONAD_REFCOUNTED_BODYATTEND( \
-						name##_counttype, (var).counted,  failattend, succattend ); } \
+						name##_counttype, name##_counttype, (var).counted,  failattend, succattend ); } \
 				if( (var).counted ) { \
 					LIBANDRIA4_MONAD_BARE_REFCOUNTED_BODYNEGLECT( \
-						name##_counttype, (var).counted, ( memfuncs_ptr ), \
+						name##_counttype, name##_counttype, (var).counted, ( memfuncs_ptr ), \
 						failneglect, succneglect, ondead ); } \
 				(var).counted = valptr; } }
 	#define LIBANDRIA4_MONAD_REFPOINTER_BARE_BODYDEINIT( name, var, memfuncs_ptr,  failneglect, succneglect, ondead ) \
 		{ name##_counttype ** name##_ptr = &( (var).counted ); \
-			LIBANDRIA4_MONAD_BARE_REFCOUNTED_BODYNEGLECT( name##_counttype, name##_ptr, ( memfuncs_ptr ), \
+			LIBANDRIA4_MONAD_BARE_REFCOUNTED_BODYNEGLECT( name##_counttype, name##_counttype, name##_ptr, ( memfuncs_ptr ), \
 				failneglect, succneglect, ondead ) }
 	
 	#define LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL( name, valuetype ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDDECL( name##_counttype, valuetype ); \
+		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDDECL( name##_counttype, name##_counttype, valuetype ); \
 		typedef struct name name; \
 		LIBANDRIA4_MONAD_REFPOINTER_BUILDTYPE_DEFINITION( name );
 	#define LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDIMPL( name, valuetype, memfuncs_ptr,  onattend, onneglect, ondie ) \
 		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPPEDIMPL( \
-			name##_counttype, valuetype, memfuncs_ptr,  onattend, onneglect, ondie )
+			name##_counttype, name##_counttype, valuetype, \
+			memfuncs_ptr,  onattend, onneglect, ondie )
 	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYINIT( name, var, innerval, aux,  failinit, badalloc, badata ) \
 		{ name##_counttype ** name##_ptr = &( (var).counted ); \
-			LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_EXPRINIT( name##_counttype, name##_ptr, \
+			LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_EXPRINIT( name##_counttype, name##_counttype, name##_ptr, \
 				innerval, aux,  failinit, badalloc, badata ); }
 	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYSET( name, var, valptr,  failneglect, failattend, succneglect, succattend, ondead ) \
 		{ if( (var).counted == (valptr) ) { /* Do nothing. */ ; } \
 			else { if( valptr ) { \
 					LIBANDRIA4_MONAD_REFCOUNTED_BODYATTEND( \
-						name##_counttype, (valptr),  failattend, succattend ); } \
+						name##_counttype, name##_counttype, (valptr),  failattend, succattend ); } \
 				if( (var).counted ) { \
 					LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( \
-						name##_counttype, (var).counted, \
+						name##_counttype, name##_counttype, (var).counted, \
 						failneglect, succneglect, ondead ); } \
-				(var).counted = valptr; \
-				 } }
+				(var).counted = valptr; } }
 	#define LIBANDRIA4_MONAD_REFPOINTER_WRAPPED_BODYDEINIT( name, var,  failneglect, succneglect, ondead ) \
 		{ name##_counttype ** name##_ptr = &( (var).counted ); \
-			LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( name##_counttype, name##_ptr, \
+			LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( name##_counttype, name##_counttype, name##_ptr, \
 				failneglect, succneglect, ondead ) }
 	
 		/* This needs to be paired with a LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL() */
