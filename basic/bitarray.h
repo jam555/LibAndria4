@@ -31,8 +31,8 @@
 	#include "pascalarray.h"
 	
 	
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_bitarray_, uint8_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_bitsurface_, libandria4_bitarray_pascalarray* );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_bitarray_, uint8_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_bitsurface_, libandria4_bitarray_pascalarray* );
 	
 	typedef struct libandria4_bitarray
 	{
@@ -69,6 +69,8 @@
 	libandria4_bitarray_result libandria4_bitarray_build( size_t len );
 	libandria4_bitarray_result libandria4_bitarray_rebuild( libandria4_bitarray *barr,  size_t newlen );
 		libandria4_result libandria4_bitarray_fill( libandria4_bitarray *barr,  uint8_t *src );
+			/* Exists for *_bitsurface_*() usage. */
+		libandria4_result libandria4_bitarray_fill2( libandria4_bitarray_pascalarray *parr,  uint8_t *src );
 		libandria4_bitarray_result libandria4_bitarray_buildNfill( size_t len,  uint8_t *src );
 		/* read() and write() will return negatives on error, all others are successes. */
 		int libandria4_bitarray_read( libandria4_bitarray *barr, size_t offset );
@@ -78,7 +80,7 @@
 		/*  bit will be set or cleared based on the related bit in the array, */
 		/*  and the bits in the array will be updated after the visitor() calls */
 		/*  have returned. Extra bits can be presented to visitor(). */
-	void libandria4_bitarray_visit( libandria4_bitarray *barr,  void *data, void (*visitor)( void*, int ) );
+	void libandria4_bitarray_visit( libandria4_bitarray *barr,  void *data, void (*visitor)( void*, int* ) );
 	
 	
 	
