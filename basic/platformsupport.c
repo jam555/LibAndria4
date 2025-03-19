@@ -27,7 +27,7 @@ SOFTWARE.
 */
 
 #include <errno.h>
-#include "platformdetect.h"
+#include "platformsupport.h"
 /* We need to actually get CHAR_BIT from somewhere. */
 
 
