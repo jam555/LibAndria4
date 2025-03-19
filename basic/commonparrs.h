@@ -31,36 +31,38 @@ SOFTWARE.
 	
 	/* Remember to link with commonparrs.c and pascalstring.c */
 	
-	#include "pascalarray.h"
-	
-	
 		/* size_t and ptrdiff_t. */
 	#include <stddef.h>
 		/* The uint*_t and int*_t types. */
 	#include <stdint.h>
 	
+	
+	#include "pascalarray.h"
+	
+	
+	
 	/* The following are pascal arrays for common types.  */
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_short_, short );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_int_, int );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_long_, long );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_voidptr_, void* );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_float_, float );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_double_, double );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_short_, short );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_int_, int );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_long_, long );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_voidptr_, void* );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_float_, float );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_double_, double );
 	
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_sizet_, size_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_ptrdifft_, ptrdiff_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_sizet_, size_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_ptrdifft_, ptrdiff_t );
 	
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_int8t_, int8_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_int16t_, int16_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_int32t_, int32_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_intptrt_, intptr_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_intmaxt_, intmax_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_int8t_, int8_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_int16t_, int16_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_int32t_, int32_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_intptrt_, intptr_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_intmaxt_, intmax_t );
 	
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_uint8t_, uint8_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_uint16t_, uint16_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_uint32t_, uint32_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_uintptrt_, uintptr_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_uintmaxt_, uintmax_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_uint8t_, uint8_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_uint16t_, uint16_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_uint32t_, uint32_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_uintptrt_, uintptr_t );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_uintmaxt_, uintmax_t );
 	
 	
 		/* For libandria4_char_pascalarray{}, which just has some extras */
@@ -69,9 +71,9 @@ SOFTWARE.
 	
 		/* Declares libandria4_charparrptr_pascalarray{}, and matching types */
 		/*  for wchar_t and utf32 strings. */
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_charparrptr_, libandria4_char_pascalarray* );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_wcharparrptr_, libandria4_wchar_pascalarray* );
-	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPEDDECLARE( libandria4_utf32parrptr_, libandria4_utf32_pascalarray* );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_charparrptr_, libandria4_char_pascalarray* );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_wcharparrptr_, libandria4_wchar_pascalarray* );
+	LIBANDRIA4_DEFINE_PASCALARRAY_WRAPPEDDECLARE( libandria4_utf32parrptr_, libandria4_utf32_pascalarray* );
 	
 #endif
 /* End lib4 basic commonparrs.h */
