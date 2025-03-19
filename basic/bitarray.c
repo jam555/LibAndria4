@@ -65,7 +65,7 @@ int libandria4_bitarray_init( libandria4_bitarray *barr,  size_t len )
 		(
 			libandria4_bitarray_pascalarray_init
 			(
-				barr,
+				&( barr->arr ),
 				( ( len - ( len % 8 ) ) / 8 ) + ( len % 8 ? 1 : 0 )
 			)
 		);
@@ -78,11 +78,11 @@ libandria4_bitarray_result libandria4_bitarray_build( size_t len )
 	void *a;
 	libandria4_failure_uipresult b;
 	b.val = LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED;
-	LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( libandria4_stdmemfuncs );
+	/* LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( &libandria4_stdmemfuncs ); */
 	
 	if( len )
 	{
-		if( !( libandria4_stdmemfuncs->alloc ) )
+		if( !( libandria4_stdmemfuncs.alloc ) )
 		{
 			return
 			(
@@ -93,11 +93,11 @@ libandria4_bitarray_result libandria4_bitarray_build( size_t len )
 		}
 		
 		libandria4_ptrresult ptrres =
-			(libandria4_stdmemfuncs->alloc)
+			(libandria4_stdmemfuncs.alloc)
 			(
-				libandria4_stdmemfuncs->data,
+				libandria4_stdmemfuncs.data,
 				
-				sizeof( libandria4_bitarray ) + sizeof( uint8_t ) * height
+				sizeof( libandria4_bitarray ) + sizeof( uint8_t ) * len
 			);
 		LIBANDRIA4_PTRRESULT_BODYMATCH( ptrres, LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb )
 	}
@@ -106,9 +106,9 @@ libandria4_bitarray_result libandria4_bitarray_build( size_t len )
 	{
 		if( libandria4_bitarray_init( (libandria4_bitarray*)a,  len ) < 0 )
 		{
-			(libandria4_stdmemfuncs->dealloc)
+			(libandria4_stdmemfuncs.dealloc)
 			(
-				libandria4_stdmemfuncs->data,
+				libandria4_stdmemfuncs.data,
 				
 				a
 			);
@@ -134,7 +134,7 @@ libandria4_bitarray_result libandria4_bitarray_rebuild( libandria4_bitarray *bar
 {
 	if( barr )
 	{
-		libandria4_bitarray_result res1 = libandria4_bitarray_build( width, height );
+		libandria4_bitarray_result res1 = libandria4_bitarray_build( newlen );
 		void *a;
 #define libandria4_bitarray_rebuild_FAIL1( err ) \
 	return( LIBANDRIA4_BITARRAY_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_FAILURE_NOTINITIALIZED ) );
@@ -150,24 +150,28 @@ libandria4_bitarray_result libandria4_bitarray_rebuild( libandria4_bitarray *bar
 			++iter;
 		}
 		
-		return( LIBANDRIA4_BITSURFACE_RESULT_BUILDSUCCESS( a_ ) );
+		return( LIBANDRIA4_BITARRAY_RESULT_BUILDSUCCESS( a_ ) );
 	}
 	
 	return( LIBANDRIA4_BITARRAY_RESULT_BUILDFAILURE( LIBANDRIA4_RESULT_FAILURE_DOMAIN ) );
 }
-libandria4_result libandria4_bitarray_fill( libandria4_bitarray *barr,  uint8_t *src )
+libandria4_result libandria4_bitarray_fill2( libandria4_bitarray_pascalarray *parr,  uint8_t *src )
 {
-	if( barr && src )
+	if( parr && src )
 	{
-		return( libandria4_bitarray_pascalarray_fill( &( barr->arr ),  src ) );
+		return( libandria4_bitarray_pascalarray_fill( parr,  src ) );
 	}
 	
 	return
 	(
 		LIBANDRIA4_RESULT_BUILDFAILURE(
-			(libandria4_failure_result){ LIBANDRIA4_RESULT_FAILURE_DOMAIN }
+			/* (libandria4_failure_result) */ LIBANDRIA4_RESULT_FAILURE_DOMAIN
 		)
 	);
+}
+libandria4_result libandria4_bitarray_fill( libandria4_bitarray *barr,  uint8_t *src )
+{
+	return( libandria4_bitarray_fill2( &( barr->arr ),  src ) );
 }
 libandria4_bitarray_result libandria4_bitarray_buildNfill( size_t len,  uint8_t *src )
 {
@@ -242,12 +246,12 @@ int libandria4_bitarray_write( libandria4_bitarray *barr, size_t offset,  int va
 }
 libandria4_result libandria4_bitarray_destroy( libandria4_bitarray *barr )
 {
-	return( (libandria4_stdmemfuncs->dealloc)( libandria4_stdmemfuncs->data,  (void*)barr ) );
+	return( (libandria4_stdmemfuncs.dealloc)( libandria4_stdmemfuncs.data,  (void*)barr ) );
 }
 	typedef struct libandria4_bitarray_visit_struct
 	{
 		void *data;
-		void (*visitor)( void*, int );
+		void (*visitor)( void*, int* );
 		
 	} libandria4_bitarray_visit_struct;
 		/* Note that this is also used by libandria4_bitsurface_visit_helper(). */
@@ -327,7 +331,7 @@ int libandria4_bitsurface_init( libandria4_bitsurface *bsurf,  size_t width, siz
 		void *a;
 #define libandria4_bitsurface_init_UNWIND( err ) \
 	while( iter ) { --iter; \
-		libandria4_result libandria4_bitarray_pascalarray_build( bsurf->surf.body[ iter ] ); \
+		libandria4_result libandria4_bitarray_pascalarray_build( ( bsurf->surf.body[ iter ] ) ); \
 		bsurf->surf.body[ iter ] = (libandria4_bitarray_pascalarray*)0; } \
 	return( -2 );
 		while( iter < height )
@@ -354,11 +358,11 @@ libandria4_bitsurface_result libandria4_bitsurface_build( size_t width, size_t h
 	void *a = (void*)0;
 	libandria4_failure_uipresult b;
 	b.val = LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED;
-	LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( libandria4_stdmemfuncs );
+	/* LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( &libandria4_stdmemfuncs ); */
 	
-	if( len )
+	if( height )
 	{
-		if( !( libandria4_stdmemfuncs->alloc ) )
+		if( !( libandria4_stdmemfuncs.alloc ) )
 		{
 			return
 			(
@@ -369,9 +373,9 @@ libandria4_bitsurface_result libandria4_bitsurface_build( size_t width, size_t h
 		}
 		
 		libandria4_ptrresult ptrres =
-			(libandria4_stdmemfuncs->alloc)
+			(libandria4_stdmemfuncs.alloc)
 			(
-				libandria4_stdmemfuncs->data,
+				libandria4_stdmemfuncs.data,
 				
 				sizeof( libandria4_bitsurface ) + sizeof( uint8_t ) * height
 			);
@@ -382,9 +386,9 @@ libandria4_bitsurface_result libandria4_bitsurface_build( size_t width, size_t h
 	{
 		if( libandria4_bitsurface_init( (libandria4_bitsurface*)a,  width, height ) < 0 )
 		{
-			(libandria4_stdmemfuncs->dealloc)
+			(libandria4_stdmemfuncs.dealloc)
 			(
-				libandria4_stdmemfuncs->data,
+				libandria4_stdmemfuncs.data,
 				
 				a
 			);
@@ -468,7 +472,7 @@ libandria4_result libandria4_bitsurface_fill( libandria4_bitsurface *bsurf,  uin
 #define libandria4_bitsurface_fill_FAIL( err ) \
 	LIBANDRIA4_RESULT_RETURNFAILURE( (libandria4_failure_result){ iter } );
 			libandria4_result res =
-				libandria4_bitarray_fill( bsurf->surf.body[ iter ],  src[ iter ] );
+				libandria4_bitarray_fill2( bsurf->surf.body[ iter ],  src[ iter ] );
 			LIBANDRIA4_MONAD_EITHER_BODYMATCH( res,  LIBANDRIA4_NULL_MACRO, libandria4_bitsurface_fill_FAIL );
 			
 			++iter;
@@ -548,12 +552,22 @@ libandria4_bitsurface_result libandria4_bitsurface_excerpt
 			{
 				a->surf.body[ h ]->body[ w_ + w ] = 0;
 				
+				/*
+					Various lines HAD BEEN structured as:
+						src->surf[ basal_y + h ]->body[ w_ + w ] ,
+					but src->surf is a scalar instead of an array, so that doesn't work.
+					
+					TODO: Figure out the correct formulation, this may be tied to some future bug!
+						Look for "CHECKPTR" comments!
+				*/
+				
 					/* (libandria4_bitsurface*)->width is in bits, not bytes. */
 				while( ( w_ + w + 1 ) * 8 < src->width && w * 8 < width )
 				{
 					a->surf.body[ h ]->body[ w ] =
 						(
-							src->surf[ basal_y + h ]->body[ w_ + w ] &
+								/* CHECKPTR */
+							src->surf.body[ basal_y + h ]->body[ w_ + w ] &
 							highmask
 						) >> bitoffset;
 					
@@ -561,7 +575,7 @@ libandria4_bitsurface_result libandria4_bitsurface_excerpt
 						/*  its new alignment. */
 					a->surf.body[ h ]->body[ w ] |=
 						(
-							src->surf[ basal_y + h ]->body[ w_ + w + 1 ] &
+							src->surf.body[ basal_y + h ]->body[ w_ + w + 1 ] &
 							lowmask
 						) << bitoffset;
 					
@@ -571,7 +585,7 @@ libandria4_bitsurface_result libandria4_bitsurface_excerpt
 				{
 					a->surf.body[ h ]->body[ w ] =
 						(
-							src->surf[ basal_y + h ]->body[ w_ + w ] &
+							src->surf.body[ basal_y + h ]->body[ w_ + w ] &
 							highmask
 						) >> bitoffset;
 					
@@ -657,9 +671,9 @@ int libandria4_bitsurface_write( libandria4_bitsurface *bsurf, size_t x, size_t 
 	/*  It also needs to be tolerant of individual sub-arrays not being present. */
 libandria4_result libandria4_bitsurface_destroy( libandria4_bitsurface *bsurf )
 {
-	libandria4_bitsurface_pascalarray_visit( &( bsurf.surf ),  (void*)0, &libandria4_bitsurface_destroy_helper );
+	libandria4_bitsurface_pascalarray_visit( &( bsurf->surf ),  (void*)0, &libandria4_bitsurface_destroy_helper );
 	
-	return( (libandria4_stdmemfuncs->dealloc)( libandria4_stdmemfuncs->data,  (void*)bsurf ) );
+	return( (libandria4_stdmemfuncs.dealloc)( libandria4_stdmemfuncs.data,  (void*)bsurf ) );
 }
 	typedef struct libandria4_bitsurface_visit_struct
 	{
@@ -671,7 +685,7 @@ libandria4_result libandria4_bitsurface_destroy( libandria4_bitsurface *bsurf )
 	{
 		libandria4_bitsurface_visit_struct *vis = (libandria4_bitsurface_visit_struct*)data;
 		
-		libandria4_bitarray_pascalarray_visit( barr,  (void*)&( vis->vis ), &libandria4_bitarray_visit_helper );
+		libandria4_bitarray_pascalarray_visit( *barr,  (void*)&( vis->vis ), &libandria4_bitarray_visit_helper );
 		vis->hinc( vis->vis.data );
 	}
 void libandria4_bitsurface_visit( libandria4_bitsurface *bsurf,  void *data, void (*visitor)( void*, int* ), void (*hinc)( void* ) )
