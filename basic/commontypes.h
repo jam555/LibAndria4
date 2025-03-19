@@ -114,5 +114,12 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_EITHER_EXPRCHAIN( var, onsucc, builderr )
 	/* Note: If you need reduce(), then just wrap *_EXPRMATCH(). */
 	
+	
+	
+		/* This also includes pascalstring.h; the two of them */
+		/*  provide a variety of pascal-array definitions, and */
+		/*  pascalstring.h itself provides a FEW extra capabilities. */
+	#include "commonparrs.h"
+	
 #endif
 /* End libandria4 basic commontypes.h */
