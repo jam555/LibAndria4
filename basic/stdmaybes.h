@@ -34,8 +34,6 @@ SOFTWARE.
 		/* intptr_t and uintptr_t. */
 	#include <stdint.h>
 	
-	#include "commontypes.h"
-	
 	#include "monads.h"
 	
 	
@@ -311,6 +309,14 @@ SOFTWARE.
 	#define LIBANDRIA4_MAYBEVOIDPTR_RETURNJUST( val ) LIBANDRIA4_MONAD_MAYBE_RETURNLEFT( libandria4_maybevoidptr, void*, val )
 	#define LIBANDRIA4_MAYBEVOIDPTR_RETURNNOTHING() LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( libandria4_maybevoidptr, void* )
 	
+#endif
+
+#if defined( LIBANDRIA4_BASIC_COMMONTYPES_H ) && !defined( LIBANDRIA4_BASIC_STDMAYBES_H__with_commontypes )
+# define LIBANDRIA4_BASIC_STDMAYBES_H__with_commontypes
+	
+	/* This relieves the need to directly include commontypes.h, */
+	/*  to reduce the syntax error surface (particularly, to avoid */
+	/*  including pascalstring.h). */
 	
 	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( libandria4_maybefuncptr, libandria4_common_voidfuncp_void );
 	
@@ -326,6 +332,7 @@ SOFTWARE.
 	
 	#define LIBANDRIA4_MAYBEFUNCPTR_RETURNJUST( val ) LIBANDRIA4_MONAD_MAYBE_RETURNLEFT( libandria4_maybefuncptr, void (*)(), val )
 	#define LIBANDRIA4_MAYBEFUNCPTR_RETURNNOTHING() LIBANDRIA4_MONAD_MAYBE_RETURNRIGHT( libandria4_maybefuncptr, void (*)() )
+	
 	
 #endif
 /* End libandria4 basic stdmaybes.h */
