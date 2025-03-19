@@ -492,56 +492,7 @@ SOFTWARE.
 	
 	
 	
-	
-	
-	
-	
-	
-	/* TODO: Create a platformsupport.h, and move the stuff below into it. */
-	
-	#include "monads.h"
-	#include "stdio.h"
-	
-	#if LIBANDRIA4_PLATFORM_FILE_OFFSET_BITS > 32
-		#if LIBANDRIA4_TARGETPLATFORM == LIBANDRIA4_TARGETPLATFORM_MSWIN
-			typedef __int64 libandria4_foff_t;
-		#elif LIBANDRIA4_TARGETPLATFORM == LIBANDRIA4_TARGETPLATFORM_NIX
-			typedef off_t libandria4_foff_t;
-		#else
-			#warning "Unknown platform: ftello/_ftelli64 equivalent not known."
-			typedef long libandria4_foff_t;
-		#endif
-	#else
-		typedef long libandria4_foff_t;
-	#endif
-	
-	LIBANDRIA4_MONAD_EITHER_BUILDTYPE( libandria4_either_fofft_int, libandria4_foff_t, int );
-	typedef libandria4_either_fofft_int libandria4_either_fofft;
-	#define LIBANDRIA4_EITHER_FOFFT_BUILDSUCCESS( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( libandria4_either_fofft, libandria4_foff_t, ( val ) )
-	#define LIBANDRIA4_EITHER_FOFFT_BUILDERROR( val ) \
-		LIBANDRIA4_MONAD_EITHER_BUILDRIGHT( libandria4_either_fofft, int, ( val ) )
-	#define LIBANDRIA4_EITHER_FOFFT_BODYMATCH( var, succmatch, errmatch ) \
-		LIBANDRIA4_MONAD_EITHER_BODYMATCH( var, succmatch, errmatch )
-	#define LIBANDRIA4_EITHER_FOFFT_EXPRMATCH( var, succmatch, errmatch ) \
-		LIBANDRIA4_MONAD_EITHER_EXPRMATCH( var, succmatch, errmatch )
-	
-	typedef struct libandria4_int_errint
-	{
-		int val, err;
-		
-	} libandria4_int_errint;
-	
-		/* origin expects the standard SEEK_SET, SEEK_CUR, and SEEK_END macros from C. */
-	libandria4_int_errint libandria4_fseek( FILE *stream, libandria4_either_fofft offset, int origin );
-	libandria4_either_fofft libandria4_ftell( FILE *stream );
-	
-	
-	
-	int libandria4_endiancheck_islittleendian();
-	int libandria4_endiancheck_isbigendian();
-	int libandria4_endiancheck_ispdp11endian();
-	int libandria4_endiancheck_ishoneywell316endian();
+	/* Some additional stuff has moved to platformsupport.h. */
 	
 #endif
 /* End libandria4 basic platformdetect.h */
