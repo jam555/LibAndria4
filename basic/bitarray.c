@@ -32,9 +32,9 @@ SOFTWARE.
 /*
 		Do these belong in this file? Where did the file declarations below
 		come from?
-	LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( libandria4_bitarray_, uint8_t );
-	LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( libandria4_bitsurface_, libandria4_bitarray_pascalarray* );
 */
+LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( libandria4_bitarray_, uint8_t );
+LIBANDRIA4_DEFINE_PASCALARRAY_STDDEFINE( libandria4_bitsurface_, libandria4_bitarray_pascalarray* );
 
 
 /* WARNING: libandria4_bitarray_visit_helper() is used by */
@@ -330,8 +330,16 @@ int libandria4_bitsurface_init( libandria4_bitsurface *bsurf,  size_t width, siz
 		size_t iter = 0;
 		void *a;
 #define libandria4_bitsurface_init_UNWIND( err ) \
+	size_t res = iter; \
+	while( res < height ) { \
+			bsurf->surf.body[ res ] = (libandria4_bitarray_pascalarray*)0; \
+			++res; } \
 	while( iter ) { --iter; \
-		libandria4_result libandria4_bitarray_pascalarray_build( ( bsurf->surf.body[ iter ] ) ); \
+		libandria4_result res2 = libandria4_bitarray_pascalarray_destroy( bsurf->surf.body[ iter ] ); \
+		LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_EXPRMATCH( res2, \
+			LIBANDRIA4_OP_SETresTO0, \
+			LIBANDRIA4_OP_SETresTO1 ); \
+		if( res != 0 ) { return( -3 ); } \
 		bsurf->surf.body[ iter ] = (libandria4_bitarray_pascalarray*)0; } \
 	return( -2 );
 		while( iter < height )
