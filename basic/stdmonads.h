@@ -93,6 +93,12 @@ SOFTWARE.
 		libandria4_failure_result
 	);
 	
+	/*
+		!!! TODO !!!
+		These *_BUILD*() macros treat their value arguments differently than the
+		matching *_RETURN*() macros! Fix this in some sensible way (preferably by
+		moving to normal integers)!
+	*/
 	#define LIBANDRIA4_RESULT_BUILDSUCCESS( val ) \
 		LIBANDRIA4_MONAD_EITHER_BUILDLEFT( \
 			libandria4_result, \
@@ -166,63 +172,65 @@ SOFTWARE.
 	libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err );
 	libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ );
 	
-	extern inline libandria4_result libandria4_errno_popresult( int *errnum )
-	{
-		libandria4_result res = libandria4_errno_2result();
-		
-		if( errnum )
+	#if !defined( LIBANDRIA4_BASIC_STDMONADS_C )
+		extern inline libandria4_result libandria4_errno_popresult( int *errnum )
 		{
-			*errnum = errno;
+			libandria4_result res = libandria4_errno_2result();
+			
+			if( errnum )
+			{
+				*errnum = errno;
+			}
+			
+			errno = 0;
+			
+			return( res );
 		}
-		
-		errno = 0;
-		
-		return( res );
-	}
-	extern inline libandria4_result libandria4_result_from_maybeerr( libandria4_maybeint err )
-	{
-		return
-		(
-			LIBANDRIA4_MAYBEINT_EXPRMATCH(
-				err,
-				
-				LIBANDRIA4_RESULT_BUILDFAILURE,
-				LIBANDRIA4_RESULT_BUILDSUCCESS_GENERIC )
-		);
-	}
-	extern inline libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ )
-	{
-		return
-		(
-			LIBANDRIA4_MAYBEINT_EXPRMATCH(
-				succ,
-				
-				LIBANDRIA4_RESULT_BUILDSUCCESS,
-				LIBANDRIA4_RESULT_BUILDFAILURE_GENERIC )
-		);
-	}
-	extern inline libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err )
-	{
-		return
-		(
-			LIBANDRIA4_RESULT_EXPRMATCH(
-				err,
-				
-				LIBANDRIA4_MAYBEINT_BUILDNOTHING2,
-				LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT )
-		);
-	}
-	extern inline libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ )
-	{
-		return
-		(
-			LIBANDRIA4_RESULT_EXPRMATCH(
-				succ,
-				
-				LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT,
-				LIBANDRIA4_MAYBEINT_BUILDNOTHING2 )
-		);
-	}
+		extern inline libandria4_result libandria4_result_from_maybeerr( libandria4_maybeint err )
+		{
+			return
+			(
+				LIBANDRIA4_MAYBEINT_EXPRMATCH(
+					err,
+					
+					LIBANDRIA4_RESULT_BUILDFAILURE,
+					LIBANDRIA4_RESULT_BUILDSUCCESS_GENERIC )
+			);
+		}
+		extern inline libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ )
+		{
+			return
+			(
+				LIBANDRIA4_MAYBEINT_EXPRMATCH(
+					succ,
+					
+					LIBANDRIA4_RESULT_BUILDSUCCESS,
+					LIBANDRIA4_RESULT_BUILDFAILURE_GENERIC )
+			);
+		}
+		extern inline libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err )
+		{
+			return
+			(
+				LIBANDRIA4_RESULT_EXPRMATCH(
+					err,
+					
+					LIBANDRIA4_MAYBEINT_BUILDNOTHING2,
+					LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT )
+			);
+		}
+		extern inline libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ )
+		{
+			return
+			(
+				LIBANDRIA4_RESULT_EXPRMATCH(
+					succ,
+					
+					LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT,
+					LIBANDRIA4_MAYBEINT_BUILDNOTHING2 )
+			);
+		}
+	#endif
 	
 	
 	
