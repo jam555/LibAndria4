@@ -28,6 +28,9 @@ SOFTWARE.
 
 #include <errno.h>
 
+
+	/* Surpress definition of the inlines in this context. */
+#define LIBANDRIA4_BASIC_STDMONADS_C
 #include "stdmonads.h"
 #include "simpleops.h"
 
@@ -47,22 +50,19 @@ libandria4_result libandria4_errno_2result()
 			return
 			(
 				LIBANDRIA4_RESULT_BUILDFAILURE(
-					(libandria4_failure_result){
-						LIBANDRIA4_RESULT_FAILURE_DOMAIN } )
+					LIBANDRIA4_RESULT_FAILURE_DOMAIN )
 			);
 		case ERANGE:
 			return
 			(
 				LIBANDRIA4_RESULT_BUILDFAILURE(
-					(libandria4_failure_result){
-						LIBANDRIA4_RESULT_FAILURE_RANGE } )
+					LIBANDRIA4_RESULT_FAILURE_RANGE )
 			);
 		case EILSEQ:
 			return
 			(
 				LIBANDRIA4_RESULT_BUILDFAILURE(
-					(libandria4_failure_result){
-						LIBANDRIA4_RESULT_FAILURE_ILSEQ } )
+					LIBANDRIA4_RESULT_FAILURE_ILSEQ )
 			);
 			
 		default:
@@ -70,16 +70,14 @@ libandria4_result libandria4_errno_2result()
 			return
 			(
 				LIBANDRIA4_RESULT_BUILDFAILURE(
-					(libandria4_failure_result){
-						LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED } )
+					LIBANDRIA4_RESULT_FAILURE_UNDIFFERENTIATED )
 			);
 	}
 	
 	return
 	(
 		LIBANDRIA4_RESULT_BUILDSUCCESS(
-			(libandria4_success_result){
-				LIBANDRIA4_RESULT_GENERIC } )
+			LIBANDRIA4_RESULT_GENERIC )
 	);
 }
 libandria4_result libandria4_errno_popresult( int *errnum )
@@ -107,11 +105,18 @@ libandria4_result libandria4_result_from_maybeerr( libandria4_maybeint err )
 	
 	if( res )
 	{
-		LIBANDRIA4_RESULT_RETURNFAILURE( a );
+		LIBANDRIA4_RESULT_RETURNFAILURE(
+			(libandria4_failure_result){ a }
+		);
 		
 	} else {
 		
-		LIBANDRIA4_RESULT_RETURNSUCCESS( LIBANDRIA4_RESULT_GENERIC );
+		LIBANDRIA4_RESULT_RETURNSUCCESS(
+			(libandria4_success_result)
+			{
+				LIBANDRIA4_RESULT_GENERIC
+			}
+		);
 	}
 }
 libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ )
@@ -120,21 +125,29 @@ libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ )
 	LIBANDRIA4_MAYBEINT_BODYMATCH(
 		succ,
 		
-		LIBANDRIA4_OP_SETresTOn1,
-		LIBANDRIA4_OP_SETaFLAGresAS1 );
+		LIBANDRIA4_OP_SETaFLAGresAS1,
+		LIBANDRIA4_OP_SETresTOn1 );
 	
 	if( res )
 	{
-		LIBANDRIA4_RESULT_RETURNSUCCESS( a );
+		LIBANDRIA4_RESULT_RETURNSUCCESS(
+			(libandria4_success_result){ a }
+		);
 		
 	} else {
 		
-		LIBANDRIA4_RESULT_RETURNFAILURE( LIBANDRIA4_RESULT_GENERIC );
+		LIBANDRIA4_RESULT_RETURNFAILURE(
+			(libandria4_failure_result)
+			{
+				LIBANDRIA4_RESULT_GENERIC
+			}
+		);
 	}
 }
 libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err )
 {
-	int a, res;
+	int res;
+	libandria4_failure_result a;
 	LIBANDRIA4_RESULT_BODYMATCH(
 		err,
 		
@@ -143,7 +156,7 @@ libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err )
 	
 	if( res )
 	{
-		LIBANDRIA4_MAYBEINT_RETURNJUST( a );
+		LIBANDRIA4_MAYBEINT_RETURNJUST( a.val );
 		
 	} else {
 		
@@ -152,16 +165,17 @@ libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err )
 }
 libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ )
 {
-	int a, res;
+	int res;
+	libandria4_success_result a;
 	LIBANDRIA4_RESULT_BODYMATCH(
-		err,
+		succ,
 		
 		LIBANDRIA4_OP_SETaFLAGresAS1,
 		LIBANDRIA4_OP_SETresTOn1 );
 	
 	if( res )
 	{
-		LIBANDRIA4_MAYBEINT_RETURNJUST( a );
+		LIBANDRIA4_MAYBEINT_RETURNJUST( a.val );
 		
 	} else {
 		
