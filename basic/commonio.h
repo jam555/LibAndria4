@@ -75,6 +75,7 @@ SOFTWARE.
 	{
 		FILE *f;
 		uintptr_t ref_count;
+		
 	} libandria4_FILE_handle;
 	
 	

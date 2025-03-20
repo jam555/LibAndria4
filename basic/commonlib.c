@@ -94,13 +94,16 @@ libandria4_ptrresult libandria4_memmem
 	
 	if( haystack_ && needle_ && haysize >= needlesize )
 	{
-		unsigned char *haystack = (char*)haystack_, *needle = (char*)needle_;
+		unsigned char *haystack = (unsigned char*)haystack_, *needle = (unsigned char*)needle_;
 		size_t hoff = 0, noff = 0, goff = 0;
 		
 		if( needlesize % needlegrain )
 		{
 			LIBANDRIA4_PTRRESULT_RETURNFAILURE(
-				LIBANDRIA4_RESULT_FAILURE_DOMAIN );
+				(libandria4_failure_uipresult){
+					LIBANDRIA4_RESULT_FAILURE_DOMAIN
+				}
+			);
 		}
 		
 		while( hoff + needlesize <= haysize )
@@ -108,7 +111,7 @@ libandria4_ptrresult libandria4_memmem
 			while( noff < needlesize &&
 				haystack[ hoff + noff + goff ] == needle[ noff + goff ] )
 			{
-				while( graintest < needlegrain &&
+				while( goff < needlegrain &&
 					haystack[ hoff + noff + goff ] == needle[ noff + goff ] )
 				{
 					++goff;
@@ -135,7 +138,12 @@ libandria4_ptrresult libandria4_memmem
 		/* No match found, fall-through to null. */
 	}
 	
-	LIBANDRIA4_PTRRESULT_RETURNFAILURE( LIBANDRIA4_RESULT_FAILURE_EOF );
+	LIBANDRIA4_PTRRESULT_RETURNFAILURE( 
+		(libandria4_failure_uipresult)
+		{
+			LIBANDRIA4_RESULT_FAILURE_EOF
+		}
+	);
 }
 
 	/* Reverses the order of the elements in the memory buffer. */
