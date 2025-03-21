@@ -495,6 +495,9 @@ SOFTWARE.
 	#define LIBANDRIA4_APPLY_LATER( func ) LIBANDRIA4_APPLY_GATE( 0, func )
 	
 	
+	/* TODO: move these to commonlib.h, and add a define-macro for header */
+	/*  use. Also add some to the type-description files that use type-descs */
+	/*  instead of "t" in the version-2 variant. */
 	/* These generate a function that returns an integer that uniquely */
 	/*  identifies the provided type. Extra differentiation via tag, just in */
 	/*  case. Use *_IDFUNC() for POD types, use *_IDFUNC2() for non-POD */

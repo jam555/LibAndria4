@@ -43,11 +43,12 @@ SOFTWARE.
 	
 		/* Packages the algorithm to convert from a structure element's */
 		/*  address to the structure's address. */
+		/* TODO: move into commonlib.h. */
 	#define LIBANDRIA4_STRUCTADDRfromELEMADDR( structtype, elemname,  elemptr ) \
-		( ( (structtype) *)( \
+		( ( structtype *)( \
 			(char*)( elemptr ) + ( \
-				(char*)&( ( ( (structtype) *)0 )->( elemname ) ) - \
-				(char*)( ( (structtype) *)0 ) ) ) )
+				(char*)&( ( ( structtype *)0 )-> elemname ) - \
+				(char*)( ( structtype *)0 ) ) ) )
 	
 	
 	

@@ -70,6 +70,7 @@ SOFTWARE.
 	
 	
 	
+		/* TODO: Move forking-type and it's macros into monads.h. */
 		/* This is used here, so it's defined here. The common macros for it */
 		/*  are further down. */
 	#define LIBANDRIA4_COMMONLIB_FORKINGTYPE( prefix, type ) \
@@ -78,6 +79,8 @@ SOFTWARE.
 			prefix ## fork, libandria4_commonlib_err );
 	
 	
+	
+	/* TODO: Merge these (including the forking-types) into basictypes.h. */
 	
 	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
 		libandria4_commonlib_maybyte,
