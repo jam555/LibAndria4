@@ -55,10 +55,9 @@ SOFTWARE.
 	
 		/* These produce the actual values. */
 	#define LIBANDRIA4_MONAD_MAYBE_BUILDJUST( name, type, val ) \
-		( (name){ (type)( val ), 0 } )
+		( (name){ (type)( val ), 1 } )
 	#define LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( name, type ) \
-		( (name){ (type)( 0 ), 1 } ) \
-		/* C allows compound-literals for scalar types too, so this is fine. */
+		( (name){ (type)( 0 ), 0 } )
 	
 		/* The *BODY* version takes statements, *EXPR* takes expressions. */
 	#define LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, match, otherwise ) \
