@@ -312,7 +312,17 @@ libandria4_error_mayerr libandria4_error_print
 					LIBANDRIA4_ERROR_MAYERR_RETERR10();
 				}
 				
-				res2 = libandria4_error_print_simplestruct( io, err );
+				res2 =
+					libandria4_error_print_simplestruct
+					(
+						io,
+						LIBANDRIA4_STRUCTADDRfromELEMADDR(
+							libandria4_error_simplestruct,
+							type,
+							
+							err
+						)
+					);
 				LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR11 );
 				
 				break;
