@@ -27,9 +27,12 @@ SOFTWARE.
 */
 
 
+#include <limits.h>
 #include <time.h>
 
 
+#include "basictypes.h"
+#include "stdmonads.h"
 #include "commonlib.h"
 	/* For LIBANDRIA4_RESULT_FAILURE_DOMAIN. */
 #include "commonerrvals.h"
@@ -243,7 +246,7 @@ libandria4_error_mayerr libandria4_error_print
 		
 		switch( err->typeid )
 		{
-			case LIBANDRIA4_ERRORSTRUCT_SIMPLETYPE:
+			case LIBANDRIA4_ERROR_TYPE_SIMPLESTRUCT:
 #define libandria4_error_print_STR_FUNC "function: "
 #define libandria4_error_print_STR_SRC " at "
 #define libandria4_error_print_STR_DESC " announces this error: "
@@ -268,7 +271,7 @@ libandria4_error_mayerr libandria4_error_print
 					LIBANDRIA4_ERROR_MAYERR_RETERR6();
 				}
 				libandria4_commonio_eithgeneric res1 = io->putc( io,  (libandria4_commonio_byte)' ' );
-				res2 = LIBANDRIA4_COMMONIO_EITHGENERIC_TO_MAYERR( res1 );
+				res2 = LIBANDRIA4_COMMONIO_EITHGENERIC_TO_ERRMAYERR( res1 );
 				LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR7 );
 				if
 				(
@@ -353,11 +356,16 @@ libandria4_error_mayerr libandria4_sleep( uint32_t millisecs )
 			
 		} else if( res == -1 )
 		{
-			res = ret.val;
+			libandria4_error_mayerr tmp = LIBANDRIA4_RESULT_TO_ERRMAYERR( ret );
+			LIBANDRIA4_ERROR_MAYERR_BODYMATCH(
+				tmp,
+				
+				LIBANDRIA4_OP_SETres,
+				LIBANDRIA4_OP_SETresTO0 );
 			ret = libandria4_errno_2result();
 			errno = res;
 			
-			LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( ret.val );
+			return( LIBANDRIA4_RESULT_TO_ERRMAYERR( ret ) );
 			
 		} else {
 			
