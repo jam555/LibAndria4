@@ -408,7 +408,7 @@ libandria4_error_mayerr libandria4_sleep( uint32_t millisecs )
 
 int libandria4_cb_ctoi_feedint_c( void *dest, char ignore, int num )
 {
-	libandria4_cb_ctoi_intconv *ic = (*libandria4_cb_ctoi_intconv)dest;
+	libandria4_cb_ctoi_intconv *ic = (libandria4_cb_ctoi_intconv*)dest;
 	
 	if( ic )
 	{
@@ -420,7 +420,7 @@ int libandria4_cb_ctoi_feedint_c( void *dest, char ignore, int num )
 }
 int libandria4_cb_atoi_feedint_s( void *dest,  size_t ig2, char *ig3, size_t off,  int num )
 {
-	libandria4_cb_ctoi_intconv *ic = (*libandria4_cb_ctoi_intconv)dest;
+	libandria4_cb_ctoi_intconv *ic = (libandria4_cb_ctoi_intconv*)dest;
 	
 	if( ic )
 	{
@@ -523,7 +523,7 @@ libandria4_commonlib_intint_eithfork libandria4_cb_atoi
 	}
 	if( ic.stat == 2 )
 	{
-		LIBANDRIA4_COMMONLIB_CHARFORK_RETFOREIGN( off );
+		LIBANDRIA4_COMMONLIB_INTFORK_RETFOREIGN( off );
 	}
 	
 	LIBANDRIA4_COMMONLIB_INTFORK_RETMATCH( ret );
