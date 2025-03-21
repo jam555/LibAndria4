@@ -31,38 +31,11 @@ SOFTWARE.
 	
 	#include "monads.h"
 	#include "commonio.h"
+	#include "basictypes.h"
 	
 	
 	
 	/* An error reporting facility. */
-	
-	typedef uintptr_t libandria4_error_errint;
-	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE( libandria4_error_mayerr, libandria4_error_errint );
-	
-	#define LIBANDRIA4_ERROR_MAYERR_JUSTERR( val ) \
-		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_error_mayerr, libandria4_error_errint, val )
-	#define LIBANDRIA4_ERROR_MAYERR_NOERR() \
-		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_error_mayerr, libandria4_error_errint )
-	
-		/* The *BODY* takes statements, *EXPR* takes expressions, */
-		/*  *REDUCE extracts values. */
-	#define LIBANDRIA4_ERROR_MAYERR_BODYMATCH( var,  onerr, onsucc ) \
-		LIBANDRIA4_MONAD_MAYBE_BODYMATCH( var, onerr, onsucc )
-	#define LIBANDRIA4_ERROR_MAYERR_EXPRMATCH( var,  onerr, onsucc ) \
-		LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( var, onerr, onsucc )
-		/* "onsucc" always produces a "nothing" monad, so onerr should do */
-		/*  something compatible. Basically only useful for translating */
-		/*  "maybe" types. */
-	#define LIBANDRIA4_ERROR_MAYERR_EXPRCHAIN( var,  name, type, onerr ) \
-		LIBANDRIA4_MONAD_MAYBE_EXPRCHAIN( name, type,  var,  onerr )
-			/* alt gets subbed in for "nothing". */
-	#define LIBANDRIA4_ERROR_MAYERR_REDUCE( var,  alttype, altval ) \
-		LIBANDRIA4_MONAD_MAYBE_REDUCE( var,  alttype, altval )
-	
-	#define LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( val ) \
-		return( LIBANDRIA4_ERROR_MAYERR_JUSTERR( val ) );
-	#define LIBANDRIA4_ERROR_MAYERR_RETURN_SUCCESS() \
-		return( LIBANDRIA4_ERROR_MAYERR_NOERR() );
 	
 	
 	
