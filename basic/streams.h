@@ -127,6 +127,37 @@ SOFTWARE.
 				( libandria4_commonio_handle*, long, int /* origin */ );
 	
 	
+	typedef enum
+	{
+		libandria4_commonio_handle_vtable_funcenums__INVALID = -1,
+		libandria4_commonio_handle_vtable_funcenums__NULL = 0,
+		
+		libandria4_commonio_handle_vtable_funcenums_flush = 1,
+		
+		libandria4_commonio_handle_vtable_funcenums_getc = 2,
+		libandria4_commonio_handle_vtable_funcenums_ungetc = 4,
+		libandria4_commonio_handle_vtable_funcenums_putc = 8,
+		
+		libandria4_commonio_handle_vtable_funcenums_gets_s = 16,
+		libandria4_commonio_handle_vtable_funcenums_puts_s = 32,
+		
+		libandria4_commonio_handle_vtable_funcenums_tell = 64,
+		libandria4_commonio_handle_vtable_funcenums_seek = 128,
+		libandria4_commonio_handle_vtable_funcenums_rewind = 256,
+		
+		libandria4_commonio_handle_vtable_funcenums_clearerr = 512,
+		libandria4_commonio_handle_vtable_funcenums_eof = 1024,
+		libandria4_commonio_handle_vtable_funcenums_error = 2048,
+		
+		libandria4_commonio_handle_vtable_funcenums_close = 4096,
+		
+			/* Remember to manually update! */
+		libandria4_commonio_handle_vtable_funcenums__ALLFLAGS = 8191,
+		libandria4_commonio_handle_vtable_funcenums__PASTEND
+		
+	} libandria4_commonio_handle_vtable_funcenums;
+	
+	
 		/* This, with the addition of "uintptr_t typeid;", was */
 		/*  formerly called libandria4_commonio_handle{}. A new */
 		/*  version of libandria4_commonio_handle{} now exists */

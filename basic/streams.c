@@ -43,32 +43,32 @@ int libandria4_commonio_handle_verifydispatch( libandria4_commonio_handle *handl
 {
 	if( handle )
 	{
-		switch( handle.dispatch )
+		switch( handle->dispatch )
 		{
 			case libandria4_commonio_handle_vtabtype_handle:
-				if( !( handle.vtab.hand ) )
+				if( !( handle->vtab.hand ) )
 				{
 					return( -5 );
 				}
 				break;
 			case libandria4_commonio_handle_vtabtype_istream:
-				if( !( handle.vtab.istr ) )
+				if( !( handle->vtab.istr ) )
 				{
 					return( -6 );
 				}
 				break;
 			case libandria4_commonio_handle_vtabtype_ostream:
-				if( !( handle.vtab.ostr ) )
+				if( !( handle->vtab.ostr ) )
 				{
 					return( -7 );
 				}
 				break;
 			default:
-				if( handle.dispatch == libandria4_commonio_handle_vtabtype_invalid )
+				if( handle->dispatch == libandria4_commonio_handle_vtabtype_invalid )
 				{
 					return( -2 );
 					
-				} else if( handle.dispatch == libandria4_commonio_handle_vtabtype__END )
+				} else if( handle->dispatch == libandria4_commonio_handle_vtabtype__END )
 				{
 					return( -3 );
 					
@@ -79,6 +79,191 @@ int libandria4_commonio_handle_verifydispatch( libandria4_commonio_handle *handl
 		}
 		
 		return( 1 );
+	}
+	
+	return( -1 );
+}
+
+
+
+#define libandria4_commonio_handle_hasfunc_OMNICAPS \
+	libandria4_commonio_handle_vtable_funcenums_flush | \
+	libandria4_commonio_handle_vtable_funcenums_close
+#define libandria4_commonio_handle_hasfunc_COMMONCAPS \
+	libandria4_commonio_handle_hasfunc_OMNICAPS | \
+	\
+	libandria4_commonio_handle_vtable_funcenums_tell | \
+	libandria4_commonio_handle_vtable_funcenums_seek | \
+	libandria4_commonio_handle_vtable_funcenums_rewind | \
+	\
+	libandria4_commonio_handle_vtable_funcenums_clearerr | \
+	libandria4_commonio_handle_vtable_funcenums_eof | \
+	libandria4_commonio_handle_vtable_funcenums_error
+static const libandria4_commonio_handle_vtable_funcenums
+	libandria4_commonio_handle_vtable_funcenums_masks[] =
+		{
+			/* libandria4_commonio_handle_vtabtype_invalid */
+				libandria4_commonio_handle_vtable_funcenums__INVALID,
+			
+			/* libandria4_commonio_handle_vtabtype_handle */
+				libandria4_commonio_handle_vtable_funcenums__ALLFLAGS,
+			/* libandria4_commonio_handle_vtabtype_istream */
+				libandria4_commonio_handle_hasfunc_COMMONCAPS |
+					libandria4_commonio_handle_vtable_funcenums_getc |
+					libandria4_commonio_handle_vtable_funcenums_gets_s |
+					libandria4_commonio_handle_vtable_funcenums_ungetc,
+			/* libandria4_commonio_handle_vtabtype_ostream */
+				libandria4_commonio_handle_hasfunc_COMMONCAPS |
+					libandria4_commonio_handle_vtable_funcenums_putc |
+					libandria4_commonio_handle_vtable_funcenums_puts_s,
+			/* libandria4_commonio_handle_vtabtype_seekable */
+				libandria4_commonio_handle_hasfunc_OMNICAPS |
+					libandria4_commonio_handle_vtable_funcenums_tell |
+					libandria4_commonio_handle_vtable_funcenums_seek |
+					libandria4_commonio_handle_vtable_funcenums_rewind,
+			/* libandria4_commonio_handle_vtabtype_errorable */
+				libandria4_commonio_handle_hasfunc_OMNICAPS |
+					libandria4_commonio_handle_vtable_funcenums_clearerr |
+					libandria4_commonio_handle_vtable_funcenums_eof |
+					libandria4_commonio_handle_vtable_funcenums_error,
+			
+			/* libandria4_commonio_handle_vtabtype__END */
+				libandria4_commonio_handle_vtable_funcenums__PASTEND
+		};
+
+libandria4_commonio_handle_vtable_funcenums libandria4_commonio_handle_detfuncs
+(
+	libandria4_commonio_handle *hand
+)
+{
+	if( hand && funcs >= libandria4_commonio_handle_vtable_funcenums__NULL )
+	{
+		if( funcs >= libandria4_commonio_handle_vtable_funcenums__PASTEND )
+		{
+			return( libandria4_commonio_handle_vtable_funcenums__INVALID );
+		}
+		if
+		(
+			hand->dispatch < libandria4_commonio_handle_vtabtype_invalid ||
+			hand->dispatch > libandria4_commonio_handle_vtabtype__END
+		)
+		{
+			return( libandria4_commonio_handle_vtable_funcenums__INVALID );
+		}
+		
+		
+		libandria4_commonio_handle_vtable_funcenums ret =
+			libandria4_commonio_handle_vtable_funcenums_masks[ hand->dispatch ];
+		
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_flush ) ?
+				( libandria4_commonio_handle_FETCH_flush( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_flush : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_getc ) ?
+				( libandria4_commonio_handle_FETCH_getc( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_getc : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_ungetc ) ?
+				( libandria4_commonio_handle_FETCH_ungetc( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_ungetc : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_putc ) ?
+				( libandria4_commonio_handle_FETCH_putc( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_putc : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_gets_s ) ?
+				( libandria4_commonio_handle_FETCH_gets_s( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_gets_s : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_puts_s ) ?
+				( libandria4_commonio_handle_FETCH_puts_s( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_puts_s : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_tell ) ?
+				( libandria4_commonio_handle_FETCH_tell( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_tell : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_seek ) ?
+				( libandria4_commonio_handle_FETCH_seek( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_seek : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_rewind ) ?
+				( libandria4_commonio_handle_FETCH_rewind( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_rewind : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_clearerr ) ?
+				( libandria4_commonio_handle_FETCH_clearerr( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_clearerr : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_eof ) ?
+				( libandria4_commonio_handle_FETCH_eof( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_eof : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_error ) ?
+				( libandria4_commonio_handle_FETCH_error( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_error : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		
+		ret ^=
+			( ret & libandria4_commonio_handle_vtable_funcenums_close ) ?
+				( libandria4_commonio_handle_FETCH_close( hand ) ?
+					libandria4_commonio_handle_vtable_funcenums_close : 
+					libandria4_commonio_handle_vtable_funcenums__NULL ) :
+				( libandria4_commonio_handle_vtable_funcenums__NULL );
+		
+		
+		return( ret );
+	}
+	
+	return( libandria4_commonio_handle_vtable_funcenums__INVALID );
+}
+int libandria4_commonio_handle_hasfunc
+(
+	libandria4_commonio_handle *hand,
+	libandria4_commonio_handle_vtable_funcenums funcs
+)
+{
+	if( hand && funcs >= libandria4_commonio_handle_vtable_funcenums__NULL )
+	{
+		if( funcs >= libandria4_commonio_handle_vtable_funcenums__PASTEND )
+		{
+			return( -2 );
+		}
+		
+		
+		return
+		(
+			( libandria4_commonio_handle_detfuncs( hand ) & funcs == funcs ) ?
+				1 : 0
+		);
 	}
 	
 	return( -1 );
