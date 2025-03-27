@@ -33,10 +33,11 @@ SOFTWARE.
 
 #include "basictypes.h"
 #include "stdmonads.h"
-#include "commonlib.h"
 	/* For LIBANDRIA4_RESULT_FAILURE_DOMAIN. */
 #include "commonerrvals.h"
 #include "simpleops.h"
+#include "elemtools.h"
+#include "commonlib.h"
 
 
 /* Platform-specific includes. */
@@ -195,32 +196,35 @@ libandria4_error_mayerr libandria4_error_print_simplestruct
 	{
 		if( !libandria4_commonio_handle_hasbasics( io ) )
 		{
-			LIBANDRIA4_ERROR_MAYERR_RETERR2();
-		}
-		if( !( io->puts_s ) )
-		{
-			LIBANDRIA4_ERROR_MAYERR_RETERR3();
-		}
-		if( !( err->str ) && err->str_len )
-		{
-			LIBANDRIA4_ERROR_MAYERR_RETERR4();
+			 /* LIBANDRIA4_ERROR_MAYERR_RETERR2(); */
+			 LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 2 );
 		}
 		
+		int res = 0, a;
+			/* This is a macro, it already exists, it does the right */
+			/*  thing, use it. And yes, THERE ARE MORE. */
+		libandria4_commonio_eithgeneric tmp =
+			libandria4_commonio_handle_PUTS_S(
+				io,
+				(libandria4_commonio_byte*)( err->str ), err->str_len
+			);
+		LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH(
+			tmp,
+			
+			LIBANDRIA4_OP_SETaFLAGresAS1,
+			LIBANDRIA4_OP_SETaFLAGresASn1
+		);
 		
-		if
-		(
-			!libandria4_commonio_recursivewrapper_puts_s
-			(
-				io,  (libandria4_commonio_byte*)( err->str ), err->str_len
-			)
-		)
+		if( !res )
 		{
-			LIBANDRIA4_ERROR_MAYERR_RETERR5();
+			/* LIBANDRIA4_ERROR_MAYERR_RETERR5(); */
+			LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 5 );
 		}
 		
 		LIBANDRIA4_ERROR_MAYERR_RETURN_SUCCESS();
 	}
-	LIBANDRIA4_ERROR_MAYERR_RETERR1();
+	/* LIBANDRIA4_ERROR_MAYERR_RETERR1(); */
+	LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 1 );
 }
 libandria4_error_mayerr libandria4_error_print
 (
@@ -236,7 +240,18 @@ libandria4_error_mayerr libandria4_error_print
 		{
 			LIBANDRIA4_ERROR_MAYERR_RETERR2();
 		}
-		if( !( io->putc && io->puts_s && io->flush ) )
+		if
+		(
+			!(
+				libandria4_commonio_handle_hasfunc
+				(
+					io,
+					libandria4_commonio_handle_vtable_funcenums_putc |
+						libandria4_commonio_handle_vtable_funcenums_puts_s |
+						libandria4_commonio_handle_vtable_funcenums_flush
+				)
+			)
+		)
 		{
 			LIBANDRIA4_ERROR_MAYERR_RETERR3();
 		}
