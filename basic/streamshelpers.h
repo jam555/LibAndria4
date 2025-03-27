@@ -30,6 +30,8 @@ SOFTWARE.
 # define LIBANDRIA4_BASIC_STREAMSHELPERS_H
 	
 	#include "streams.h"
+	#include "simpleops.h"
+	#include "elemtools.h"
 	
 	
 	
@@ -46,35 +48,254 @@ SOFTWARE.
 	/**  to depend on the documentation above. ******************/
 	/************************************************************/
 	/************************************************************/
+	/* WHAT documentation? TODO: copy that documentation to here. */
+	/* TODO: Add *_seekable support to libandria4_commonio_handle_*MATCH(). */
 	
 	/* This function and two macros are used "internally" to this header, */
 	/*  but aren't necessarily BAD to use elsewhere. */
 	int libandria4_commonio_handle_verifydispatch( libandria4_commonio_handle* );
-	#define libandria4_commonio_handle_BODYMATCH( var,  fullhand, inhand, outhand,  badhand ) \
-		if( libandria4_commonio_handle_verifydispatch( &( var ) ) ) { \
-			if( (var).dispatch == libandria4_commonio_handle_vtabtype_handle ) { \
-				(fullhand)( (var).vtab.hand ); } else \
-			if( (var).dispatch == libandria4_commonio_handle_vtabtype_istream ) { \
-				(inhand)( (var).vtab.istr ); } else \
-			if( (var).dispatch == libandria4_commonio_handle_vtabtype_ostream ) { \
-				(outhand)( (var).vtab.ostr ); } else \
-			{ (badhand)( (var).dispatch, &(var) ); } \
+	#define libandria4_commonio_handle_BODYMATCH( var,  fullhand, inhand, outhand,  badhand, ... ) \
+		if( libandria4_commonio_handle_verifydispatch( ( var ) ) ) { \
+			if( (var)->dispatch == libandria4_commonio_handle_vtabtype_handle ) { \
+				(fullhand)( ( var ), (var)->vtab.hand, __VA_ARGS__ ); } else \
+			if( (var)->dispatch == libandria4_commonio_handle_vtabtype_istream ) { \
+				(inhand)( ( var ), (var)->vtab.istr, __VA_ARGS__ ); } else \
+			if( (var)->dispatch == libandria4_commonio_handle_vtabtype_ostream ) { \
+				(outhand)( ( var ), (var)->vtab.ostr, __VA_ARGS__ ); } else \
+			{ (badhand)( (var)->dispatch, (var), __VA_ARGS__ ); } \
 		} else { \
-			(badhand)( libandria4_commonio_handle_vtabtype_invalid, &(var) ); }
-	#define libandria4_commonio_handle_EXPRMATCH( var,  fullhand, inhand, outhand,  badhand ) \
-		( ( libandria4_commonio_handle_verifydispatch( &( var ) ) ) ? ( \
-				( (var).dispatch == libandria4_commonio_handle_vtabtype_handle ) ? ( \
-					(fullhand)( &( var ), (var).vtab.hand ) \
+			(badhand)( libandria4_commonio_handle_vtabtype_invalid, &(var), __VA_ARGS__ ); }
+		/* This specifically does mapping between handles and handlers based on */
+		/*  handle type. */
+	#define libandria4_commonio_handle_EXPRMATCH( var,  fullhand, inhand, outhand,  badhand, ... ) \
+		( ( libandria4_commonio_handle_verifydispatch( ( var ) ) ) ? ( \
+				( (var)->dispatch == libandria4_commonio_handle_vtabtype_handle ) ? ( \
+					fullhand( ( var ), (var)->vtab.hand, __VA_ARGS__ ) \
 				) : ( \
-					( (var).dispatch == libandria4_commonio_handle_vtabtype_istream ) ? ( \
-						(inhand)( &( var ), (var).vtab.istr ) \
+					( (var)->dispatch == libandria4_commonio_handle_vtabtype_istream ) ? ( \
+						inhand( ( var ), (var)->vtab.istr, __VA_ARGS__ ) \
 					) : ( \
-						( (var).dispatch == libandria4_commonio_handle_vtabtype_ostream ) ? ( \
-							(outhand)( &( var ), (var).vtab.ostr ) \
+						( (var)->dispatch == libandria4_commonio_handle_vtabtype_ostream ) ? ( \
+							outhand( ( var ), (var)->vtab.ostr, __VA_ARGS__ ) \
 						) : ( \
-							(badhand)( (var).dispatch, &(var) ) ) ) ) \
-			) : ( (badhand)( libandria4_commonio_handle_vtabtype_invalid, &(var) ) ) )
+							badhand( (var)->dispatch, (var), __VA_ARGS__ ) ) ) ) \
+			) : ( badhand( libandria4_commonio_handle_vtabtype_invalid, &(var), __VA_ARGS__ ) ) )
 	
+	libandria4_commonio_handle_vtable_funcenums libandria4_commonio_handle_detfuncs
+	(
+		libandria4_commonio_handle *hand
+	);
+	int libandria4_commonio_handle_hasfunc
+	(
+		libandria4_commonio_handle *hand,
+		libandria4_commonio_handle_vtable_funcenums funcs
+	);
+	
+	/*********************************************************************************/
+	
+	
+		#define libandria4_commonio_handle_FETCH_flush_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->flush )
+	#define libandria4_commonio_handle_FETCH_flush( hptr ) ( \
+			(libandria4_commonio_genericfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_flush_HELPER1, \
+						libandria4_commonio_handle_FETCH_flush_HELPER1, \
+						libandria4_commonio_handle_FETCH_flush_HELPER1, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+	
+		#define libandria4_commonio_handle_FETCH_getc_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->getc )
+	#define libandria4_commonio_handle_FETCH_getc( hptr ) ( \
+			(libandria4_commonio_fetchbyte)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_getc_HELPER1, \
+						libandria4_commonio_handle_FETCH_getc_HELPER1, \
+						LIBANDRIA4_OP_ISVAL0, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+		#define libandria4_commonio_handle_FETCH_ungetc_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->ungetc )
+	#define libandria4_commonio_handle_FETCH_ungetc( hptr ) ( \
+			(libandria4_commonio_storebyte)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_ungetc_HELPER1, \
+						libandria4_commonio_handle_FETCH_ungetc_HELPER1, \
+						LIBANDRIA4_OP_ISVAL0, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+		#define libandria4_commonio_handle_FETCH_gets_s_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->gets_s )
+	#define libandria4_commonio_handle_FETCH_gets_s( hptr ) ( \
+			(libandria4_commonio_strfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_gets_s_HELPER1, \
+						libandria4_commonio_handle_FETCH_gets_s_HELPER1, \
+						LIBANDRIA4_OP_ISVAL0, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+	
+		#define libandria4_commonio_handle_FETCH_putc_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->putc )
+	#define libandria4_commonio_handle_FETCH_putc( hptr ) ( \
+			(libandria4_commonio_storebyte)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_putc_HELPER1, \
+						LIBANDRIA4_OP_ISVAL0, \
+						libandria4_commonio_handle_FETCH_putc_HELPER1, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+		#define libandria4_commonio_handle_FETCH_puts_s_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->puts_s )
+	#define libandria4_commonio_handle_FETCH_puts_s( hptr ) ( \
+			(libandria4_commonio_strfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_puts_s_HELPER1, \
+						LIBANDRIA4_OP_ISVAL0, \
+						libandria4_commonio_handle_FETCH_puts_s_HELPER1, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+	
+		#define libandria4_commonio_handle_FETCH_tell_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->tell )
+		#define libandria4_commonio_handle_FETCH_tell_HELPER2( just ) \
+			( (just)->tell )
+		#define libandria4_commonio_handle_FETCH_tell_HELPER3( hptr, vtab,  dummy ) \
+			LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->seekable, \
+					libandria4_commonio_handle_FETCH_tell_HELPER2, \
+					LIBANDRIA4_OP_ISVAL0 )
+	#define libandria4_commonio_handle_FETCH_tell( hptr ) ( \
+			(libandria4_commonio_longfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_tell_HELPER1, \
+						libandria4_commonio_handle_FETCH_tell_HELPER3, \
+						libandria4_commonio_handle_FETCH_tell_HELPER3, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+		#define libandria4_commonio_handle_FETCH_seek_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->seek )
+		#define libandria4_commonio_handle_FETCH_seek_HELPER2( just ) \
+			( (just)->seek )
+		#define libandria4_commonio_handle_FETCH_seek_HELPER3( hptr, vtab,  dummy ) \
+			LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->seekable, \
+					libandria4_commonio_handle_FETCH_seek_HELPER2, \
+					LIBANDRIA4_OP_ISVAL0 )
+	#define libandria4_commonio_handle_FETCH_seek( hptr ) ( \
+			(libandria4_commonio_seekfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_seek_HELPER1, \
+						libandria4_commonio_handle_FETCH_seek_HELPER3, \
+						libandria4_commonio_handle_FETCH_seek_HELPER3, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+		#define libandria4_commonio_handle_FETCH_rewind_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->rewind )
+		#define libandria4_commonio_handle_FETCH_rewind_HELPER2( just ) \
+			( (just)->rewind )
+		#define libandria4_commonio_handle_FETCH_rewind_HELPER3( hptr, vtab,  dummy ) \
+			LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->seekable, \
+					libandria4_commonio_handle_FETCH_rewind_HELPER2, \
+					LIBANDRIA4_OP_ISVAL0 )
+	#define libandria4_commonio_handle_FETCH_rewind( hptr ) ( \
+			(libandria4_commonio_genericfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_rewind_HELPER1, \
+						libandria4_commonio_handle_FETCH_rewind_HELPER3, \
+						libandria4_commonio_handle_FETCH_rewind_HELPER3, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+	
+		#define libandria4_commonio_handle_FETCH_clearerr_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->clearerr )
+		#define libandria4_commonio_handle_FETCH_clearerr_HELPER2( just ) \
+			( (just)->clearerr )
+		#define libandria4_commonio_handle_FETCH_clearerr_HELPER3( hptr, vtab,  dummy ) \
+			LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->errable, \
+					libandria4_commonio_handle_FETCH_clearerr_HELPER2, \
+					LIBANDRIA4_OP_ISVAL0 )
+	#define libandria4_commonio_handle_FETCH_clearerr( hptr ) ( \
+			(libandria4_commonio_genericfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_clearerr_HELPER1, \
+						libandria4_commonio_handle_FETCH_clearerr_HELPER3, \
+						libandria4_commonio_handle_FETCH_clearerr_HELPER3, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+		#define libandria4_commonio_handle_FETCH_eof_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->eof )
+		#define libandria4_commonio_handle_FETCH_eof_HELPER2( just ) \
+			( (just)->eof )
+		#define libandria4_commonio_handle_FETCH_eof_HELPER3( hptr, vtab,  dummy ) \
+			LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->errable, \
+					libandria4_commonio_handle_FETCH_eof_HELPER2, \
+					LIBANDRIA4_OP_ISVAL0 )
+	#define libandria4_commonio_handle_FETCH_eof( hptr ) ( \
+			(libandria4_commonio_genericfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_eof_HELPER1, \
+						libandria4_commonio_handle_FETCH_eof_HELPER3, \
+						libandria4_commonio_handle_FETCH_eof_HELPER3, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+		#define libandria4_commonio_handle_FETCH_error_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->error )
+		#define libandria4_commonio_handle_FETCH_error_HELPER2( just ) \
+			( (just)->error )
+		#define libandria4_commonio_handle_FETCH_error_HELPER3( hptr, vtab,  dummy ) \
+			LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->errable, \
+					libandria4_commonio_handle_FETCH_error_HELPER2, \
+					LIBANDRIA4_OP_ISVAL0 )
+	#define libandria4_commonio_handle_FETCH_error( hptr ) ( \
+			(libandria4_commonio_genericfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_error_HELPER1, \
+						libandria4_commonio_handle_FETCH_error_HELPER3, \
+						libandria4_commonio_handle_FETCH_error_HELPER3, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
+	
+	
+		#define libandria4_commonio_handle_FETCH_close_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->close )
+	#define libandria4_commonio_handle_FETCH_close( hptr ) ( \
+			(libandria4_commonio_genericfunc)( \
+				libandria4_commonio_handle_EXPRMATCH( \
+					hptr, \
+						libandria4_commonio_handle_FETCH_close_HELPER1, \
+						libandria4_commonio_handle_FETCH_close_HELPER1, \
+						libandria4_commonio_handle_FETCH_close_HELPER1, \
+						LIBANDRIA4_OP_ISVAL0, \
+						dummy ) ) )
 	
 	
 	/*********************************************************************************/
@@ -87,234 +308,156 @@ SOFTWARE.
 	/*********************************************************************************/
 	
 	
-		#define libandria4_commonio_handle_FLUSH_HELPER1( hptr, vtptr ) ( (vtptr)->flush( (hptr) ) )
-		#define libandria4_commonio_handle_FLUSH_HELPER2( type, hptr ) ( \
-			(type) == libandria4_commonio_handle_vtabtype_seekable ? \
-				libandria4_commonio_handle_FLUSH_HELPER1( (hptr), (hptr)->vtab.seek ) : ( \
-					(type) == libandria4_commonio_handle_vtabtype_errorable ? \
-						libandria4_commonio_handle_FLUSH_HELPER1( (hptr), (hptr)->vtab.err ) : \
-						LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2() ) )
+			/* The previous implementation even had the bad-handler use the helper */
+			/*  instead of just returning an error: should we do that again? */
+		#define libandria4_commonio_handle_FLUSH_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->flush( hptr ) )
 	#define libandria4_commonio_handle_FLUSH( hptr ) ( \
-			libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? \
-					libandria4_commonio_handle_EXPRMATCH( *( hptr ), \
-						libandria4_commonio_handle_FLUSH_HELPER1, \
-						libandria4_commonio_handle_FLUSH_HELPER1, \
-						libandria4_commonio_handle_FLUSH_HELPER1, \
-						libandria4_commonio_handle_FLUSH_HELPER2 ) : \
-					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_FLUSH_HELPER1, \
+					libandria4_commonio_handle_FLUSH_HELPER1, \
+					libandria4_commonio_handle_FLUSH_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					dummy ) )
 	
 	
-		#define libandria4_commonio_handle_GETC_HELPER1( hptr, vtptr ) ( (vtptr)->getc( (hptr) ) )
-		#define libandria4_commonio_handle_GETC_INVALID( type, hptr ) ( LIBANDRIA4_COMMONIO_EITHBYTE_ERR_2() ) )
-	#define libandria4_commonio_handle_GETC( hptr ) ( \
-			libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? \
-					libandria4_commonio_handle_EXPRMATCH( *( hptr ), \
-						libandria4_commonio_handle_GETC_HELPER1, \
-						libandria4_commonio_handle_GETC_HELPER1, \
-						libandria4_commonio_handle_GETC_INVALID, \
-						libandria4_commonio_handle_GETC_INVALID ) : \
-					LIBANDRIA4_COMMONIO_EITHBYTE_ERR_1() )
+		#define libandria4_commonio_handle_GETC_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->getc( hptr ) )
+	#define libandria4_commonio_handle_GETC( hptr,  val ) ( \
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_GETC_HELPER1, \
+					libandria4_commonio_handle_GETC_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHBYTE_ERR_2, \
+					LIBANDRIA4_COMMONIO_EITHBYTE_ERR_1, \
+					dummy ) )
 	
-		#define libandria4_commonio_handle_UNGETC_HELPER1( hptr, vtptr,  val ) \
-			( !!(vtptr) ? (vtptr)->ungetc( (hptr),  (val) ) : LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2 )
-		#define libandria4_commonio_handle_UNGETC_INVALID( type, hptr ) ( (libandria4_commonio_handle_vtable*)0 )
+		#define libandria4_commonio_handle_UNGETC_HELPER1( hptr, vtab,  val ) \
+			( (vtab)->ungetc( hptr,  val ) )
 	#define libandria4_commonio_handle_UNGETC( hptr,  val ) ( \
-			libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? \
-					libandria4_commonio_handle_UNGETC_HELPER1( (hptr), \
-							libandria4_commonio_handle_EXPRMATCH( *( hptr ), \
-								LIBANDRIA4_RETURN_2ND, \
-								LIBANDRIA4_RETURN_2ND, \
-								libandria4_commonio_handle_UNGETC_INVALID, \
-								libandria4_commonio_handle_UNGETC_INVALID ), \
-							(val) ) : \
-					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_UNGETC_HELPER1, \
+					libandria4_commonio_handle_UNGETC_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					(val) ) )
 	
-		#define libandria4_commonio_handle_GETS_S_HELPER1( hptr, vtptr,  arr, len ) \
-			( !!(vtptr) ? (vtptr)->gets_s( (hptr),  (arr), (len) ) : LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2 )
-		#define libandria4_commonio_handle_GETS_S_INVALID( type, hptr ) ( (libandria4_commonio_handle_vtable*)0 )
+		#define libandria4_commonio_handle_GETS_S_HELPER1( hptr, vtab,  arr, len ) \
+			( (vtab)->gets_s( hptr,  arr, len ) )
 	#define libandria4_commonio_handle_GETS_S( hptr,  arr, len ) ( \
-			libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? \
-					libandria4_commonio_handle_GETS_S_HELPER1( (hptr), \
-							libandria4_commonio_handle_EXPRMATCH( *( hptr ), \
-								LIBANDRIA4_RETURN_2ND, \
-								LIBANDRIA4_RETURN_2ND, \
-								libandria4_commonio_handle_GETS_S_INVALID, \
-								libandria4_commonio_handle_GETS_S_INVALID ), \
-							(arr), (len) ) : \
-					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_GETS_S_HELPER1, \
+					libandria4_commonio_handle_GETS_S_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					(arr), (len) ) )
 	
 	
-		#define libandria4_commonio_handle_PUTC_HELPER1( hptr, vtptr,  val ) \
-			( !!(vtptr) ? (vtptr)->putc( (hptr),  (val) ) : LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2 )
-		#define libandria4_commonio_handle_PUTC_INVALID( type, hptr ) ( (libandria4_commonio_handle_vtable*)0 )
+		#define libandria4_commonio_handle_PUTC_HELPER1( hptr, vtab,  val ) \
+			( (vtab)->putc( hptr,  val ) )
 	#define libandria4_commonio_handle_PUTC( hptr,  val ) ( \
-			libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? \
-					libandria4_commonio_handle_PUTC_HELPER1( (hptr), \
-							libandria4_commonio_handle_EXPRMATCH( *( hptr ), \
-								LIBANDRIA4_RETURN_2ND, \
-								libandria4_commonio_handle_PUTC_INVALID, \
-								LIBANDRIA4_RETURN_2ND, \
-								libandria4_commonio_handle_PUTC_INVALID ), \
-							(val) ) : \
-					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_PUTC_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2, \
+					libandria4_commonio_handle_PUTC_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					(val) ) )
 	
-		#define libandria4_commonio_handle_PUTS_S_HELPER1( hptr, vtptr,  arr, len ) \
-			( !!(vtptr) ? (vtptr)->puts_s( (hptr),  (arr), (len) ) : LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2 )
-		#define libandria4_commonio_handle_PUTS_S_INVALID( type, hptr ) ( (libandria4_commonio_handle_vtable*)0 )
+		#define libandria4_commonio_handle_PUTS_S_HELPER1( hptr, vtab,  arr, len ) \
+			( (vtab)->puts_s( hptr,  arr, len ) )
 	#define libandria4_commonio_handle_PUTS_S( hptr,  arr, len ) ( \
-			libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? \
-					libandria4_commonio_handle_PUTS_S_HELPER1( (hptr), \
-							libandria4_commonio_handle_EXPRMATCH( *( hptr ), \
-								LIBANDRIA4_RETURN_2ND, \
-								libandria4_commonio_handle_PUTS_S_INVALID, \
-								LIBANDRIA4_RETURN_2ND, \
-								libandria4_commonio_handle_PUTS_S_INVALID ), \
-							(arr), (len) ) : \
-					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_PUTS_S_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2, \
+					libandria4_commonio_handle_PUTS_S_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					(arr), (len) ) )
 	
 	
-		#define libandria4_commonio_handle_TELL_HELPER1( hptr, vtptr ) \
-			( (vtptr) ? \
-				(vtptr)->tell( (hptr) ) : \
-				LIBANDRIA4_COMMONIO_EITHLONG_ERR_2() )
-		#define libandria4_commonio_handle_TELL_HELPER2( hptr, vtptr ) \
-			libandria4_commonio_handle_TELL_HELPER1( (hptr), \
-				LIBANDRIA4_MONAD_MAYBE_REDUCE( libandria4_commonio_seekable*, (vtptr)->seekable, 0 ) )
-	#define libandria4_commonio_handle_TELL( hptr ) \
-		( libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? ( \
-					( hptr )->dispatch == libandria4_commonio_handle_vtabtype_handle ? \
-						libandria4_commonio_handle_TELL_HELPER1( ( hptr ), (hptr)->vtab.hand ) : ( \
-							( hptr )->dispatch == libandria4_commonio_handle_vtabtype_seekable ? \
-								libandria4_commonio_handle_TELL_HELPER1( ( hptr ), (hptr)->vtab.seek ) : ( \
-									( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_istream ? \
-										libandria4_commonio_handle_TELL_HELPER2( (hptr), (hptr)->vtab.istr ) : ( \
-											( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_ostream ? \
-												libandria4_commonio_handle_TELL_HELPER2( (hptr), (hptr)->vtab.ostr ) : \
-												LIBANDRIA4_COMMONIO_EITHLONG_ERR_3() ) ) ) ) : \
-				LIBANDRIA4_COMMONIO_EITHLONG_ERR_1() )
+		#define libandria4_commonio_handle_TELL_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->tell( hptr,  arr, len ) )
+	#define libandria4_commonio_handle_TELL( hptr ) ( \
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_TELL_HELPER1, \
+					libandria4_commonio_handle_TELL_HELPER1, \
+					libandria4_commonio_handle_TELL_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHLONG_ERR_1, \
+					dummy ) )
 	
-		#define libandria4_commonio_handle_SEEK_HELPER1( hptr, vtptr,  dist, origin ) \
-			( (vtptr) ? \
-				(vtptr)->seek( (hptr),  (dist), (origin) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2() )
-		#define libandria4_commonio_handle_SEEK_HELPER2( hptr, vtptr,  dist, origin ) \
-			libandria4_commonio_handle_SEEK_HELPER1( (hptr), \
-				LIBANDRIA4_MONAD_MAYBE_REDUCE( libandria4_commonio_seekable*, (vtptr)->seekable, 0 ), \
-				(dist), (origin) )
-	#define libandria4_commonio_handle_SEEK( hptr,  dist, origin ) \
-		( libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? ( \
-					( hptr )->dispatch == libandria4_commonio_handle_vtabtype_handle ? \
-						libandria4_commonio_handle_SEEK_HELPER1( \
-								( hptr ), (hptr)->vtab.hand,  (dist), (origin) ) : ( \
-							( hptr )->dispatch == libandria4_commonio_handle_vtabtype_seekable ? \
-								libandria4_commonio_handle_SEEK_HELPER1( \
-										( hptr ), (hptr)->vtab.seek,  (dist), (origin) ) : ( \
-									( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_istream ? \
-										libandria4_commonio_handle_SEEK_HELPER2( \
-												(hptr), (hptr)->vtab.istr,  (dist), (origin) ) : ( \
-											( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_ostream ? \
-												libandria4_commonio_handle_SEEK_HELPER2( \
-													(hptr), (hptr)->vtab.ostr,  (dist), (origin) ) : \
-												LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_3() ) ) ) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+		#define libandria4_commonio_handle_SEEK_HELPER1( hptr, vtab,  dist, origin ) \
+			( (vtab)->seek( hptr,  dist, origin ) )
+	#define libandria4_commonio_handle_SEEK( hptr,  dist, origin ) ( \
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_SEEK_HELPER1, \
+					libandria4_commonio_handle_SEEK_HELPER1, \
+					libandria4_commonio_handle_SEEK_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					(dist), (origin) ) )
 	
-		#define libandria4_commonio_handle_REWIND_HELPER1( hptr, vtptr ) \
-			( (vtptr) ? \
-				(vtptr)->rewind( (hptr) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2() )
-		#define libandria4_commonio_handle_REWIND_HELPER2( hptr, vtptr ) \
-			libandria4_commonio_handle_REWIND_HELPER1( (hptr), \
-				LIBANDRIA4_MONAD_MAYBE_REDUCE( libandria4_commonio_seekable*, (vtptr)->seekable, 0 ) )
-	#define libandria4_commonio_handle_REWIND( hptr ) \
-		( libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? ( \
-					( hptr )->dispatch == libandria4_commonio_handle_vtabtype_handle ? \
-						libandria4_commonio_handle_REWIND_HELPER1( ( hptr ), (hptr)->vtab.hand ) : ( \
-							( hptr )->dispatch == libandria4_commonio_handle_vtabtype_seekable ? \
-								libandria4_commonio_handle_REWIND_HELPER1( ( hptr ), (hptr)->vtab.seek ) : ( \
-									( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_istream ? \
-										libandria4_commonio_handle_REWIND_HELPER2( (hptr), (hptr)->vtab.istr ) : ( \
-											( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_ostream ? \
-												libandria4_commonio_handle_REWIND_HELPER2( (hptr), (hptr)->vtab.ostr ) : \
-												LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_3() ) ) ) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+		#define libandria4_commonio_handle_REWIND_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->rewind( hptr ) )
+	#define libandria4_commonio_handle_REWIND( hptr ) ( \
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_REWIND_HELPER1, \
+					libandria4_commonio_handle_REWIND_HELPER1, \
+					libandria4_commonio_handle_REWIND_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					dummy ) )
 	
 	
-		#define libandria4_commonio_handle_CLEARERR_HELPER1( hptr, vtptr ) \
-			( (vtptr) ? \
-				(vtptr)->clearerr( (hptr) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2() )
-		#define libandria4_commonio_handle_CLEARERR_HELPER2( hptr, vtptr ) \
-			libandria4_commonio_handle_CLEARERR_HELPER1( (hptr), \
-				LIBANDRIA4_MONAD_MAYBE_REDUCE( libandria4_commonio_errorable*, (vtptr)->errable, 0 ) )
-	#define libandria4_commonio_handle_CLEARERR( hptr ) \
-		( libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? ( \
-					( hptr )->dispatch == libandria4_commonio_handle_vtabtype_handle ? \
-						libandria4_commonio_handle_CLEARERR_HELPER1( ( hptr ), (hptr)->vtab.hand ) : ( \
-							( hptr )->dispatch == libandria4_commonio_handle_vtabtype_errorable ? \
-								libandria4_commonio_handle_CLEARERR_HELPER1( ( hptr ), (hptr)->vtab.err ) : ( \
-									( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_istream ? \
-										libandria4_commonio_handle_CLEARERR_HELPER2( (hptr), (hptr)->vtab.istr ) : ( \
-											( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_ostream ? \
-												libandria4_commonio_handle_CLEARERR_HELPER2( (hptr), (hptr)->vtab.ostr ) : \
-												LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_3() ) ) ) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
 	
-		#define libandria4_commonio_handle_EOF_HELPER1( hptr, vtptr ) \
-			( (vtptr) ? \
-				(vtptr)->eof( (hptr) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2() )
-		#define libandria4_commonio_handle_EOF_HELPER2( hptr, vtptr ) \
-			libandria4_commonio_handle_EOF_HELPER1( (hptr), \
-				LIBANDRIA4_MONAD_MAYBE_REDUCE( libandria4_commonio_errorable*, (vtptr)->errable, 0 ) )
-	#define libandria4_commonio_handle_EOF( hptr ) \
-		( libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? ( \
-					( hptr )->dispatch == libandria4_commonio_handle_vtabtype_handle ? \
-						libandria4_commonio_handle_EOF_HELPER1( ( hptr ), (hptr)->vtab.hand ) : ( \
-							( hptr )->dispatch == libandria4_commonio_handle_vtabtype_errorable ? \
-								libandria4_commonio_handle_EOF_HELPER1( ( hptr ), (hptr)->vtab.err ) : ( \
-									( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_istream ? \
-										libandria4_commonio_handle_EOF_HELPER2( (hptr), (hptr)->vtab.istr ) : ( \
-											( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_ostream ? \
-												libandria4_commonio_handle_EOF_HELPER2( (hptr), (hptr)->vtab.ostr ) : \
-												LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_3() ) ) ) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+		#define libandria4_commonio_handle_CLEARERR_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->clearerr( hptr ) )
+	#define libandria4_commonio_handle_CLEARERR( hptr ) ( \
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_CLEARERR_HELPER1, \
+					libandria4_commonio_handle_CLEARERR_HELPER1, \
+					libandria4_commonio_handle_CLEARERR_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					dummy ) )
 	
-		#define libandria4_commonio_handle_ERROR_HELPER1( hptr, vtptr ) \
-			( (vtptr) ? \
-				(vtptr)->error( (hptr) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2() )
-		#define libandria4_commonio_handle_ERROR_HELPER2( hptr, vtptr ) \
-			libandria4_commonio_handle_ERROR_HELPER1( (hptr), \
-				LIBANDRIA4_MONAD_MAYBE_REDUCE( libandria4_commonio_errorable*, (vtptr)->errable, 0 ) )
-	#define libandria4_commonio_handle_ERROR( hptr ) \
-		( libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? ( \
-					( hptr )->dispatch == libandria4_commonio_handle_vtabtype_handle ? \
-						libandria4_commonio_handle_ERROR_HELPER1( ( hptr ), (hptr)->vtab.hand ) : ( \
-							( hptr )->dispatch == libandria4_commonio_handle_vtabtype_errorable ? \
-								libandria4_commonio_handle_ERROR_HELPER1( ( hptr ), (hptr)->vtab.err ) : ( \
-									( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_istream ? \
-										libandria4_commonio_handle_ERROR_HELPER2( (hptr), (hptr)->vtab.istr ) : ( \
-											( hptr )->dispatch ==  libandria4_commonio_handle_vtabtype_ostream ? \
-												libandria4_commonio_handle_ERROR_HELPER2( (hptr), (hptr)->vtab.ostr ) : \
-												LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_3() ) ) ) ) : \
-				LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+		#define libandria4_commonio_handle_EOF_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->eof( hptr ) )
+	#define libandria4_commonio_handle_EOF( hptr ) ( \
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_EOF_HELPER1, \
+					libandria4_commonio_handle_EOF_HELPER1, \
+					libandria4_commonio_handle_EOF_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					dummy ) )
+	
+		#define libandria4_commonio_handle_ERROR_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->error( hptr ) )
+	#define libandria4_commonio_handle_ERROR( hptr ) ( \
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_ERROR_HELPER1, \
+					libandria4_commonio_handle_ERROR_HELPER1, \
+					libandria4_commonio_handle_ERROR_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					dummy ) )
 	
 	
-		#define libandria4_commonio_handle_CLOSE_HELPER1( hptr, vtptr ) ( (vtptr)->close( (hptr) ) )
-		#define libandria4_commonio_handle_CLOSE_HELPER2( type, hptr ) ( \
-			(type) == libandria4_commonio_handle_vtabtype_seekable ? \
-				libandria4_commonio_handle_CLOSE_HELPER1( (hptr), (hptr)->vtab.seek ) : ( \
-					(type) == libandria4_commonio_handle_vtabtype_errorable ? \
-						libandria4_commonio_handle_CLOSE_HELPER1( (hptr), (hptr)->vtab.err ) : \
-						LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_2() ) )
+		#define libandria4_commonio_handle_CLOSE_HELPER1( hptr, vtab,  dummy ) \
+			( (vtab)->close( hptr ) )
 	#define libandria4_commonio_handle_CLOSE( hptr ) ( \
-			libandria4_commonio_handle_verifydispatch( ( hptr ) ) ? \
-					libandria4_commonio_handle_EXPRMATCH( *( hptr ), \
-						libandria4_commonio_handle_CLOSE_HELPER1, \
-						libandria4_commonio_handle_CLOSE_HELPER1, \
-						libandria4_commonio_handle_CLOSE_HELPER1, \
-						libandria4_commonio_handle_CLOSE_HELPER2 ) : \
-					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1() )
+			libandria4_commonio_handle_EXPRMATCH( \
+				hptr, \
+					libandria4_commonio_handle_CLOSE_HELPER1, \
+					libandria4_commonio_handle_CLOSE_HELPER1, \
+					libandria4_commonio_handle_CLOSE_HELPER1, \
+					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
+					dummy ) )
 	
 #endif
 /* End libandria4 basic streamshelpers.h */
