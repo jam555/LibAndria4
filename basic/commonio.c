@@ -44,26 +44,22 @@ int libandria4_commonio_handle_hasbasics( libandria4_commonio_handle *io )
 {
 	if( io )
 	{
-		if( !( io->close ) )
-		{
-			return( -2 );
-		}
-		
-		if( !( io->error ) )
-		{
-			return( -2 );
-		}
-		if( !( io->eof ) )
-		{
-			return( -2 );
-		}
-		if( !( io->clearerr ) )
-		{
-			return( -2 );
-		}
-		
-		
-		return( 1 );
+		return
+		(
+			(
+				libandria4_commonio_handle_hasfunc
+				(
+					io,
+					
+					libandria4_commonio_handle_vtable_funcenums_clearerr |
+					libandria4_commonio_handle_vtable_funcenums_eof |
+					libandria4_commonio_handle_vtable_funcenums_error |
+					
+					libandria4_commonio_handle_vtable_funcenums_close
+				)
+				
+			) ? 1 : -2
+		);
 	}
 	
 	return( -1 );
