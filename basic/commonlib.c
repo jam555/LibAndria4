@@ -278,14 +278,16 @@ libandria4_error_mayerr libandria4_error_print
 					LIBANDRIA4_ERROR_MAYERR_RETERR4();
 				}
 				
-				res2 = libandria4_error_print_simplestruct( io, err->funcname );
+				libandria4_error_simplestruct *simperr = (libandria4_error_simplestruct*)err;
+				res2 = libandria4_error_print_simplestruct( io, simperr->funcname );
 				LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR5 );
 				
 				if( !libandria4_commonio_utility_putint( io,  line ) )
 				{
 					LIBANDRIA4_ERROR_MAYERR_RETERR6();
 				}
-				libandria4_commonio_eithgeneric res1 = io->putc( io,  (libandria4_commonio_byte)' ' );
+				libandria4_commonio_eithgeneric res1 =
+					libandria4_commonio_handle_PUTC( io,  (libandria4_commonio_byte)' ' );
 				res2 = LIBANDRIA4_COMMONIO_EITHGENERIC_TO_ERRMAYERR( res1 );
 				LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR7 );
 				if
@@ -335,7 +337,7 @@ libandria4_error_mayerr libandria4_error_print
 							libandria4_error_simplestruct,
 							type,
 							
-							err
+							simperr
 						)
 					);
 				LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR11 );
