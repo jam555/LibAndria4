@@ -71,11 +71,16 @@ int libandria4_commonio_utility_clearerr( libandria4_commonio_handle *io )
 {
 	if( io )
 	{
-		if( !( io->putc ) )
-		{
-			return( -2 );
-		}
-		if( !( io->eof && io->clearerr ) )
+		if
+		(
+			libandria4_commonio_handle_hasfunc
+			(
+				io,
+				
+				libandria4_commonio_handle_vtable_funcenums_clearerr |
+				libandria4_commonio_handle_vtable_funcenums_eof
+			)
+		)
 		{
 			return( -3 );
 		}
@@ -84,11 +89,11 @@ int libandria4_commonio_utility_clearerr( libandria4_commonio_handle *io )
 		libandria4_commonio_eithgeneric res1;
 		libandria4_commonio_mayerr res2;
 		
-		res1 = io->eof( io );
+		res1 = libandria4_commonio_handle_EOF( io );
 		res2 = LIBANDRIA4_COMMONIO_EITHGENERIC_TO_MAYERR( res1 );
 		LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  libandria4_commonio_int_RETERR4 );
 		
-		res1 = io->clearerr( io );
+		res1 = libandria4_commonio_handle_CLEARERR( io );
 		res2 = LIBANDRIA4_COMMONIO_EITHGENERIC_TO_MAYERR( res );
 		LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  libandria4_commonio_int_RETERR5 );
 		
@@ -111,11 +116,28 @@ int libandria4_commonio_recursivewrapper_puts_s
 		{
 			return( -2 );
 		}
-		if( !( io->puts_s ) )
+		if
+		(
+			libandria4_commonio_handle_hasfunc
+			(
+				io,
+				
+				libandria4_commonio_handle_vtable_funcenums_puts_s
+			)
+		)
 		{
 			return( -3 );
 		}
-		if( !( io->eof && io->clearerr ) )
+		if
+		(
+			libandria4_commonio_handle_hasfunc
+			(
+				io,
+				
+				libandria4_commonio_handle_vtable_funcenums_clearerr |
+				libandria4_commonio_handle_vtable_funcenums_eof
+			)
+		)
 		{
 			return( -4 );
 		}
@@ -126,7 +148,10 @@ int libandria4_commonio_recursivewrapper_puts_s
 		
 		while( len - iter )
 		{
-			res1 = io->puts_s( io, (libandria4_commonio_byte*)( str + iter ), len - iter );
+			res1 = libandria4_commonio_handle_PUTS_S(
+					io,
+					(libandria4_commonio_byte*)( str + iter ), len - iter
+				);
 			LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH(
 				res1,
 					LIBANDRIA4_OP_SETa,
@@ -148,11 +173,28 @@ int libandria4_commonio_utility_putint( libandria4_commonio_handle *io,  int i )
 {
 	if( io )
 	{
-		if( !( io->putc ) )
+		if
+		(
+			libandria4_commonio_handle_hasfunc
+			(
+				io,
+				
+				libandria4_commonio_handle_vtable_funcenums_putc
+			)
+		)
 		{
 			return( -2 );
 		}
-		if( !( io->eof && io->clearerr ) )
+		if
+		(
+			libandria4_commonio_handle_hasfunc
+			(
+				io,
+				
+				libandria4_commonio_handle_vtable_funcenums_clearerr |
+				libandria4_commonio_handle_vtable_funcenums_eof
+			)
+		)
 		{
 			return( -3 );
 		}
@@ -162,7 +204,8 @@ int libandria4_commonio_utility_putint( libandria4_commonio_handle *io,  int i )
 		libandria4_commonio_eithgeneric res1;
 #define libandria4_commonio_utility_putint_PUTLOOP( reterr, chara ) \
 		b = 1; while( b ) { b = 0; \
-			res1 = io->putc( io, (libandria4_commonio_byte)( chara ) ); \
+			res1 = libandria4_commonio_handle_PUTC( \
+				io, (libandria4_commonio_byte)( chara ) ); \
 			LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( res1, \
 				LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb ); \
 			if( b && !libandria4_commonio_utility_clearerr( io ) ) { ( reterr )(); } }
