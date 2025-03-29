@@ -271,6 +271,23 @@ SOFTWARE.
 	struct libandria4_commonio_seekable
 	{
 	};
+	
+	
+	
+	libandria4_commonio_eithgeneric
+		libandria4_commonio_genericfunc_reterr
+			( libandria4_commonio_handle *ignore );
+	libandria4_commonio_eithlong
+		libandria4_commonio_longfunc_reterr
+			( libandria4_commonio_handle *ignore );
+	libandria4_commonio_eithgeneric
+		libandria4_commonio_seekfunc_reterr
+			( libandria4_commonio_handle *ignore1, long ignore2, int ignore3 );
+	
+	
+	
+	
+	
 	/*
 		For the sake of convenience, a comprehensive set of function macros
 		have been created to access the various standard functions accessible

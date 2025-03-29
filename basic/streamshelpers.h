@@ -380,35 +380,65 @@ SOFTWARE.
 	
 	
 		#define libandria4_commonio_handle_TELL_HELPER1( hptr, vtab,  dummy ) \
-			( (vtab)->tell( hptr,  arr, len ) )
+			( (vtab)->tell( hptr ) )
+			#define libandria4_commonio_handle_TELL_HELPER2( just ) \
+				( (just)->tell )
+			#define libandria4_commonio_handle_TELL_HELPER3( ... ) \
+				( &libandria4_commonio_longfunc_reterr )
+		#define libandria4_commonio_handle_TELL_HELPER4( hptr, vtab,  dummy ) \
+			( LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->seekable, \
+					libandria4_commonio_handle_TELL_HELPER2, \
+					libandria4_commonio_handle_TELL_HELPER3 ) \
+				( hptr ) )
 	#define libandria4_commonio_handle_TELL( hptr ) ( \
 			libandria4_commonio_handle_EXPRMATCH( \
 				hptr, \
 					libandria4_commonio_handle_TELL_HELPER1, \
-					libandria4_commonio_handle_TELL_HELPER1, \
-					libandria4_commonio_handle_TELL_HELPER1, \
+					libandria4_commonio_handle_TELL_HELPER4, \
+					libandria4_commonio_handle_TELL_HELPER4, \
 					LIBANDRIA4_COMMONIO_EITHLONG_ERR_1, \
 					dummy ) )
 	
 		#define libandria4_commonio_handle_SEEK_HELPER1( hptr, vtab,  dist, origin ) \
 			( (vtab)->seek( hptr,  dist, origin ) )
+			#define libandria4_commonio_handle_SEEK_HELPER2( just ) \
+				( (just)->seek )
+			#define libandria4_commonio_handle_SEEK_HELPER3( ... ) \
+				( &libandria4_commonio_seekfunc_reterr )
+		#define libandria4_commonio_handle_SEEK_HELPER4( hptr, vtab,  dummy ) \
+			( LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->seekable, \
+					libandria4_commonio_handle_SEEK_HELPER2, \
+					libandria4_commonio_handle_SEEK_HELPER3 ) \
+				( hptr,  dist, origin ) )
 	#define libandria4_commonio_handle_SEEK( hptr,  dist, origin ) ( \
 			libandria4_commonio_handle_EXPRMATCH( \
 				hptr, \
 					libandria4_commonio_handle_SEEK_HELPER1, \
-					libandria4_commonio_handle_SEEK_HELPER1, \
-					libandria4_commonio_handle_SEEK_HELPER1, \
+					libandria4_commonio_handle_SEEK_HELPER4, \
+					libandria4_commonio_handle_SEEK_HELPER4, \
 					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
 					(dist), (origin) ) )
 	
 		#define libandria4_commonio_handle_REWIND_HELPER1( hptr, vtab,  dummy ) \
 			( (vtab)->rewind( hptr ) )
+			#define libandria4_commonio_handle_REWIND_HELPER2( just ) \
+				( (just)->rewind )
+			#define libandria4_commonio_handle_REWIND_HELPER3( ... ) \
+				( &libandria4_commonio_genericfunc_reterr )
+		#define libandria4_commonio_handle_REWIND_HELPER4( hptr, vtab,  dummy ) \
+			( LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->seekable, \
+					libandria4_commonio_handle_REWIND_HELPER2, \
+					libandria4_commonio_handle_REWIND_HELPER3 ) \
+				( hptr ) )
 	#define libandria4_commonio_handle_REWIND( hptr ) ( \
 			libandria4_commonio_handle_EXPRMATCH( \
 				hptr, \
 					libandria4_commonio_handle_REWIND_HELPER1, \
-					libandria4_commonio_handle_REWIND_HELPER1, \
-					libandria4_commonio_handle_REWIND_HELPER1, \
+					libandria4_commonio_handle_REWIND_HELPER4, \
+					libandria4_commonio_handle_REWIND_HELPER4, \
 					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
 					dummy ) )
 	
@@ -416,6 +446,16 @@ SOFTWARE.
 	
 		#define libandria4_commonio_handle_CLEARERR_HELPER1( hptr, vtab,  dummy ) \
 			( (vtab)->clearerr( hptr ) )
+			#define libandria4_commonio_handle_CLEARERR_HELPER2( just ) \
+				( (just)->clearerr )
+			#define libandria4_commonio_handle_CLEARERR_HELPER3( ... ) \
+				( &libandria4_commonio_genericfunc_reterr )
+		#define libandria4_commonio_handle_CLEARERR_HELPER4( hptr, vtab,  dummy ) \
+			( LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->errable, \
+					libandria4_commonio_handle_CLEARERR_HELPER2, \
+					libandria4_commonio_handle_CLEARERR_HELPER3 ) \
+				( hptr ) )
 	#define libandria4_commonio_handle_CLEARERR( hptr ) ( \
 			libandria4_commonio_handle_EXPRMATCH( \
 				hptr, \
@@ -427,23 +467,43 @@ SOFTWARE.
 	
 		#define libandria4_commonio_handle_EOF_HELPER1( hptr, vtab,  dummy ) \
 			( (vtab)->eof( hptr ) )
+			#define libandria4_commonio_handle_EOF_HELPER2( just ) \
+				( (just)->eof )
+			#define libandria4_commonio_handle_EOF_HELPER3( ... ) \
+				( &libandria4_commonio_genericfunc_reterr )
+		#define libandria4_commonio_handle_EOF_HELPER4( hptr, vtab,  dummy ) \
+			( LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->errable, \
+					libandria4_commonio_handle_EOF_HELPER2, \
+					libandria4_commonio_handle_EOF_HELPER3 ) \
+				( hptr ) )
 	#define libandria4_commonio_handle_EOF( hptr ) ( \
 			libandria4_commonio_handle_EXPRMATCH( \
 				hptr, \
 					libandria4_commonio_handle_EOF_HELPER1, \
-					libandria4_commonio_handle_EOF_HELPER1, \
-					libandria4_commonio_handle_EOF_HELPER1, \
+					libandria4_commonio_handle_EOF_HELPER4, \
+					libandria4_commonio_handle_EOF_HELPER4, \
 					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
 					dummy ) )
 	
 		#define libandria4_commonio_handle_ERROR_HELPER1( hptr, vtab,  dummy ) \
 			( (vtab)->error( hptr ) )
+			#define libandria4_commonio_handle_ERROR_HELPER2( just ) \
+				( (just)->error )
+			#define libandria4_commonio_handle_ERROR_HELPER3( ... ) \
+				( &libandria4_commonio_genericfunc_reterr )
+		#define libandria4_commonio_handle_ERROR_HELPER4( hptr, vtab,  dummy ) \
+			( LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
+				(vtab)->errable, \
+					libandria4_commonio_handle_ERROR_HELPER2, \
+					libandria4_commonio_handle_ERROR_HELPER3 ) \
+				( hptr ) )
 	#define libandria4_commonio_handle_ERROR( hptr ) ( \
 			libandria4_commonio_handle_EXPRMATCH( \
 				hptr, \
 					libandria4_commonio_handle_ERROR_HELPER1, \
-					libandria4_commonio_handle_ERROR_HELPER1, \
-					libandria4_commonio_handle_ERROR_HELPER1, \
+					libandria4_commonio_handle_ERROR_HELPER4, \
+					libandria4_commonio_handle_ERROR_HELPER4, \
 					LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1, \
 					dummy ) )
 	

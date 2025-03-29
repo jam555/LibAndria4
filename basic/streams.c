@@ -39,6 +39,36 @@ SOFTWARE.
 
 
 
+libandria4_commonio_eithgeneric
+	libandria4_commonio_genericfunc_reterr
+		( libandria4_commonio_handle *ignore )
+{
+	return
+	(
+		LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1( dummy )
+	);
+}
+libandria4_commonio_eithlong
+	libandria4_commonio_longfunc_reterr
+		( libandria4_commonio_handle *ignore )
+{
+	return
+	(
+		LIBANDRIA4_COMMONIO_EITHLONG_ERR_1( dummy )
+	);
+}
+libandria4_commonio_eithgeneric
+	libandria4_commonio_seekfunc_reterr
+		( libandria4_commonio_handle *ignore1, long ignore2, int ignore3 )
+{
+	return
+	(
+		LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1( dummy )
+	);
+}
+
+
+
 int libandria4_commonio_handle_verifydispatch( libandria4_commonio_handle *handle )
 {
 	if( handle )
