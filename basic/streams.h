@@ -30,9 +30,6 @@ SOFTWARE.
 # define LIBANDRIA4_BASIC_STREAMS_H
 	
 	#include "arraccess.h"
-		/* commonio.h also includes this file, but does so after it's */
-		/*  defined several types that we use here. */
-	#include "commonio.h"
 	
 	
 	
@@ -68,13 +65,15 @@ SOFTWARE.
 	
 	
 	
+	/* These two wrapped *_errorable and *_seekable instead of their vtable */
+	/*  versions... and that was useless. */
 	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
 		libandria4_commonio_mayerrable,
-		libandria4_commonio_errorable*
+		libandria4_commonio_errorable_vtable*
 	);
 	LIBANDRIA4_MONAD_MAYBE_BUILDTYPE(
 		libandria4_commonio_mayseek,
-		libandria4_commonio_seekable*
+		libandria4_commonio_seekable_vtable*
 	);
 	
 	/* Do I even use these macros anywhere? They may need to be moved */
@@ -93,6 +92,12 @@ SOFTWARE.
 		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayseek, ( libandria4_commonio_seekable* ) )
 	#define LIBANDRIA4_COMMONIO_MAYERR_NOSEEKABLE() \
 		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayseek, ( libandria4_commonio_seekable* ) )
+	
+	
+	
+		/* commonio.h also includes this file, but does so after it's */
+		/*  defined several types that we use here. */
+	#include "commonio.h"
 	
 	
 	
@@ -283,6 +288,24 @@ SOFTWARE.
 	libandria4_commonio_eithgeneric
 		libandria4_commonio_seekfunc_reterr
 			( libandria4_commonio_handle *ignore1, long ignore2, int ignore3 );
+	libandria4_commonio_eithbyte
+		libandria4_commonio_fetchbyte_reterr
+			( libandria4_commonio_handle *ignore );
+	libandria4_commonio_eithgeneric
+		libandria4_commonio_storebyte_reterr
+			( libandria4_commonio_handle *ignore, libandria4_commonio_byte ignore2 );
+	libandria4_commonio_eithgeneric
+		libandria4_commonio_strfunc_reterr
+			( libandria4_commonio_handle *ignore1, libandria4_commonio_byte *ignore2, size_t ignore3 );
+	
+	
+	
+	#define libandria4_commonio_genericfunc_NULLPTR( ... ) ( ( libandria4_commonio_genericfunc )0 )
+	#define libandria4_commonio_longfunc_NULLPTR( ... ) ( ( libandria4_commonio_longfunc )0 )
+	#define libandria4_commonio_seekfunc_NULLPTR( ... ) ( ( libandria4_commonio_seekfunc )0 )
+	#define libandria4_commonio_fetchbyte_NULLPTR( ... ) ( ( libandria4_commonio_fetchbyte )0 )
+	#define libandria4_commonio_storebyte_NULLPTR( ... ) ( ( libandria4_commonio_storebyte )0 )
+	#define libandria4_commonio_strfunc_NULLPTR( ... ) ( ( libandria4_commonio_strfunc )0 )
 	
 	
 	
