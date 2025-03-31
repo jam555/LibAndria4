@@ -66,6 +66,33 @@ libandria4_commonio_eithgeneric
 		LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1( dummy )
 	);
 }
+libandria4_commonio_eithbyte
+	libandria4_commonio_fetchbyte_reterr
+		( libandria4_commonio_handle *ignore )
+{
+	return
+	(
+		LIBANDRIA4_COMMONIO_EITHBYTE_ERR_1( dummy )
+	);
+}
+libandria4_commonio_eithgeneric
+	libandria4_commonio_storebyte_reterr
+		( libandria4_commonio_handle *ignore, libandria4_commonio_byte ignore2 )
+{
+	return
+	(
+		LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1( dummy )
+	);
+}
+libandria4_commonio_eithgeneric
+	libandria4_commonio_strfunc_reterr
+		( libandria4_commonio_handle *ignore1, libandria4_commonio_byte *ignore2, size_t ignore3 )
+{
+	return
+	(
+		LIBANDRIA4_COMMONIO_EITHGENERIC_ERR_1( dummy )
+	);
+}
 
 
 
@@ -166,12 +193,8 @@ libandria4_commonio_handle_vtable_funcenums libandria4_commonio_handle_detfuncs
 	libandria4_commonio_handle *hand
 )
 {
-	if( hand && funcs >= libandria4_commonio_handle_vtable_funcenums__NULL )
+	if( hand )
 	{
-		if( funcs >= libandria4_commonio_handle_vtable_funcenums__PASTEND )
-		{
-			return( libandria4_commonio_handle_vtable_funcenums__INVALID );
-		}
 		if
 		(
 			hand->dispatch < libandria4_commonio_handle_vtabtype_invalid ||
@@ -315,7 +338,14 @@ libandria4_commonio_eithgeneric libandria4_commonio_common_puts_s
 		{
 			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED );
 		}
-		if( !( io->putc ) )
+		if
+		(
+			!libandria4_commonio_handle_hasfunc
+			(
+				io,
+				libandria4_commonio_handle_vtable_funcenums_putc
+			)
+		)
 		{
 			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED );
 		}
@@ -329,7 +359,7 @@ libandria4_commonio_eithgeneric libandria4_commonio_common_puts_s
 		int a;
 		while( iter < len )
 		{
-			res = io->putc( io, str[ iter ] );
+			res = libandria4_commonio_handle_PUTC( io,  str[ iter ] );
 			LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH(
 				res,
 					LIBANDRIA4_NULL_MACRO,
@@ -356,17 +386,24 @@ libandria4_commonio_eithgeneric libandria4_commonio_common_gets_s
 		{
 			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED );
 		}
-		if( !( io->getc ) )
+		if
+		(
+			!libandria4_commonio_handle_hasfunc
+			(
+				io,
+				libandria4_commonio_handle_vtable_funcenums_getc
+			)
+		)
 		{
 			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED );
 		}
-		if( !str && len )
+		if( !dest && len )
 		{
 			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_SIZEMISMATCH );
 		}
-						libandria4_commonio_eithbyte
+						/* TODO: delete this! libandria4_commonio_eithbyte
 							(*libandria4_commonio_fetchbyte)
-								( libandria4_commonio_handle* );
+								( libandria4_commonio_handle* ); */
 		
 		libandria4_commonio_eithbyte res;
 		size_t iter = 0;
@@ -374,7 +411,7 @@ libandria4_commonio_eithgeneric libandria4_commonio_common_gets_s
 		libandria4_commonio_err b = LIBANDRIA4_COMMONIOVALS_ERR_UNDIFFERENTIATED;
 		while( iter < len && b == LIBANDRIA4_COMMONIOVALS_ERR_UNDIFFERENTIATED )
 		{
-			res = io->getc( io );
+			res = libandria4_commonio_handle_GETC( io );
 #define libandria4_commonio_common_gets_s_ONERR( err ) \
 	b = (err); if( b != LIBANDRIA4_COMMONIOVALS_EOF ) { LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( b ); }
 			LIBANDRIA4_COMMONIO_EITHBYTE_BODYMATCH(
@@ -383,7 +420,7 @@ libandria4_commonio_eithgeneric libandria4_commonio_common_gets_s
 					libandria4_commonio_common_gets_s_ONERR
 				);
 			
-			str[ iter ] = a;
+			dest[ iter ] = a;
 			++iter;
 		}
 		
@@ -435,14 +472,14 @@ static libandria4_commonio_eithbyte
 	{
 		if( hand_->dispatch != libandria4_commonio_handle_vtabtype_istream )
 		{
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH );
+			LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH );
 		}
 		
 		libandria4_commonio_istream_ungetwrapper_vtable *hand =
 			libandria4_commonio_istream_ungetwrapper_vtable_FROM_ISTREAMVTABPTR( hand_->vtab.istr );
 		if( !hand || !( hand->is ) || !( hand->is->getc ) )
 		{
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED );
+			LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED );
 		}
 		
 		libandria4_commonio_byte a;
@@ -523,17 +560,14 @@ int libandria4_commonio_istream_ungetwrapper_init
 
 
 
-???
-	/* Are these right? Do we need some other "hand_" value? */
-???
 #define libandria4_commonio_GENERICGETC( name, typeenum, desttype, converter, frommember ) \
 static libandria4_commonio_eithbyte name( libandria4_commonio_handle *hand_ ) { \
 	if( hand_ ) { \
 		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
 		desttype *hand = converter( hand_->vtab. frommember ); \
 		if( !hand || !( hand->is ) || !( hand->is->getc ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
 		return( ( hand->is->getc )( hand_ ) ); } \
 	LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICUNGETC( name, typeenum, desttype, converter, frommember ) \
@@ -616,7 +650,6 @@ static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ )
 			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
 		return( ( hand->is->error )( hand_ ) ); } \
 	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
-???
 
 
 
@@ -683,6 +716,8 @@ libandria4_commonio_GENERICFLUSH(
 	libandria4_commonio_ostream_vtable_wrapperflush,
 		libandria4_commonio_handle_vtabtype_ostream,
 		libandria4_commonio_handlevtable_2ostream,
+			/* This is defined in streamsinner.h: re-examine it to figure out */
+			/*  WHY it casts between istream and ostream. */
 		libandria4_commonio_handlevtable_2ostream_vtable_FROM_HANDLEVTABPTR,
 		ostr
 );
@@ -864,6 +899,7 @@ int libandria4_commonio_handlevtable_errorable_init
 		libandria4_commonio_handle_opaquedata*,
 		libandria4_commonio_handle_opaquedata_ondie );
 */
+typedef struct libandria4_commonio_handle_opaquedata libandria4_commonio_handle_opaquedata;
 LIBANDRIA4_MONAD_REFPOINTER_DEFINE_WRAPPEDDECL(
 	libandria4_commonio_handle_data,
 	libandria4_commonio_handle_opaquedata* );
@@ -881,103 +917,6 @@ void libandria4_commonio_handle_opaquedata_ondie( void *ign1, libandria4_commoni
 
 
 
-	#define LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE_DEFINITION( name, valuetype ) \
-		struct name \
-			{ uintptr_t ref_count; \
-				void *auxiliary; \
-				/* Note that for the sake of supporting arrays (pascal or */ \
-				/*  otherwise), the valuetype member MUST be the last in */ \
-				/*  the structure. */ \
-				valuetype val; };
-	#define LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name, valuetype ) \
-		typedef struct name name; \
-		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE_DEFINITION( name, valuetype ); \
-		typedef void (*name##_onbadfp)( void*,  name**, valuetype, void* );
-	
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_INIT( name, valuetype ) \
-		int name##_init( libandria4_memfuncs_t *mf,  name **ptr, \
-			valuetype val, void *aux, \
-			name##_onbadfp badalloc, void *badata ) \
-		{ if( ptr && !( *ptr ) ) { LIBANDRIA4_MEMFUNCS_T_PTR_BLOCKREQUIRE( mf ); \
-				if( !( mf->alloc ) ) { if( badalloc ) { badalloc( badata,  ptr,  val, aux ); } \
-					return( -2 ); } \
-				void *a = (void*)0; \
-				libandria4_ptrresult ptrres = (mf->alloc)( mf->data, sizeof( name ) ); \
-				LIBANDRIA4_PTRRESULT_BODYMATCH( ptrres, \
-					LIBANDRIA4_OP_SETa, LIBANDRIA4_NULL_MACRO ) } \
-				if( a ) { \
-					*ptr = (name*)a; ( *ptr )->ref_count = 1; \
-					( *ptr )->auxiliary = aux; ( *ptr )->val = val; } \
-				else { if( badalloc ) { badalloc( badata,  ptr,  val, aux ); } \
-					return( -3 ); } \
-				return( 1 ); } \
-			return( -1 ); }
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_ATTEND( name,  onattend ) \
-		libandria4_maybeint name##_attend( name **ptr ) { \
-			if( ptr && *ptr && ( *ptr )->ref_count =< 1 ) { \
-				++( ( *ptr )->ref_count ); \
-				onattend( *ptr, ( *ptr )->auxiliary, ( *ptr )->val ); \
-				LIBANDRIA4_MAYBEINT_RETURNJUST( 1 ); } \
-			LIBANDRIA4_MAYBEINT_RETURNNOTHING(); }
-		/* Returns "nothing" for bad args, 1 for normal success, 2 for deallocating success. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_NEGLECT( name,  onneglect, ondie ) \
-		libandria4_maybeint name##_neglect( libandria4_memfuncs_t *mf,  name **ptr ) { \
-			if( ptr && ( *ptr )->ref_count =< 1 ) { int res = 1; \
-				--( ( *ptr )->ref_count ); \
-				onneglect( *ptr, ( *ptr )->auxiliary, ( *ptr )->val ); \
-				if( ( *ptr )->ref_count < 1 ) { \
-					ondie( ( *ptr )->auxiliary, ( *ptr )->val ); \
-					if( mf->dealloc ) { return( (mf->dealloc)( mf->data, *ptr ) ); } \
-					res = 2; } \
-				*ptr = ((name)*)0; \
-				LIBANDRIA4_MAYBEINT_RETURNJUST( res ); } \
-			LIBANDRIA4_MAYBEINT_RETURNNOTHING(); }
-
-
-
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDDECL( name, valuetype ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_BUILDTYPE( name, valuetype ); \
-		int name##_init( name **ptr,  valuetype val, void *aux, \
-			name##_onbadfp badalloc, void *badata ); \
-		libandria4_maybeint name##_attend( name **ptr ); \
-		libandria4_maybeint name##_neglect( name **ptr );
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDIMPL( name, valuetype, memfuncs_ptr,  onattend, onneglect, ondie ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_INIT( libandria4_definer_##name, valuetype ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_NEGLECT( libandria4_definer_##name,  onneglect, ondie ) \
-		int name##_init( name **ptr,  valuetype val, void *aux,  name##_onbadfp badalloc, void *badata ) \
-				{ return( libandria4_definer_##name##_init( ( memfuncs_ptr ),  ptr,  val, aux, badalloc, badata ) ); } \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_ATTEND( name,  onattend ) \
-		libandria4_maybeint name##_neglect( name **ptr ) { return( name##_neglect( ( memfuncs_ptr ),  ptr ) ); }
-		/* Start tracking. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_EXPRINIT( name, pointer,  value, aux,  onfull, badalloc, badata ) \
-		( !(pointer) ? \
-			name##_init( &(pointer),  (value), (aux), &(badalloc), (badata) ) : \
-			onfull( pointer,  value, aux ) )
-		/* Drop reference. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_WRAPPED_BODYNEGLECT( name, pointer,  onbad, onsucc, ondead ) \
-		{ name ** name##_ptr = (pointer);  libandria4_maybeint name##res = name##_neglect( name##_ptr ); \
-			int a = 0;   LIBANDRIA4_MAYBEINT_BODYMATCH( name##res,  LIBANDRIA4_OP_SETa, onbad ); \
-			if( a == 1 ) { onsucc( name##_ptr ); } \
-			else { ondead( name##_ptr ); } }
-	
-		/* This needs to be paired with a LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDDECL() invocation. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_STDIMPL( name, valuetype,  onattend, onneglect, ondie ) \
-		LIBANDRIA4_MONAD_REFCOUNTED_DEFINE_WRAPEDIMPL( \
-			name, valuetype, &libandria4_stdmemfuncs, \
-			onattend, onneglect, ondie )
-	
-	
-		/* Restart tracking. No cleanup is done, so if cleanup is needed then receiver() needs to do it. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_EXPRREINIT( pointer, memfuncs_ptr,  value, aux,  receiver, recdata, resvar ) \
-		( (resvar) = receiver( recdata, (pointer)->val, (pointer)->auxiliary ), \
-			(pointer)->val = (value), (pointer)->auxiliary = aux )
-	#define LIBANDRIA4_MONAD_REFCOUNTED_EXPRREDUCE( pointer,  func, badptr ) \
-		( !!(pointer) ? ( func( (pointer)->auxiliary, (pointer)->val ) ) : ( badptr( pointer ) ) )
-		/* Add reference. */
-	#define LIBANDRIA4_MONAD_REFCOUNTED_BODYATTEND( name, pointer,  onbad, onsucc ) \
-		{ name ** name##_ptr = &(pointer);  libandria4_maybeint name##res = name##_attend( name##_ptr ); \
-			int a = 0;   LIBANDRIA4_MAYBEINT_BODYMATCH( name##res,  LIBANDRIA4_OP_SETa, onbad ); \
-			if( a == 1 ) { onsucc( name##_ptr ); } }
 
 
 
@@ -992,7 +931,7 @@ libandria4_commonio_eithhandle
 {
 	if
 	(
-		fname &&
+		fname_ &&
 		mode_ > libandria4_commonio_handle_vtabtype_invalid &&
 		mode_ < libandria4_commonio_handle_vtabtype__END
 	)
@@ -1051,11 +990,13 @@ libandria4_commonio_eithhandle
 					LIBANDRIA4_COMMONIO_EITHHANDLE_RETERR( LIBANDRIA4_RESULT_FAILURE_RANGE );
 				
 					/* "Temporary" failures. */
-				case EAGAIN:
 				case EINTR:
 				case ENETRESET:
 				case ETXTBSY:
+				case EAGAIN:
+#if EAGAIN != EWOULDBLOCK
 				case EWOULDBLOCK:
+#endif
 					if( !retried )
 					{
 						errno = 0;
@@ -1108,7 +1049,7 @@ libandria4_commonio_eithhandle
 				
 					/* Simple failures. */
 				case EBADF:
-				case EACCES;
+				case EACCES:
 				case EFAULT:
 				case EFBIG:
 				case EHOSTUNREACH:
@@ -1129,7 +1070,9 @@ libandria4_commonio_eithhandle
 				case ENOTSUP:
 				case ENOTTY:
 				case ENXIO:
+#if EOPNOTSUPP != ENOTSUP
 				case EOPNOTSUPP:
+#endif
 				case EOWNERDEAD:
 				case EPERM:
 				case EPROTONOSUPPORT:
