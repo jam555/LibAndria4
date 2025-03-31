@@ -102,6 +102,8 @@ SOFTWARE.
 	typedef struct libandria4_commonio_handlevtable_2istream
 	{
 		libandria4_commonio_istream_vtable here;
+		libandria4_commonio_seekable_vtable seekable;
+		libandria4_commonio_errorable_vtable errable;
 		libandria4_commonio_handle_vtable *is;
 		
 	} libandria4_commonio_handlevtable_2istream;
@@ -118,6 +120,8 @@ SOFTWARE.
 	typedef struct libandria4_commonio_handlevtable_2ostream
 	{
 		libandria4_commonio_ostream_vtable here;
+		libandria4_commonio_seekable_vtable seekable;
+		libandria4_commonio_errorable_vtable errable;
 		libandria4_commonio_handle_vtable *is;
 		
 	} libandria4_commonio_handlevtable_2ostream;
