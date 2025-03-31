@@ -94,7 +94,7 @@ int libandria4_commonio_utility_clearerr( libandria4_commonio_handle *io )
 		LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  libandria4_commonio_int_RETERR4 );
 		
 		res1 = libandria4_commonio_handle_CLEARERR( io );
-		res2 = LIBANDRIA4_COMMONIO_EITHGENERIC_TO_MAYERR( res );
+		res2 = LIBANDRIA4_COMMONIO_EITHGENERIC_TO_MAYERR( res1 );
 		LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  libandria4_commonio_int_RETERR5 );
 		
 		
@@ -208,7 +208,7 @@ int libandria4_commonio_utility_putint( libandria4_commonio_handle *io,  int i )
 				io, (libandria4_commonio_byte)( chara ) ); \
 			LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH( res1, \
 				LIBANDRIA4_OP_SETa, LIBANDRIA4_OP_SETb ); \
-			if( b && !libandria4_commonio_utility_clearerr( io ) ) { ( reterr )(); } }
+			if( b && !libandria4_commonio_utility_clearerr( io ) ) { reterr (); } }
 		
 			/* Write any negative signs. */
 		int tmp = ( i < 0 ? 1 : 0 );
