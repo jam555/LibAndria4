@@ -70,6 +70,8 @@ SOFTWARE.
 	
 	
 	
+	#include <stdio.h>
+	
 		/* Does this get used ANYWHERE? */
 	typedef struct libandria4_FILE_handle
 	{
