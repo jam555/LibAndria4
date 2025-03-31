@@ -433,27 +433,26 @@ libandria4_commonio_eithgeneric libandria4_commonio_common_gets_s
 
 
 
-
 #define libandria4_commonio_GENERICFLUSH( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->flush ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->flush )( hand_ ) ); } \
-	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_flush ) ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_FLUSH( hand_ ) ); } \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICCLOSE( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->close ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->close )( hand_ ) ); } \
-	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_close ) ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_CLOSE( hand_ ) ); } \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 
 
 
@@ -561,95 +560,95 @@ int libandria4_commonio_istream_ungetwrapper_init
 
 
 #define libandria4_commonio_GENERICGETC( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithbyte name( libandria4_commonio_handle *hand_ ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->getc ) ) { \
-			LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->getc )( hand_ ) ); } \
-	LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithbyte name( libandria4_commonio_handle *hand_ ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_getc ) ) { \
+				LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_GETC( hand_ ) ); } \
+		LIBANDRIA4_COMMONIO_EITHBYTE_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICUNGETC( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_, libandria4_commonio_byte val ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->ungetc ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->ungetc )( hand_, val ) ); } \
-	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_, libandria4_commonio_byte val ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_ungetc ) ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_UNGETC( hand_, val ) ); } \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICPUTC( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_, libandria4_commonio_byte val ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->putc ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->putc )( hand_, val ) ); } \
-	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_, libandria4_commonio_byte val ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_putc ) ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_PUTC( hand_, val ) ); } \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICTELL( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithlong name( libandria4_commonio_handle *hand_ ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->tell ) ) { \
-			LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->tell )( hand_ ) ); } \
-	LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithlong name( libandria4_commonio_handle *hand_ ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_tell ) ) { \
+				LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_TELL( hand_ ) ); } \
+		LIBANDRIA4_COMMONIO_EITHLONG_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICSEEK( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_, long off, int ori ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->seek ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->seek )( hand_,  off, ori ) ); } \
-	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_, long off, int ori ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_seek ) ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_SEEK( hand_,  off, ori ) ); } \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICREWIND( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->rewind ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->rewind )( hand_ ) ); } \
-	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_rewind ) ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_REWIND( hand_ ) ); } \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICCLEARERR( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->clearerr ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->clearerr )( hand_ ) ); } \
-	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_clearerr ) ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_CLEARERR( hand_ ) ); } \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICEOF( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->eof ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->eof )( hand_ ) ); } \
-	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_eof ) ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_EOF( hand_ ) ); } \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 #define libandria4_commonio_GENERICERROR( name, typeenum, desttype, converter, frommember ) \
-static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
-	if( hand_ ) { \
-		if( hand_->dispatch != typeenum ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
-		desttype *hand = converter( hand_->vtab. frommember ); \
-		if( !hand || !( hand->is ) || !( hand->is->error ) ) { \
-			LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
-		return( ( hand->is->error )( hand_ ) ); } \
-	LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
+	static libandria4_commonio_eithgeneric name( libandria4_commonio_handle *hand_ ) { \
+		if( hand_ ) { \
+			if( hand_->dispatch != typeenum ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_TYPEMISMATCH ); } \
+			if( !hand_ || !libandria4_commonio_handle_hasfunc( hand_, \
+					libandria4_commonio_handle_vtable_funcenums_error ) ) { \
+				LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_NOTINITIALIZED ); } \
+			return( libandria4_commonio_handle_ERROR( hand_ ) ); } \
+		LIBANDRIA4_COMMONIO_EITHGENERIC_RETERR( LIBANDRIA4_COMMONIOVALS_ERR_BADARGS ); }
 
 
 
@@ -698,11 +697,27 @@ int libandria4_commonio_handlevtable_2istream_init
 		wrapper->here.ungetc = &libandria4_commonio_istream_vtable_wrapperungetc;
 		wrapper->here.close = &libandria4_commonio_istream_vtable_wrapperclose;
 		
-		wrapper->is = host;
-			wrapper->here.seekable = host->seekable;
-			wrapper->here.errable = host->errable;
+		wrapper->seekable.flush = host->flush;
+		wrapper->seekable.tell = host->tell;
+		wrapper->seekable.seek = host->seek;
+		wrapper->seekable.rewind = host->rewind;
+		wrapper->seekable.close = host->close;
 		
-		/* ??? Might need more initialization? */
+		wrapper->errable.flush = host->flush;
+		wrapper->errable.clearerr = host->clearerr;
+		wrapper->errable.eof = host->eof;
+		wrapper->errable.error = host->error;
+		wrapper->errable.close = host->close;
+		
+		wrapper->is = host;
+		wrapper->here.seekable =
+			LIBANDRIA4_COMMONIO_MAYERR_JUSTSEEKABLE(
+				&( wrapper->seekable )
+			);
+		wrapper->here.errable =
+			LIBANDRIA4_COMMONIO_MAYERR_JUSTERRABLE(
+				&( wrapper->errable )
+			);
 		
 		return( 1 );
 	}
@@ -751,11 +766,27 @@ int libandria4_commonio_handlevtable_2ostream_init
 		wrapper->here.puts_s = &libandria4_commonio_common_puts_s;
 		wrapper->here.close = &libandria4_commonio_ostream_vtable_wrapperclose;
 		
-		wrapper->is = host;
-			wrapper->here.seekable = host->seekable;
-			wrapper->here.errable = host->errable;
+		wrapper->seekable.flush = host->flush;
+		wrapper->seekable.tell = host->tell;
+		wrapper->seekable.seek = host->seek;
+		wrapper->seekable.rewind = host->rewind;
+		wrapper->seekable.close = host->close;
 		
-		/* ??? Might need more initialization? */
+		wrapper->errable.flush = host->flush;
+		wrapper->errable.clearerr = host->clearerr;
+		wrapper->errable.eof = host->eof;
+		wrapper->errable.error = host->error;
+		wrapper->errable.close = host->close;
+		
+		wrapper->is = host;
+		wrapper->here.seekable =
+			LIBANDRIA4_COMMONIO_MAYERR_JUSTSEEKABLE(
+				&( wrapper->seekable )
+			);
+		wrapper->here.errable =
+			LIBANDRIA4_COMMONIO_MAYERR_JUSTERRABLE(
+				&( wrapper->errable )
+			);
 		
 		return( 1 );
 	}

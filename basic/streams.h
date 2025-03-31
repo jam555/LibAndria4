@@ -80,18 +80,32 @@ SOFTWARE.
 	/*  to the bottom and added to documentation. */
 	
 	#define LIBANDRIA4_COMMONIO_MAYERR_JUSTERRABLE( val ) \
-		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_commonio_mayerrable, ( libandria4_commonio_errorable* ), val )
+		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( \
+			libandria4_commonio_mayerrable, \
+			libandria4_commonio_errorable_vtable*, \
+			val )
 	#define LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOERRABLE( ... ) \
-		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayerrable, ( libandria4_commonio_errorable* ) )
+		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( \
+			libandria4_commonio_mayerrable, \
+			libandria4_commonio_errorable_vtable* )
 	#define LIBANDRIA4_COMMONIO_MAYERR_NOERRABLE() \
-		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayerrable, ( libandria4_commonio_errorable* ) )
+		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( \
+			libandria4_commonio_mayerrable, \
+			libandria4_commonio_errorable_vtable* )
 	
 	#define LIBANDRIA4_COMMONIO_MAYERR_JUSTSEEKABLE( val ) \
-		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( libandria4_commonio_mayseek, ( libandria4_commonio_seekable* ), val )
+		LIBANDRIA4_MONAD_MAYBE_BUILDJUST( \
+			libandria4_commonio_mayseek, \
+			libandria4_commonio_seekable_vtable*, \
+			val )
 	#define LIBANDRIA4_COMMONIO_MAYERR_FORCE_NOSEEKABLE( ... ) \
-		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayseek, ( libandria4_commonio_seekable* ) )
+		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( \
+			libandria4_commonio_mayseek, \
+			libandria4_commonio_seekable_vtable* )
 	#define LIBANDRIA4_COMMONIO_MAYERR_NOSEEKABLE() \
-		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( libandria4_commonio_mayseek, ( libandria4_commonio_seekable* ) )
+		LIBANDRIA4_MONAD_MAYBE_BUILDNOTHING( \
+			libandria4_commonio_mayseek, \
+			libandria4_commonio_seekable_vtable* )
 	
 	
 	
