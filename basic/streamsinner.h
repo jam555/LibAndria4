@@ -78,6 +78,8 @@ SOFTWARE.
 	
 		/* Provides single-byte-only unget capabilities. */
 	typedef struct libandria4_commonio_istream_ungetwrapper_vtable
+		libandria4_commonio_istream_ungetwrapper_vtable;
+	typedef struct libandria4_commonio_istream_ungetwrapper_vtable
 	{
 		libandria4_commonio_istream_vtable here;
 		libandria4_commonio_istream_vtable *is;
