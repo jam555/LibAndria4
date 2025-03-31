@@ -419,7 +419,7 @@ SOFTWARE.
 				( (just)->seek )
 			#define libandria4_commonio_handle_SEEK_HELPER3( ... ) \
 				( &libandria4_commonio_seekfunc_reterr )
-		#define libandria4_commonio_handle_SEEK_HELPER4( hptr, vtab,  dummy ) \
+		#define libandria4_commonio_handle_SEEK_HELPER4( hptr, vtab,  dist, origin ) \
 			( LIBANDRIA4_MONAD_MAYBE_EXPRMATCH( \
 				(vtab)->seekable, \
 					libandria4_commonio_handle_SEEK_HELPER2, \
