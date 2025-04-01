@@ -2,6 +2,7 @@
 1) finish the current effort (parsers/CPArgs1/test1.c);
 	DONE
 2) take the files that get debugged, and copy into a new "v0.1rc"
+	STARTED
 3) rearrange those files as follows:
 	primitive/
 		Stuff that doesn't depend on anything else; e.g. platformdetect.h and
