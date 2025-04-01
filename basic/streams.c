@@ -953,6 +953,8 @@ void libandria4_commonio_handle_opaquedata_ondie( void *ign1, libandria4_commoni
 
 /* Standard FILE* implmentations. */
 
+#include <string.h>
+
 libandria4_commonio_eithhandle
 	libandria4_commonio_fopen
 	(
@@ -1002,7 +1004,19 @@ libandria4_commonio_eithhandle
 			
 			/* Allocate a new p-string with one extra character, copy over fname, set the last character to null. */
 			
-			??? ;
+			libandria4_char_pascalarray_result res =
+				libandria4_char_pascalarray_build( fname_->len + 1 );
+#define libandria4_commonio_fopen_OPERR_RET( var ) \
+	LIBANDRIA4_COMMONIO_EITHHANDLE_RETERR( var.val )
+			libandria4_char_pascalarray *a;
+			LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
+				res,
+					LIBANDRIA4_OP_SETa,
+					libandria4_commonio_fopen_OPERR_RET );
+			void* memcpy( a->body, fname_->body, std::size_t count );
+			a->body[ a->len - 1 ] = '\0';
+			
+			fname = a;
 		}
 		
 		int e_ = errno, retried = 0;
@@ -1132,15 +1146,23 @@ libandria4_commonio_eithhandle
 		}
 		errno = e_;
 		
-		/* For successful returns: */
-			/* LIBANDRIA4_COMMONIO_EITHHANDLE_RETHANDLE( val ) */
 		if( fname != fname_ )
 		{
-				/* Free up the locally-allocated file name. */
-			??? ;
+			/* Free up the locally-allocated file name. */
+			
+			libandria4_result res = libandria4_char_pascalarray_destroy( fname );
+#define libandria4_commonio_fopen_CLERR_RET( var ) \
+	fclose( f ); f = 0; \
+	LIBANDRIA4_COMMONIO_EITHHANDLE_RETERR( var.val )
+			LIBANDRIA4_DEFINE_PASCALARRAY_RESULT_BODYMATCH(
+				res,
+					LIBANDRIA4_NULL_MACRO,
+					libandria4_commonio_fopen_CLERR_RET );
+			
+			fname = 0;
 		}
 		
-		;
+		LIBANDRIA4_COMMONIO_EITHHANDLE_RETHANDLE( f );
 	}
 	
 	LIBANDRIA4_COMMONIO_EITHHANDLE_RETERR( LIBANDRIA4_RESULT_FAILURE_DOMAIN );
