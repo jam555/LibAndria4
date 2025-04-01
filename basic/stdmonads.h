@@ -190,71 +190,63 @@ SOFTWARE.
 	
 	
 	libandria4_result libandria4_errno_2result();
-	libandria4_result libandria4_errno_popresult( int *errnum );
-	libandria4_result libandria4_result_from_maybeerr( libandria4_maybeint err );
-	libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ );
-	libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err );
-	libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ );
-	
-	#if !defined( LIBANDRIA4_BASIC_STDMONADS_C )
-		extern inline libandria4_result libandria4_errno_popresult( int *errnum )
+	inline libandria4_result libandria4_errno_popresult( int *errnum )
+	{
+		libandria4_result res = libandria4_errno_2result();
+		
+		if( errnum )
 		{
-			libandria4_result res = libandria4_errno_2result();
-			
-			if( errnum )
-			{
-				*errnum = errno;
-			}
-			
-			errno = 0;
-			
-			return( res );
+			*errnum = errno;
 		}
-		extern inline libandria4_result libandria4_result_from_maybeerr( libandria4_maybeint err )
-		{
-			return
-			(
-				LIBANDRIA4_MAYBEINT_EXPRMATCH(
-					err,
-					
-					LIBANDRIA4_RESULT_BUILDFAILURE,
-					LIBANDRIA4_RESULT_BUILDSUCCESS_GENERIC )
-			);
-		}
-		extern inline libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ )
-		{
-			return
-			(
-				LIBANDRIA4_MAYBEINT_EXPRMATCH(
-					succ,
-					
-					LIBANDRIA4_RESULT_BUILDSUCCESS,
-					LIBANDRIA4_RESULT_BUILDFAILURE_GENERIC )
-			);
-		}
-		extern inline libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err )
-		{
-			return
-			(
-				LIBANDRIA4_RESULT_EXPRMATCH(
-					err,
-					
-					LIBANDRIA4_MAYBEINT_BUILDNOTHING2,
-					LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT )
-			);
-		}
-		extern inline libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ )
-		{
-			return
-			(
-				LIBANDRIA4_RESULT_EXPRMATCH(
-					succ,
-					
-					LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT,
-					LIBANDRIA4_MAYBEINT_BUILDNOTHING2 )
-			);
-		}
-	#endif
+		
+		errno = 0;
+		
+		return( res );
+	}
+	inline libandria4_result libandria4_result_from_maybeerr( libandria4_maybeint err )
+	{
+		return
+		(
+			LIBANDRIA4_MAYBEINT_EXPRMATCH(
+				err,
+				
+				LIBANDRIA4_RESULT_BUILDFAILURE,
+				LIBANDRIA4_RESULT_BUILDSUCCESS_GENERIC )
+		);
+	}
+	inline libandria4_result libandria4_result_from_maybesucc( libandria4_maybeint succ )
+	{
+		return
+		(
+			LIBANDRIA4_MAYBEINT_EXPRMATCH(
+				succ,
+				
+				LIBANDRIA4_RESULT_BUILDSUCCESS,
+				LIBANDRIA4_RESULT_BUILDFAILURE_GENERIC )
+		);
+	}
+	inline libandria4_maybeint libandria4_result_to_maybeerr( libandria4_result err )
+	{
+		return
+		(
+			LIBANDRIA4_RESULT_EXPRMATCH(
+				err,
+				
+				LIBANDRIA4_MAYBEINT_BUILDNOTHING2,
+				LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT )
+		);
+	}
+	inline libandria4_maybeint libandria4_result_to_maybesucc( libandria4_result succ )
+	{
+		return
+		(
+			LIBANDRIA4_RESULT_EXPRMATCH(
+				succ,
+				
+				LIBANDRIA4_RESULT_BUILDJUST_MAYBEINT,
+				LIBANDRIA4_MAYBEINT_BUILDNOTHING2 )
+		);
+	}
 	
 	
 	
