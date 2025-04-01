@@ -101,7 +101,7 @@ libandria4_commonio_eithhandle
 				res,
 					LIBANDRIA4_OP_SETa,
 					libandria4_commonio_fopen_OPERR_RET );
-			void* memcpy( a->body, fname_->body, std::size_t count );
+			void* memcpy( a->body, fname_->body, fname_->len );
 			a->body[ a->len - 1 ] = '\0';
 			
 			fname = a;
