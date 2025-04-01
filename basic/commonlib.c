@@ -27,6 +27,10 @@ SOFTWARE.
 */
 
 
+#warning Blindly setting _POSIX_C_SOURCE, this belongs in if guards!
+#define _POSIX_C_SOURCE 200112L
+
+
 #include <limits.h>
 #include <time.h>
 
@@ -372,10 +376,40 @@ libandria4_error_mayerr libandria4_sleep( uint32_t millisecs )
 	#elif defined(_POSIX_VERSION) || __unix__ || __linux__ || __QNX__ || __ANDROID__ || __APPLE__
 		
 		libandria4_result ret = libandria4_errno_2result();
+		int res;
 		
-			/* usleep() takes microseconds */
-			/* Linux docs list the following two errors: EINTR and EINVAL */
-		int res = usleep( ( (uintmax_t)millisecs ) * 1000 );
+#if _POSIX_C_SOURCE >= 200112L
+		{
+			/* TODO: On systems where CLOCK_MONOTONIC doesn't exist, use CLOCK_REALTIME instead. */
+			
+			const clockid_t clk = CLOCK_MONOTONIC;
+			struct timespec done_at;
+			
+			res = clock_gettime( clk, &done_at );
+			if( res == 0 )
+			{
+				/* TODO: Compensate for the Year 2038 problem. */
+				
+				done_at.tv_nsec += ( millisecs % 1000 ) * 1000 * 1000;
+				done_at.tv_sec += ( millisecs - ( millisecs % 1000 ) ) / 1000;
+				
+				res = EINTR;
+				while( res == EINTR )
+				{
+					res =
+						clock_nanosleep
+						( clk, TIMER_ABSTIME, &done_at, 0 );
+				}
+				if( res != EINTR && res != 0 )
+				{
+					errno = res;
+					res = -1;
+				}
+			}
+		}
+#else
+	#error "commonlib.c didn't find a basal clock!"
+#endif
 		
 		if( res == 0 )
 		{
@@ -409,7 +443,7 @@ libandria4_error_mayerr libandria4_sleep( uint32_t millisecs )
 		waittime = tmptime;
 			/* On Windows the accuracy is often 1/64 of a second, on at */
 			/*  least Ubuntu the actual GRANULARITY (precision, not */
-			/*  accuracy) ius in milliseconds. */
+			/*  accuracy) is in milliseconds. */
 		waittime += ( (double)millisecs / 1000 ) * ( CLOCKS_PER_SECOND );
 			/* Force at least SOME step. */
 		waittime += ( (millisecs > 0) && (waittime == tmptime) ? 1 : 0 );
