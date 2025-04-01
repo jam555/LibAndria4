@@ -1,21 +1,29 @@
 	Ok, debugging is getting a bit annoying. Here's the plan:
 1) finish the current effort (parsers/CPArgs1/test1.c);
 	DONE
-2) take the files that get debugged, and copy into a new "v0.1rc"
+2) take the files that got debugged, and copy into a new "v0.1rc"
 	STARTED
 3) rearrange those files as follows:
 	primitive/
 		Stuff that doesn't depend on anything else; e.g. platformdetect.h and
 			monads.h
+		STARTED
 	basic/
 		Stuff like stdmonads, stdmaybes, commonlib, commonerr, etc.
 4) stuff like commonerr DOES NOT define it's own types, they all use types
 	defined in e.g. stdmonads. Use e.g. basictypes.h for POD types, and
 	commontypes.h for stuff that is a bit more complex (and thus harder to
 	debug). Files like commoniotypes.h PROBABLY shouldn't exist.
+		STARTED
 5) start the makefile pretty early. Keep the basic structure of the current make
 	system, but get some stuff setup for e.g. regression testing.
 6) figure out the exceptions system: I want that for some runtime error
-	reporting stuff (e.g. the monad-ification of the streams interface).
+	reporting stuff (e.g. the monad-ification of the streams interface). Note
+	that only the basic necessary types and any definitional macros should be
+	specified inside /primitive/* ! Everything else should go in it's own
+	directory!
+7) redesign the primitive error-reporting system so that it'll be ready for the
+	exceptions system, and simple enough to be used (via "dev/null" equivalence)
+	even without common-io stuff.
     0    1    1    2    2    3    3    4    4    5    5    6    6    7    7    8
     5    0    5    0    5    0    5    0    5    0    5    0    5    0    5    0
