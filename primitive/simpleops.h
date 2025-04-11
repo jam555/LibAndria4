@@ -464,20 +464,6 @@ SOFTWARE.
 	
 	
 	
-	#define LIBANDRIA4_STRINGIFY( a ) LIBANDRIA4_INNER_STRINGIFY( a )
-	#define LIBANDRIA4_INNER_STRINGIFY( a ) #a
-	
-	
-	#define LIBANDRIA4_BOOLCAT( a, b ) \
-		LIBANDRIA4_CAT( LIBANDRIA4_BOOL( a ), LIBANDRIA4_BOOL( b ) )
-	#define LIBANDRIA4_CAT( a, ... ) LIBANDRIA4_PRIMITIVE_CAT( a, __VA_ARGS__ )
-	#define LIBANDRIA4_PRIMITIVE_CAT( a, ... ) a ## __VA_ARGS__
-	
-	#define LIBANDRIA4_CONCAT( ... ) LIBANDRIA4_CAT( __VA_ARGS__ )
-	#define LIBANDRIA4_CONCATENATE( ... ) LIBANDRIA4_CAT( __VA_ARGS__ )
-	#define LIBANDRIA4_JOIN( ... ) LIBANDRIA4_CAT( __VA_ARGS__ )
-	
-	
 	#define LIBANDRIA4_CHECK( ... ) LIBANDRIA4_SELECT_2ND( __VA_ARGS__, 0 )
 		/* Should x be wrapped in parens for this to work right? */
 	#define LIBANDRIA4_PROBE( x ) x, 1,
@@ -493,26 +479,6 @@ SOFTWARE.
 			/*  generally wrap it in another function of your own. */
 			/* See also LIBANDRIA4_IDENTITY_LATER() in this same file. */
 	#define LIBANDRIA4_APPLY_LATER( func ) LIBANDRIA4_APPLY_GATE( 0, func )
-	
-	
-	/* TODO: move these to commonlib.h, and add a define-macro for header */
-	/*  use. Also add some to the type-description files that use type-descs */
-	/*  instead of "t" in the version-2 variant. */
-	/* These generate a function that returns an integer that uniquely */
-	/*  identifies the provided type. Extra differentiation via tag, just in */
-	/*  case. Use *_IDFUNC() for POD types, use *_IDFUNC2() for non-POD */
-	/*  types. And yes, it's ok to use the statics as variables, as long as */
-	/*  you know what you're doing. */
-	#define LIBANDRIA4_BUILDIDFUNC( type, tag, inner_type ) \
-		uintptr_t libandria4_idfunc_type_##type##tag() { \
-			static inner_type t; return( (uintptr_t)&t ); }
-		/* As above, but with call-once configuration, for more advanced */
-		/*  type info. */
-	#define LIBANDRIA4_BUILDIDFUNC2( type, tag, inner_type, config_func ) \
-		uintptr_t libandria4_idfunc_type_##type##tag() { \
-			static inner_type t, *t_ = (inner_type*)0; \
-			if( !t_ ) { t_ = &t; config_func( t_ ); } \
-			return( (uintptr_t)t_ ); }
 	
 	
 	
