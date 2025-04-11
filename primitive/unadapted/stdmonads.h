@@ -190,6 +190,10 @@ SOFTWARE.
 	
 	
 	libandria4_result libandria4_errno_2result();
+	
+	#if __STDC_VERSION__ < 199901L
+		#error "stdmonads.h REQUIRES C99 for use of inline."
+	#endif
 	inline libandria4_result libandria4_errno_popresult( int *errnum )
 	{
 		libandria4_result res = libandria4_errno_2result();

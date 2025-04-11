@@ -29,10 +29,11 @@ SOFTWARE.
 #ifndef LIBANDRIA4_BASIC_PLATFORMSUPPORT_H
 # define LIBANDRIA4_BASIC_PLATFORMSUPPORT_H
 	
+	#include <stdio.h>
+	
 	#include "platformdetect.h"
 	
 	#include "monads.h"
-	#include "stdio.h"
 	
 	#if LIBANDRIA4_PLATFORM_FILE_OFFSET_BITS > 32
 		#if LIBANDRIA4_TARGETPLATFORM == LIBANDRIA4_TARGETPLATFORM_MSWIN
