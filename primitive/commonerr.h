@@ -31,35 +31,24 @@ SOFTWARE.
 	
 	#include "basictypes.h"
 	#include "monads.h"
-	#include "commonio.h"
 	
 	
 	
 	/* An error reporting facility. */
-	/* TODO: Rewrite this to not directly use common-io, to take a set of */
-	/*  function pointers & their auxiliary data so that noop dummies can */
-	/*  be defaulted to, and to use type-descriptor pointers instead of */
-	/*  uint32_t for type-ids. */
+	/* TODO: Continue developing this stuff. Particularly look at extending */
+	/*  libandria4_error_print(), and whatever the VT100 stuff near the end */
+	/*  was originally about. */
 	
 	
 	
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR1( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 1 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR2( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 2 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR3( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 3 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR4( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 4 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR5( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 5 );
-	
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR6( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 6 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR7( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 7 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR8( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 8 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR9( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 9 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR10( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 10 );
-	
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR11( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 11 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR12( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 12 );
-	#define LIBANDRIA4_ERROR_MAYERR_RETERR13( ... ) LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 13 );
-	
-	
+	void libandria4_error_setputc
+	(
+		void *newdata, libandria4_common_putcharfuncp_int newputc,
+			/* Optional: if provided, then the target of the pointers will */
+			/*  be set to the values that are being replaced by the new */
+			/*  arguments. */
+		void *olddata, libandria4_common_putcharfuncp_int *oldputc
+	);
 	
 	
 	
@@ -97,15 +86,13 @@ SOFTWARE.
 	/* These are both implemented in commonlib.c */
 	libandria4_error_mayerr libandria4_error_print
 	(
-		libandria4_commonio_handle *io,
-			libandria4_error_basalstruct *err,
-			int line,
-			char *file
+		libandria4_error_basalstruct *err,
+		int line,
+		char *file
 	);
 		/* Just prints ->str[]. */
-	libandria4_error_mayerr libandria4_error_print_simplestruct
+	int libandria4_error_print_simplestruct
 	(
-		libandria4_commonio_handle *io,
 		libandria4_error_simplestruct *err
 	);
 	

@@ -186,183 +186,6 @@ int libandria4_memreverse( void *base_, size_t count, size_t size )
 
 
 
-/* ... TODO: Move these error-reporter functions elsewhere. commonlib.h/.c */
-/*  should eventually not rely on commonio.h at all, but these shouldn't be */
-/*  de-coupled from it. */
-	/* Remember to remove the note about this TODO in commonlib.h */
-libandria4_error_mayerr libandria4_error_print_simplestruct
-(
-	libandria4_commonio_handle *io,
-	libandria4_error_simplestruct *err
-)
-{
-	if( io && err )
-	{
-		if( !libandria4_commonio_handle_hasbasics( io ) )
-		{
-			 /* LIBANDRIA4_ERROR_MAYERR_RETERR2(); */
-			 LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 2 );
-		}
-		
-		int res = 0, a;
-			/* This is a macro, it already exists, it does the right */
-			/*  thing, use it. And yes, THERE ARE MORE. */
-		libandria4_commonio_eithgeneric tmp =
-			libandria4_commonio_handle_PUTS_S(
-				io,
-				(libandria4_commonio_byte*)( err->str ), err->str_len
-			);
-		LIBANDRIA4_COMMONIO_EITHGENERIC_BODYMATCH(
-			tmp,
-			
-			LIBANDRIA4_OP_SETaFLAGresAS1,
-			LIBANDRIA4_OP_SETaFLAGresASn1
-		);
-		
-		if( !res )
-		{
-			/* LIBANDRIA4_ERROR_MAYERR_RETERR5(); */
-			LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 5 );
-		}
-		
-		LIBANDRIA4_ERROR_MAYERR_RETURN_SUCCESS();
-	}
-	/* LIBANDRIA4_ERROR_MAYERR_RETERR1(); */
-	LIBANDRIA4_ERROR_MAYERR_RETURN_ERROR( 1 );
-}
-libandria4_error_mayerr libandria4_error_print
-(
-	libandria4_commonio_handle *io,
-		libandria4_error_basalstruct *err,
-		int line,
-		char *file
-)
-{
-	if( io && err )
-	{
-		if( !libandria4_commonio_handle_hasbasics( io ) )
-		{
-			LIBANDRIA4_ERROR_MAYERR_RETERR2();
-		}
-		if
-		(
-			!(
-				libandria4_commonio_handle_hasfunc
-				(
-					io,
-					libandria4_commonio_handle_vtable_funcenums_putc |
-						libandria4_commonio_handle_vtable_funcenums_puts_s |
-						libandria4_commonio_handle_vtable_funcenums_flush
-				)
-			)
-		)
-		{
-			LIBANDRIA4_ERROR_MAYERR_RETERR3();
-		}
-		
-		libandria4_commonio_eithgeneric res1;
-		libandria4_error_mayerr res2;
-		
-		switch( err->typeid )
-		{
-			case LIBANDRIA4_ERROR_TYPE_SIMPLESTRUCT:
-#define libandria4_error_print_STR_FUNC "function: "
-#define libandria4_error_print_STR_SRC " at "
-#define libandria4_error_print_STR_DESC " announces this error: "
-				if
-				(
-					!libandria4_commonio_recursivewrapper_puts_s
-					(
-						io,
-							(libandria4_commonio_byte*)libandria4_error_print_STR_FUNC,
-							sizeof( libandria4_error_print_STR_FUNC )
-					)
-				)
-				{
-					LIBANDRIA4_ERROR_MAYERR_RETERR4();
-				}
-				
-				libandria4_error_simplestruct *simperr = (libandria4_error_simplestruct*)err;
-				res2 = libandria4_error_print_simplestruct( io, simperr->funcname );
-				LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR5 );
-				
-				if( !libandria4_commonio_utility_putint( io,  line ) )
-				{
-					LIBANDRIA4_ERROR_MAYERR_RETERR6();
-				}
-				libandria4_commonio_eithgeneric res1 =
-					libandria4_commonio_handle_PUTC( io,  (libandria4_commonio_byte)' ' );
-				res2 = LIBANDRIA4_COMMONIO_EITHGENERIC_TO_ERRMAYERR( res1 );
-				LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR7 );
-				if
-				(
-					!libandria4_commonio_recursivewrapper_puts_s
-					(
-						io,
-							(libandria4_commonio_byte*)file,
-							strlen( file )
-					)
-				)
-				{
-					LIBANDRIA4_ERROR_MAYERR_RETERR8();
-				}
-				
-				if
-				(
-					!libandria4_commonio_recursivewrapper_puts_s
-					(
-						io,
-							(libandria4_commonio_byte*)libandria4_error_print_STR_SRC,
-							sizeof( libandria4_error_print_STR_SRC )
-					)
-				)
-				{
-					LIBANDRIA4_ERROR_MAYERR_RETERR9();
-				}
-				
-				if
-				(
-					!libandria4_commonio_recursivewrapper_puts_s
-					(
-						io,
-							(libandria4_commonio_byte*)libandria4_error_print_STR_DESC,
-							sizeof( libandria4_error_print_STR_DESC )
-					)
-				)
-				{
-					LIBANDRIA4_ERROR_MAYERR_RETERR10();
-				}
-				
-				res2 =
-					libandria4_error_print_simplestruct
-					(
-						io,
-						LIBANDRIA4_STRUCTADDRfromELEMADDR(
-							libandria4_error_simplestruct,
-							type,
-							
-							simperr
-						)
-					);
-				LIBANDRIA4_COMMONIO_MAYERR_NULLSUCC( res2,  LIBANDRIA4_ERROR_MAYERR_RETERR11 );
-				
-				break;
-				
-			case LIBANDRIA4_ERROR_TYPE_BASALSTRUCT:
-				LIBANDRIA4_ERROR_MAYERR_RETERR12();
-				
-			default:
-				LIBANDRIA4_ERROR_MAYERR_RETERR13();
-		}
-		
-		LIBANDRIA4_ERROR_MAYERR_RETURN_SUCCESS();
-	};
-	
-	LIBANDRIA4_ERROR_MAYERR_RETERR1();
-}
-
-
-
 libandria4_error_mayerr libandria4_sleep( uint32_t millisecs )
 {
 	#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
@@ -464,6 +287,79 @@ libandria4_error_mayerr libandria4_sleep( uint32_t millisecs )
 		LIBANDRIA4_ERROR_MAYERR_RETURN_SUCCESS();
 		
 	#endif
+}
+
+
+
+int libandria4_null_putchar( void*, char )
+{
+		/* This version intentionally just discards characters. */
+	return( 1 );
+}
+
+int libandria4_commonio_utility_putint
+(
+	void *outdata, libandria4_common_putcharfuncp_int outfunc,
+	int i
+)
+{
+	if( !outfunc )
+	{
+		outfunc = &libandria4_null_putchar;
+	}
+	
+		/* Write any negative signs. */
+	int tmp = ( i < 0 ? 1 : 0 );
+	i *= ( tmp ? -1 : 1 );
+	if( tmp )
+	{
+		if( !outfunc( outdata, '-' ) )
+		{
+			return( -4 );
+		}
+	}
+	
+		/* Make some space so modmask can't overflow. */
+	int ilast = i % 10;
+	i -= ilast;
+	i /= 10;
+	
+		/* We won't be bothering with leading 0s. */
+	int modmask = 10;
+	while( i % modmask >= 10 )
+	{
+		modmask *= 10;
+	}
+	
+	static char *charas = "0123456789";
+	
+		/* tmp =,-=,/= results in: */
+			/* The DECIMAL digit we want gets stored, along with those */
+			/*  under it; */
+			/* Those under it get removed; and */
+			/* It gets pulled down to the 1s column. */
+		/*  So, it isolates a digit, and then drops it so it can directly */
+		/*  be used as an index. */
+	tmp = i % modmask;
+	while( modmask > 1 )
+	{
+		modmask /= 10;
+		tmp -= tmp % modmask;
+		tmp /= modmask;
+		
+		if( !outfunc( outdata, charas[ tmp ] ) )
+		{
+			return( -5 );
+		}
+	}
+	
+		/* Now we write out that digit we separated earlier. */
+	if( !outfunc( outdata, charas[ ilast ] ) )
+	{
+		return( -6 );
+	}
+	
+	return( 1 );
 }
 
 

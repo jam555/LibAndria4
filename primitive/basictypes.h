@@ -71,6 +71,8 @@ SOFTWARE.
 	typedef uintptr_t libandria4_common_perr;
 	
 	
+	typedef int (*libandria4_common_putcharfuncp_int)( void*, char );
+	
 	
 	/* Note that most of the contents of this file have moved to commontypes.h */
 	

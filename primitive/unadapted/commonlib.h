@@ -39,7 +39,7 @@ SOFTWARE.
 	
 		/* For size_t. */
 	#include <stddef.h>
-		/* For uintprt_t and uint*_t. */
+		/* For uintptr_t and uint*_t. */
 	#include <stdint.h>
 	#include "monads.h"
 		/* For libandria4_ptrresult{} and libandria4_errno_2result(). */
@@ -49,6 +49,7 @@ SOFTWARE.
 	
 	
 	
+		/* A simple identity-mapping array: the index is the output. */
 	extern const unsigned char libandria4_commonlib_firstchars[ 128 ];
 	
 	typedef uint8_t libandria4_commonlib_byte;
@@ -113,7 +114,7 @@ SOFTWARE.
 	
 	
 		/* This literally just exists to waste a very small amount of time. */
-		/*  It's implemented in commonlib2.h to stop it from being optimized */
+		/*  It's implemented in commonlib2.c to stop it from being optimized */
 		/*  into oblivion. */
 	int libandria4_timesink( int dummy );
 	
@@ -143,6 +144,19 @@ SOFTWARE.
 	
 		/* Waits for AT LEAST the provided number of milliseconds. */
 	libandria4_error_mayerr libandria4_sleep( uint32_t millisecs );
+	
+	
+	
+		/* Of type libandria4_common_putcharfuncp_int, which itself is */
+		/*  defined in basictypes.h. */
+	int libandria4_null_putchar( void*, char );
+	
+		/* *_itoputc() seemed a bit too cryptic of a name. */
+	int libandria4_i2putc
+	(
+		void *outdata, libandria4_common_putcharfuncp_int outfunc,
+		int i
+	);
 	
 	
 	
