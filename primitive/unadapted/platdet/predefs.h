@@ -108,6 +108,7 @@ SOFTWARE.
 	#define LIBANDRIA4_COMPILER_ERA_2000S 4
 	#define LIBANDRIA4_COMPILER_ERA_2010S 5
 	#define LIBANDRIA4_COMPILER_ERA_2020S 6
+	#define LIBANDRIA4_COMPILER_ERA_2030S 7
 	#define LIBANDRIA4_COMPILER_ERA_OVERFLOWED LIBANDRIA4_COMPILER_ERAMASK
 		/* This should be set in lock-step with ( LIBANDRIA4_COMPILER & */
 		/*  LIBANDRIA4_COMPILER_ERAMASK ), unless the value is 31 or above. Note */
@@ -159,5 +160,99 @@ SOFTWARE.
 	#define LIBANDRIA4_COMPILER_CODEBASE_DJGPP ( 18 * LIBANDRIA4_COMPILER_CODEBASEMULTIPLIER )
 		/* Note: Highest allowable value is 65504! Not that anyone should */
 		/*  reach that. */
+	
+	
+	
+	/* For all of these, "0" means "undefined/unspecified/error". For *_PROCESSOR* 0 & */
+	/*  1, the sequential ordering of numbers "2" and above have no actual meaning */
+	/*  beyond distinguishing one group from another group. */
+		/* For *_PROCESSOR0, the sequential ordering of "1" and "2" aren't directly */
+		/*  meaningful, they indicate only that the two processor categories are */
+		/*  majorly different from each other... excepting, of course, that "1" and */
+		/*  "2" are intentionally allocated to the Intel 4004 and 8008 for historical */
+		/*  reasons. */
+		/* It is worth noting that some machine types, such as 68k and ColdFire, or */
+		/*  8080 and x86, might be EXPECTED to share the same *_PROCESSOR0 value, but */
+		/*  actually MUST have seperate values, because despite their common heritage */
+		/*  they actually are meaningfully incompatible with each other's byte-code. */
+	#define LIBANDRIA4_PROCESSOR0 0
+	/* For all the rest of these, 1 means "founder" (such as the 6502, 8080, */
+	/*  8086/8088, or 68000), "2"+ means "successor". */
+		/* Used to distinguish major variant lines of the *_PROCESSOR0 architectures, */
+		/*  e.g. the 80186 from normal x86 processors, or the z80 from it's */
+		/*  half-sibling 8085. */
+	#define LIBANDRIA4_PROCESSOR1 0
+		/* Used to distinguish secondary variations, such as the 80286 from the */
+		/*  80386, or the 8080 (as the "1" machine) from it's descendants (the 8085 */
+		/*  and/or z80 & descendants). Unlike *_PROCESSOR* 0 & 1, the sequential */
+		/*  ordering of "1"+ is meant to be DIRECTLY informative, indicating a direct */
+		/*  progression of features. As a result, features that are not reliably */
+		/*  present in all members of multiple later "generations" of designs MUST NOT */
+		/*  be represented in *_PROCESSOR2... and if a feature suddenly becomes */
+		/*  unreliably present instead of reliably existing or disappearing, then that */
+		/*  is a major problem, which MUST be represented by either: */
+			/* 1) (desirable) producing new values of *_PROCESSOR1 to represent this */
+			/*  break, or */
+			/* 2) producing a new *_PROCESSOR2 value and creating a *_PROCESSOR3 to */
+			/*  represent further development of reliable features. */
+	#define LIBANDRIA4_PROCESSOR2 0
+	/* Note that UNRELIABLE FEATURES should be represented by machine-specific flags. */
+	
+	/* These use the same values as the *_PROCESSOR* macros, but speak of the target. */
+	#define LIBANDRIA4_TARGETPROCESSOR0 0
+	#define LIBANDRIA4_TARGETPROCESSOR1 0
+	#define LIBANDRIA4_TARGETPROCESSOR2 0
+	
+	
+	#define LIBANDRIA4_PROCESSOR0_ERAMASK 1
+	#define LIBANDRIA4_PROCESSOR0_ERAMULT 2
+		/* The "older" ttl-logic processor implementations... and stuff like BMOW. */
+	#define LIBANDRIA4_PROCESSOR0_ERA_INSTITUTIONAL 0
+		/* Begins with the Intel 4004, and ONLY includes processors that first REACHED */
+		/*  the general populace as Medium-Scale Integration chip implementations */
+		/*  instead of Standard Logic, discrete transistors, or other low-density */
+		/*  approaches. Thus, the OLDEST generally agreed member of this group is the */
+		/*  Intel 4004. The 4004 is choosen because it was the first single-chip */
+		/*  maximally-general-purpose CPU available for purchase: even classified */
+		/*  predecessors were either multi-chip, or could only be programmed at their */
+		/*  manufacturing facility. The 8008 might be argued to be a better candidate, */
+		/*  but it was ALSO from Intel... */
+	#define LIBANDRIA4_PROCESSOR0_ERA_POPULIS 1
+	
+	#define LIBANDRIA4_PROCESSOR0_ERAINSTITUTIONAL( val ) \
+		( ( ( val ) * LIBANDRIA4_PROCESSOR0_ERAMULT ) | \
+			LIBANDRIA4_PROCESSOR0_ERA_INSTITUTIONAL )
+	#define LIBANDRIA4_PROCESSOR0_ERAPOPULIS( val ) \
+		( ( ( val ) * LIBANDRIA4_PROCESSOR0_ERAMULT ) | \
+			LIBANDRIA4_PROCESSOR0_ERA_POPULIS )
+	
+	
+	#define LIBANDRIA4_PROCESSOR0_ISA_UNKNOWN 0
+		/* I'd be surprised if anything that runs on a 4004 or 8008 can even process */
+		/* this file. */
+	#define LIBANDRIA4_PROCESSOR0_ISA_Intel4004 LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 1 ) /* 1971 */
+	#define LIBANDRIA4_PROCESSOR0_ISA_Intel8008 LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 2 ) /* 1972 */
+	
+	/* Now, the ones somewhat worth taking seriously. */
+		/* Note that the Intel 8080, 8085, z80, and other descendants, must be */
+		/*  distinguished through *_PROCESSOR1 (8085==2, z80==3). */
+	#define LIBANDRIA4_PROCESSOR0_ISA_8080 LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 3 ) /* 1974 */
+	#define LIBANDRIA4_PROCESSOR0_ISA_6800 LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 4 ) /* 1974 */
+	#define LIBANDRIA4_PROCESSOR0_ISA_6502 LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 5 ) /* 1975 */
+		/* *_PROCESSOR1: common x86==2, 80186==3. */
+	#define LIBANDRIA4_PROCESSOR0_ISA_x86 LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 6 ) /* 1978 */
+	#define LIBANDRIA4_PROCESSOR0_ISA_68k LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 7 ) /* 1979 */
+	#define LIBANDRIA4_PROCESSOR0_ISA_MIPS LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 8 ) /* 1985 */
+	#define LIBANDRIA4_PROCESSOR0_ISA_ARM LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 9 ) /* 1985 */
+	#define LIBANDRIA4_PROCESSOR0_ISA_SPARC LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 10 ) /* 1987 */
+		/* Originally & mostly IBM. */
+	#define LIBANDRIA4_PROCESSOR0_ISA_PowerISA LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 11 ) /* 1990 */
+		/* Included because of 32x, Saturn, & Dreamcast. */
+	#define LIBANDRIA4_PROCESSOR0_ISA_SuperH LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 12 ) /* 1992 */
+	#define LIBANDRIA4_PROCESSOR0_ISA_RISC_V LIBANDRIA4_PROCESSOR0_ERAPOPULIS( 13 ) /* 2010 */
+	
+	/*
+		It is time to produce processor-identification logic.
+	*/
 	
 #endif /* End primitive platdet predefs.h */
