@@ -157,10 +157,8 @@ SOFTWARE.
 		( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == LIBANDRIA4_COMPILER_CODEBASE_GNU ) || \
 		( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == LIBANDRIA4_COMPILER_CODEBASE_LLVM )
 		/* Supported: */
-			/* __TINYC__ : Tiny C Compiler. */
 			/* __GNUC__ : GCC C/C++. */
 			/* __llvm__ and/or __clang__ : LLVM C / Clang. */
-			/* _MSC_VER : MSVC. */
 		
 		#if __STDC_VERSION__ >= 199901L
 			
@@ -169,25 +167,9 @@ SOFTWARE.
 			#include "platdet/calccell.h"
 			#include "platdet/comncell.h"
 			
-			#undef LIBANDRIA4_JMPBUF_CELLCOUNT
-			#if ???
-				/* x86 64-bit. */
-				#define LIBANDRIA4_JMPBUF_CELLCOUNT ( 10 )
-			#endif
+			#include "platdet/comnjump.h"
 			
-			#ifdef __STDC_NO_ATOMICS__
-				#define LIBANDRIA4_SIGNAL_FENCE( var ) #error "??? signal fence hasn't been identified yet.\n"
-				#define LIBANDRIA4_ATOMIC_FENCE( var ) #error "??? isn't known to support atomics.\n"
-			#elif __STDC_VERSION__ >= 201112L
-				#include <stdatomic.h>
-				#define LIBANDRIA4_SIGNAL_FENCE( var ) atomic_signal_fence( var )
-				#define LIBANDRIA4_ATOMIC_FENCE( var ) atomic_thread_fence( var )
-			#else
-				#define LIBANDRIA4_SIGNAL_FENCE( var ) #error "??? signal fence hasn't been identified yet.\n"
-				#define LIBANDRIA4_ATOMIC_FENCE( var ) #error "??? atomic fence hasn't been identified yet.\n"
-			#endif
-			
-			#warning "TCC isn't known to support threads, but some systems in LibAndria4 require threads.\n"
+			#warning "Some systems in LibAndria4 require threads, figure out which compiler versions don't support them.\n"
 		#else
 			#error "Unknown C support level in platformdetect.h .\n"
 		#endif
@@ -195,9 +177,6 @@ SOFTWARE.
 	#elif \
 		( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == LIBANDRIA4_COMPILER_CODEBASE_MSVC )
 		/* Supported: */
-			/* __TINYC__ : Tiny C Compiler. */
-			/* __GNUC__ : GCC C/C++. */
-			/* __llvm__ and/or __clang__ : LLVM C / Clang. */
 			/* _MSC_VER : MSVC. */
 		
 		#if __STDC_VERSION__ >= 199901L
@@ -207,28 +186,9 @@ SOFTWARE.
 			#include "platdet/calccell.h"
 			#include "platdet/comncell.h"
 			
-			#undef LIBANDRIA4_JMPBUF_CELLCOUNT
-			#if ???
-				/* x86 64-bit. */
-				#define LIBANDRIA4_JMPBUF_CELLCOUNT ( 10 )
-			#endif
+			#include "platdet/comnjump.h"
 			
-			#ifdef __STDC_NO_ATOMICS__
-				#define LIBANDRIA4_SIGNAL_FENCE( var ) #error "MSVC signal fence hasn't been identified yet.\n"
-				#define LIBANDRIA4_ATOMIC_FENCE( var ) #error "MSVC atomic fence hasn't been identified yet.\n"
-			#elif __STDC_VERSION__ >= 201112L
-				#include <stdatomic.h>
-				#define LIBANDRIA4_SIGNAL_FENCE( var ) atomic_signal_fence( var )
-				#define LIBANDRIA4_ATOMIC_FENCE( var ) atomic_thread_fence( var )
-			#else
-				#define LIBANDRIA4_SIGNAL_FENCE( var ) #error "MSVC signal fence hasn't been identified yet.\n"
-				#define LIBANDRIA4_ATOMIC_FENCE( var ) #error "MSVC atomic fence hasn't been identified yet.\n"
-			#endif
-			
-			#define LIBANDRIA4_SIGNAL_FENCE( var ) /* TCC always spills are regs at each statement end. */
-			#define LIBANDRIA4_ATOMIC_FENCE( var ) #error "TCC isn't known to support atomics.\n"
-			
-			#warning "TCC isn't known to support threads, but some systems in LibAndria4 require threads.\n"
+			#warning "Some systems in LibAndria4 require threads, figure out which compiler versions don't support them.\n"
 		#else
 			#error "Unknown C support level in platformdetect.h .\n"
 		#endif
@@ -237,9 +197,6 @@ SOFTWARE.
 		( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == LIBANDRIA4_COMPILER_CODEBASE_TCC )
 		/* Supported: */
 			/* __TINYC__ : Tiny C Compiler. */
-			/* __GNUC__ : GCC C/C++. */
-			/* __llvm__ and/or __clang__ : LLVM C / Clang. */
-			/* _MSC_VER : MSVC. */
 		
 		#if __STDC_VERSION__ >= 199901L
 			
@@ -248,14 +205,7 @@ SOFTWARE.
 			#include "platdet/calccell.h"
 			#include "platdet/comncell.h"
 			
-			#undef LIBANDRIA4_JMPBUF_CELLCOUNT
-			#if ???
-				/* x86 64-bit. */
-				#define LIBANDRIA4_JMPBUF_CELLCOUNT ( 10 )
-			#endif
-			
-			#define LIBANDRIA4_SIGNAL_FENCE( var ) /* TCC always spills are regs at each statement end. */
-			#define LIBANDRIA4_ATOMIC_FENCE( var ) #error "TCC isn't known to support atomics.\n"
+			#include "platdet/comnjump.h"
 			
 			#warning "TCC isn't known to support threads, but some systems in LibAndria4 require threads.\n"
 		#else
