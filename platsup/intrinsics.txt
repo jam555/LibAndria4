@@ -1,0 +1,28 @@
+A listing of useful intrinsics:
+
+MSVC:
+	_AddressOfReturnAddress: returns the address holding the return address
+	__debugbreak: inserts a breakpoint
+	__emul: multiply, takes 32 bit vals, returns a 64bit
+	__faststorefence: ensures all previous reads & writes finish before further progress; amd64
+	__invlpg: invalidates the TLB page associated with the 64bit addr
+	_ReturnAddress: provides the addr that will be returned to (see: _AddressOfReturnAddress)
+GCC:
+	If __GCC_HAVE_DWARF2_CFI_ASM is defined, DWARF CFI directives can be emitted as inline assembly.
+
+
+
+
+
+
+
+
+
+Here's some macros:
+
+#if defined(__APPLE__)
+#if defined(__linux__)
+#if defined(__unix__)
+#if defined(WIN32)
+#if defined(__MINGW32__)
+#if defined(__MINGW64__)
