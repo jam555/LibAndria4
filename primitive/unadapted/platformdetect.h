@@ -111,6 +111,10 @@ SOFTWARE.
 	
 	
 	
+	#include "platdet/proc.h"
+	
+	
+	
 	#include "platdet/platform.h"
 	
 	
