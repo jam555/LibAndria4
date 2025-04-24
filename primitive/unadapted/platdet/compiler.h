@@ -61,7 +61,6 @@ SOFTWARE.
 	/*  _CRAYC : Cray C. */
 	/*  __DCC__ : Diab C/C++. */
 	/*  _DICE : Dice C. */
-	/*  __DMC__ : Digital Mars C. */
 	/*  __SYSC__ : Dignus Systems/C++. */
 	/*  __PATHCC__ : EKOPath. */
 	/*  __EDG__ : EDG C++ Frontend. */
@@ -79,34 +78,47 @@ SOFTWARE.
 	
 	#if defined( __GNUC__ )
 		#if defined( __INTEL_COMPILER ) || defined( __ICC ) || defined( __ECC ) || defined( __ICL )
-			#warning "Warning: Detected Intel C compiler masquerading as GNU C compiler!"
+			#warning "Warning: Detected Intel C compiler masquerading as GNU C compiler!\n"
 		#endif
 		
 		
-		#if defined( LIBANDRIA4_COMPILER ) && LIBANDRIA4_COMPILER & ( ~LIBANDRIA4_COMPILER_CODEBASEANTIMASK ) != LIBANDRIA4_COMPILER_CODEBASE_GNU
+		#if defined( LIBANDRIA4_COMPILER ) && LIBANDRIA4_COMPILER != 0
 			#error "Error: Libandria4 platformdetect.h LIBANDRIA4_COMPILER"
-			#error " already had a non-null value when detecting GNU C compiler."
+			#error " already had a non-null value when detecting GNU C compiler.\n"
 		#else
 			#ifdef LIBANDRIA4_COMPILER
 				#undef LIBANDRIA4_COMPILER
 			#endif
 			#define LIBANDRIA4_COMPILER LIBANDRIA4_COMPILER_CODEBASE_GNU
 		#endif
-	#endif
 	
 		/* This might not actually detect the earliest Microsoft C compilers. */
 		/*  Supposedly versions before 3.0 might register as Lattice C */
 		/*  instead, as Microsoft apparently licensed that codebase. */
-	#if defined( _MSC_VER )
-		#if defined( LIBANDRIA4_COMPILER ) && LIBANDRIA4_COMPILER & ( ~LIBANDRIA4_COMPILER_CODEBASEANTIMASK ) != LIBANDRIA4_COMPILER_CODEBASE_MSVC
+	#elif defined( _MSC_VER )
+		#if defined( LIBANDRIA4_COMPILER ) && LIBANDRIA4_COMPILER != 0
 			#error "Error: Libandria4 platformdetect.h LIBANDRIA4_COMPILER"
-			#error " already had a non-null value when detecting Microsoft C compiler."
+			#error " already had a non-null value when detecting Microsoft C compiler.\n"
 		#else
 			#ifdef LIBANDRIA4_COMPILER
 				#undef LIBANDRIA4_COMPILER
 			#endif
 			#define LIBANDRIA4_COMPILER LIBANDRIA4_COMPILER_CODEBASE_MSVC
 		#endif
+	
+	#elif defined( __DMC__ )
+		#if defined( LIBANDRIA4_COMPILER ) && LIBANDRIA4_COMPILER != 0
+			#error "Error: Libandria4 platformdetect.h LIBANDRIA4_COMPILER"
+			#error " already had a non-null value when detecting Digital Mars C compiler.\n"
+		#else
+			#ifdef LIBANDRIA4_COMPILER
+				#undef LIBANDRIA4_COMPILER
+			#endif
+			#define LIBANDRIA4_COMPILER LIBANDRIA4_COMPILER_CODEBASE_DIGIMARS
+		#endif
+		
+	#else
+		#error "Unrecognized compiler.\n"
 	#endif
 	
 #endif /* End primitive platdet platform.h */
