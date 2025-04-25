@@ -29,46 +29,8 @@ SOFTWARE.
 /* Based on https://nullprogram.com/blog/2023/02/12/ , visited on 11/Apr/2025. */
 /*  Look in the references directory for a saved copy of the page. */
 
-/* Attention users! jetjmp()/longjmp() have unpredictable interations with */
-/*  compiler optimizations, so if your variables might get updated after */
-/*  setjmp(), then analyze them to figure out which need to be tagged */
-/*  "volatile". */
+#include "jmpalike.h"
 
-
-#include "platformdetect.h"
-
-
-/*
-	Floating point: for generic access, include fenv.h
-		for x86, referencing https://www.felixcloutier.com/ :
-			"RDSSPD \n" read shadow-stack pointer
-			Note: look up the other shadow-stack stuff
-			
-			"fwait \n" check for and handle pending exceptions that aren't
-			* 	 masked before proceeding
-			"fwait \n finit \n" ops get the exception status, then clear the
-			* 	 whole x87
-			"fwait \n fnstsw \n" ops get the exception status (use for
-			* 	 dispatching, not setjmp).
-			"fnop \n" does nothing but take space, time, & increment x86 & x87
-			* 	 ip pointers: use for alignment
-			"fldenv \n" loads the entire x87 state from memory, should execute
-			* 	 from same mode as the store
-			"fwait \n fnstenv \n" ops get exscept. status, then store all x87
-			* 	 state expect stack vals to mem: reverse of fldenv
-			"frstor \n" loads an entire x87 state, including stack
-			"fwait \n fnsave \n" ops do fnstenv, then store stack, then finit:
-			* 	 reverse of frstor
-			
-			"fxrstor \n" Reloads the x87 FPU, MMX technology, XMM, and MXCSR
-			* 	 registers
-			"fxsave \n" reverse of fxrstor
-			
-			"pause \n" a no-op specifically used to mark spin-loops: a hint that
-			* 	 memory-order problems PROBABLY won't happen
-			
-			"rdpid \n" get the processor id
-*/
 
 /*
 	From: https://en.wikipedia.org/wiki/Control_register#Control_registers_in_Intel_x86_series
@@ -102,37 +64,16 @@ SOFTWARE.
 */
 
 
-typedef void *libandria4_jmpalike_buf[ LIBANDRIA4_JMPBUF_CELLCOUNT ];
-typedef uint16_t libandria4_jmpalike_float[ LIBANDRIA4_FLOATBUF_CELLCOUNT ];
-
-#if ???
-typedef uint16_t libandria4_mathbuf_opt0[ LIBANDRIA4_MATHBUF_OPTSIZE_x87 ];
-#elif ???
-typedef uint16_t libandria4_mathbuf_opt0[ LIBANDRIA4_MATHBUF_OPTSIZE_x87 ];
-	#if \
-		( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == \
-		LIBANDRIA4_COMPILER_CODEBASE_GNU
-typedef uint16_t libandria4_mathbuf_opt1[ LIBANDRIA4_MATHBUF_OPTSIZE_SSE ]
-	__attribute__ ((aligned (16)));
-typedef uint16_t libandria4_mathbuf_opt2[ LIBANDRIA4_MATHBUF_OPTSIZE__AVX1 ]
-	__attribute__ ((aligned (64)));
-	#endif
-#else
-#endif
-
 
 #if \
-	( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == \
-		LIBANDRIA4_COMPILER_CODEBASE_GNU ) || \
-	( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == \
-		LIBANDRIA4_COMPILER_CODEBASE_LLVM )
+	LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_GNU ) || \
+	LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_LLVM )
 	
 	#define LIBANDRIA4_NAKEDATTR __attribute__((naked))
 	#define LIBANDRIA4_SETJMPATTR __attribute__((naked,returns_twice))
 	
 #elif  \
-	( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == \
-		LIBANDRIA4_COMPILER_CODEBASE_MSVC )
+	LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_MSVC )
 	
 	#error "This is unverified!\n"
 	
@@ -140,8 +81,7 @@ typedef uint16_t libandria4_mathbuf_opt2[ LIBANDRIA4_MATHBUF_OPTSIZE__AVX1 ]
 	#define LIBANDRIA4_SETJMPATTR _Noreturn
 	
 #elif \
-	( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == \
-		LIBANDRIA4_COMPILER_CODEBASE_TCC )
+	LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_TCC )
 	
 	#error "Syntax for TCC in jmpalike.h hasn't been worked out yet.\n"
 	
@@ -234,57 +174,10 @@ The .c file contents proper are below.
 
 
 
-static uintptr_t ptrhash( size_t len, char *str )
-{
-	uintptr_t ret = 0, offr = 0, offp = 0;
-	uint16_t patch = 0;
-	
-	while( len )
-	{
-		patch += ( *str ) << offp;
-		
-		len -= 1;
-		++str;
-		offp += 7;
-		if( offp >= 8 )
-		{
-			offp -= 8;
-			offr += 8;
-			ret ^= ( ( patch & 255 ) << offr );
-			patch &= ( 255 << 8 );
-			patch >>= 8;
-		}
-		if( offr >= CHAR_BITS * LIBANDRIA4_CELLTYPE_REGSIZE )
-		{
-			offr = 0;
-		}
-	}
-	while( patch )
-	{
-		offr += 8;
-		ret ^= ( ( patch & 255 ) << offr );
-		patch &= ( 255 << 8 );
-		patch >>= 8;
-		
-		if( offr >= CHAR_BITS * LIBANDRIA4_CELLTYPE_REGSIZE )
-		{
-			offr = 0;
-		}
-	}
-	
-	return( ret );
-}
-#define LIB4_MASK_PTR( val ) \
-	( (libandria4_jmpalike_buf)( (uintptr_t)( val ) ^ \
-		ptrhash( strlen( __DATE__ ), __DATE__ ) ^ \
-		ptrhash( strlen( __TIME__ ), __TIME__ ) ^ \
-		ptrhash( strlen( __TIMESTAMP__ ), __TIMESTAMP__ ) ) )
 
 #if \
-	( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == \
-		LIBANDRIA4_COMPILER_CODEBASE_GNU ) || \
-	( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == \
-		LIBANDRIA4_COMPILER_CODEBASE_LLVM )
+	LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_GNU ) || \
+	LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_LLVM )
 	
 	#if LIBANDRIA4_CELLTYPE_REGSIZE == 8
 		
@@ -658,175 +551,6 @@ static uintptr_t ptrhash( size_t len, char *str )
 		#if ???
 		/* Initial AVX specific stuff, always 64 bit. */
 		
-		/*
-			The stuff here is partially based on:
-				https://www.moritz.systems/blog/how-debuggers-work-getting-and-setting-x86-registers-part-1/#fxsave-vs-fxsave64
-		*/
-		
-			/* Some 486 also support this, but I'm not sure how to ID them, */
-			/*  so waiting for Pentium will do. */
-		#if LIBANDRIA4_TARGETPROCESSOR2 >= \
-			LIBANDRIA4_PROCESSOR0_ISA_x86_Pentium1
-			
-			static thread char procname[ 12 ];
-			uint32_t libandria4_cpuid_inner( uint32_t leaf, uint32_t sub )
-			{
-				uint32_t res, a, b, c;
-				
-				__asm__ volatile {
-					"mov %%ecx %%eax\n"
-					"mov %%edx %%ecx\n"
-					"cpuid\n"
-					"mov %%eax %0\n"
-					"mov %%ebx %1\n"
-					"mov %%edx %2\n"
-					"mov %%ecx %3\n"
-					:
-					"=m"(res), "=m"(a), "=m"(b), "=m"(c)
-				};
-				
-				if( leaf == 0 )
-				{
-					int i1 = 0, i2 = 0;
-					while( i2 < 3 )
-					{
-						procname[ i2 * 4 + i1 ] =
-							(
-								a & ( 255 << ( i1 * 8 ) )
-							) >> ( i1 * 8 );
-						++i1;
-						if( i1 >= 4 )
-						{
-							i1 = 0;
-							++i2;
-							a = b;
-							b = c;
-						}
-					}
-				}
-				
-				return( res );
-			}
-		#endif
-		int libandria4_cpuid( uint32_t leaf, uint32_t subleaf,  uint32_t *ret, char *name )
-		{
-			#if LIBANDRIA4_TARGETPROCESSOR2 < \
-				LIBANDRIA4_PROCESSOR0_ISA_x86_Pentium1
-				
-				return( -1 );
-				
-			#else
-				uint32_t tmp;
-				if( !ret )
-				{
-					ret = &tmp;
-				}
-				*ret = libandria4_cpuid_inner( leaf, subleaf );
-				if( leaf == 0 && name )
-				{
-					int i = 0;
-					while( i < 12 )
-					{
-						name[ i ] = procname[ i ];
-						++i;
-					}
-				}
-				
-				return( 1 );
-			#endif
-		}
-		
-		int test_xsave_avail()
-		{
-			static int status = 0;
-			
-			
-			if( status == 0 )
-			{
-				volatile uint32_t tmp;
-				volatile uint32_t str[ 3 ];
-				int res = libandria4_cpuid( 1, 0,  &tmp, (char*)str );
-				
-					/* Test ECX for XSAVE. */
-				if( str[ 2 ] & 0x04000000 )
-				{
-					status = 1;
-					
-				} else {
-					
-					status = -1;
-				}
-			
-			return( status );
-		}
-		int test_avx_avail()
-		{
-			static int status = 0;
-			
-			
-			if( status == 0 )
-			{
-				volatile uint32_t tmp;
-				volatile uint32_t str[ 3 ];
-				int res = libandria4_cpuid( 1, 0,  &tmp, (char*)str );
-				
-					/* Test ECX for AVX. */
-				if( str[ 2 ] & 0x10000000 )
-				{
-					status = 1;
-					
-				} else {
-					
-					status = -1;
-				}
-			
-			return( status );
-		}
-		int find_avxoffset( uint32_t *off )
-		{
-			static uint32_t offset;
-			static int status = 0;
-			
-			
-			if( status == 0 )
-			{
-				volatile uint32_t tmp;
-				volatile uint32_t str[ 3 ];
-				int res = libandria4_cpuid( 0x0D, 0x02,  &tmp, (char*)str );
-				
-				res = 1;
-				offset = str[ 0 ];
-			}
-			if( status && off )
-			{
-				*off = offset;
-			}
-			
-			return( status );
-		}
-		int find_avxsize( uint32_t *sz )
-		{
-			static uint32_t size;
-			static int status = 0;
-			
-			
-			if( status == 0 )
-			{
-				volatile uint32_t tmp;
-				volatile uint32_t str[ 3 ];
-				int res = libandria4_cpuid( 0x0D, 0,  &tmp, (char*)str );
-				
-				res = 1;
-				size = str[ 0 ];
-			}
-			if( status && sz )
-			{
-				*sz = size;
-			}
-			
-			return( status );
-		}
-		
 		void mark_mathdata2( libandria4_mathbuf_opt2 buf )
 		{
 			if( test_xsaveymm_avail() )
@@ -926,9 +650,7 @@ static uintptr_t ptrhash( size_t len, char *str )
 		
 	#endif
 	
-#elif  \
-	( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == \
-		LIBANDRIA4_COMPILER_CODEBASE_MSVC )
+#elif LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_MSVC )
 	
 	#if LIBANDRIA4_CELLTYPE_REGSIZE == 4
 		
@@ -1045,9 +767,7 @@ static uintptr_t ptrhash( size_t len, char *str )
 		
 	#endif
 	
-#elif \
-	( ( LIBANDRIA4_COMPILER & ~(LIBANDRIA4_COMPILER_ERAMASK) ) == \
-		LIBANDRIA4_COMPILER_CODEBASE_TCC )
+#elif LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_TCC )
 	
 	#error "Syntax for TCC in jmpalike.c hasn't been worked out yet.\n"
 	

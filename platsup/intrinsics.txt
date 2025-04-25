@@ -26,3 +26,40 @@ Here's some macros:
 #if defined(WIN32)
 #if defined(__MINGW32__)
 #if defined(__MINGW64__)
+
+
+
+
+
+
+
+	Floating point: for generic access, include fenv.h
+		for x86, referencing https://www.felixcloutier.com/ :
+			"RDSSPD \n" read shadow-stack pointer
+			Note: look up the other shadow-stack stuff
+			
+			"fwait \n" check for and handle pending exceptions that aren't
+			* 	 masked before proceeding
+			"fwait \n finit \n" ops get the exception status, then clear the
+			* 	 whole x87
+			"fwait \n fnstsw \n" ops get the exception status (use for
+			* 	 dispatching, not setjmp).
+			"fnop \n" does nothing but take space, time, & increment x86 & x87
+			* 	 ip pointers: use for alignment
+			"fldenv \n" loads the entire x87 state from memory, should execute
+			* 	 from same mode as the store
+			"fwait \n fnstenv \n" ops get exscept. status, then store all x87
+			* 	 state expect stack vals to mem: reverse of fldenv
+			"frstor \n" loads an entire x87 state, including stack
+			"fwait \n fnsave \n" ops do fnstenv, then store stack, then finit:
+			* 	 reverse of frstor
+			
+			"fxrstor \n" Reloads the x87 FPU, MMX technology, XMM, and MXCSR
+			* 	 registers
+			"fxsave \n" reverse of fxrstor
+			
+			"pause \n" a no-op specifically used to mark spin-loops: a hint that
+			* 	 memory-order problems PROBABLY won't happen
+			
+			"rdpid \n" get the processor id
+				Isn't it "cpuid" ?
