@@ -1,7 +1,6 @@
-Move the long-jump stuff into a "root" platsup directory. Move the platform
- detect & platform support stuff into "root" platdet/ & "root" platsup/
- directories.
-The exception & coroutine stuff should both move into "root" platsup/ .
+Divide the setjump/longjump stuff across more files for "cleanliness". Style
+ this after the x86 stuff in platform detect, with more specific stuff being
+ defined in subsidiary files.
 A fallback for stdint.h & similar should be added to "root" platdet/ , so that
  the platform support code can at least be useful on compilers that otherwise
  can't support LibAndria4.
