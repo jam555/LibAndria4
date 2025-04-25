@@ -26,18 +26,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "../detect.h"
-
-#if LIBANDRIA4_PRIMITIVE_PLATDET_COMNCELL_H
-# define LIBANDRIA4_PRIMITIVE_PLATDET_COMNCELL_H
+#ifndef LIBANDRIA4_PLATDET_PLATFORMDETECT_H
+	/* Note that this include guard must stay in lock-step with the one in */
+	/*  platformdetect.h */
 	
-	
-	
-	#define LIBANDRIA4_CELLTYPE_KNOWN ( 1 )
-	
-	#define LIBANDRIA4_CELLTYPE_DPTRSIZE LIBANDRIA4_CELLTYPE_SIZE
-	#define LIBANDRIA4_CELLTYPE_FPTRSIZE LIBANDRIA4_CELLTYPE_SIZE
-	#define LIBANDRIA4_CELLTYPE_INTSIZE LIBANDRIA4_CELLTYPE_SIZE
-	#define LIBANDRIA4_CELLTYPE_REGSIZE LIBANDRIA4_CELLTYPE_SIZE
-	
-#endif /* End primitive platdet comncell.h */
+	#include "platformdetect.h"
+#endif
+/* End Liandria4 platdet detect.h */

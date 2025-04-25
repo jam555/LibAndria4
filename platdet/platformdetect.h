@@ -26,8 +26,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef LIBANDRIA4_BASIC_PLATFORMDETECT_H
-# define LIBANDRIA4_BASIC_PLATFORMDETECT_H
+#ifndef LIBANDRIA4_PLATDET_PLATFORMDETECT_H
+# define LIBANDRIA4_PLATDET_PLATFORMDETECT_H
+	/* Note that if these include guards change, then so too must those in */
+	/*  detect.h */
 	
 	/**************************************************************************/
 	/**************************************************************************/

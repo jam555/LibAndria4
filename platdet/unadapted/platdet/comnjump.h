@@ -26,10 +26,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "../detect.h"
+
 #if LIBANDRIA4_PRIMITIVE_PLATDET_COMNJUMP_H
 # define LIBANDRIA4_PRIMITIVE_PLATDET_COMNJUMP_H
 	
-	#include "../platformdetect.h"
 	
 		/* This is technically already included via platformdetect, but it's */
 		/*  good to make things explicit. */

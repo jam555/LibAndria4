@@ -26,11 +26,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "../detect.h"
+
 #if LIBANDRIA4_PRIMITIVE_PLATDET_COMPILER_H
 # define LIBANDRIA4_PRIMITIVE_PLATDET_COMPILER_H
 	
-	#include "../platformdetect.h"
-	
+	/* For devs: to test for a particular compiler, use */
+		/* LIBANDRIA4_COMPILER_IS_CODEBASE( ref ) from predef.h */
+	/*  To test for era (which you probably won't want to do), use */
+		/* LIBANDRIA4_COMPILER_IS_ERA( ref ) */
+	/*  (also from predef.h). Other things can be done, but those things will */
+	/*  largely be dominated by visual noise, so usually you shouldn't do */
+	/*  them. */
 	
 	/* This is just a convenience file, to "purify" the contents of */
 	/*  ../platformdetect.h, making it easier to read. It is meant to contain */
