@@ -63,3 +63,41 @@ Here's some macros:
 			
 			"rdpid \n" get the processor id
 				Isn't it "cpuid" ?
+
+
+
+
+
+
+
+/*
+	From: https://en.wikipedia.org/wiki/Control_register#Control_registers_in_Intel_x86_series
+	
+	XCR0 register bits:
+		0		X87	x87 FPU	x87 FPU/MMX State, must be '1'
+		1		SSE	SSE	MXCSR and 16 XMM registers
+		2		AVX	AVX	16 upper-halves of the YMM registers[a]
+		3		BNDREG	MPX	Four BND registers
+		4		BNDCSR	BNDCFGU and BNDSTATUS registers
+		5		OPMASK	AVX-512	Eight k-mask registers
+		6		ZMM_Hi256	16 upper-halves of the ZMM registers[b]
+		7		Hi16_ZMM	16 "high" ZMM registers (ZMM16 through ZMM31)
+		8		PT	Processor Trace	
+		9		PKRU	Protection Keys	PKRU register
+		10		PASID		
+		11		CET_U	Intel CET	User shadow stack
+		12		CET_S	Supervisor shadow stack
+		13		HDC	Hardware Duty Cycling	
+		14		UINTR	User interrupts	
+		15		LBR	Last Branch Records	
+		16		HWP	Hardware P-states	
+		17		XTILECFG	Intel AMX	64-byte TILECFG register
+		18		XTILEDATA	Eight 1024-byte TILE registers
+		19		APX	Intel APX	16 "high" GPRs (R16 through R31)
+		20–63	Reserved
+	
+	"xsave" depends on the EDX and EAX registers, which it uses with the XCR0
+	register to figure out what data it will be working with. EDX holds the
+	*  most-significant 32 bits, while EAX holds the least-significant 32 bits.
+*/
+
