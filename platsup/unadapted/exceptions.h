@@ -26,6 +26,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+/* This file is now very "broken", due to some samples moved here from */
+/*  jmpalike.c . They're at the end of the file. */
+
 #ifndef LIBANDRIA4_PRIMITIVE_EXCEPTIONS_H
  #define LIBANDRIA4_PRIMITIVE_EXCEPTIONS_H
 	
@@ -303,5 +306,31 @@ SOFTWARE.
 			__TIMESTAMP__
 		};
 	
+#endif
+
+
+
+#if 0
+		/* Demo version. This stuff really goes in exceptions.h, except */
+		/*  that it should be a more-complete implementation. */
+	typedef struct
+	{
+		libandria4_jmpalike_buf buf;
+		void *oldref;
+		
+	} ;
+	#define LIBANDRIA4_EXCEPTIONS_THROW( destptr ) \
+		{ \
+			if( !libandria4_rebasestack( \
+					( destptr )->buf, \
+					( destptr )->oldref, \
+					(void*)&libandria4_exceptions_progress \
+				) ) \
+			{ \
+					/* We've adjusted stuff, so we need to update the ref. addr. */ \
+				( destptr )->oldref = (void*)&libandria4_exceptions_progress; \
+				libandria4_longjmp( ( destptr )->buf, uintptr_t ret ); \
+			} \
+		}
 #endif
 /* Ending primitive exceptions.h */
