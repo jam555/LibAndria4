@@ -51,3 +51,68 @@ typedef uint16_t libandria4_mathbuf_opt2[ LIBANDRIA4_MATHBUF_OPTSIZE__AVX1 ]
 	#endif
 #else
 #endif
+
+
+
+#if \
+	LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_GNU ) || \
+	LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_LLVM )
+	
+	#define LIBANDRIA4_NAKEDATTR __attribute__((naked))
+	#define LIBANDRIA4_SETJMPATTR __attribute__((naked,returns_twice))
+	
+#elif  \
+	LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_MSVC )
+	
+	#error "This is unverified!\n"
+	
+	#define LIBANDRIA4_NAKEDATTR __declspec(naked)
+	#define LIBANDRIA4_SETJMPATTR _Noreturn
+	
+#else
+	
+	#error "jmpalike.h doesn't support this compiler yet.\n"
+	
+#endif
+
+
+
+	/* Called once per exception-handler throw-context. */
+int libandria4_jmpalike_rebasestack
+(
+	libandria4_jmpalike_buf buf,
+	  void *oldref, void *newref
+);
+
+#define LIBANDRIA4_JMPALIKE_SETCORE( buf ) \
+	( LIBANDRIA4_SIGNAL_FENCE( var ), \
+		libandria4_jmpalike_setcore( buf ) )
+
+#define LIBANDRIA4_JMPALIKE_SETOTHERS( buf ) \
+	( LIBANDRIA4_SIGNAL_FENCE( var ), \
+		libandria4_jmpalike_setothers( buf ) )
+
+#define LIBANDRIA4_JMPALIKE_SET( buf ) \
+	( LIBANDRIA4_SIGNAL_FENCE( var ), \
+		libandria4_jmpalike_set( buf ) )
+
+#define LIBANDRIA4_JMPALIKE_JMP( buf, retval ) \
+	( LIBANDRIA4_SIGNAL_FENCE( var ), \
+		libandria4_jmpalike_jmp( buf, retval ) )
+
+
+
+/* DO NOT directly call ay of these, use the macro versions above instead. */
+
+	/* Called once per exception-handler catch-context. */
+LIBANDRIA4_SETJMPATTR
+uintptr_t libandria4_jmpalike_setcore( libandria4_jmpalike_buf buf );
+
+	/* Called every time it's passed, in exception-handler catch-context. */
+void libandria4_jmpalike_setothers( libandria4_jmpalike_buf buf );
+
+LIBANDRIA4_SETJMPATTR
+uintptr_t libandria4_jmpalike_set( libandria4_jmpalike_buf buf );
+
+
+int libandria4_jmpalike_jmp( libandria4_jmpalike_buf buf, uintptr_t ret );
