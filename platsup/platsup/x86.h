@@ -102,20 +102,20 @@ SOFTWARE.
 		#if __STDC_VERSION__ >= 199901L
 			
 			#ifdef __STDC_NO_ATOMICS__
-				#define LIBANDRIA4_SIGNAL_FENCE( var ) \
+				#define LIBANDRIA4_SIGNAL_FENCE( ) \
 					#error "??? signal fence hasn't been identified yet.\n"
-				#define LIBANDRIA4_ATOMIC_FENCE( var ) \
+				#define LIBANDRIA4_ATOMIC_FENCE( ) \
 					#error "??? isn't known to support atomics.\n"
 			#elif __STDC_VERSION__ >= 201112L
 				#include <stdatomic.h>
-				#define LIBANDRIA4_SIGNAL_FENCE( var ) \
-					atomic_signal_fence( var )
-				#define LIBANDRIA4_ATOMIC_FENCE( var ) \
-					atomic_thread_fence( var )
+				#define LIBANDRIA4_SIGNAL_FENCE( ) \
+					atomic_signal_fence( memory_order_seq_cst )
+				#define LIBANDRIA4_ATOMIC_FENCE( ) \
+					atomic_thread_fence( memory_order_seq_cst )
 			#else
-				#define LIBANDRIA4_SIGNAL_FENCE( var ) \
+				#define LIBANDRIA4_SIGNAL_FENCE( ) \
 					#error "??? signal fence hasn't been identified yet.\n"
-				#define LIBANDRIA4_ATOMIC_FENCE( var ) \
+				#define LIBANDRIA4_ATOMIC_FENCE( ) \
 					#error "??? atomic fence hasn't been identified yet.\n"
 			#endif
 			
