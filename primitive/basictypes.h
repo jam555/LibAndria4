@@ -52,6 +52,7 @@ SOFTWARE.
 	/*  format used for this function-pointer type. Any shorter names should */
 	/*  be listed in relevant /abbrevs/basictypes.h (or similar) files. */
 	typedef void (*libandria4_common_voidfuncp_void)();
+	typedef void (*libandria4_common_voidfuncp_voidp)( void* );
 	
 	
 	#if __INTELLISENSE__
