@@ -93,11 +93,19 @@ Microsoft
 				aware of) simply sharing the same start address, but obviously
 				the size of the union is the size of it's largest element.
 			fast call
-				In contrast to structures, the stack grows downwards. If you
-				want a structure to duplicate the layout of function arguments,
-				then you MUST list the structure elements in the opposite order
-				from the function arguments, while keeping in mind the alignment
-				behaviors of each.
+				In contrast to structures, the stack grows downwards. However,
+				the arguments themselves are pushed in REVERSE order (so, the
+				first argument to be put on the stack is actually the LAST
+				argument to the function, NOT the first one!), so the relative
+				order of memory addresses is actually the same: for both
+				structures and function arguments, the first element listed is
+				in the lowest-numbered address, while the last is in the
+				highest-valued address, with all elements between allocated
+				addresses between the first and last in a contiguous sequence.
+				If you want a structure with the same memory layout as a set of
+				arguments, then you just list the elements in the same order
+				while taking into consideration the alignment and by-value vs
+				by-reference traits of stack arguments.
 				
 				All register-passed arguments have space allocated on the stack
 				in case the callee needs to use the register for something else,
