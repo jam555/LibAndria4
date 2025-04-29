@@ -1,0 +1,223 @@
+This work is licensed under CC BY 4.0. To view a copy of this license, visit
+	https://creativecommons.org/licenses/by/4.0/
+
+LibAndria4 info for platform ABIs. This is meant for LibAndria4 development, but
+is hoped to be of use for other purposes as well.
+
+
+Terminology:
+	Function: For the purposes of this document, all procedures, subroutines,
+		routines, etc., will be called functions.
+	Called: A function that was been, is being, or will be called by the current
+		"view point" code (wqhich will usually be a function).
+	Callee: The same function as the Called function. Used in slightly different
+		syntactic contexts.
+	Caller: The code (usually a function) that has, is, or will call the Callee.
+	Stack: An implementation mechanism that allows multiple incomplete calls to
+		a specific function to simultaneously exist without conflicting with
+		each other. This is metaphorically achieved by simply stacking pieces of
+		data into a single pile, discarding data values when the function
+		invocation that they are associated with completes. This allows function
+		invocations to pause their own execution while transfering execution to
+		a different function invocation, by associating each function
+		invocation's data storage with a distinct storage area (called a Stack
+		Frame) instead of just sharing a single storage area with all possible
+		invocations of the function. The common implementation in "imperative"
+		programming languages is to allocate the Stack Frames sequentially from
+		a linear memory space, for function invocations that never complete
+		until ALL of the function invocations that they cause have completed,
+		and furthermore never cause a function invocation until after all of the
+		function invocations that has already triggered have completed: this
+		allows the memory-management of the linear memory space (sometimes
+		itself called the Stack) to be performed by just choosing a single
+		reference point in the memory space, and tracking the distance from that
+		point which is currently being treated as in-use for Stack Frames,
+		because the Stack Frame that will next be allocated or released is
+		always the Stack Frame furthest from the reference point. Having said
+		that, other implementations (such as arbitrarily allocated Stack Frames
+		associated with Callee function invocations that can outlive their
+		Caller function invocation) are possible, at the cost of forcing changes
+		to the memory management system in use as well. Note that in
+		multi-threading systems, coroutine/fiber/green thread systems, and for
+		kernel mode vs user mode: each thread, coroutine/fiber/green-thread, and
+		usually the kernel and the user mode code will usually have it's own
+		stack.
+		Stacks seem to at least have been in use in limited form by Konrad Zuse
+		in 1945, A.M. Turing in 1946, patented by Samelson and Bauer in 1957,
+		and used as a replacement for "named" registers in computers such as the
+		Burroughs Large Systems and languages such as FORTH.
+	Array: A grouping-together of identical types of data elements in
+		non-overlapping but contiguous memory locations, in such a fashion that
+		individual elements can be found by just using an offset with a
+		reference location of the array itself.
+	Structure: A grouping-together of arbitrary types of data elements in
+		non-overlapping but contiguous memory locations, in such a fashion that
+		individual elements can be found by just using an offset with a
+		reference location of the structure itself.
+	Union: A grouping-together of arbitrary types of data elements in
+		overlapping (and thus contiguous) memory locations, in such a fashion
+		that individual elements can be found by just using an offset with a
+		reference location of the union itself, with the offsets for all
+		elements usually being identical values.
+
+Microsoft
+	x86
+		64 bit
+			data structures
+				Scalars, floating-point, and e.g. __m128 are expected to have
+				alignment identical to their size.
+				
+				Arrays are expected to have the same alignment as is recommended
+				for their members.
+				
+				Structures "grow" upwards: if element "b" in a structure is
+				defined AFTER element "a", then element b's address will be
+				numerically larger than the address of element a.
+				
+				The alignment of structures is expected to be the same as the
+				maximum alignment of any of it's elements. All elements must be
+				placed at their own proper alignment in regards to the start of
+				the structure, which may require the use of padding (e.g. a
+				uint32_t following a uint8_t will have 3 bytes of padding
+				between it and the uint8_t). The size of a structure must be a
+				whole-number multiple of it's alignment, which may require
+				padding at the end of the structure. Compiler flags or type
+				attributes CAN change the internal spacing, but that's an
+				extended subject.
+				
+				Structure bit-fields won't cross their "natural" alignment
+				boundaries, but I otherwise will ignore them for now.
+				
+				The alignment of unions follows the same rules as the alignment
+				of structures, with all elements (in every case I'm currently
+				aware of) simply sharing the same start address, but obviously
+				the size of the union is the size of it's largest element.
+			fast call
+				In contrast to structures, the stack grows downwards. If you
+				want a structure to duplicate the layout of function arguments,
+				then you MUST list the structure elements in the opposite order
+				from the function arguments, while keeping in mind the alignment
+				behaviors of each.
+				
+				All register-passed arguments have space allocated on the stack
+				in case the callee needs to use the register for something else,
+				while additionally making varargs support and taking the address
+				of an individual argument simpler, but that pre-allocated space
+				is left uninitialized: space for 4 arguments must ALWAYS be
+				allocated on the stack, even if the function takes fewer
+				arguments, for the sake of simplifying support for K&R/
+				unprototyped functions (and supposedly for varargs too, but I
+				assume that's just to allow the support to be uniform across all
+				function types). Each argument-slot on the stack must be 8-bytes
+				in size (regardless of the data type's actual size) because
+				they're required to be aligned on 8-byte boundaries. All
+				additional arguments are stored on the stack, past the space
+				reserved for the first four, before the callee is actually
+				called and before the arguments are initialized: this is because
+				all stack addresses beyond RSP are considered volatile, and thus
+				may be altered by e.g. the OS or a debugger with no warning,
+				notification, or restoration; thus, RSP must be moved beyond all
+				argument slots on the stack before those locations can safely be
+				initialized or otherwise used. Arguments are never allocated
+				across multiple registers, and if they won't fit then they're
+				passed by reference instead of by value. Integers and pointers
+				are passed, left-to-right, in RCX, RDX, R8, and R9,
+				respectively, and floats/doubles in XMM0, XMM1, XMM2, and XMM3.
+				All arguments are right-justified so that the lowest-valued bit
+				of the register is always used. Any argument larger than 8 bytes
+				(e.g. the __m128 type) is thus ALWAYS passed by reference. For
+				specifically varargs & un-prototyped functions, floating-point
+				values MUST be duplicated into the corresponding general-purpose
+				register, to simplify calls. For functions that aren't fully
+				prototyped, floating-point arguments will specifically be passed
+				as doubles instead of just floats. If a register is only
+				partially used, then the unused bytes ARE NOT zeroed out, nor
+				sign-extended: if you need it done, then you have to do it
+				yourself.
+				
+				Note that a base-pointer is not necessarily used: a base-pointer
+				is required if e.g. alloca is used to allocate stack space
+				dynamically, but otherwise the compiler is allowed to omit it.
+				Most functions must keep the stack at 16-byte alignment
+				everywhere other than it's prolog (relevant for e.g. initial
+				entry, right after the return address has been pushed).
+				The norm is that any non-volatile registers that need to be
+				saved and any local-variables will be pushed directly after the
+				return address, the frame pointer will point to the stack slot
+				directly after if the frame pointer is used, then alloca-space
+				will be placed, and finally the space for the largest argument-
+				-block that any called function might require: the return
+				address for any such called functions will be pushed directly
+				below the save slot for RCX, thus the return address for a
+				particular call will always be directly adjacent (and
+				specifically below) to the argument storage area for that same
+				call. Technically, the argument-block is capable of being
+				dynamically constructed if a frame-pointer is used, but at least
+				MSVC doesn't currently do that.
+				
+				Beware! Functions that don't call other functions aren't
+				required to maintain stack alignment at all! Further, "leaf"
+				functions (note that I don't know how to trigger identification
+				as a leaf function) aren't allowed to alter non-volatile
+				registers (including RSP!), MUSTN'T call other functions,
+				MUSTN'T allocate stack space, MUSTN'T use exception handling,
+				BUT doesn't require any prolog, epilog, or function table entry.
+				
+				Note that in addition to the registers used for arguments, RAX,
+				R10, R11, XMM4, and XMM5 are ALSO considered volatile, and thus
+				the callee can do anything to them that it wants without being
+				required to restore their previous values in the callee's
+				epilog. When present, the non-XMM sections of ALL of the YMM and
+				ZMM registers are considered volatile, and when present XMM
+				registers 16-31 are ALSO considered volatile. When present, the
+				TMM registers are volatile. If you use them, then unless you're
+				doing something like whole-program analysis, assume that any
+				function you call will trash them.
+				
+				RAX and XMM0 are used for return values, with scalars being
+				returned via RAX, and non-scalars (including float and __m128)
+				returned via XMM0. Note that user-defined types MUSTN'T be
+				returned via register FROM MEMBER-FUNCTIONS (note that if the
+				"this" pointer is designated in the argument list instead of
+				being implied, then the function is treated as a static instead
+				of a member). Further, to be returned via register the type
+				MUSTN'T have constructors, destructors, copy-assignment
+				operators, private or protected non-static members, non-static
+				reference members, base classes, virtual functions, or members
+				that violate any of these restrictions: essentially this is the
+				C++03 standard for POD types, but the C++11 standard for POD
+				types isn't fully compatible and thus must be distructed for
+				this purpose. If the return type cannot be placed in a register,
+				then the CALLER must allocate memory for it, and pass the
+				address to that memory as a "hidden" (to the programmer) 1st
+				argument, with the named arguments consequentially "pushed" one
+				argument to the left (so e.g. the second argument becomes the
+				third argument); THAT SAME POINTER MUST THEN BE RETURNED IN RAX!
+				As a special note, if the function has an implicit "this"
+				pointer, then that "this" pointer will itself cause the return-
+				-value pointer to be moved into the "second argument" slot: THIS
+				IS NOT OBVIOUS FROM THE MICROSOFT PAGES! :
+					https://learn.microsoft.com/en-us/windows-hardware/drivers/
+						debugger/x64-architecture?redirectedfrom=MSDN#
+						calling-conventions
+					https://learn.microsoft.com/en-us/cpp/build/
+						x64-calling-convention?view=msvc-170#return-values
+				See also:
+					https://stackoverflow.com/questions/78239096/
+						why-does-msvc-never-return-struct-in-rax-for-member-
+						functions
+					https://ziggit.dev/t/
+						calling-convention-consistent-with-c-methods/5411/13
+				There seems to be at least a little debate about the placement
+				of "this", though "always RCX" seems to be the consistent
+				answer.
+				BEWARE! I have no idea how return-via-pointer and
+				explicit-this-argument interact!
+				
+				Like the stack-pointer, malloc() and alloca() allocate data
+				usually to 16-byte alignment: beware that this means that other
+				options must be used for __m128 variables and other types that
+				require more than 16-byte alignment. Structures & arrays normally
+				are aligned to their "natural" alignment.
+			vectorcall
+				I will currently ignore this.
