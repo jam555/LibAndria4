@@ -70,27 +70,57 @@ struct libandria4_coro1_buf
 	/*  starting roughly half-way through the function. */
 	/* TODO: make certain that this structure ACTUALLY matches the layout of */
 	/*  libandria4_coro1_start()'s arguments! */
-struct libandria4_coro1_startparams
-{
-	libandria4_coro1_buf *coro;
-	
-	libandria4_common_voidfuncp_voidp fun;
-	void *arg;
-	libandria4_coro1_startparams *thisptr;
-	
-	void *old_sp;
-	void *old_fp;
-};
+#if \
+	LIBANDRIA4_TARGETPROCESSOR0 == LIBANDRIA4_PROCESSOR0_ISA_x86 && \
+	LIBANDRIA4_CELLTYPE_REGSIZE == 4 && \
+	( \
+		LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_MSVC )\
+	)
+	/*
+	Probably works for these too:
+		LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_GNU ) || \
+		LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_LLVM ) || \
+		LIBANDRIA4_COMPILER_IS_CODEBASE( LIBANDRIA4_COMPILER_CODEBASE_TCC )
+	*/
+		/* Note this the elements of this struct MUST be listed in the same */
+		/*  order as the arguments of libandria4_coro1_start(). */
+	struct libandria4_coro1_startparams
+	{
+		/* These should all have the same alignment as stack-slots, so no */
+		/*  need for special alignment stunts. */
+		
+			/* &coro - sizeof( pointer ) * 1 */
+			/* This will hold the return address. It doesn't correspond to  */
+		libandria4_common_voidfuncp_void retaddr;
+		
+		libandria4_coro1_buf *coro,
+		
+			/* &coro + sizeof( pointer ) * 1 */
+		libandria4_common_voidfuncp_voidp func,
+			/* &coro + sizeof( pointer ) * 2 */
+		void *arg,
+			/* &coro + sizeof( pointer ) * 3 */
+		libandria4_coro1_startparams *stack_head,
+		
+		void *dummy1, /* &coro + sizeof( pointer ) * 4 */
+		void *dummy2 /* &coro + sizeof( pointer ) * 5 */
+	};
+		/* This should be located at the END of */
+#else
+#endif
 void libandria4_coro1_start
 (
 	libandria4_coro1_buf *coro,
 	
+		/* &coro + sizeof( pointer ) * 1 */
 	libandria4_common_voidfuncp_voidp func,
+		/* &coro + sizeof( pointer ) * 2 */
 	void *arg,
+		/* &coro + sizeof( pointer ) * 3 */
 	libandria4_coro1_startparams *stack_head,
 	
-	void *dummy1,
-	void *dummy2
+	void *dummy1, /* &coro + sizeof( pointer ) * 4 */
+	void *dummy2/* &coro + sizeof( pointer ) * 5 */
 );
 
 
