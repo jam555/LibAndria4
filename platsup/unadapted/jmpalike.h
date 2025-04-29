@@ -32,6 +32,7 @@ SOFTWARE.
 /*  "volatile". */
 
 #include "../platdet/detect.h"
+#include "../primitive/basictypes.h"
 
 
 typedef void *libandria4_jmpalike_buf[ LIBANDRIA4_JMPBUF_CELLCOUNT ];
@@ -49,8 +50,48 @@ typedef uint16_t libandria4_mathbuf_opt2[ LIBANDRIA4_MATHBUF_OPTSIZE__AVX1 ]
 	#else
 		#error "Unsupported compiler, add support.\n"
 	#endif
-#else
 #endif
+
+
+typedef struct libandria4_coro1_buf libandria4_coro1_buf;
+typedef struct libandria4_coro1_startparams libandria4_coro1_startparams;
+
+struct libandria4_coro1_buf
+{
+	libandria4_jmpalike_buf callee, caller;
+};
+	/* For the Coro-1 style coroutrines, this structure needs to be at the */
+	/*  start of the coroutine's "personal" stack, which for x86 (and many */
+	/*  other processor architectures) means that it belongs at the highest */
+	/*  address of the memory that you're allocating for your stack. It's */
+	/*  variables MUST be laid out in the same low-level format as */
+	/*  libandria4_coro1_start()'s arguments... because */
+	/*  libandria4_coro1_start() actually WILL use it as it's stack-frame */
+	/*  starting roughly half-way through the function. */
+	/* TODO: make certain that this structure ACTUALLY matches the layout of */
+	/*  libandria4_coro1_start()'s arguments! */
+struct libandria4_coro1_startparams
+{
+	libandria4_coro1_buf *coro;
+	
+	libandria4_common_voidfuncp_voidp fun;
+	void *arg;
+	libandria4_coro1_startparams *thisptr;
+	
+	void *old_sp;
+	void *old_fp;
+};
+void libandria4_coro1_start
+(
+	libandria4_coro1_buf *coro,
+	
+	libandria4_common_voidfuncp_voidp func,
+	void *arg,
+	libandria4_coro1_startparams *stack_head,
+	
+	void *dummy1,
+	void *dummy2
+);
 
 
 
@@ -101,18 +142,21 @@ int libandria4_jmpalike_rebasestack
 		libandria4_jmpalike_jmp( buf, retval ) )
 
 
+void libandria_coro1_yield( libandria4_coro1_buf *coro );
+int libandria4_coro1_next( libandria4_coro1_buf *coro );
+
+
 
 /* DO NOT directly call ay of these, use the macro versions above instead. */
 
 	/* Called once per exception-handler catch-context. */
 LIBANDRIA4_SETJMPATTR
-uintptr_t libandria4_jmpalike_setcore( libandria4_jmpalike_buf buf );
+intptr_t libandria4_jmpalike_setcore( libandria4_jmpalike_buf buf );
 
 	/* Called every time it's passed, in exception-handler catch-context. */
 void libandria4_jmpalike_setothers( libandria4_jmpalike_buf buf );
 
 LIBANDRIA4_SETJMPATTR
-uintptr_t libandria4_jmpalike_set( libandria4_jmpalike_buf buf );
+intptr_t libandria4_jmpalike_set( libandria4_jmpalike_buf buf );
 
-
-int libandria4_jmpalike_jmp( libandria4_jmpalike_buf buf, uintptr_t ret );
+int libandria4_jmpalike_jmp( libandria4_jmpalike_buf buf, intptr_t ret );

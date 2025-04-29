@@ -72,7 +72,7 @@ SOFTWARE.
  analysis such as whole program optimization.
 */
 static __attribute__((naked,returns_twice))
-uintptr_t jmpalike_setcore( libandria4_jmpalike_buf buf )
+intptr_t jmpalike_setcore( libandria4_jmpalike_buf buf )
 {
 		/* Supresses a GCC "unused variable" warning. */
 	(void)buf;
@@ -181,7 +181,7 @@ void jmpalike_loadothers( libandria4_jmpalike_buf buf )
 	};
 }
 __attribute__((naked,noreturn))
-void jmpalike_jmpcore( libandria4_jmpalike_buf buf, uintptr_t ret )
+void jmpalike_jmpcore( libandria4_jmpalike_buf buf, intptr_t ret )
 {
     (void)buf;
     (void)ret;
