@@ -75,6 +75,183 @@ SOFTWARE.
 	typedef int (*libandria4_common_putcharfuncp_int)( void*, char );
 	
 	
+	/* These conditionals are to control the availability of generic */
+	/*  conversion unions. Probably the most important part is the floating- */
+	/*  -point section, because it's a nuisance to do target-independant */
+	/*  calculations for it's size, and thus is best done here. */
+	#ifndef LIBANDRIA4_CELLTYPE_REGSIZE
+		#error "*_REGSIZE is required, but wasn't found.\n"
+	#endif
+	#if LIBANDRIA4_CELLTYPE_REGSIZE >= 1
+		typedef union
+		{
+			uint8_t u8[ 1 ];
+			int8_t s8[ 1 ];
+			
+			#if LIBANDRIA4_FLOATTYPE_SIZE == 1
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 1 ];
+			#endif
+			
+			#if LIBANDRIA4_CELLTYPE_DPTRSIZE <= LIBANDRIA4_CELLTYPE_REGSIZE
+				#error "8-bit data pointers, LibAndria4 doesn't currently support this.\n"
+			#endif
+			#if LIBANDRIA4_CELLTYPE_FPTRSIZE <= LIBANDRIA4_CELLTYPE_REGSIZE
+				#error "8-bit function pointers, LibAndria4 doesn't currently support this.\n"
+			#endif
+			
+		} libandria4_basicunions_1;
+	#else
+		#error "*_REGSIZE held an insane value.\n"
+	#endif
+	#if LIBANDRIA4_CELLTYPE_REGSIZE >= 2
+		typedef union
+		{
+			uint8_t u8[ 2 ];
+			uint16_t u16[ 1 ];
+			
+			int8_t s8[ 2 ];
+			int16_t s16[ 1 ];
+			
+			#if LIBANDRIA4_FLOATTYPE_SIZE == 1
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 2 ];
+			#elif LIBANDRIA4_FLOATTYPE_SIZE == 2
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 1 ];
+			#endif
+			#if LIBANDRIA4_LFLOATTYPE_SIZE == 1
+				LIBANDRIA4_LFLOATTYPE_TYPE fl[ 2 ];
+			#elif LIBANDRIA4_LFLOATTYPE_SIZE == 2
+				LIBANDRIA4_LFLOATTYPE_TYPE fl[ 1 ];
+			#endif
+			#if LIBANDRIA4_LLFLOATTYPE_SIZE == 1
+				LIBANDRIA4_LLFLOATTYPE_TYPE fll[ 2 ];
+			#elif LIBANDRIA4_LLFLOATTYPE_SIZE == 2
+				LIBANDRIA4_LLFLOATTYPE_TYPE fll[ 1 ];
+			#endif
+			
+			#if LIBANDRIA4_CELLTYPE_DPTRSIZE <= LIBANDRIA4_CELLTYPE_REGSIZE
+				#error "16-bit data pointers, LibAndria4 doesn't currently support this.\n"
+			#endif
+			#if LIBANDRIA4_CELLTYPE_FPTRSIZE <= LIBANDRIA4_CELLTYPE_REGSIZE
+				#error "16-bit function pointers, LibAndria4 doesn't currently support this.\n"
+			#endif
+			
+		} libandria4_basicunions_2;
+	#endif
+	#if LIBANDRIA4_CELLTYPE_REGSIZE >= 4
+		typedef union
+		{
+			uint8_t u8[ 4 ];
+			uint16_t u16[ 2 ];
+			uint32_t u32[ 1 ];
+			
+			int8_t s8[ 4 ];
+			int16_t s16[ 2 ];
+			int32_t s32[ 1 ];
+			
+			#if LIBANDRIA4_FLOATTYPE_SIZE == 1
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 4 ];
+			#elif LIBANDRIA4_FLOATTYPE_SIZE == 2
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 2 ];
+			#elif LIBANDRIA4_FLOATTYPE_SIZE <= 4
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 1 ];
+			#endif
+			#if LIBANDRIA4_LFLOATTYPE_SIZE == 1
+				LIBANDRIA4_LFLOATTYPE_TYPE fl[ 4 ];
+			#elif LIBANDRIA4_LFLOATTYPE_SIZE == 2
+				LIBANDRIA4_LFLOATTYPE_TYPE fl[ 2 ];
+			#elif LIBANDRIA4_LFLOATTYPE_SIZE <= 4
+				LIBANDRIA4_LFLOATTYPE_TYPE fl[ 1 ];
+			#endif
+			#if LIBANDRIA4_LLFLOATTYPE_SIZE == 1
+				LIBANDRIA4_LLFLOATTYPE_TYPE fll[ 4 ];
+			#elif LIBANDRIA4_LLFLOATTYPE_SIZE == 2
+				LIBANDRIA4_LLFLOATTYPE_TYPE fll[ 2 ];
+			#elif LIBANDRIA4_LLFLOATTYPE_SIZE <= 4
+				LIBANDRIA4_LLFLOATTYPE_TYPE fll[ 1 ];
+			#endif
+			
+			#if LIBANDRIA4_CELLTYPE_DPTRSIZE == 1
+				#error "8-bit data pointers, LibAndria4 doesn't currently support this.\n"
+			#elif LIBANDRIA4_CELLTYPE_DPTRSIZE == 2
+				#error "16-bit data pointers, LibAndria4 doesn't currently support this.\n"
+			#elif LIBANDRIA4_CELLTYPE_DPTRSIZE <= 4
+				void *dp[ 1 ];
+			#endif
+			#if LIBANDRIA4_CELLTYPE_FPTRSIZE == 1
+				#error "8-bit function pointers, LibAndria4 doesn't currently support this.\n"
+			#elif LIBANDRIA4_CELLTYPE_FPTRSIZE == 2
+				#error "16-bit function pointers, LibAndria4 doesn't currently support this.\n"
+			#elif LIBANDRIA4_CELLTYPE_FPTRSIZE <= 4
+				void (*fp[ 1 ])();
+			#endif
+			
+		} libandria4_basicunions_4;
+	#endif
+	#if LIBANDRIA4_CELLTYPE_REGSIZE >= 8
+		typedef union
+		{
+			uint8_t u8[ 8 ];
+			uint16_t u16[ 4 ];
+			uint32_t u32[ 2 ];
+			uint64_t u64[ 1 ];
+			
+			int8_t s8[ 8 ];
+			int16_t s16[ 4 ];
+			int32_t s32[ 2 ];
+			int64_t s64[ 1 ];
+			
+			#if LIBANDRIA4_FLOATTYPE_SIZE == 1
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 8 ];
+			#elif LIBANDRIA4_FLOATTYPE_SIZE == 2
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 4 ];
+			#elif LIBANDRIA4_FLOATTYPE_SIZE <= 4
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 2 ];
+			#elif LIBANDRIA4_FLOATTYPE_SIZE <= 8
+				LIBANDRIA4_FLOATTYPE_TYPE ff[ 1 ];
+			#endif
+			#if LIBANDRIA4_LFLOATTYPE_SIZE == 1
+				LIBANDRIA4_LFLOATTYPE_TYPE fl[ 8 ];
+			#elif LIBANDRIA4_LFLOATTYPE_SIZE == 2
+				LIBANDRIA4_LFLOATTYPE_TYPE fl[ 4 ];
+			#elif LIBANDRIA4_LFLOATTYPE_SIZE <= 4
+				LIBANDRIA4_LFLOATTYPE_TYPE fl[ 2 ];
+			#elif LIBANDRIA4_LFLOATTYPE_SIZE <= 8
+				LIBANDRIA4_LFLOATTYPE_TYPE fl[ 1 ];
+			#endif
+			#if LIBANDRIA4_LLFLOATTYPE_SIZE == 1
+				LIBANDRIA4_LLFLOATTYPE_TYPE fll[ 8 ];
+			#elif LIBANDRIA4_LLFLOATTYPE_SIZE == 2
+				LIBANDRIA4_LLFLOATTYPE_TYPE fll[ 4 ];
+			#elif LIBANDRIA4_LLFLOATTYPE_SIZE <= 4
+				LIBANDRIA4_LLFLOATTYPE_TYPE fll[ 2 ];
+			#elif LIBANDRIA4_LLFLOATTYPE_SIZE <= 8
+				LIBANDRIA4_LLFLOATTYPE_TYPE fll[ 1 ];
+			#endif
+			
+			#if LIBANDRIA4_CELLTYPE_DPTRSIZE == 1
+				#error "8-bit data pointers, LibAndria4 doesn't currently support this.\n"
+			#elif LIBANDRIA4_CELLTYPE_DPTRSIZE == 2
+				#error "16-bit data pointers, LibAndria4 doesn't currently support this.\n"
+			#elif LIBANDRIA4_CELLTYPE_DPTRSIZE <= 4
+				void *dp[ 2 ];
+			#elif LIBANDRIA4_CELLTYPE_DPTRSIZE <= 8
+				void *dp[ 1 ];
+			#endif
+			#if LIBANDRIA4_CELLTYPE_FPTRSIZE == 1
+				#error "8-bit function pointers, LibAndria4 doesn't currently support this.\n"
+			#elif LIBANDRIA4_CELLTYPE_FPTRSIZE == 2
+				#error "16-bit function pointers, LibAndria4 doesn't currently support this.\n"
+			#elif LIBANDRIA4_CELLTYPE_FPTRSIZE <= 4
+				void (*fp[ 2 ])();
+			#elif LIBANDRIA4_CELLTYPE_FPTRSIZE <= 8
+				void (*fp[ 1 ])();
+			#endif
+			
+		} libandria4_basicunions_8;
+	#endif
+	
+	
+	
 	/* Note that most of the contents of this file have moved to commontypes.h */
 	
 	
