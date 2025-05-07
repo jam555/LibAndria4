@@ -60,8 +60,317 @@ Terminology:
 		reference location of the union itself, with the offsets for all
 		elements usually being identical values.
 
+Mine
+	x86
+		32 bit
+			edecl : "Extended cdecl"
+				Common x86-32 __cdecl, but with excepjmp for exception-preemption
+				+ excepflag for exception-unwinding, mandatory base-pointers,
+				multi-frame per-function-invocation for preemption (BP for args
+				& normal locals, SP for preemptor locals). Use a negative SIGN
+				in FLAGS to trigger exception-unwinding in the caller (so set SIGN
+				to positive if you don't want to trigger exception-handling code
+				in the caller). The other flags should be left untouched for the
+				exception case, but might (maybe?) be given some meaning for other
+				purposes as further exceptions (see arbicall.c?).
+				
+				In particular, the exception-originating function:
+					1) Initializes it's exception-record data structure
+						(preferably colocated with all other possible exception-
+						-record types, but mandatorily located in a per-thread
+						location),
+					2) reads it's return destination from the stack (without
+						destroying it! No pops!),
+					3) calculates a target from the return destination with a
+						calling-convention-dictated fixed-offset,
+					4) CALLS that address, thereby pushing an additional
+						return-address (the excep-ret) onto the stack, after
+						"manually" pushing some stack-frame identifying
+						information onto the stack so that any exception-
+						-preemptors can access local variables from the
+						function-invocation that they should logically be
+						contained by, and PARTICULARLY so that it can identify
+						it's "own" return-address.
+				The location called will be a hardwired jump instruction within
+				the exception-originator's initial caller, that itself is
+				normally protected from execution by an additional hardwired
+				jump: it may occur before or after the relevant call, but MUST
+				be at a calling-convention-dictated offset from the relevant
+				call, so that the execption-originator can calculate it's
+				location based solely upon that function's own calling
+				convention, and the return-address that the call stores on the
+				stack. That protected-jump, when executed, will jump to an
+				exception-preemptor associated with the caller of the
+				exception-originator.
+				The exception-preemptor:
+					1) Will execute it's code, theoretically trying to "solve"
+						the exception.
+					2a) If it succeeds, then it will set the exception-flag (on
+						x86, SIGN) to "safe" (on x86, positive), and execute a
+						simple return.
+					2b) If it fails and is ALSO in an edecl function (or for
+						some OTHER reason is able to continue attempting
+						exception-preemption), then it will:
+						i) perform steps (2) & (3) that the exception-
+							-originating function has done, using the
+							information that the exception-originating function
+							pushed onto the stack for it to find it's own
+							return-address,
+						ii) adjust the information that the exception-originator
+							pushed, so that the next exception-preemptor will
+							believe itself to have DIRECTLY have been called by
+							the exception-originator, and
+						iii) JUMP to the calculated target for the next
+							exception-preemptor to try it's own hand at fixing
+							the problem.
+						Note that while an exception-preemptor CAN pass along a
+						DIFFERENT exception to the next stage, there CAN ONLY BE
+						ONE ACTIVE EXCEPTION PER THREAD AT A TIME: any condition
+						that would otherwise "force" two exceptions to
+						simultaneously be traversing the exception-system of a
+						single thread should either:
+							i) Cause a thread/program crash, or
+							ii) Have each tied to a different FIBER, with only
+								one ACTUALLY in play at a time, or
+							iii) Merge them into a single exception that
+								adequately describes both, or
+							iv) If possible, perform exception-preemptor step
+								(2c).
+							Depending on any number of things, (i) or (iii) may
+							require the exception-preemptor to deinitialize the
+							exception.
+						Note also that all of the steps described here apply to
+						all exception-preemptors, REGARDLESS of whether they
+						were accessed with a call or a jump: they should either
+						not know (nor care) about if they were directly invoked,
+						or they should only know because they used the excep-ret
+						address to begin an analysis of the stack (which they
+						REALLY shouldn't do in even halfway-normal
+						circumstances). Each jump from one exception-preemptor
+						to the next should be a tail-call, with each exception-
+						-preemptor quite literally having an identical calling-
+						-signature to all other edecl exception-preemptors.
+					2c) If it fails, and exception-preemption CANNOT continue,
+						then it will set the exception-flag (on x86, SIGN) to
+						"exception" (on x86, negative), and execute a simple
+						return.
+				Baring some manner of "hard failure" such as a call to exit(),
+				a ret operation in an exception-preemptor WILL return execution
+				to the exception-originator, with the exception-flag (repeat
+				here...) indicating success or failure of the attempted
+				preemption.
+					1a) If the flag is "exception", then preemption failed, so
+						the exception-originator must return with the exception-
+						-flag still set to "exception": the function that called
+						it must then react accordingly; note that the exception-
+						-originating function must cleanup the exception that it
+						was passing around.
+					1b) If the flag is "safe", then preemption succeeded, so the
+						exception-originator should continue as normal.
+				If the exception-originator's initial caller detects that the
+				exception-flag is "exception", then it must jump to a relevant
+				exception-handler, which itself may react to the exception in
+				any number of ways. Note that if the exception-handler "cancels"
+				the exception, then it must deinitialize the exception.
+    5    0    5    0    5    0    5    0    5    0    5    0    5    0    5    0
+				;
+			mret : "Multi-return"
+				The arguments are pushed onto the stack in cdecl order (with ECX
+				and EDX storing the first two, but shadow space still allocated
+				on the stack), cdecl order, with a "size" value then pushed as
+				well (but NOT stored in a register), listing the total bytes
+				allocated to the arguments. Any "this" pointer will have shadow
+				space allocated AFTER the "size" value, but as in the Microsoft
+				__thiscall variations will still (and always) be treated as the
+				FIRST argument, and this WILL be stored in ECX (or RCX on 64-bit).
+				As is predictable, the return address will be pushed after the
+				size/this space. The choice between storing a value directly in
+				an argument slot vs storing it's pointer there follows the same
+				rules as the relevant __cdecl format. Return values are stored
+				according to the same rules as arguments (including by-value vs
+				by-reference rules), BUT in contrast to __cdecl MULTILE returns
+				are allowed, all (conceptually) stored on the stack, and in the
+				opposite order to arguments (so the first listed return will be
+				located furthest from the stack pointer, the last return will be
+				closest, and all between with be located sequentially). If there
+				isn't enough space in the argument space, then the CALLEE will
+				enlarge the space, both moving and modifying the "size" value as
+				appropriate, and moving the return pointer (and, if needed, the
+				"this" pointer) to suite. The "size" value MUST be on top of the
+				stack after return, and will be used by the CALLER to reliably
+				free the argument/return space even if the needed return space
+				was larger than the provided argument space.
+				Note that the argument space IS ALLOWED to be larger than is
+				required for the arguments, to allow optimization if the total
+				legal return space is known: the "size" should not be used by
+				the callee for anything other than to convey to the caller the
+				total needed deallocation after return (particularly, it MUST
+				NOT be used to provide bounds-checking for variadic argument
+				access, to enable compilers to optimize local-var placement to
+				minimize copy & move operations). The compiler is ALLOWED (but
+				never required) to use local variables in the caller as part of
+				the argument space if they are correctly located (or locatable)
+				to match the correct position of relevant arguments, BUT the
+				callee IS then allowed to alter them based on it's own knowledge
+				of it's own required argument space size, so this MUST only be
+				done with careful analysis of the consequences by the compiler:
+				it's good if the destination of a particular value can be
+				located at the same place that the callee would store it, but
+				otherwise is likely bad. ECX and EDX have the same relation to
+				the "first two returns" as they do to the first two arguments,
+				but to repeat the address relation the the first and last
+				arguments are the opposite of the returns: the first argument
+				and last return are closest to the stack pointer, the last
+				argument and first return furthest from the stack pointer, all
+				other arguments and returns are located sequentially.
+				Any 64-bit versions should use the registers used for arguments
+				in the common C ABI according to the pattern already described.
+				
+				Variadic functions must ONLY store returns in a mixture of the
+				space used to store explicitly specified arguments, and space
+				that the function explicitly ADDS to it's frame; the space used
+				to store any variadic arguments MUST NOT be used to hold
+				returns, both in case of errors, and in case of non-standard
+				uses of variadic-function tools.
+			sizecall : "Sized call"
+				As mret, but using cdecl return behaviors, and a callee-cleaned
+				stack: the size value is used to let the function know HOW MUCH
+				to drop from the stack.
+				
+				On x86 this will commonly be done by:
+					1) popping the return address and size value into volatile
+						registers,
+					2) dropping the stack space that's no longer needed,
+					3) pushing the return address back, and
+					4) only then performing the return,
+				because the x86 return opcode only accepts an immediate instead
+				of a reference to a register for it's stack-shrinking value.
+			refcall : "Reference call"
+				As sizecall, but all arguments are provided via references, and
+				multiple returns are supported in the same fashion as "hidden"
+				leading arguments: any "this" pointer is still "more-leading"
+				than the return references.
+			logcall : "Logging call"
+				As refcall, but a single hidden context pointer is provided.
+				Returns & exceptions are both handled by pushing a pointer to
+				the relevant value, then a pointer TO the context pointer, then
+				calling an API-specified function. The exception extensions of
+				edecl, and the return pointers of refcall, are not relevant, and
+				thus are not provided.
+			"Extended" variants of mret, sizecall, and refcall can be allowed,
+			adding the same features that edecl adds to cdecl to these other
+			calling conventions.
+
+
+
 Microsoft
 	x86
+		Special note on the FLAGS register's Direction flag: the OS and C
+			library expect this flag to be cleared on both entry AND exit of
+			calls. What you do in your code is your fault, but beware the
+			code of others!
+		
+		Names
+			__cdecl
+				A single underscore is prefixed to the name.
+			__stdcall
+				A single underscore is prefixed to the name, then a single at
+				symbol is postfixed, and then followed by the number of bytes
+				for the arguments as a decimal number.
+				Note that C++ stdcall is actually implementation-specific.
+			__fastcall
+				For 32-bit, a single at symbol is prefixed to the name, and
+				another is postfixed, and followed by the number of bytes for
+				the argument as a decimal number.
+		
+		32 bit
+			data structures
+				The alignment of elements will be as expected, that being
+				according to their size, but under some circumstances
+				(particularly: when passed as a stack argument) the structure
+				might not be aligned to IT'S OWN alignment requirements, thus
+				breaking the alignment requirements of it's elements as well.
+				basictypes.h has some typedef'd unions to make it simpler to
+				relocate misaligned instances of e.g. floats to a correct
+				alignment for usage.
+			
+			calling conventions
+				All MSVC 32-bit calling conventions can treat EAX, ECX, and EDX
+				as volatile, must update ESP according to the calling
+				convention's rules, and must preserve the other registers.
+				Non-POD types and types larger than 64 bits are returned via
+				pointer in EAX, POD types 32-bits and smaller are returned
+				directly in EAX, POD types 33-bits to 64-bits in size are
+				returned in EAX and EDX, excepting that floating-point values
+				are returned in ST(0) instead. All arguments smaller than 32
+				bits will be widened to 32 bits. Per:
+					https://bitcodersblog.wordpress.com/2017/05/10/
+						win32-programming-in-nasm-part-2/
+				all arguments will be passed for AT LEAST both stdcall and cdecl
+				in the form that they are specified in the argument list: if
+				listed as values, they'[ll be passed as values, if as references
+				then as references, if as pointers then as pointers.
+				ST(0) to ST(7) should be FULLY popped before any function call.
+				ST(1) to ST(7) should be fully popped when exiting a function.
+				
+			__stdcall
+				Arguments on stack, pushed right to left, callee cleans the
+				stack. Arguments are passed in the form (value, reference, or
+				pointer) specified in the source-code argument list.
+			__thiscall (MSVC++)
+				As __stdcall, "this" pointer passed in the ECX register.
+			COM
+				As __stdcall, BUT "this" pointer pushed onto stack as hidden
+				argument after all other arguments.
+			__fastcall
+				As __stdcall, but the first two DWORD or smaller
+				arguments that are not a struct, class, or union are stored in
+				ECX and EDX. Shadow space IS NOT allocated on the stack for the
+				ECX and EDX registers (so, organizationally sub-optimal, but
+				reduces stack consumption, which on particularly early 32-bit
+				x86 would have been useful). Mostly useful to very simple "leaf"
+				functions (such as getters and setters), rather than anything
+				complicated.
+				
+				If a register is available, but the argument being considered
+				can't go into it (too big, or either a struct, class, or union)
+				then it goes on the stack as the next entry, and consideration
+				moves to the next argument, until either all passing-registers
+				have been filled (in which case ALL other arguments go on the
+				stack), or all of the function's arguments have been assigned to
+				either register or stack: examination procedes from left to
+				right. To reiterate, structs, classes, and unions ALWAYS go on
+				the stack, REGARDLESS of their size. Enums & enum classes CAN BE
+				passed via register IF their underlying type is allowed to be
+				stored in a register.
+				
+				Beware that a Wikipedia table claimed that the non-member
+				version of fastcall returns any pointer in BX instead of AX:
+				this needs to be looked into (though it's likely a Wiki goof).
+				Particularly, this was noted for 8086 instead of IA-32.
+			__cdecl
+				As __stdcall, but the caller cleans the stack instead of the
+				callee. Arguments are passed in the form (value, reference, or
+				pointer) specified in the source-code argument list.
+				The only guaranteed stack alignment is 4 byte/32 bit. Stuff like
+				double (or other 64+ bit types) will SOMETIMES get aligned to 8
+				bytes, but only as an optimization. Code like this:
+					void foo()
+					{
+						alignas(8) uint64_t a;
+						hoge(&a);
+					}
+				... will cause the call to the function hoge() to be 8-bit
+				aligned. This (at least in some versions) can e.g. cause Rust
+				FFI-functions to emit a pointer-alignment error if they're being
+				called.
+				Supposedly, for non-POD/larger than 64-bit returns the space
+				for the returen is provided just like in 64-bit fast call,
+				with the caller allocating the destination and providing it
+				to the callee as a hidden first argument, but pushed on the
+				stack instead of in a register. Wikipedia claims that the
+				CALLEE pops the stack pointer to the destination space upon
+				returning, but that seems to be a typo.
 		64 bit
 			data structures
 				Scalars, floating-point, and e.g. __m128 are expected to have
@@ -92,6 +401,9 @@ Microsoft
 				of structures, with all elements (in every case I'm currently
 				aware of) simply sharing the same start address, but obviously
 				the size of the union is the size of it's largest element.
+			stacks
+				Note that the stack always points to the bottom of the newest
+				stack slot that has been allocated without being deallocated.
 			fast call
 				In contrast to structures, the stack grows downwards. However,
 				the arguments themselves are pushed in REVERSE order (so, the
@@ -194,7 +506,7 @@ Microsoft
 				reference members, base classes, virtual functions, or members
 				that violate any of these restrictions: essentially this is the
 				C++03 standard for POD types, but the C++11 standard for POD
-				types isn't fully compatible and thus must be distructed for
+				types isn't fully compatible and thus must be distrusted for
 				this purpose. If the return type cannot be placed in a register,
 				then the CALLER must allocate memory for it, and pass the
 				address to that memory as a "hidden" (to the programmer) 1st
