@@ -1,0 +1,275 @@
+LibAndria version 4
+TODO:
+	Fully replace the definition of libandria4_failure_result{}
+		(basic/stdmonads.h) with libandria4_commonio_err (commonio.h).
+		Trying to foist proper typing in was nice and all, but it's really
+		just too much hassle. Afterwards, move all uses of
+		libandria4_commonio_err to the new definition of
+		libandria4_failure_result (since libandria4_commonio_err will be
+		superfluous).
+	At some point, add Google Varints: an arbitrary-length integer where
+		the highest bit of each byte indicates if the number continues with
+		the next byte.
+	Build an actual initial release. It should:
+		Be enough for a reasonable non-GUI program, or the backend of a
+			GUI application that's intended to be easy to port from toolkit
+			to toolkit.
+			Except that no printf() or file/directory stuff will be
+				included in this version, that stuff will be left to the
+				next version. The practical base MUST be established first.
+		Be C++ -safe, which it currently doesn't try to be.
+		
+		stripped-down version of platformdetect.h
+			MUST include a library version identifier!
+			Detect at least MSVC, GCC, and Clang.
+			Predefine some include hooks if they aren't already present.
+		platformsupport.c
+			Add a platformsupport.h
+				We want some asserts support, preferably supporting further
+					extensions & resumption, and an "integrated" (default to
+					ignoring it) logging system. Is /need_local/asserts.h
+					actually relevant AT ALL? Where IS it's actual assert
+					supposed to come from?
+			Predefine some more include hooks.
+			It would also be nice to include some sort of version flags or
+				macros in all of the headers, for easy feature detection.
+				Maybe follow part of the X-macros pattern, by having some
+				"data receiver" macro that gets called in all of them, and
+				just have the default version be a null macro that gets
+				defined in platformdetect.h?
+		Nativize /need_local/celltype.h to some other file in /basic .
+			Should probable move e.g. libandria4_commonio_err and
+				libandria4_commonio_perr (with more generic names) here as
+				well, since a "common base of POD types" is highly
+				desirable to build everything else on top of.
+		an improved commonerrvals.h
+			The name should probably be included in the improvement
+		commoniokeysyms.h
+			Fix the name up a bit, double-check descriptions and nameing.
+		Need tests (to justify making it a release) built on a decent
+			makefile system. Can probably use the existing stuff, but will
+			need to double-check that.
+				At least pascalarrays and the current stdmonads.h seem to
+					have SOME tests, are those worthwhile?
+		Should have a stddef.h (or commondef.h?) for fairly "basic" stuff
+			(e.g. common types, common error values, common monads,
+			asserts). Platform detection/support PROBABLY shouldn't be
+			part of this... unless it's needed for the common types.
+				More include hooks.
+		
+		maybe eval.h ?
+		simpleops.h & some or all of it's includes
+		nulls.h
+		sizeofmacros.h
+		elemtools.h
+			arraccess.h just in case
+		
+		monads.h
+			Does the refcounting stuff REALLY belong here? How well does
+				it REALLY conform to monadic behaviors? I suspect that it
+				should (for project layout reasons, if nothing else) be
+				moved to it's own file; if so, then produce a directory
+				for it as well (since it hopefully won't stay the only
+				memory-tracking system available...).
+				If reftracking gets moved, then port
+					/need_local/metacode/macwrap_operations.h to there as
+					well... except the stuff that belongs in /math should
+					go into /math.
+		updated versions of:
+			stdmaybes.h
+			stdmonads.h/.c
+			Should stdmaybes just be merged into stdmonads?
+			Should have include hooks.
+		
+		stdmem.h/.c
+			It needs AT LEAST name fixes.
+			Nativize memreverse.h/.c, probably put the code in stdmem.h/.c
+				since that's where it probably belongs.
+			Macros to handle segmented memory: near->far, far->near,
+				definition macros, typedefs for equivalent types, access
+				macros (especially the high-memory distinction! Note:
+				high-memory is what happens when you DON'T throw away that
+				last overflow bit on the IBM PC, and thus DON'T loop back
+				to null/0...). These should be in place so that if stuff
+				needs to convert to 16-bit later (I might do it for the
+				terminal engine, and thus who knows what else, since I
+				KINDA DO WANT to be able to run my custom terminal API on
+				e.g. original PC hardware), it'll already be prepared.
+				Extra support components as they seem obvious.
+			Maybe add the old file-pointers stuff, for treating files
+				like memory?
+		
+		pascalarray.h
+		bitarray.h/.c
+		list.h
+		bintrees.h
+		baretrees.h
+		Maybe strtrees.h (see note for second release: rename it)
+		Some macroset implementation.
+			More include hooks.
+		Move some of the text_pascalarray.h/.c stuff to pascalstring.h/.c
+			for a partial implementation of THAT file, since it's already
+			implemented... except that this might have already been done?
+			Try to provide a pascalstring.h/.c version that has most or all
+			of the useful C stdlib stuff, and maybe some extras from
+			/need_local .
+			Maybe text_pascalarray.h/.c just got blindly ported and can be
+			blindly dropped? Check.
+		Move the text_pascalarray.h/.c "decimal increment" function to a
+			new file and type in the /math directory. If any stuff from
+			pascalstring.h/.c seems relevant to /text/charsets, then try to
+			figure out how to move it there.
+		
+		some rationalization of:
+			commonmacros.h
+			commontypes.h
+			commoniovals.h
+			commonio.h/.c
+			commonerr.h
+		REGARDLESS of whether they get directly included or not, because
+			some things should be moved into them, and LOTS of things should
+			be moved FROM them to other places (especially a number of
+			finalized monads)
+		
+		Is anything from /math worth adding?
+		Just skip /parsers, nothing is ready.
+		Several files from /text are probably ready.
+			Especially check /charsets.
+			Port /need_local/text/char2num.h/.c !
+			Port /need_local/text/cb_ctoi.c !
+	Build a second release. It should:
+		Add strtrees.h (if not already done)
+			Rename to radixtrees.h when added, regardless of first or
+				second release.
+		Look at adding a red-black tree.
+		Include initial ports of /need_local/adv_iofuncs/:
+			errors/err.h/.c AS A cb_printf() (a printf() engine) type of
+				system. Leave clean-up and extension for later, it just
+				needs to properly output.
+			cbscanf.c (a scanf() engine)
+				Don't worry about cleaning it up, or full compatibility
+					with the printf()-engine: that can wait a release.
+			cbscanred.c/_2.c/_3.c (doesn't exactly matter which, though I
+				THINK two of those were intentionally different;
+				regular-expression parsers with I THINK my own syntax).
+					Egads, 2 & 3 are certainly somewhat terse, but 3 is
+						really out there. Seems like it's trying to be
+						robust though? Maybe DON'T WORRY about adding them
+						in the second release, and just throw them into the
+						"working on it!" pile with edline.c ?
+			extrachar.h/.c : extrachar was created specifically for the
+				MetaC preprocessor, but it should be fleshed out a bit more
+				into a "character with metadata" type. Remember to use e.g.
+				the reference-counting stuff where appropriate. Stuff like
+				"maybe-scancode" and "maybe-keysym" should be included, with
+				each probably storing an array instead of a character for
+				multi-signal sequence support.
+		Work on /need_local/adv_iofuncs/edline.c a bit more: it might not be
+			made functional, but ideally getting it closer should be
+			semi-easy (especially since e.g. keysyms and list-builders will
+			be ready already).
+		Both versions of the streams:
+			streams.h/.c (what was .txt for again?)
+			/mutastreams
+			Remember to double-check, and maybe add some capabilities.
+		Directory support.
+			Make it generic: I want to be able to support MULTIPLE openable
+				resource stores, including real files, "ROM" files, and
+				sockets, even if I initially don't use that.
+			Directory overlays: use radixtrees.h where needed.
+			Include a "source prefix": I want to be able to designate
+				sub-directories to access in reference to.
+			/need_local/directories may have an implementation with dir.h/.c,
+				and has SOME platform info with dirio.h
+			ROM directories: they should have some actual directory-structure
+				imitation, and also should support file-backed ROMs where
+				desired.
+		
+		So, string-trees, various formatted I/O inner-engines, and
+			file/directory support. Should be a good selection of things.
+	Build a third release. It should:
+		If there isn't a red-black tree, try to add it now.
+		Clean up the printf() & scanf() engines, ideally bring both to full
+			parity with each other.
+		At least clean up the regex scanners, and preferably bring one or
+			more to full release.
+		Try to have a basic edline ready.
+		Try to add some malloc()-style memory management engine; I want it
+			usable for e.g. allocating INSIDE a file too.
+		If file-pointers to treat files like memory aren't in yet, then add
+			them.
+		Try to build a program that will output properly formed C macro
+			code when linked with a file that describes the macros
+			themselves. This is to try to help with compilers with limited
+			macro support, AND ALSO to maybe improve the platform detection
+			code?
+	Build a fourth release. It should:
+		Add a red-black tree.
+			Yes, treat this as necessary. It needs to happen, and this is
+				probably the best time.
+		Add the Ansi/VT100 terminal engine.
+			It should have both a terminal-side and a client-side set of
+				inner-functions.
+		At least try to make some progress at windowing wrapped around the
+			VT100 support. Base it on the common Curses interface, but don't
+			bother reproducing it: that interface is kinda annoying with the
+			"only one instance" traits; just use it as reference for what is
+			actually required.
+		Try to support a custom interface on the terminal for my "improved
+			terminal" ideas.
+		Try to support Kitty's alternate character standard on the VT100
+			emulator.
+		Try to make a simple "my terminal engine driving Curses" program for
+			easier compatibility.
+	Build a fifth release. It should:
+		Support root-pointers. Remember, red-black trees should exist first.
+		typeinfo.h
+			Remember to document all of the C standard types, AND the ones
+				LibAndria4 has builk up. Including "documentation builders"
+				where needed (macroized types). This auxiliary work might
+				be the majority of the work for this.
+		Consider backing buffers for the terminal-engine for the old IBM
+			MDA, CGA, EGA, and VGA, and 3rd part Hercules and other common
+			cards. After all, it's a semi-separate implementation.
+		
+		Those should both be fairly good feature bookmarks.
+	Build a sixth release. It should:
+		Introduce a real implementation of LCIS.
+			Note that this properly depends on typeinfo.h
+		A more advanced transactions system.
+			Again, dependant on typeinfo.h
+		If threading support hasn't been added, then add it.
+	At some point some gather/scatter stuff should get added.
+
+
+
+
+
+I only just copied this stuff to my Chromebook, and need to spruce things up:
+	Add more abbreviations to stdabbrevs/metaCabbrevs.h.
+	Need a proper readme to explain stuff.
+	Need to add tests & makefiles for those tests.
+	Need to bring in more stuff (e.g. get that rope stuff working, &
+		streams/dirs).
+	Need to bring in/build some version of LCIS.
+	Need to move some stuff (e.g. the error reporter & it's behind the scenes
+		printf()-derivative) from MetaC to here.
+		E.g. need to move MetaC's char2num.h/.c to LibAndria4.
+	monalike_math.h needs to have functions rewritten, because e.g. just( 1 )
+		+ nothing() should equal 1, but currently equals 0: this is wrong and
+		should be fixed.
+		Actually, is that even true? Is this a "square root of -1" thing?
+	text_pascalarray.c has a lot of concat operators instead of just sticking
+		the sub-tokens together directly: decide if that should be changed or
+		not.
+	It looks like charsets_EBCDICInvariant.h isn't actually complete.
+	Review all of the include guards to see if any are still wrong.
+	Review to see if there's still anything prefixed "lib4", or not prefixed
+		at all.
+	Need to review organization, to see if there's any sensible improvements.
+	Move most or all concrete type definitions into commontypes.h.
+	Compare commontypes.h's platform detection to platformdetect.h to see if
+		it should be e.g. adopted there.
+	Add documentation explaining that dirs updating at the time of their
+		files updating means that dir builds must be in the root makefiles
+		instead of the "normal" makefile.

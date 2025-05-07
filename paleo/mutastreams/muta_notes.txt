@@ -1,0 +1,79 @@
+
+From mutablestreams.h
+	/* Things that won't be supported: */
+		/* Directories */
+			/* That's another layer's job. */
+		/* char* setlocale (int category, const char* locale); */
+			/* Need three wrappers, two providing default behaviors ("C" verses system-current). */
+		/* string.h */
+			/* Need LOTS of wrappers. */
+		/*
+				void* bsearch
+				(
+					const void* key, const void* base,
+					size_t num, size_t size,
+					int (*compar)(const void*,const void*)
+				);
+			and
+				void qsort
+				(
+					void* base, size_t num, size_t size,
+					int (*compar)(const void*,const void*)
+				);
+		*/
+			/* Only noted because I need to make a wrapper... elsewhere. */
+		/*
+				char* asctime( const struct tm * timeptr );
+			and
+				char* ctime( const time_t * timer );
+			and
+				size_t strftime( char* ptr, size_t maxsize, const char* format,  const struct tm* timeptr );
+		*/
+			/* Only noted because I need to make a wrapper... elsewhere. */
+		/* char* getenv (const char* name); */
+			/* Only noted because I need to make a wrapper... elsewhere. */
+		/* FILE * fopen ( const char * filename, const char * mode ); */
+			/* This is probably not appropriate for this system. */
+		/* reopen( ) */
+			/* That's another layer's job. */
+		/* int remove ( const char * filename ); */
+			/* That's another layer's job. */
+		/* int rename ( const char * oldname, const char * newname ); */
+			/* That's another layer's job. */
+		/* FILE * tmpfile ( void ); */
+			/* That's another layer's job. */
+		/* char * tmpnam ( char * str ); */
+			/* That's another layer's job. */
+		/* void setbuf ( FILE * stream, char * buffer ); & friend(s). */
+			/* "Somebody else's problem", aka "make the caller do it". */
+		/* int ungetc ( int character, FILE * stream ); */
+			/* As setbuf(), but probably a wrapper in specific. */
+		/* gets(), puts(), read(), write(). */
+			/* As setbuf(), but probably a wrapper in specific. */
+	/* You may have noticed that some reasons are repeated. This is intended */
+	/*  to be a flexible back-end, but as a result there are some things */
+	/*  that just don't really make sense to implement, often because they */
+	/*  properly should be implemented only once, and thus outside of this */
+	/*  file. These things themselves tend to fall into categories, and thus */
+	/*  specific categories of reason tend to repeat. */
+	
+	
+	
+	/* Note: rewrite things a bit so that the aux data in the refcounter type */
+	/*  is specifically a virtual table that implements various I/O functions, */
+	/*  including deletion. Also, the bi-tuplic monad should be used to allow */
+	/*  various operations to swap refcounter pointers in and out for e.g. */
+	/*  composite streams, iterators over text ropes, etc. */
+	/* TODO: */
+	
+	
+	
+	/* Complete libandria4_FILE_tracker_redirect() */
+	/* LIBANDRIA4_NEWSTREAMS_ONDIE() has a note about an error: fix it. */
+	/* This .txt file needs to be seperated into both a .h and a .c file. */
+	/* There are some notes about needed header files: fulfill them. */
+	/* libandria4_FILE_tracker_close() should have it's returns rewritten. */
+	/* Need to add some null-pointer checks. */
+		
+		/* printf() will be supported by discrete external function: it's a big job, */
+		/*  and should only been done once. Same for scanf(). */

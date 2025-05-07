@@ -1,0 +1,15 @@
+Divide the setjump/longjump stuff across more files for "cleanliness". Style
+ this after the x86 stuff in platform detect, with more specific stuff being
+ defined in subsidiary files.
+A fallback for stdint.h & similar should be added to "root" platdet/ , so that
+ the platform support code can at least be useful on compilers that otherwise
+ can't support LibAndria4.
+A indirect-inclusion file should be created for platform support and platform
+ detect, so that the "make sure the environment is sane" inclusions in sub-files
+ will work better without massive risk of things falling out of sync. These
+ files should specifically only include the "host" file if the host file's
+ include guards HAVE NOT been defined (which means they need to know the
+ identity of those include guards, which is where the risk of losing sync comes
+ from), and themselves should be included OUTSIDE of any include guards in many
+ cases... for reasons I can't immediately remember, but which basically are
+ about making certain things get ABSOLUTELY defined/declared in the right order.

@@ -1,0 +1,11 @@
+Add shadow-stack support. It needs to be a sp/bp pair stored in addition to the
+ normal stuff. This is for coroutine support. On x86, it's CET.
+Another stack-modifier needs to be added for coroutine support, to allow the
+ stack and shadow stack to be COMPLETELY swapped out AS AN OPTION, partially
+ since not all coroutine variations want to do that.
+
+FIX THE jumpalike CODE TO MATCH THE CURRENT LAYOUT.
+
+Add a alter-return function (must be shadow-stack compatible) in case I decide
+ to actually implement the exceptions-via-alternate-return method I've
+ brainstormed before.

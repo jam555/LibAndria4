@@ -1,0 +1,103 @@
+A listing of useful intrinsics:
+
+MSVC:
+	_AddressOfReturnAddress: returns the address holding the return address
+	__debugbreak: inserts a breakpoint
+	__emul: multiply, takes 32 bit vals, returns a 64bit
+	__faststorefence: ensures all previous reads & writes finish before further progress; amd64
+	__invlpg: invalidates the TLB page associated with the 64bit addr
+	_ReturnAddress: provides the addr that will be returned to (see: _AddressOfReturnAddress)
+GCC:
+	If __GCC_HAVE_DWARF2_CFI_ASM is defined, DWARF CFI directives can be emitted as inline assembly.
+
+
+
+
+
+
+
+
+
+Here's some macros:
+
+#if defined(__APPLE__)
+#if defined(__linux__)
+#if defined(__unix__)
+#if defined(WIN32)
+#if defined(__MINGW32__)
+#if defined(__MINGW64__)
+
+
+
+
+
+
+
+	Floating point: for generic access, include fenv.h
+		for x86, referencing https://www.felixcloutier.com/ :
+			"RDSSPD \n" read shadow-stack pointer
+			Note: look up the other shadow-stack stuff
+			
+			"fwait \n" check for and handle pending exceptions that aren't
+			* 	 masked before proceeding
+			"fwait \n finit \n" ops get the exception status, then clear the
+			* 	 whole x87
+			"fwait \n fnstsw \n" ops get the exception status (use for
+			* 	 dispatching, not setjmp).
+			"fnop \n" does nothing but take space, time, & increment x86 & x87
+			* 	 ip pointers: use for alignment
+			"fldenv \n" loads the entire x87 state from memory, should execute
+			* 	 from same mode as the store
+			"fwait \n fnstenv \n" ops get exscept. status, then store all x87
+			* 	 state expect stack vals to mem: reverse of fldenv
+			"frstor \n" loads an entire x87 state, including stack
+			"fwait \n fnsave \n" ops do fnstenv, then store stack, then finit:
+			* 	 reverse of frstor
+			
+			"fxrstor \n" Reloads the x87 FPU, MMX technology, XMM, and MXCSR
+			* 	 registers
+			"fxsave \n" reverse of fxrstor
+			
+			"pause \n" a no-op specifically used to mark spin-loops: a hint that
+			* 	 memory-order problems PROBABLY won't happen
+			
+			"rdpid \n" get the processor id
+				Isn't it "cpuid" ?
+
+
+
+
+
+
+
+/*
+	From: https://en.wikipedia.org/wiki/Control_register#Control_registers_in_Intel_x86_series
+	
+	XCR0 register bits:
+		0		X87	x87 FPU	x87 FPU/MMX State, must be '1'
+		1		SSE	SSE	MXCSR and 16 XMM registers
+		2		AVX	AVX	16 upper-halves of the YMM registers[a]
+		3		BNDREG	MPX	Four BND registers
+		4		BNDCSR	BNDCFGU and BNDSTATUS registers
+		5		OPMASK	AVX-512	Eight k-mask registers
+		6		ZMM_Hi256	16 upper-halves of the ZMM registers[b]
+		7		Hi16_ZMM	16 "high" ZMM registers (ZMM16 through ZMM31)
+		8		PT	Processor Trace	
+		9		PKRU	Protection Keys	PKRU register
+		10		PASID		
+		11		CET_U	Intel CET	User shadow stack
+		12		CET_S	Supervisor shadow stack
+		13		HDC	Hardware Duty Cycling	
+		14		UINTR	User interrupts	
+		15		LBR	Last Branch Records	
+		16		HWP	Hardware P-states	
+		17		XTILECFG	Intel AMX	64-byte TILECFG register
+		18		XTILEDATA	Eight 1024-byte TILE registers
+		19		APX	Intel APX	16 "high" GPRs (R16 through R31)
+		20–63	Reserved
+	
+	"xsave" depends on the EDX and EAX registers, which it uses with the XCR0
+	register to figure out what data it will be working with. EDX holds the
+	*  most-significant 32 bits, while EAX holds the least-significant 32 bits.
+*/
+
