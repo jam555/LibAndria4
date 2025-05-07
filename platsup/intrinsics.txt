@@ -63,6 +63,37 @@ Here's some macros:
 			
 			"rdpid \n" get the processor id
 				Isn't it "cpuid" ?
+				
+				As a special note, if CPUID isn't available (check bit 21 of
+					EFLAGS), then the Alignment Check (AC, bit 18 of EFLAGS)
+					flag can confirm the absence of a 486+ by a failure to
+					modify the flag. If AC isn't present, then the Virtual
+					8086 Mode (VM, bit 17 of EFLAGS) flag can confirm the
+					absence of a 386+ by a failure to modify the flag (beware
+					that you need to deal with Virtual 8086 mode for this).
+					If VM isn't present, then the Mode (MD, bit 15 of FLAGS)
+					flag can confirm the absence of an NEC V-series processor
+					by a failure to modify the flag (beware that modification
+					will switch between 8080 mode and 80180 mode); further,
+					in the absence of an NEC V-series processor, the value of
+					the flag indicates the usage of a 286+ by being clear (0),
+					and the usage of a 8086 or 80186 by being set (1); the
+					inability to modify the Nested Task (NT, bit 14 of FLAGS)
+					flag or I/O Privlege Level (bits 12 & 13 of FLAGS) flags
+					similarly indicates the absence of a 286+.
+				For BIOS and bootloader code, you should obviously run these
+					tests in the opposite direction from that described.
+				Note that in NEC V-series processors, you could switch
+					between 80186 and 8080 modes. That's not a typo, you could
+					switch between x86-compatible 80186 mode and the BINARY
+					INCOMPATIBLE 8080 mode.
+					If the decision is made to support/emulate 8080 mode, bear
+					in mind that LAHF and SAHF seem to be designed to support
+					this, as do the numbering (but not the names!) of several
+					registers, and the ordering of flags in the FLAGS
+					registers of the two. Instructions don't reliably have
+					direct equivalents though.
+					See: https://retrocomputing.stackexchange.com/a/6504
 
 
 
