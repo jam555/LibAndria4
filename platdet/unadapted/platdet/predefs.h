@@ -90,6 +90,18 @@ SOFTWARE.
 			/* The number of char per "common" register. */
 		#define LIBANDRIA4_CELLTYPE_REGSIZE \
 			#error "LIBANDRIA4_CELLTYPE_REGSIZE has not been defined.\n"
+		#define LIBANDRIA4_FLOATTYPE_SIZE \
+			#error "LIBANDRIA4_FLOATTYPE_SIZE has not been defined.\n"
+		#define LIBANDRIA4_LFLOATTYPE_SIZE \
+			#error "LIBANDRIA4_LFLOATTYPE_SIZE has not been defined.\n"
+		#define LIBANDRIA4_LLFLOATTYPE_SIZE \
+			#error "LIBANDRIA4_LLFLOATTYPE_SIZE has not been defined.\n"
+		#define LIBANDRIA4_FLOATTYPE_TYPE \
+			#error "LIBANDRIA4_FLOATTYPE_TYPE has not been defined.\n"
+		#define LIBANDRIA4_LFLOATTYPE_TYPE \
+			#error "LIBANDRIA4_LFLOATTYPE_TYPE has not been defined.\n"
+		#define LIBANDRIA4_LLFLOATTYPE_TYPE \
+			#error "LIBANDRIA4_LLFLOATTYPE_TYPE has not been defined.\n"
 	
 	
 	#define LIBANDRIA4_BIGFILES_SEEK 0

@@ -37,7 +37,9 @@ SOFTWARE.
 	/*  in ../commonlib.c (or .h?) for anything usage that probably should */
 	/*  move here. */
 	
-	#if ( LIBANDRIA4_PLATFORMPREVIEW0 == LIBANDRIA4_PLATFORM0_NIX ) && ( LIBANDRIA4_COMPILER & ( ~LIBANDRIA4_COMPILER_CODEBASEANTIMASK ) != LIBANDRIA4_COMPILER_CODEBASE_GNU )
+	#if \
+		( LIBANDRIA4_PLATFORMPREVIEW0 == LIBANDRIA4_PLATFORM0_NIX ) && \
+		( LIBANDRIA4_COMPILER & ( ~LIBANDRIA4_COMPILER_CODEBASEANTIMASK ) != LIBANDRIA4_COMPILER_CODEBASE_GNU )
 			/* This is some weird thing that might be GNU specific, or */
 			/*  might not. You define some mix of _POSIX_VERSION, */
 			/*  _POSIX_C_SOURCE, _XOPEN_SOURCE, etc., to enable extra */
