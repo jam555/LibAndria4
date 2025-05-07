@@ -28,6 +28,9 @@ SOFTWARE.
 
 #ifndef LIBANDRIA4_BASIC_TYPEINFO_H
 # define LIBANDRIA4_BASIC_TYPEINFO_H
+	/* TODO: Move this to a distinct directory, and sub-divide. */
+	
+	
 	/* There was endianness detection code here, but it's been moved */
 	/*  to platformdetect.h and platformsupport.c. */
 	
@@ -36,6 +39,7 @@ SOFTWARE.
 	/* This is a system to represent information about types. Currently */
 	/*  only some simpler data types are represented, but support for */
 	/*  function signatures can (and should) reasonably be achievable. */
+		/* Note: see arbicall.c in platsup for initial function work. */
 	
 	/* Note that while some type descriptors have been added, they are */
 	/*  limited in number, with the primary focus placed on fully */
@@ -329,6 +333,8 @@ SOFTWARE.
 	
 	
 	
+	/* Need to convert these func-ptr types to use some more-generic vtable */
+	/*  type. */
 	typedef struct libandria4_typeinfo_vtable_integers libandria4_typeinfo_vtable_integers;
 	typedef int (*libandria4_typeinfo_vtable_integers_unaop)( libandria4_typeinfo_vtable_integers*,  void*,  void* );
 	typedef int (*libandria4_typeinfo_vtable_integers_biop)( libandria4_typeinfo_vtable_integers*,  void*, void*,  void* );
@@ -348,6 +354,9 @@ SOFTWARE.
 		libandria4_typeinfo_vtable_integers_unaint not;
 		libandria4_typeinfo_vtable_integers_biint equal, nequal, greater, lesser, greq, lseq, land, lior;
 	};
+		/* Just an example macro. And yes, all three MUST BE pointers */
+		/*  to their actual values, rather than the values themselves. */
+	#define LIBANDRIA4_TYPEINFO_VTABLE__SET( vtabptr, destptr, srcptr ) ???
 	
 	
 	typedef struct
