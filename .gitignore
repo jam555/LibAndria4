@@ -3,6 +3,7 @@
 #  from this project, as the user is expected to do that themselves if desired.
 /buildtools/
 /overrides/
+/references/
 !/overrides/README.txt
 *.exe
 *.o
