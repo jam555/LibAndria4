@@ -300,6 +300,12 @@ SOFTWARE.
 	
 	
 	
+		/* Figuring out floats is more of a nuisance than integers, so detect */
+		/*  via compiler & such. */
+	#include "platdet/calcfloat.h"
+	
+	
+	
 	/* Some additional stuff has moved to platformsupport.h. */
 	
 #endif
